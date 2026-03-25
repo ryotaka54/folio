@@ -36,49 +36,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const defaultProfile = (userId: string): UserProfile => ({
+    id: userId,
+    name: '',
+    mode: 'internship',
+    school_year: '',
+    career_level: '',
+    recruiting_season: '',
+    created_at: new Date().toISOString(),
+    onboarding_complete: false,
+  });
+
   const loadProfile = async (userId: string) => {
     try {
-      const { data } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      const timeout = new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('profile fetch timeout')), 5000)
+      );
+      const query = supabase.from('users').select('*').eq('id', userId).single();
+      const { data } = await Promise.race([query, timeout]) as Awaited<typeof query>;
 
-      if (data) {
-        setUser({
-          id: data.id,
-          name: data.name || '',
-          mode: data.mode || 'internship',
-          school_year: data.school_year || '',
-          career_level: data.career_level || '',
-          recruiting_season: data.recruiting_season || '',
-          created_at: data.created_at,
-          onboarding_complete: data.onboarding_complete || false,
-        });
-      } else {
-        setUser({
-          id: userId,
-          name: '',
-          mode: 'internship',
-          school_year: '',
-          career_level: '',
-          recruiting_season: '',
-          created_at: new Date().toISOString(),
-          onboarding_complete: false,
-        });
-      }
+      setUser(data ? {
+        id: data.id,
+        name: data.name || '',
+        mode: data.mode || 'internship',
+        school_year: data.school_year || '',
+        career_level: data.career_level || '',
+        recruiting_season: data.recruiting_season || '',
+        created_at: data.created_at,
+        onboarding_complete: data.onboarding_complete || false,
+      } : defaultProfile(userId));
     } catch (err) {
       console.error('Load profile error:', err);
-      setUser({
-        id: userId,
-        name: '',
-        mode: 'internship',
-        school_year: '',
-        career_level: '',
-        recruiting_season: '',
-        created_at: new Date().toISOString(),
-        onboarding_complete: false,
-      });
+      setUser(prev => prev ?? defaultProfile(userId));
     }
   };
 
@@ -111,7 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (session?.user) {
-          await loadProfile(session.user.id);
+          // Set minimal user immediately so loading clears fast
+          setUser(prev => prev ?? defaultProfile(session.user.id));
+          // Load full profile in background — don't block loading state
+          loadProfile(session.user.id).catch(console.error);
         }
       } catch (err) {
         console.error('Session load error:', err);
@@ -125,22 +117,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Hard timeout - only fires if loadSession never resolved
     const timeout = setTimeout(() => {
       if (mounted && !resolved) {
-        console.warn('Auth loading timed out, clearing stale tokens');
-        clearStaleAuthTokens();
+        console.warn('Auth loading timed out');
         setLoading(false);
       }
-    }, 6000);
+    }, 10000);
 
     loadSession();
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
 
       if (event === 'TOKEN_REFRESHED' && session?.user) {
-        await loadProfile(session.user.id);
+        loadProfile(session.user.id).catch(console.error);
       } else if (event === 'SIGNED_IN' && session?.user) {
-        await loadProfile(session.user.id);
+        setUser(prev => prev ?? defaultProfile(session.user.id));
+        loadProfile(session.user.id).catch(console.error);
         setLoading(false);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
@@ -190,11 +182,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear any stale tokens from localStorage before signing in
     clearStaleAuthTokens();
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw new Error(error.message);
-    if (data.user) {
-      await loadProfile(data.user.id);
-    }
+    // Profile loading is handled by the onAuthStateChange SIGNED_IN listener
   }, []);
 
   const signOut = useCallback(async () => {
