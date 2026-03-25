@@ -1,26 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 :root {
+  --brand-navy: #1A1A2E;
+  --accent-blue: #4361EE;
+  --light-accent: #EEF2FF;
+  --surface-gray: #F3F4F6;
+  --border-gray: #E5E7EB;
+  --body-text: #374151;
+  --muted-text: #6B7280;
+  --amber-warning: #EF9F27;
+  --green-success: #1D9E75;
   --background: #ffffff;
   --foreground: #171717;
 }
 
 @theme inline {
+  --color-brand-navy: var(--brand-navy);
+  --color-accent-blue: var(--accent-blue);
+  --color-light-accent: var(--light-accent);
+  --color-surface-gray: var(--surface-gray);
+  --color-border-gray: var(--border-gray);
+  --color-body-text: var(--body-text);
+  --color-muted-text: var(--muted-text);
+  --color-amber-warning: var(--amber-warning);
+  --color-green-success: var(--green-success);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--body-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for pipeline columns */
+.pipeline-column::-webkit-scrollbar {
+  width: 4px;
+}
+.pipeline-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+.pipeline-column::-webkit-scrollbar-thumb {
+  background: var(--border-gray);
+  border-radius: 2px;
+}
+
+/* Modal/drawer backdrop */
+.backdrop {
+  backdrop-filter: blur(2px);
+}
+
+/* Transitions */
+.slide-in {
+  animation: slideIn 0.2s ease-out;
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.15s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-enter {
+  animation: modalEnter 0.2s ease-out;
+}
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
