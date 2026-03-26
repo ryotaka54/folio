@@ -5,9 +5,10 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { INTERNSHIP_STAGES, JOB_STAGES, SCHOOL_YEARS, RECRUITING_SEASONS, CAREER_LEVELS } from '@/lib/constants';
 import { Mode } from '@/lib/types';
+import { GraduationCap, Briefcase } from 'lucide-react';
 
 export default function OnboardingPage() {
-  const { user, updateProfile, loading } = useAuth();
+  const { user, updateProfile, loading, signOut } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [mode, setMode] = useState<Mode>('internship');
@@ -18,14 +19,20 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      window.location.replace('/login');
+      router.replace('/login');
     }
     if (!loading && user?.onboarding_complete) {
-      window.location.replace('/dashboard');
+      router.replace('/dashboard');
     }
-  }, [user, loading]);
+  }, [user, loading, router]);
 
-  if (loading || !user) return null;
+  if (loading || !user || user.onboarding_complete) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="animate-pulse text-muted-text text-sm">Loading...</div>
+      </div>
+    );
+  }
 
   const handleComplete = () => {
     updateProfile({
@@ -42,7 +49,15 @@ export default function OnboardingPage() {
   const stages = mode === 'internship' ? INTERNSHIP_STAGES : JOB_STAGES;
 
   return (
-    <div className="min-h-screen bg-surface-gray flex items-center justify-center p-4">
+    <div className="min-h-screen bg-surface-gray flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-lg flex justify-end mb-2">
+        <button 
+          onClick={async () => { await signOut(); router.replace('/login'); }}
+          className="text-sm font-medium text-muted-text hover:text-brand-navy transition-colors"
+        >
+          Log out
+        </button>
+      </div>
       <div className="w-full max-w-lg">
         {/* Progress dots */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -56,7 +71,7 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-border-gray modal-enter">
+        <div className="bg-card-bg rounded-2xl p-6 md:p-8 shadow-sm border border-border-gray modal-enter">
           {/* Step 1: Mode Selection */}
           {step === 1 && (
             <div>
@@ -71,7 +86,9 @@ export default function OnboardingPage() {
                       : 'border-border-gray hover:border-accent-blue/30'
                   }`}
                 >
-                  <div className="text-2xl mb-2">🎓</div>
+                  <div className="mb-3 text-accent-blue bg-accent-blue/10 w-10 h-10 rounded-full flex items-center justify-center">
+                    <GraduationCap size={20} className="stroke-[2.5px]" />
+                  </div>
                   <div className="font-medium text-brand-navy text-sm">Internship applications</div>
                   <div className="text-xs text-muted-text mt-1">Track internship recruiting cycles</div>
                   <div className="flex flex-wrap gap-1 mt-3">
@@ -88,7 +105,9 @@ export default function OnboardingPage() {
                       : 'border-border-gray hover:border-accent-blue/30'
                   }`}
                 >
-                  <div className="text-2xl mb-2">💼</div>
+                  <div className="mb-3 text-accent-blue bg-accent-blue/10 w-10 h-10 rounded-full flex items-center justify-center">
+                    <Briefcase size={20} className="stroke-[2.5px]" />
+                  </div>
                   <div className="font-medium text-brand-navy text-sm">Full-time job applications</div>
                   <div className="text-xs text-muted-text mt-1">Track post-graduation job searches</div>
                   <div className="flex flex-wrap gap-1 mt-3">

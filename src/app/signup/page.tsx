@@ -40,7 +40,7 @@ export default function SignUpPage() {
 
       setProgressText('Loading onboarding...');
       setLoading(false);
-      window.location.href = '/onboarding';
+      router.push('/onboarding');
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
       setLoading(false);
@@ -63,7 +63,7 @@ export default function SignUpPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-border-gray">
+        <div className="bg-card-bg rounded-2xl p-6 shadow-sm border border-border-gray">
           <h1 className="text-lg font-semibold text-brand-navy mb-1">Create your account</h1>
           <p className="text-sm text-muted-text mb-6">Start tracking your applications in seconds.</p>
 

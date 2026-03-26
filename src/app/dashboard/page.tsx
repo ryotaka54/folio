@@ -3,14 +3,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { StoreProvider, useStore } from '@/lib/store';
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { INTERNSHIP_STAGES, JOB_STAGES, CATEGORIES } from '@/lib/constants';
 import { Application, PipelineStage, Category } from '@/lib/types';
 import StatsBar from '@/components/StatsBar';
 import PipelineView from '@/components/PipelineView';
 import TableView from '@/components/TableView';
+import FunnelChart from '@/components/FunnelChart';
 import AddApplicationModal from '@/components/AddApplicationModal';
 import ApplicationDrawer from '@/components/ApplicationDrawer';
+import EmptyState from '@/components/EmptyState';
+import ThemeToggle from '@/components/ThemeToggle';
 
 function DashboardContent() {
   const { user, signOut } = useAuth();
@@ -69,9 +73,9 @@ function DashboardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Top nav */}
-      <nav className="border-b border-border-gray bg-white sticky top-0 z-30">
+      <nav className="border-b border-border-gray bg-background sticky top-0 z-30">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-accent-blue flex items-center justify-center">
@@ -86,6 +90,7 @@ function DashboardContent() {
             {user?.name && (
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name}</span>
             )}
+            <ThemeToggle />
             <button
               onClick={async () => { await signOut(); router.push('/'); }}
               className="text-xs text-muted-text hover:text-body-text transition-colors"
@@ -100,6 +105,9 @@ function DashboardContent() {
         {/* Stats */}
         <StatsBar applications={applications} />
 
+        {/* Gamified Pipeline Funnel */}
+        <FunnelChart applications={applications} />
+
         {/* Controls */}
         <div className="mt-6 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
           {/* View toggle */}
@@ -108,7 +116,7 @@ function DashboardContent() {
               onClick={() => setView('pipeline')}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                 view === 'pipeline'
-                  ? 'bg-white text-brand-navy shadow-sm'
+                  ? 'bg-card-bg text-brand-navy shadow-sm'
                   : 'text-muted-text hover:text-body-text'
               }`}
             >
@@ -123,7 +131,7 @@ function DashboardContent() {
               onClick={() => setView('table')}
               className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                 view === 'table'
-                  ? 'bg-white text-brand-navy shadow-sm'
+                  ? 'bg-card-bg text-brand-navy shadow-sm'
                   : 'text-muted-text hover:text-body-text'
               }`}
             >
@@ -191,11 +199,19 @@ function DashboardContent() {
 
         {/* Content */}
         <div className="mt-6">
-          {view === 'pipeline' ? (
+          {applications.length === 0 ? (
+            <EmptyState onAdd={() => setShowAddModal(true)} />
+          ) : filteredApps.length === 0 ? (
+            <div className="py-20 text-center border-2 border-dashed border-border-gray rounded-xl bg-card-bg/30">
+               <h3 className="text-sm font-medium text-brand-navy mb-1">No matches found</h3>
+               <p className="text-xs text-muted-text">Try tweaking your search or category filters.</p>
+            </div>
+          ) : view === 'pipeline' ? (
             <PipelineView
               applications={filteredApps}
               stages={stages as PipelineStage[]}
               onCardClick={handleCardClick}
+              onStatusChange={(id, status) => handleUpdate(id, { status })}
             />
           ) : (
             <TableView
@@ -229,20 +245,51 @@ function DashboardContent() {
 }
 
 export default function DashboardPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, updateProfile } = useAuth();
   const router = useRouter();
+  const [checkingLegacy, setCheckingLegacy] = useState(true);
 
   useEffect(() => {
-    if (!loading && !user) {
-      window.location.replace('/login');
-    } else if (!loading && user && !user.onboarding_complete) {
-      window.location.replace('/onboarding');
-    }
-  }, [user, loading]);
+    let active = true;
 
-  if (loading || !user || !user.onboarding_complete) {
+    async function checkRoute() {
+      if (loading) return;
+      if (!user) {
+        if (active) {
+          setCheckingLegacy(false);
+          router.replace('/login');
+        }
+        return;
+      }
+
+      if (user.onboarding_complete) {
+        if (active) setCheckingLegacy(false);
+        return;
+      }
+
+      // Check if legacy user with existing applications
+      const { data } = await supabase.from('applications').select('id').eq('user_id', user.id).limit(1);
+
+      if (!active) return;
+
+      if (data && data.length > 0) {
+        // Auto-complete onboarding for legacy power users
+        updateProfile({ onboarding_complete: true });
+        setCheckingLegacy(false);
+      } else {
+        setCheckingLegacy(false);
+        router.replace('/onboarding');
+      }
+    }
+
+    checkRoute();
+
+    return () => { active = false; };
+  }, [user, loading, router, updateProfile]);
+
+  if (loading || checkingLegacy || !user || !user.onboarding_complete) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-muted-text text-sm">Loading...</div>
       </div>
     );

@@ -1,6 +1,7 @@
 'use client';
 
 import { Application } from '@/lib/types';
+import { ClipboardList, BarChart2, Target, Clock } from 'lucide-react';
 
 interface StatsBarProps {
   applications: Application[];
@@ -32,10 +33,10 @@ export default function StatsBar({ applications }: StatsBarProps) {
   }).length;
 
   const stats = [
-    { label: 'Total Applications', value: total.toString(), icon: '📋', highlight: false },
-    { label: 'Response Rate', value: `${responseRate}%`, icon: '📊', highlight: false },
-    { label: 'Interviews', value: interviews.toString(), icon: '🎯', highlight: false },
-    { label: 'Deadlines Soon', value: deadlinesSoon.toString(), icon: '⏰', highlight: deadlinesSoon > 0 },
+    { label: 'Total Applications', value: total.toString(), icon: <ClipboardList size={16} className="text-accent-blue" />, highlight: false },
+    { label: 'Response Rate', value: `${responseRate}%`, icon: <BarChart2 size={16} className="text-brand-navy" />, highlight: false },
+    { label: 'Interviews', value: interviews.toString(), icon: <Target size={16} className="text-amber-warning" />, highlight: false },
+    { label: 'Deadlines Soon', value: deadlinesSoon.toString(), icon: <Clock size={16} className="text-red-500" />, highlight: deadlinesSoon > 0 },
   ];
 
   return (
@@ -48,7 +49,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
           }`}
         >
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-base">{stat.icon}</span>
+            <span className="flex-shrink-0">{stat.icon}</span>
             <span className="text-xs text-muted-text font-medium">{stat.label}</span>
           </div>
           <span className={`text-2xl font-semibold ${stat.highlight ? 'text-amber-warning' : 'text-brand-navy'}`}>

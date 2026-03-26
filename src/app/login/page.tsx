@@ -27,24 +27,26 @@ export default function LoginPage() {
         setTimeout(() => reject(new Error('Connection timed out. Check that your Supabase environment variables are set correctly.')), 20000)
       );
 
+      const form = e.currentTarget as HTMLFormElement;
+      const formData = new FormData(form);
+      const submitEmail = (formData.get('email') as string) || email;
+      const submitPassword = (formData.get('password') as string) || password;
+
       setProgressText('Authenticating user...');
       await Promise.race([
-        signIn(email, password),
+        signIn(submitEmail, submitPassword),
         timeoutPromise
       ]);
 
       setProgressText('Loading dashboard...');
       setLoading(false);
-      window.location.href = '/dashboard';
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
       setLoading(false);
       setProgressText('');
     }
   };
-
-  console.log('[Folio] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'MISSING');
-  console.log('[Folio] Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'SET' : 'MISSING');
 
   return (
     <div className="min-h-screen bg-surface-gray flex items-center justify-center p-4">
@@ -61,7 +63,7 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-border-gray">
+        <div className="bg-card-bg rounded-2xl p-6 shadow-sm border border-border-gray">
           <h1 className="text-lg font-semibold text-brand-navy mb-1">Welcome back</h1>
           <p className="text-sm text-muted-text mb-6">Log in to continue tracking your applications.</p>
 
@@ -75,6 +77,7 @@ export default function LoginPage() {
               <label htmlFor="email" className="block text-sm font-medium text-body-text mb-1">Email</label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 required
                 value={email}
@@ -87,6 +90,7 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-medium text-body-text mb-1">Password</label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 required
                 value={password}

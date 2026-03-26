@@ -26,7 +26,7 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left bg-white border border-border-gray rounded-xl p-3 shadow-sm hover:shadow-md hover:border-accent-blue/20 transition-all cursor-pointer group`}
+      className={`w-full text-left bg-card-bg border border-border-gray rounded-xl p-3 shadow-sm hover:shadow-md hover:border-accent-blue/20 transition-all cursor-pointer group`}
     >
       <div className="text-sm font-medium text-brand-navy group-hover:text-accent-blue transition-colors truncate">
         {application.company}

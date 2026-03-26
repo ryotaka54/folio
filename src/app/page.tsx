@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { ClipboardList, BarChart2, Target, Clock } from 'lucide-react';
 
 export default function Home() {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ export default function Home() {
   }, [user, router]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-[1200px] mx-auto">
         <div className="flex items-center gap-2">
@@ -80,19 +81,19 @@ export default function Home() {
         </div>
 
         {/* Dashboard Preview */}
-        <div className="mt-16 rounded-2xl border border-border-gray shadow-lg overflow-hidden bg-surface-gray p-1">
-          <div className="bg-white rounded-xl p-4 md:p-6">
+        <div className="mt-16 rounded-2xl border border-border-gray shadow-lg overflow-hidden bg-background p-1">
+          <div className="bg-card-bg rounded-xl p-4 md:p-6">
             {/* Fake stats bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
               {[
-                { label: 'Total Applications', value: '24', icon: '📋' },
-                { label: 'Response Rate', value: '38%', icon: '📊' },
-                { label: 'Interviews', value: '5', icon: '🎯' },
-                { label: 'Deadlines Soon', value: '3', icon: '⏰' },
+                { label: 'Total Applications', value: '24', icon: <ClipboardList size={16} className="text-accent-blue" /> },
+                { label: 'Response Rate', value: '38%', icon: <BarChart2 size={16} className="text-brand-navy" /> },
+                { label: 'Interviews', value: '5', icon: <Target size={16} className="text-amber-warning" /> },
+                { label: 'Deadlines Soon', value: '3', icon: <Clock size={16} className="text-red-500" /> },
               ].map((stat) => (
                 <div key={stat.label} className="bg-surface-gray rounded-xl p-3 md:p-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-base">{stat.icon}</span>
+                    <span className="flex-shrink-0">{stat.icon}</span>
                     <span className="text-xs text-muted-text font-medium">{stat.label}</span>
                   </div>
                   <span className="text-xl md:text-2xl font-semibold text-brand-navy">{stat.value}</span>
@@ -116,7 +117,7 @@ export default function Home() {
                   </div>
                   <div className="space-y-2">
                     {col.cards.map((card) => (
-                      <div key={card} className="bg-white border border-border-gray rounded-lg p-3 shadow-sm">
+                      <div key={card} className="bg-card-bg border border-border-gray rounded-lg p-3 shadow-sm">
                         <div className="text-xs font-medium text-brand-navy">{card.split(' — ')[0]}</div>
                         <div className="text-[11px] text-muted-text mt-0.5">{card.split(' — ')[1]}</div>
                       </div>

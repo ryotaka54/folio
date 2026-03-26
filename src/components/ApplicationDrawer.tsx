@@ -54,10 +54,10 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
   return (
     <div
       ref={backdropRef}
-      className="fixed inset-0 z-50 flex justify-end bg-black/20 backdrop fade-in"
-      onClick={(e) => { if (e.target === backdropRef.current) onClose(); }}
+      className="fixed inset-0 z-50 flex justify-end"
     >
-      <div className="w-full max-w-md bg-white shadow-2xl h-full overflow-y-auto slide-in" onClick={(e) => e.stopPropagation()}>
+      <div className="absolute inset-0 bg-brand-navy/20 backdrop" onClick={onClose} />
+      <div className="w-full max-w-md bg-card-bg shadow-2xl h-full overflow-y-auto slide-in" onClick={(e) => e.stopPropagation()}>
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -77,7 +77,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 type="text"
                 defaultValue={application.company}
                 onChange={(e) => debouncedUpdate('company', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
               />
             </div>
 
@@ -88,7 +88,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 type="text"
                 defaultValue={application.role}
                 onChange={(e) => debouncedUpdate('role', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
               />
             </div>
 
@@ -99,7 +99,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 <select
                   defaultValue={application.category}
                   onChange={(e) => immediateUpdate('category', e.target.value)}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-white"
+                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 >
                   <option value="">None</option>
                   {CATEGORIES.map(c => (
@@ -112,7 +112,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 <select
                   defaultValue={application.status}
                   onChange={(e) => immediateUpdate('status', e.target.value)}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-white"
+                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 >
                   {stages.map(s => (
                     <option key={s} value={s}>{s}</option>
@@ -128,7 +128,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 type="date"
                 defaultValue={application.deadline || ''}
                 onChange={(e) => immediateUpdate('deadline', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
               />
             </div>
 
@@ -139,7 +139,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 type="url"
                 defaultValue={application.job_link}
                 onChange={(e) => debouncedUpdate('job_link', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 placeholder="https://..."
               />
             </div>
@@ -151,7 +151,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 defaultValue={application.notes}
                 onChange={(e) => debouncedUpdate('notes', e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors resize-none"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors resize-none bg-background"
                 placeholder="Interview prep notes, salary info, etc."
               />
             </div>
@@ -166,7 +166,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                     type="text"
                     defaultValue={application.recruiter_name}
                     onChange={(e) => debouncedUpdate('recruiter_name', e.target.value)}
-                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                     placeholder="Recruiter name"
                   />
                 </div>
@@ -176,7 +176,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                     type="email"
                     defaultValue={application.recruiter_email}
                     onChange={(e) => debouncedUpdate('recruiter_email', e.target.value)}
-                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                     placeholder="recruiter@company.com"
                   />
                 </div>
@@ -212,7 +212,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
-                      className="px-3 py-1.5 bg-white text-body-text text-xs font-medium rounded-lg border border-border-gray hover:bg-surface-gray transition-colors"
+                      className="px-3 py-1.5 bg-card-bg text-body-text text-xs font-medium rounded-lg border border-border-gray hover:bg-surface-gray transition-colors"
                     >
                       Cancel
                     </button>

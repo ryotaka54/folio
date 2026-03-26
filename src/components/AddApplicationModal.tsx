@@ -28,6 +28,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
   const [jobLink, setJobLink] = useState('');
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
+  const [isAutofilling, setIsAutofilling] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
       setJobLink('');
       setNotes('');
       setError('');
+      setIsAutofilling(false);
     }
   }, [open, stages]);
 
@@ -77,7 +79,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop p-4 fade-in"
       onClick={(e) => { if (e.target === backdropRef.current) onClose(); }}
     >
-      <div className="bg-white rounded-2xl w-full max-w-md shadow-xl modal-enter" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-card-bg rounded-2xl w-full max-w-md shadow-xl modal-enter" onClick={(e) => e.stopPropagation()}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-semibold text-brand-navy">Add Application</h2>
@@ -102,7 +104,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 placeholder="e.g. Google"
                 autoFocus
               />
@@ -117,7 +119,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="text"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 placeholder="e.g. SWE Intern"
               />
             </div>
@@ -129,7 +131,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                   id="modal-category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value as Category | '')}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-white"
+                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 >
                   <option value="">Select...</option>
                   {CATEGORIES.map(c => (
@@ -143,7 +145,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                   id="modal-status"
                   value={status}
                   onChange={(e) => setStatus(e.target.value as PipelineStage)}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-white"
+                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 >
                   {stages.map(s => (
                     <option key={s} value={s}>{s}</option>
@@ -159,18 +161,45 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
               />
             </div>
 
             <div>
-              <label htmlFor="modal-link" className="block text-sm font-medium text-body-text mb-1">Job posting link</label>
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="modal-link" className="block text-sm font-medium text-body-text">Job posting link</label>
+                {(jobLink && jobLink.startsWith('http') && !company && !role) && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsAutofilling(true);
+                      setError('');
+                      try {
+                        const res = await fetch('/api/parse', { method: 'POST', body: JSON.stringify({ url: jobLink }) });
+                        if (!res.ok) throw new Error();
+                        const data = await res.json();
+                        if (data.company) setCompany(data.company);
+                        if (data.role) setRole(data.role);
+                        if (data.category) setCategory(data.category as Category);
+                      } catch (e) {
+                        setError('Failed to auto-fill from this URL. Please fill manually.');
+                      } finally {
+                        setIsAutofilling(false);
+                      }
+                    }}
+                    disabled={isAutofilling}
+                    className="text-xs font-medium text-accent-blue hover:text-accent-blue/80 transition-colors flex items-center gap-1"
+                  >
+                    {isAutofilling ? 'Scanning...' : '✨ Autofill details'}
+                  </button>
+                )}
+              </div>
               <input
                 id="modal-link"
                 type="url"
                 value={jobLink}
                 onChange={(e) => setJobLink(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className={`w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background ${isAutofilling ? 'opacity-50 pointer-events-none' : ''}`}
                 placeholder="https://..."
               />
             </div>

@@ -62,7 +62,7 @@ export default function TableView({ applications, onRowClick }: TableViewProps) 
   ];
 
   return (
-    <div className="bg-white border border-border-gray rounded-xl overflow-hidden">
+    <div className="bg-card-bg border border-border-gray rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

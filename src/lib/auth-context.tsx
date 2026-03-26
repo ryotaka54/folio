@@ -55,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const query = supabase.from('users').select('*').eq('id', userId).single();
       const { data } = await Promise.race([query, timeout]) as Awaited<typeof query>;
 
+      const localOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`folio_onboarding_${userId}`) : null;
+
       setUser(data ? {
         id: data.id,
         name: data.name || '',
@@ -63,11 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         career_level: data.career_level || '',
         recruiting_season: data.recruiting_season || '',
         created_at: data.created_at,
-        onboarding_complete: data.onboarding_complete || false,
-      } : defaultProfile(userId));
+        onboarding_complete: data.onboarding_complete || localOnboarding === 'true',
+      } : { ...defaultProfile(userId), onboarding_complete: localOnboarding === 'true' });
     } catch (err) {
       console.error('Load profile error:', err);
-      setUser(prev => prev ?? defaultProfile(userId));
+      const localOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`folio_onboarding_${userId}`) : null;
+      setUser(prev => prev ?? { ...defaultProfile(userId), onboarding_complete: localOnboarding === 'true' });
     }
   };
 
@@ -100,10 +103,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (session?.user) {
-          // Set minimal user immediately so loading clears fast
-          setUser(prev => prev ?? defaultProfile(session.user.id));
-          // Load full profile in background — don't block loading state
-          loadProfile(session.user.id).catch(console.error);
+          // Cross-device sync via Auth Metadata to bypass RLS issues on `users` table
+          const metaOnboarding = session.user.user_metadata?.onboarding_complete === true;
+          if (metaOnboarding && typeof window !== 'undefined') {
+            localStorage.setItem(`folio_onboarding_${session.user.id}`, 'true');
+          }
+
+          // Await full profile load before clearing the loading state so route guards read the real data
+          await loadProfile(session.user.id);
         }
       } catch (err) {
         console.error('Session load error:', err);
@@ -131,9 +138,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === 'TOKEN_REFRESHED' && session?.user) {
         loadProfile(session.user.id).catch(console.error);
       } else if (event === 'SIGNED_IN' && session?.user) {
-        setUser(prev => prev ?? defaultProfile(session.user.id));
-        loadProfile(session.user.id).catch(console.error);
-        setLoading(false);
+        loadProfile(session.user.id).finally(() => {
+          if (mounted) setLoading(false);
+        });
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
         setLoading(false);
@@ -150,8 +157,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = useCallback(async (email: string, password: string) => {
     // Clear any stale tokens before signup
     clearStaleAuthTokens();
+    const cleanEmail = email.trim();
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email: cleanEmail, password });
     if (error) throw new Error(error.message);
     if (data.user) {
       const { error: profileError } = await supabase.from('users').insert({
@@ -181,8 +189,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = useCallback(async (email: string, password: string) => {
     // Clear any stale tokens from localStorage before signing in
     clearStaleAuthTokens();
+    const cleanEmail = email.trim();
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
     if (error) throw new Error(error.message);
     // Profile loading is handled by the onAuthStateChange SIGNED_IN listener
   }, []);
@@ -197,6 +206,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(prev => {
       if (!prev) return prev;
       const updated = { ...prev, ...updates };
+
+      if (updated.onboarding_complete && typeof window !== 'undefined') {
+        localStorage.setItem(`folio_onboarding_${updated.id}`, 'true');
+        
+        // Push securely to Auth JWT Metadata to bypass any `users` table RLS limitations across devices
+        supabase.auth.updateUser({
+          data: { onboarding_complete: true }
+        }).catch(err => console.error('Auth metadata update error:', err));
+      }
 
       supabase.from('users')
         .update({

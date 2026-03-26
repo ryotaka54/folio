@@ -13,6 +13,20 @@
   --green-success: #1D9E75;
   --background: #ffffff;
   --foreground: #171717;
+  --card-bg: #ffffff;
+}
+
+.dark {
+  --brand-navy: #F8FAFC;
+  --accent-blue: #5B7AF2;
+  --light-accent: #1E293B;
+  --surface-gray: #09090b;
+  --border-gray: #27272a;
+  --body-text: #e4e4e7;
+  --muted-text: #a1a1aa;
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card-bg: #18181b;
 }
 
 @theme inline {
@@ -27,6 +41,7 @@
   --color-green-success: var(--green-success);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card-bg: var(--card-bg);
 }
 
 * {
