@@ -24,18 +24,25 @@ export default function StatsBar({ applications }: StatsBarProps) {
   const interviews = applications.filter(a => interviewStages.includes(a.status)).length;
 
   const now = new Date();
-  const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
   const deadlinesSoon = applications.filter(a => {
     if (!a.deadline) return false;
     const d = new Date(a.deadline);
-    return d >= now && d <= sevenDays;
+    return d >= now && d <= sevenDaysAhead;
+  }).length;
+
+  const thisWeek = applications.filter(a => {
+    if (!a.created_at) return false;
+    return new Date(a.created_at) >= sevenDaysAgo;
   }).length;
 
   const stats = [
     {
-      label: 'In Progress',
+      label: 'Total',
       value: total.toString(),
-      subtext: total === 0 ? 'Add your first' : total === 1 ? 'Great start' : `${applied.length} submitted`,
+      subtext: thisWeek > 0 ? `+${thisWeek} this week` : 'none this week',
       icon: <TrendingUp size={16} className="text-accent-blue" />,
       highlight: false,
     },

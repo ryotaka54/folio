@@ -6,60 +6,85 @@ import { STAGE_COLORS } from '@/lib/constants';
 
 interface TableViewProps {
   applications: Application[];
+  selectedIds: Set<string>;
+  onSelectionChange: (ids: Set<string>) => void;
   onRowClick: (app: Application) => void;
 }
 
-type SortKey = 'company' | 'role' | 'category' | 'status' | 'deadline' | 'notes';
+type SortKey = 'company' | 'role' | 'category' | 'status' | 'deadline' | 'created_at';
 type SortDir = 'asc' | 'desc';
 
-export default function TableView({ applications, onRowClick }: TableViewProps) {
-  const [sortKey, setSortKey] = useState<SortKey>('company');
-  const [sortDir, setSortDir] = useState<SortDir>('asc');
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+const isDeadlineSoon = (dateStr: string | null) => {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const now = new Date();
+  return d >= now && d <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+};
+
+export default function TableView({ applications, selectedIds, onSelectionChange, onRowClick }: TableViewProps) {
+  const [sortKey, setSortKey] = useState<SortKey>('created_at');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
       setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     } else {
       setSortKey(key);
-      setSortDir('asc');
+      setSortDir(key === 'created_at' ? 'desc' : 'asc');
     }
   };
 
   const sorted = [...applications].sort((a, b) => {
-    let aVal = a[sortKey] || '';
-    let bVal = b[sortKey] || '';
-    if (sortKey === 'deadline') {
-      aVal = a.deadline || '9999';
-      bVal = b.deadline || '9999';
-    }
+    let aVal = sortKey === 'deadline' ? (a.deadline || '9999')
+      : sortKey === 'created_at' ? (a.created_at || '')
+      : (a[sortKey] || '');
+    let bVal = sortKey === 'deadline' ? (b.deadline || '9999')
+      : sortKey === 'created_at' ? (b.created_at || '')
+      : (b[sortKey] || '');
     const cmp = aVal.localeCompare(bVal);
     return sortDir === 'asc' ? cmp : -cmp;
   });
 
-  const isRejected = (status: string) => status === 'Rejected' || status === 'Declined';
+  const allSelected = applications.length > 0 && applications.every(a => selectedIds.has(a.id));
+  const someSelected = applications.some(a => selectedIds.has(a.id)) && !allSelected;
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return '—';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const toggleAll = () => {
+    if (allSelected) {
+      const next = new Set(selectedIds);
+      applications.forEach(a => next.delete(a.id));
+      onSelectionChange(next);
+    } else {
+      const next = new Set(selectedIds);
+      applications.forEach(a => next.add(a.id));
+      onSelectionChange(next);
+    }
   };
 
-  const isDeadlineSoon = (dateStr: string | null) => {
-    if (!dateStr) return false;
-    const d = new Date(dateStr);
-    const now = new Date();
-    const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    return d >= now && d <= sevenDays;
+  const toggleOne = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const next = new Set(selectedIds);
+    next.has(id) ? next.delete(id) : next.add(id);
+    onSelectionChange(next);
   };
 
   const columns: { key: SortKey; label: string; className: string }[] = [
-    { key: 'company', label: 'Company', className: 'w-[20%]' },
-    { key: 'role', label: 'Role', className: 'w-[22%]' },
-    { key: 'category', label: 'Category', className: 'w-[14%] hidden md:table-cell' },
-    { key: 'status', label: 'Status', className: 'w-[18%]' },
-    { key: 'deadline', label: 'Deadline', className: 'w-[14%] hidden md:table-cell' },
-    { key: 'notes', label: 'Notes', className: 'w-[12%] hidden lg:table-cell' },
+    { key: 'company',    label: 'Company',  className: 'w-[18%]' },
+    { key: 'role',       label: 'Role',     className: 'w-[22%]' },
+    { key: 'category',   label: 'Category', className: 'w-[13%] hidden md:table-cell' },
+    { key: 'status',     label: 'Status',   className: 'w-[16%]' },
+    { key: 'deadline',   label: 'Deadline', className: 'w-[11%] hidden md:table-cell' },
+    { key: 'created_at', label: 'Added',    className: 'w-[10%] hidden lg:table-cell' },
   ];
+
+  const SortIcon = ({ col }: { col: typeof columns[0] }) =>
+    sortKey === col.key
+      ? <span className="text-accent-blue ml-0.5">{sortDir === 'asc' ? '↑' : '↓'}</span>
+      : <span className="text-border-gray ml-0.5 opacity-0 group-hover:opacity-100">↕</span>;
 
   return (
     <div className="bg-card-bg border border-border-gray rounded-xl overflow-hidden">
@@ -67,17 +92,25 @@ export default function TableView({ applications, onRowClick }: TableViewProps) 
         <table className="w-full">
           <thead>
             <tr className="bg-surface-gray">
+              {/* Checkbox column */}
+              <th className="w-10 px-3 py-3">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  ref={el => { if (el) el.indeterminate = someSelected; }}
+                  onChange={toggleAll}
+                  className="w-3.5 h-3.5 rounded accent-accent-blue cursor-pointer"
+                />
+              </th>
               {columns.map(col => (
                 <th
                   key={col.key}
-                  className={`text-left text-xs font-medium text-muted-text px-4 py-3 cursor-pointer hover:text-brand-navy transition-colors select-none ${col.className}`}
+                  className={`group text-left text-xs font-medium text-muted-text px-3 py-3 cursor-pointer hover:text-brand-navy select-none ${col.className}`}
                   onClick={() => handleSort(col.key)}
                 >
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5">
                     {col.label}
-                    {sortKey === col.key && (
-                      <span className="text-accent-blue">{sortDir === 'asc' ? '↑' : '↓'}</span>
-                    )}
+                    <SortIcon col={col} />
                   </div>
                 </th>
               ))}
@@ -86,39 +119,57 @@ export default function TableView({ applications, onRowClick }: TableViewProps) 
           <tbody>
             {sorted.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center py-12 text-sm text-muted-text">
-                  No applications yet. Click &quot;Add Application&quot; to get started.
+                <td colSpan={7} className="text-center py-12 text-sm text-muted-text">
+                  No applications match your filters.
                 </td>
               </tr>
             )}
-            {sorted.map(app => (
-              <tr
-                key={app.id}
-                onClick={() => onRowClick(app)}
-                className={`border-t border-border-gray cursor-pointer hover:bg-surface-gray/50 transition-colors ${
-                  isRejected(app.status) ? 'opacity-50' : ''
-                }`}
-              >
-                <td className="px-4 py-3 text-sm font-medium text-brand-navy truncate max-w-0">{app.company}</td>
-                <td className="px-4 py-3 text-sm text-body-text truncate max-w-0">{app.role}</td>
-                <td className="px-4 py-3 text-xs text-muted-text hidden md:table-cell">{app.category || '—'}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className="text-[11px] font-medium px-2 py-1 rounded-full"
-                    style={{
-                      backgroundColor: `${STAGE_COLORS[app.status] || '#6B7280'}15`,
-                      color: STAGE_COLORS[app.status] || '#6B7280',
-                    }}
-                  >
-                    {app.status}
-                  </span>
-                </td>
-                <td className={`px-4 py-3 text-xs hidden md:table-cell ${isDeadlineSoon(app.deadline) ? 'text-amber-warning font-medium' : 'text-muted-text'}`}>
-                  {formatDate(app.deadline)}
-                </td>
-                <td className="px-4 py-3 text-xs text-muted-text truncate max-w-0 hidden lg:table-cell">{app.notes || '—'}</td>
-              </tr>
-            ))}
+            {sorted.map(app => {
+              const selected = selectedIds.has(app.id);
+              const rejected = app.status === 'Rejected' || app.status === 'Declined';
+              return (
+                <tr
+                  key={app.id}
+                  onClick={() => onRowClick(app)}
+                  className={`border-t border-border-gray cursor-pointer transition-colors ${
+                    selected
+                      ? 'bg-accent-blue/5'
+                      : rejected
+                      ? 'opacity-40 hover:opacity-70 hover:bg-surface-gray/50'
+                      : 'hover:bg-surface-gray/50'
+                  }`}
+                >
+                  <td className="px-3 py-2.5" onClick={e => toggleOne(app.id, e)}>
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => {}}
+                      className="w-3.5 h-3.5 rounded accent-accent-blue cursor-pointer"
+                    />
+                  </td>
+                  <td className="px-3 py-2.5 text-sm font-medium text-brand-navy truncate max-w-0">{app.company}</td>
+                  <td className="px-3 py-2.5 text-sm text-body-text truncate max-w-0">{app.role}</td>
+                  <td className="px-3 py-2.5 text-xs text-muted-text hidden md:table-cell">{app.category || '—'}</td>
+                  <td className="px-3 py-2.5">
+                    <span
+                      className="text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap"
+                      style={{
+                        backgroundColor: `${STAGE_COLORS[app.status] || '#6B7280'}18`,
+                        color: STAGE_COLORS[app.status] || '#6B7280',
+                      }}
+                    >
+                      {app.status}
+                    </span>
+                  </td>
+                  <td className={`px-3 py-2.5 text-xs hidden md:table-cell ${isDeadlineSoon(app.deadline) ? 'text-amber-warning font-medium' : 'text-muted-text'}`}>
+                    {formatDate(app.deadline)}
+                  </td>
+                  <td className="px-3 py-2.5 text-xs text-muted-text hidden lg:table-cell">
+                    {formatDate(app.created_at)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

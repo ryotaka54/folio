@@ -22,25 +22,48 @@ function DashboardContent() {
   const { applications, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
   const router = useRouter();
 
-  const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
+  const [view, setView] = useState<'pipeline' | 'table'>('table');
   const [search, setSearch] = useState('');
+  const [hideInactive, setHideInactive] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<PipelineStage | 'all'>('all');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<PipelineStage | ''>('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
 
   const stages = user?.mode === 'job' ? JOB_STAGES : INTERNSHIP_STAGES;
 
+  const inactiveStatuses = ['Rejected', 'Declined'];
+
   const filteredApps = useMemo(() => {
     return applications.filter(app => {
+      if (hideInactive && inactiveStatuses.includes(app.status)) return false;
+      if (statusFilter !== 'all' && app.status !== statusFilter) return false;
       if (search) {
         const q = search.toLowerCase();
-        if (!app.company.toLowerCase().includes(q) && !app.role.toLowerCase().includes(q)) {
-          return false;
-        }
+        if (!app.company.toLowerCase().includes(q) && !app.role.toLowerCase().includes(q)) return false;
       }
       return true;
     });
-  }, [applications, search]);
+  }, [applications, search, hideInactive, statusFilter]);
+
+  const hiddenCount = useMemo(() =>
+    applications.filter(a => inactiveStatuses.includes(a.status)).length,
+  [applications]);
+
+  const handleBulkStatusUpdate = async () => {
+    if (!bulkStatus) return;
+    await Promise.all([...selectedIds].map(id => updateApplication(id, { status: bulkStatus as PipelineStage }).catch(() => {})));
+    setSelectedIds(new Set());
+    setBulkStatus('');
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Delete ${selectedIds.size} application${selectedIds.size !== 1 ? 's' : ''}?`)) return;
+    await Promise.all([...selectedIds].map(id => deleteApplication(id).catch(() => {})));
+    setSelectedIds(new Set());
+  };
 
   const handleCardClick = (app: Application) => {
     setSelectedApp(app);
@@ -133,77 +156,68 @@ function DashboardContent() {
         <FunnelChart applications={applications} />
 
         {/* Controls */}
-        <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="mt-6 flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             {/* View toggle */}
-            <div className="flex bg-surface-gray rounded-lg p-0.5 flex-1 sm:flex-none">
-              <button
-                onClick={() => setView('pipeline')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                  view === 'pipeline'
-                    ? 'bg-card-bg text-brand-navy shadow-sm'
-                    : 'text-muted-text hover:text-body-text'
-                }`}
-              >
-                <span className="flex items-center justify-center gap-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-                  </svg>
+            <div className="flex bg-surface-gray rounded-lg p-0.5 flex-shrink-0">
+              <button onClick={() => setView('pipeline')} className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${view === 'pipeline' ? 'bg-card-bg text-brand-navy shadow-sm' : 'text-muted-text hover:text-body-text'}`}>
+                <span className="flex items-center gap-1.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                   Pipeline
                 </span>
               </button>
-              <button
-                onClick={() => setView('table')}
-                className={`flex-1 sm:flex-none px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
-                  view === 'table'
-                    ? 'bg-card-bg text-brand-navy shadow-sm'
-                    : 'text-muted-text hover:text-body-text'
-                }`}
-              >
-                <span className="flex items-center justify-center gap-1.5">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
-                  </svg>
+              <button onClick={() => setView('table')} className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${view === 'table' ? 'bg-card-bg text-brand-navy shadow-sm' : 'text-muted-text hover:text-body-text'}`}>
+                <span className="flex items-center gap-1.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                   Table
                 </span>
               </button>
             </div>
-          </div>
 
-          {/* Search */}
-          <div className="relative flex-1 sm:max-w-xs w-full">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-text" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search applications..."
-              className="w-full pl-9 pr-3 py-1.5 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
-            />
-          </div>
+            {/* Search */}
+            <div className="relative flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-text" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by company or role..." className="w-full pl-9 pr-3 py-1.5 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue" />
+            </div>
 
-          {/* Add button */}
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="sm:ml-auto w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors flex items-center justify-center gap-1.5 shadow-md active:scale-[0.98] sm:flex-shrink-0"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Add Application
-          </button>
+            {/* Status filter */}
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value as PipelineStage | 'all')}
+              className="py-1.5 px-3 border border-border-gray rounded-lg text-sm text-muted-text focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-background flex-shrink-0"
+            >
+              <option value="all">All statuses</option>
+              {stages.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+
+            {/* Hide inactive toggle */}
+            <button
+              onClick={() => setHideInactive(h => !h)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border flex-shrink-0 transition-colors ${
+                hideInactive
+                  ? 'bg-surface-gray border-border-gray text-muted-text'
+                  : 'bg-accent-blue/10 border-accent-blue/30 text-accent-blue'
+              }`}
+            >
+              {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
+            </button>
+
+            {/* Add button */}
+            <button onClick={() => setShowAddModal(true)} className="sm:ml-auto px-4 py-2 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 flex items-center gap-1.5 shadow-sm active:scale-[0.98] flex-shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add
+            </button>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="mt-6 flex-1">
+        <div className="mt-4 flex-1">
           {applications.length === 0 ? (
             <EmptyState onAdd={() => setShowAddModal(true)} />
           ) : filteredApps.length === 0 ? (
             <div className="py-20 text-center border-2 border-dashed border-border-gray rounded-xl bg-card-bg/30">
-               <h3 className="text-sm font-medium text-brand-navy mb-1">No matches found</h3>
-               <p className="text-xs text-muted-text">Try tweaking your search or category filters.</p>
+              <h3 className="text-sm font-medium text-brand-navy mb-1">No matches</h3>
+              <p className="text-xs text-muted-text">Try adjusting your filters.</p>
             </div>
           ) : view === 'pipeline' ? (
             <PipelineView
@@ -215,10 +229,41 @@ function DashboardContent() {
           ) : (
             <TableView
               applications={filteredApps}
+              selectedIds={selectedIds}
+              onSelectionChange={setSelectedIds}
               onRowClick={handleCardClick}
             />
           )}
         </div>
+
+        {/* Bulk action bar */}
+        {selectedIds.size > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-brand-navy text-white px-4 py-2.5 rounded-2xl shadow-2xl">
+            <span className="text-sm font-medium mr-1">{selectedIds.size} selected</span>
+            <select
+              value={bulkStatus}
+              onChange={e => setBulkStatus(e.target.value as PipelineStage | '')}
+              className="bg-white/10 border border-white/20 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none"
+            >
+              <option value="">Move to...</option>
+              {stages.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <button
+              onClick={handleBulkStatusUpdate}
+              disabled={!bulkStatus}
+              className="px-3 py-1.5 bg-accent-blue text-white text-xs font-medium rounded-lg disabled:opacity-40 hover:bg-accent-blue/80"
+            >
+              Apply
+            </button>
+            <div className="w-px h-4 bg-white/20 mx-1" />
+            <button onClick={handleBulkDelete} className="px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600">
+              Delete
+            </button>
+            <button onClick={() => setSelectedIds(new Set())} className="ml-1 text-white/60 hover:text-white text-xs">
+              ✕
+            </button>
+          </div>
+        )}
 
         {/* Dashboard Footer */}
         <footer className="mt-20 py-8 border-t border-border-gray flex flex-col sm:flex-row items-center justify-between gap-4">
