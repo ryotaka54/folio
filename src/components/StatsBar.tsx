@@ -77,8 +77,8 @@ export default function StatsBar({ applications }: StatsBarProps) {
           className={`rounded-xl p-4 transition-colors ${
             stat.highlight
               ? stat.label === 'Interviews'
-                ? 'bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900'
-                : 'bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900'
+                ? 'bg-emerald-50 border-2 border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-700'
+                : 'bg-amber-50 border-2 border-amber-300 dark:bg-amber-950/30 dark:border-amber-700'
               : 'bg-surface-gray'
           }`}
         >
@@ -88,7 +88,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
           </div>
           <span className={`text-2xl font-semibold ${
             stat.highlight
-              ? stat.label === 'Interviews' ? 'text-emerald-600' : 'text-amber-500'
+              ? stat.label === 'Interviews' ? 'text-emerald-700' : 'text-amber-600'
               : 'text-brand-navy'
           }`}>
             {stat.value}
