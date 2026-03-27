@@ -13,7 +13,7 @@ export default function EmptyState({ onAdd }: EmptyStateProps) {
       </div>
       <h3 className="text-2xl font-semibold text-brand-navy mb-2 tracking-tight">Your offer starts here</h3>
       <p className="text-sm text-muted-text text-center max-w-xs mb-8 leading-relaxed">
-        Every offer begins with a single application. Add yours and Folio will map your path to getting hired.
+        Every offer begins with a single application. Add yours and Applyd will map your path to getting hired.
       </p>
       <button
         onClick={onAdd}
