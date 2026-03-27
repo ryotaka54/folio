@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { PipelineStage, Category, Application } from '@/lib/types';
+import { PipelineStage, Category } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
 
 interface AddApplicationModalProps {
@@ -15,7 +15,7 @@ interface AddApplicationModalProps {
     deadline: string | null;
     job_link: string;
     notes: string;
-  }) => void;
+  }) => Promise<void>;
   stages: PipelineStage[];
 }
 
@@ -29,6 +29,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
   const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
   const [isAutofilling, setIsAutofilling] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
       setNotes('');
       setError('');
       setIsAutofilling(false);
+      setIsSaving(false);
     }
   }, [open, stages]);
 
@@ -55,32 +57,74 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
 
   if (!open) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const isValidUrl = (url: string) => {
+    try { new URL(url); return true; } catch { return false; }
+  };
+
+  const handleAutofill = async () => {
+    if (!isValidUrl(jobLink)) {
+      setError('Please enter a valid URL before autofilling.');
+      return;
+    }
+    setIsAutofilling(true);
+    setError('');
+    try {
+      const res = await fetch('/api/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: jobLink }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Autofill failed');
+      }
+      if (data.company) setCompany(data.company);
+      if (data.role) setRole(data.role);
+      if (data.category) setCategory(data.category as Category);
+    } catch (e: any) {
+      setError(e.message || 'Could not autofill from this URL. Please fill in manually.');
+    } finally {
+      setIsAutofilling(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!company.trim() || !role.trim()) {
       setError('Company and role are required');
       return;
     }
-    onSave({
-      company: company.trim(),
-      role: role.trim(),
-      category,
-      status,
-      deadline: deadline || null,
-      job_link: jobLink,
-      notes,
-    });
-    onClose();
+    setIsSaving(true);
+    setError('');
+    try {
+      await onSave({
+        company: company.trim(),
+        role: role.trim(),
+        category,
+        status,
+        deadline: deadline || null,
+        job_link: jobLink,
+        notes,
+      });
+      onClose();
+    } catch {
+      setError('Failed to save application. Please try again.');
+      setIsSaving(false);
+    }
   };
+
+  const showAutofill = isValidUrl(jobLink) && !isAutofilling;
 
   return (
     <div
       ref={backdropRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop p-4 fade-in"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30 backdrop fade-in"
       onClick={(e) => { if (e.target === backdropRef.current) onClose(); }}
     >
-      <div className="bg-card-bg rounded-2xl w-full max-w-md shadow-xl modal-enter" onClick={(e) => e.stopPropagation()}>
-        <div className="p-6">
+      <div className="bg-card-bg rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md shadow-xl modal-enter max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="p-5 sm:p-6">
+          {/* Drag handle for mobile */}
+          <div className="w-10 h-1 bg-border-gray rounded-full mx-auto mb-4 sm:hidden" />
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-semibold text-brand-navy">Add Application</h2>
             <button onClick={onClose} className="text-muted-text hover:text-body-text p-1">
@@ -104,7 +148,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 placeholder="e.g. Google"
                 autoFocus
               />
@@ -119,7 +163,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="text"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 placeholder="e.g. SWE Intern"
               />
             </div>
@@ -131,7 +175,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                   id="modal-category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value as Category | '')}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                  className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 >
                   <option value="">Select...</option>
                   {CATEGORIES.map(c => (
@@ -145,7 +189,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                   id="modal-status"
                   value={status}
                   onChange={(e) => setStatus(e.target.value as PipelineStage)}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                  className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 >
                   {stages.map(s => (
                     <option key={s} value={s}>{s}</option>
@@ -161,37 +205,27 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label htmlFor="modal-link" className="block text-sm font-medium text-body-text">Job posting link</label>
-                {(jobLink && jobLink.startsWith('http') && !company && !role) && (
+                {showAutofill && (
                   <button
                     type="button"
-                    onClick={async () => {
-                      setIsAutofilling(true);
-                      setError('');
-                      try {
-                        const res = await fetch('/api/parse', { method: 'POST', body: JSON.stringify({ url: jobLink }) });
-                        if (!res.ok) throw new Error();
-                        const data = await res.json();
-                        if (data.company) setCompany(data.company);
-                        if (data.role) setRole(data.role);
-                        if (data.category) setCategory(data.category as Category);
-                      } catch (e) {
-                        setError('Failed to auto-fill from this URL. Please fill manually.');
-                      } finally {
-                        setIsAutofilling(false);
-                      }
-                    }}
-                    disabled={isAutofilling}
+                    onClick={handleAutofill}
                     className="text-xs font-medium text-accent-blue hover:text-accent-blue/80 transition-colors flex items-center gap-1"
                   >
-                    {isAutofilling ? 'Scanning...' : '✨ Autofill details'}
+                    ✨ Autofill details
                   </button>
+                )}
+                {isAutofilling && (
+                  <span className="text-xs text-muted-text flex items-center gap-1">
+                    <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                    Scanning...
+                  </span>
                 )}
               </div>
               <input
@@ -199,7 +233,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="url"
                 value={jobLink}
                 onChange={(e) => setJobLink(e.target.value)}
-                className={`w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background ${isAutofilling ? 'opacity-50 pointer-events-none' : ''}`}
+                className={`w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background ${isAutofilling ? 'opacity-50 pointer-events-none' : ''}`}
                 placeholder="https://..."
               />
             </div>
@@ -211,16 +245,17 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 placeholder="Quick note..."
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors mt-2"
+              disabled={isSaving}
+              className="w-full py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors mt-2 disabled:opacity-50"
             >
-              Save Application
+              {isSaving ? 'Saving...' : 'Save Application'}
             </button>
           </form>
         </div>

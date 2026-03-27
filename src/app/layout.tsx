@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import CommandPalette from "@/components/CommandPalette";
 
 export const metadata: Metadata = {
-  title: "Folio — Track Every Application",
+  title: "Applyd — Track Every Application",
   description: "The simplest way for students to track internship and job applications. Never miss a deadline.",
 };
 
@@ -16,8 +16,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <head>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+      </head>
+      <body className="antialiased">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
             {children}
             <CommandPalette />

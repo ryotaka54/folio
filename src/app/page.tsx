@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { ClipboardList, BarChart2, Target, Clock } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Home() {
   const { user } = useAuth();
@@ -25,21 +26,18 @@ export default function Home() {
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-[1200px] mx-auto">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-accent-blue flex items-center justify-center">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <polyline points="14 2 14 8 20 8" />
-              <line x1="16" y1="13" x2="8" y2="13" />
-              <line x1="16" y1="17" x2="8" y2="17" />
-              <polyline points="10 9 9 9 8 9" />
-            </svg>
-          </div>
-          <span className="text-xl font-semibold text-brand-navy tracking-tight">Folio</span>
+          <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
+            <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
+            <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
+          </svg>
+          <span className="text-xl font-semibold text-brand-navy tracking-tight">Applyd</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
           <Link
             href="/login"
-            className="px-4 py-2 text-sm font-medium text-body-text hover:text-brand-navy transition-colors rounded-lg"
+            className="px-4 py-2 text-sm font-medium text-muted-text hover:text-brand-navy hover:bg-surface-gray/50 transition-colors rounded-lg"
           >
             Log in
           </Link>
@@ -73,7 +71,7 @@ export default function Home() {
             </Link>
             <Link
               href="/login"
-              className="px-6 py-3 text-base font-medium text-body-text bg-surface-gray hover:bg-border-gray transition-colors rounded-lg"
+              className="px-6 py-3 text-base font-medium text-body-text bg-surface-gray/50 hover:bg-surface-gray transition-colors rounded-lg border border-border-gray/50"
             >
               Log in
             </Link>
@@ -81,8 +79,8 @@ export default function Home() {
         </div>
 
         {/* Dashboard Preview */}
-        <div className="mt-16 rounded-2xl border border-border-gray shadow-lg overflow-hidden bg-background p-1">
-          <div className="bg-card-bg rounded-xl p-4 md:p-6">
+        <div className="mt-16 rounded-3xl border border-border-gray/50 shadow-2xl overflow-hidden bg-background p-1.5 bg-gradient-to-b from-border-gray/20 to-transparent">
+          <div className="bg-card-bg rounded-[22px] p-4 md:p-8 border border-border-gray/50">
             {/* Fake stats bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
               {[
@@ -178,8 +176,22 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border-gray py-6 text-center">
-        <p className="text-xs text-muted-text">© 2025 Folio. Built for students, by students.</p>
+      <footer className="border-t border-border-gray py-12 bg-surface-gray/30">
+        <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2 opacity-50 grayscale">
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
+              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
+              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
+            </svg>
+            <span className="text-sm font-semibold text-brand-navy tracking-tight">Applyd</span>
+          </div>
+          <div className="flex items-center gap-8">
+            <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help & FAQ</Link>
+            <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Us</Link>
+            <span className="text-xs text-muted-text/50">© 2026 Applyd</span>
+          </div>
+        </div>
       </footer>
     </div>
   );

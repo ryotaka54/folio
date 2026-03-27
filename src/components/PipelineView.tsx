@@ -24,7 +24,13 @@ function DraggableCard({ application, onClick, muted }: { application: Applicati
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none">
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      {...attributes} 
+      {...listeners} 
+      className={`touch-none draggable-card ${isDragging ? 'draggable-active' : ''} select-none`}
+    >
       <div className={isDragging ? 'shadow-xl scale-105 transition-transform' : ''}>
         <ApplicationCard application={application} onClick={onClick} muted={muted} />
       </div>
@@ -39,7 +45,7 @@ function DroppableColumn({ stage, count, color, isRejected, children }: { stage:
   });
 
   return (
-    <div className="min-w-[220px] w-[220px] flex-shrink-0 flex flex-col">
+    <div className="min-w-[180px] w-[180px] flex-shrink-0 flex flex-col snap-center">
       <div className="flex items-center gap-2 mb-3 px-1">
         <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
         <span className="text-xs font-medium text-muted-text truncate">{stage}</span>
@@ -95,8 +101,8 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
   };
 
   return (
-    <DndContext id="folio-dnd-context" sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex gap-3 overflow-x-auto pb-4 -mx-2 px-2" style={{ minHeight: '400px' }}>
+    <DndContext id="applyd-dnd-context" sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x-mandatory" style={{ minHeight: '400px' }}>
         {stages.map((stage) => {
           const stageApps = applications.filter(a => a.status === stage);
           const color = STAGE_COLORS[stage] || '#6B7280';
@@ -111,8 +117,11 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
               isRejected={isRejected}
             >
               {stageApps.length === 0 && (
-                <div className="flex items-center justify-center py-8">
-                  <span className="text-xs text-muted-text/40 pointer-events-none">Drop here</span>
+                <div className="flex flex-col items-center justify-center py-8 gap-1.5 pointer-events-none">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-text/30">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                  </svg>
+                  <span className="text-xs text-muted-text/40 text-center">No applications yet</span>
                 </div>
               )}
               {stageApps.map(app => (
@@ -127,12 +136,14 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
           );
         })}
       </div>
-      <DragOverlay dropAnimation={null}>
+      <DragOverlay dropAnimation={null} className="draggable-active select-none">
         {activeId ? (
-          <ApplicationCard
-            application={applications.find(a => a.id === activeId)!}
-            onClick={() => {}}
-          />
+          <div className="scale-105 shadow-2xl">
+            <ApplicationCard
+              application={applications.find(a => a.id === activeId)!}
+              onClick={() => {}}
+            />
+          </div>
         ) : null}
       </DragOverlay>
     </DndContext>

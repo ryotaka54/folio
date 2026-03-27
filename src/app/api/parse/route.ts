@@ -78,6 +78,13 @@ export async function POST(request: Request) {
       category = 'Finance';
     }
 
+    if (!company && !role) {
+      return NextResponse.json(
+        { error: 'Could not extract job details from this page. Please fill in manually.' },
+        { status: 422 }
+      );
+    }
+
     return NextResponse.json({
       company: company || '',
       role: role || '',

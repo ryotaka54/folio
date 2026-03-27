@@ -32,9 +32,16 @@ export default function StatsBar({ applications }: StatsBarProps) {
     return d >= now && d <= sevenDays;
   }).length;
 
+  const STATS_THRESHOLD = 5;
   const stats = [
     { label: 'Total Applications', value: total.toString(), icon: <ClipboardList size={16} className="text-accent-blue" />, highlight: false },
-    { label: 'Response Rate', value: `${responseRate}%`, icon: <BarChart2 size={16} className="text-brand-navy" />, highlight: false },
+    { 
+      label: 'Response Rate', 
+      value: applied.length >= STATS_THRESHOLD ? `${responseRate}%` : '—', 
+      subtext: applied.length < STATS_THRESHOLD ? `Add ${STATS_THRESHOLD - applied.length} more to unlock` : null,
+      icon: <BarChart2 size={16} className="text-brand-navy" />, 
+      highlight: false 
+    },
     { label: 'Interviews', value: interviews.toString(), icon: <Target size={16} className="text-amber-warning" />, highlight: false },
     { label: 'Deadlines Soon', value: deadlinesSoon.toString(), icon: <Clock size={16} className="text-red-500" />, highlight: deadlinesSoon > 0 },
   ];
@@ -55,6 +62,9 @@ export default function StatsBar({ applications }: StatsBarProps) {
           <span className={`text-2xl font-semibold ${stat.highlight ? 'text-amber-warning' : 'text-brand-navy'}`}>
             {stat.value}
           </span>
+          {'subtext' in stat && stat.subtext && (
+            <p className="text-[10px] text-muted-text/60 mt-0.5 leading-tight">{stat.subtext}</p>
+          )}
         </div>
       ))}
     </div>

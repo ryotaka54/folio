@@ -1,102 +1,113 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { Application } from './types';
 import { supabase } from './supabase';
 
 interface StoreContextType {
   applications: Application[];
+  storeError: string | null;
+  clearStoreError: () => void;
   addApplication: (app: Omit<Application, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<Application>;
-  updateApplication: (id: string, updates: Partial<Application>) => void;
-  deleteApplication: (id: string) => void;
+  updateApplication: (id: string, updates: Partial<Application>) => Promise<void>;
+  deleteApplication: (id: string) => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export function StoreProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [applications, setApplications] = useState<Application[]>([]);
+  const [storeError, setStoreError] = useState<string | null>(null);
+  const loadingRef = useRef(false);
 
-  // Load applications from Supabase
-  useEffect(() => {
-    const load = async () => {
+  const loadApplications = useCallback(async () => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    try {
       const { data, error } = await supabase
         .from('applications')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
-      if (data) {
-        setApplications(data as Application[]);
-      }
+      if (data) setApplications(data as Application[]);
       if (error) console.error('Load applications error:', error);
-    };
-
-    load();
+    } finally {
+      loadingRef.current = false;
+    }
   }, [userId]);
 
-  const addApplication = useCallback(async (appData: Omit<Application, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<Application> => {
-    const now = new Date().toISOString();
-    const newApp = {
-      ...appData,
-      user_id: userId,
-      created_at: now,
-      updated_at: now,
-    };
+  useEffect(() => {
+    loadApplications();
+  }, [loadApplications]);
 
+  const addApplication = useCallback(async (
+    appData: Omit<Application, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+  ): Promise<Application> => {
+    const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('applications')
-      .insert(newApp)
+      .insert({ ...appData, user_id: userId, created_at: now, updated_at: now })
       .select()
       .single();
 
-    if (error) {
-      console.error('Add application error:', error);
-      // Fallback: create with local ID
-      const fallback: Application = {
-        ...newApp,
-        id: crypto.randomUUID(),
-      } as Application;
-      setApplications(prev => [fallback, ...prev]);
-      return fallback;
-    }
+    if (error) throw new Error(error.message || 'Failed to save application');
 
     const app = data as Application;
     setApplications(prev => [app, ...prev]);
     return app;
   }, [userId]);
 
-  const updateApplication = useCallback((id: string, updates: Partial<Application>) => {
+  const updateApplication = useCallback(async (id: string, updates: Partial<Application>): Promise<void> => {
     const updatedFields = { ...updates, updated_at: new Date().toISOString() };
 
-    // Optimistic update
-    setApplications(prev =>
-      prev.map(a => a.id === id ? { ...a, ...updatedFields } : a)
-    );
+    // Optimistic update — capture snapshot for rollback
+    let snapshot: Application[] = [];
+    setApplications(prev => {
+      snapshot = prev;
+      return prev.map(a => a.id === id ? { ...a, ...updatedFields } : a);
+    });
 
-    // Persist to Supabase
-    supabase.from('applications')
+    const { error } = await supabase
+      .from('applications')
       .update(updatedFields)
       .eq('id', id)
-      .then(({ error }) => {
-        if (error) console.error('Update application error:', error);
-      });
-  }, []);
+      .eq('user_id', userId);
 
-  const deleteApplication = useCallback((id: string) => {
-    // Optimistic delete
-    setApplications(prev => prev.filter(a => a.id !== id));
+    if (error) {
+      setApplications(snapshot);
+      const msg = 'Failed to update. Changes not saved.';
+      setStoreError(msg);
+      throw new Error(msg);
+    }
+  }, [userId]);
 
-    // Persist to Supabase
-    supabase.from('applications')
+  const deleteApplication = useCallback(async (id: string): Promise<void> => {
+    // Optimistic delete — capture snapshot for rollback
+    let snapshot: Application[] = [];
+    setApplications(prev => {
+      snapshot = prev;
+      return prev.filter(a => a.id !== id);
+    });
+
+    const { error } = await supabase
+      .from('applications')
       .delete()
       .eq('id', id)
-      .then(({ error }) => {
-        if (error) console.error('Delete application error:', error);
-      });
-  }, []);
+      .eq('user_id', userId);
+
+    if (error) {
+      setApplications(snapshot);
+      const msg = 'Failed to delete. Please try again.';
+      setStoreError(msg);
+      throw new Error(msg);
+    }
+  }, [userId]);
+
+  const clearStoreError = useCallback(() => setStoreError(null), []);
 
   return (
-    <StoreContext.Provider value={{ applications, addApplication, updateApplication, deleteApplication }}>
+    <StoreContext.Provider value={{ applications, storeError, clearStoreError, addApplication, updateApplication, deleteApplication }}>
       {children}
     </StoreContext.Provider>
   );

@@ -14,11 +14,11 @@ export const supabase = createBrowserClient(supabaseUrl!, supabaseAnonKey!, {
     flowType: 'pkce',
     detectSessionInUrl: true,
     persistSession: true,
-    storageKey: 'folio-auth-token',
+    storageKey: 'applyd-auth-token',
   },
   global: {
     headers: {
-      'X-Client-Info': 'folio-web',
+      'X-Client-Info': 'applyd-web',
     },
   },
 });

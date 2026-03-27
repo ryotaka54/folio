@@ -26,7 +26,7 @@ function clearStaleAuthTokens() {
       }
     }
     // Also clear our custom key
-    localStorage.removeItem('folio-auth-token');
+    localStorage.removeItem('applyd-auth-token');
   } catch (e) {
     // Silent fail
   }
@@ -52,24 +52,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const timeout = new Promise<null>((_, reject) =>
         setTimeout(() => reject(new Error('profile fetch timeout')), 5000)
       );
-      const query = supabase.from('users').select('*').eq('id', userId).single();
-      const { data } = await Promise.race([query, timeout]) as Awaited<typeof query>;
+      const query = supabase.from('users').select('*').eq('id', userId).maybeSingle();
+      const { data, error: fetchError } = await Promise.race([query, timeout]) as Awaited<typeof query>;
 
-      const localOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`folio_onboarding_${userId}`) : null;
+      if (fetchError) {
+        console.error('Profile fetch error:', fetchError);
+      }
 
-      setUser(data ? {
-        id: data.id,
-        name: data.name || '',
-        mode: data.mode || 'internship',
-        school_year: data.school_year || '',
-        career_level: data.career_level || '',
-        recruiting_season: data.recruiting_season || '',
-        created_at: data.created_at,
-        onboarding_complete: data.onboarding_complete || localOnboarding === 'true',
-      } : { ...defaultProfile(userId), onboarding_complete: localOnboarding === 'true' });
+      const localOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`applyd_onboarding_${userId}`) : null;
+
+      if (data) {
+        setUser({
+          id: data.id,
+          name: data.name || '',
+          mode: data.mode || 'internship',
+          school_year: data.school_year || '',
+          career_level: data.career_level || '',
+          recruiting_season: data.recruiting_season || '',
+          created_at: data.created_at,
+          onboarding_complete: data.onboarding_complete || localOnboarding === 'true',
+        });
+      } else {
+        // No profile row exists — auto-create one so future writes succeed
+        const newProfile = {
+          id: userId,
+          name: '',
+          mode: 'internship',
+          school_year: '',
+          career_level: '',
+          recruiting_season: '',
+          onboarding_complete: localOnboarding === 'true',
+        };
+        supabase.from('users').upsert(newProfile).then(({ error: upsertErr }) => {
+          if (upsertErr) console.error('Auto-create profile error:', upsertErr);
+        });
+        setUser({ ...defaultProfile(userId), onboarding_complete: localOnboarding === 'true' });
+      }
     } catch (err) {
       console.error('Load profile error:', err);
-      const localOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`folio_onboarding_${userId}`) : null;
+      const localOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`applyd_onboarding_${userId}`) : null;
       setUser(prev => prev ?? { ...defaultProfile(userId), onboarding_complete: localOnboarding === 'true' });
     }
   };
@@ -106,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Cross-device sync via Auth Metadata to bypass RLS issues on `users` table
           const metaOnboarding = session.user.user_metadata?.onboarding_complete === true;
           if (metaOnboarding && typeof window !== 'undefined') {
-            localStorage.setItem(`folio_onboarding_${session.user.id}`, 'true');
+            localStorage.setItem(`applyd_onboarding_${session.user.id}`, 'true');
           }
 
           // Await full profile load before clearing the loading state so route guards read the real data
@@ -208,7 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updated = { ...prev, ...updates };
 
       if (updated.onboarding_complete && typeof window !== 'undefined') {
-        localStorage.setItem(`folio_onboarding_${updated.id}`, 'true');
+        localStorage.setItem(`applyd_onboarding_${updated.id}`, 'true');
         
         // Push securely to Auth JWT Metadata to bypass any `users` table RLS limitations across devices
         supabase.auth.updateUser({
@@ -217,7 +238,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       supabase.from('users')
-        .update({
+        .upsert({
+          id: updated.id,
           name: updated.name,
           mode: updated.mode,
           school_year: updated.school_year,
@@ -225,7 +247,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           recruiting_season: updated.recruiting_season,
           onboarding_complete: updated.onboarding_complete,
         })
-        .eq('id', updated.id)
         .then(({ error }) => {
           if (error) console.error('Profile update error:', error);
         });
