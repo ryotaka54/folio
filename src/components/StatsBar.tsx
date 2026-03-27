@@ -74,13 +74,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className={`rounded-xl p-4 transition-colors ${
-            stat.highlight
-              ? stat.label === 'Interviews'
-                ? 'bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900'
-                : 'bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900'
-              : 'bg-card-bg border border-border-gray'
-          }`}
+          className="rounded-xl p-4 bg-card-bg border border-border-gray"
         >
           <div className="flex items-center gap-2 mb-1">
             <span className="flex-shrink-0">{stat.icon}</span>
