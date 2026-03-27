@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Application, PipelineStage } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, X } from 'lucide-react';
+
+const inputCls = [
+  'w-full px-3 bg-background border border-border-gray rounded-md text-sm',
+  'focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20',
+  'placeholder:text-text-tertiary transition-colors',
+  'h-9',
+].join(' ');
 
 interface ApplicationDrawerProps {
   application: Application | null;
@@ -83,26 +90,25 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
       <div className="relative z-10 w-full sm:max-w-md bg-card-bg shadow-2xl h-full overflow-y-auto slide-in" onClick={(e) => e.stopPropagation()}>
         <div className="p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-brand-navy">Application Details</h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>
+              Application Details
+            </h2>
             <div className="flex items-center gap-3">
-              {/* Save status indicator */}
               {saveStatus === 'saving' && (
-                <span className="text-xs text-muted-text flex items-center gap-1">
+                <span className="text-[12px] flex items-center gap-1" style={{ color: 'var(--muted-text)' }}>
                   <svg className="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                   Saving
                 </span>
               )}
               {saveStatus === 'saved' && (
-                <span className="text-xs text-green-success flex items-center gap-1">
+                <span className="text-[12px] flex items-center gap-1" style={{ color: 'var(--green-success)' }}>
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   Saved
                 </span>
               )}
-              <button onClick={onClose} aria-label="Close" className="text-muted-text hover:text-body-text p-1">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
+              <button onClick={onClose} aria-label="Close" className="p-1 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
+                <X size={16} />
               </button>
             </div>
           </div>
@@ -110,34 +116,34 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
           <div className="space-y-4">
             {/* Company */}
             <div>
-              <label className="block text-xs font-medium text-muted-text mb-1">Company</label>
+              <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Company</label>
               <input
                 type="text"
                 defaultValue={application.company}
                 onChange={(e) => debouncedUpdate('company', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className={inputCls}
               />
             </div>
 
             {/* Role */}
             <div>
-              <label className="block text-xs font-medium text-muted-text mb-1">Role</label>
+              <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Role</label>
               <input
                 type="text"
                 defaultValue={application.role}
                 onChange={(e) => debouncedUpdate('role', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className={inputCls}
               />
             </div>
 
             {/* Location */}
             <div>
-              <label className="block text-xs font-medium text-muted-text mb-1">Location</label>
+              <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Location</label>
               <input
                 type="text"
                 defaultValue={application.location || ''}
                 onChange={(e) => debouncedUpdate('location', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className={inputCls}
                 placeholder="e.g. New York, NY"
               />
             </div>
@@ -145,11 +151,11 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
             {/* Category + Status */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-muted-text mb-1">Category</label>
+                <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Category</label>
                 <select
                   defaultValue={application.category}
                   onChange={(e) => immediateUpdate('category', e.target.value)}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                  className={inputCls}
                 >
                   <option value="">None</option>
                   {CATEGORIES.map(c => (
@@ -158,11 +164,11 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-muted-text mb-1">Status</label>
+                <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Status</label>
                 <select
                   defaultValue={application.status}
                   onChange={(e) => immediateUpdate('status', e.target.value)}
-                  className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                  className={inputCls}
                 >
                   {stages.map(s => (
                     <option key={s} value={s}>{s}</option>
@@ -173,19 +179,19 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
 
             {/* Deadline */}
             <div>
-              <label className="block text-xs font-medium text-muted-text mb-1">Deadline</label>
+              <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Deadline</label>
               <input
                 type="date"
                 defaultValue={application.deadline || ''}
                 onChange={(e) => immediateUpdate('deadline', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className={inputCls}
               />
             </div>
 
             {/* Job Link */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-medium text-muted-text">Job posting link</label>
+                <label className="block text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Job posting link</label>
                 {application.job_link && isValidUrl(application.job_link) && (
                   <a
                     href={application.job_link}
@@ -201,44 +207,44 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 type="url"
                 defaultValue={application.job_link}
                 onChange={(e) => debouncedUpdate('job_link', e.target.value)}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className={inputCls}
                 placeholder="https://..."
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-xs font-medium text-muted-text mb-1">Notes</label>
+              <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Notes</label>
               <textarea
                 defaultValue={application.notes}
                 onChange={(e) => debouncedUpdate('notes', e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors resize-none bg-background"
+                className="w-full px-3 py-2 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors resize-none"
                 placeholder="Interview prep notes, salary info, etc."
               />
             </div>
 
             {/* Recruiter Contact */}
             <div className="border-t border-border-gray pt-4 mt-4">
-              <h3 className="text-xs font-medium text-muted-text mb-3 uppercase tracking-wide">Recruiter Contact</h3>
+              <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-3" style={{ color: 'var(--muted-text)' }}>Recruiter Contact</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-muted-text mb-1">Name</label>
+                  <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Name</label>
                   <input
                     type="text"
                     defaultValue={application.recruiter_name}
                     onChange={(e) => debouncedUpdate('recruiter_name', e.target.value)}
-                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                    className={inputCls}
                     placeholder="Recruiter name"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-muted-text mb-1">Email</label>
+                  <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Email</label>
                   <input
                     type="email"
                     defaultValue={application.recruiter_email}
                     onChange={(e) => debouncedUpdate('recruiter_email', e.target.value)}
-                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                    className={inputCls}
                     placeholder="recruiter@company.com"
                   />
                 </div>
@@ -268,13 +274,14 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                   <div className="flex gap-2">
                     <button
                       onClick={() => { onDelete(application.id); onClose(); }}
-                      className="px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600 transition-colors"
+                      className="px-3 py-1.5 bg-red-500 text-white text-[12px] font-medium rounded-md hover:bg-red-600 transition-colors"
                     >
                       Yes, delete
                     </button>
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
-                      className="px-3 py-1.5 bg-card-bg text-body-text text-xs font-medium rounded-lg border border-border-gray hover:bg-surface-gray transition-colors"
+                      className="px-3 py-1.5 text-[12px] font-medium rounded-md border border-border-gray transition-colors"
+                      style={{ background: 'var(--card-bg)', color: 'var(--brand-navy)' }}
                     >
                       Cancel
                     </button>

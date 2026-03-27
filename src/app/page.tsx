@@ -25,28 +25,30 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="flex items-center justify-between px-6 py-4 max-w-[1200px] mx-auto">
+      <nav className="flex items-center justify-between px-6 max-w-[1200px] mx-auto h-[52px] border-b border-border-gray">
         <div className="flex items-center gap-2">
-          <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
-            <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
-            <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
+          <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#2563EB"/>
+            <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#2563EB" opacity="0.6"/>
+            <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#2563EB" opacity="0.3"/>
           </svg>
-          <span className="text-xl font-semibold text-brand-navy tracking-tight">Applyd</span>
+          <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <ThemeToggle />
           <Link
             href="/login"
-            className="px-4 py-2 text-sm font-medium text-muted-text hover:text-brand-navy hover:bg-surface-gray/50 transition-colors rounded-lg"
+            className="h-8 px-3 text-[13px] font-medium rounded-md transition-colors flex items-center"
+            style={{ color: 'var(--muted-text)' }}
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="px-4 py-2 text-sm font-medium text-white bg-accent-blue hover:bg-accent-blue/90 transition-colors rounded-lg"
+            className="h-8 px-3 text-[13px] font-medium text-white rounded-md transition-colors flex items-center"
+            style={{ background: 'var(--accent-blue)' }}
           >
-            Sign up
+            Sign up free
           </Link>
         </div>
       </nav>
@@ -54,75 +56,91 @@ export default function Home() {
       {/* Hero */}
       <main className="max-w-[1200px] mx-auto px-6 pt-16 pb-20">
         <div className="text-center max-w-2xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-semibold text-brand-navy leading-tight tracking-tight">
+          <h1 className="text-[40px] md:text-[48px] font-semibold leading-[1.1]" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}>
             Track every application.
             <br />
-            <span className="text-accent-blue">Never miss a deadline.</span>
+            <span style={{ color: 'var(--accent-blue)' }}>Never miss a deadline.</span>
           </h1>
-          <p className="mt-4 text-lg text-muted-text leading-relaxed">
+          <p className="mt-4 text-[16px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
             The simplest way for students to manage internship and job applications
             — all in one place, with zero setup required.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3">
             <Link
               href="/signup"
-              className="px-6 py-3 text-base font-medium text-white bg-accent-blue hover:bg-accent-blue/90 transition-colors rounded-lg shadow-sm"
+              className="h-10 px-5 text-[14px] font-medium text-white rounded-md transition-colors flex items-center"
+              style={{ background: 'var(--accent-blue)' }}
             >
               Get started — it&apos;s free
             </Link>
             <Link
               href="/login"
-              className="px-6 py-3 text-base font-medium text-body-text bg-surface-gray/50 hover:bg-surface-gray transition-colors rounded-lg border border-border-gray/50"
+              className="h-10 px-5 text-[14px] font-medium rounded-md border transition-colors flex items-center"
+              style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
             >
               Log in
             </Link>
           </div>
-          <p className="mt-4 text-xs text-muted-text/60">
+          <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
             Free forever · No credit card · Used by students at 50+ universities
           </p>
         </div>
 
         {/* Dashboard Preview */}
-        <div className="mt-16 rounded-3xl border border-border-gray/50 shadow-2xl overflow-hidden bg-background p-1.5 bg-gradient-to-b from-border-gray/20 to-transparent">
-          <div className="bg-card-bg rounded-[22px] p-4 md:p-8 border border-border-gray/50">
-            {/* Fake stats bar */}
+        <div className="mt-16 rounded-lg border border-border-gray overflow-hidden">
+          <div className="bg-card-bg p-4 md:p-6">
+            {/* Stats bar — matches real StatsBar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
               {[
-                { label: 'Total', value: '24', subtext: '+6 this week', icon: <TrendingUp size={16} className="text-accent-blue" />, valueClass: 'text-brand-navy' },
-                { label: 'Response Rate', value: '38%', subtext: 'of applications replied', icon: <Zap size={16} className="text-amber-500" />, valueClass: 'text-brand-navy' },
-                { label: 'Interviews', value: '5', subtext: "You're on a roll", icon: <MessageSquare size={16} className="text-emerald-500" />, valueClass: 'text-emerald-600' },
-                { label: 'Act Now', value: '3', subtext: 'deadlines this week', icon: <Clock size={16} className="text-red-500" />, valueClass: 'text-amber-700' },
+                { label: 'Total', value: '24', subtext: '+6 this week', icon: <TrendingUp size={14} />, accent: null },
+                { label: 'Response Rate', value: '38%', subtext: 'of applications replied', icon: <Zap size={14} />, accent: null },
+                { label: 'Interviews', value: '5', subtext: "You're on a roll", icon: <MessageSquare size={14} />, accent: 'green' as const },
+                { label: 'Act Now', value: '3', subtext: 'deadlines this week', icon: <Clock size={14} />, accent: 'amber' as const },
               ].map((stat) => (
-                <div key={stat.label} className="bg-card-bg border border-border-gray rounded-xl p-3 md:p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="flex-shrink-0">{stat.icon}</span>
-                    <span className="text-xs text-muted-text font-medium">{stat.label}</span>
+                <div
+                  key={stat.label}
+                  className="rounded-lg p-3 md:p-4 bg-background border border-border-gray"
+                  style={stat.accent === 'green'
+                    ? { borderLeft: '3px solid #16A34A' }
+                    : stat.accent === 'amber'
+                    ? { borderLeft: '3px solid #D97706' }
+                    : undefined}
+                >
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <span style={{ color: 'var(--text-tertiary)' }}>{stat.icon}</span>
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.05em]" style={{ color: 'var(--muted-text)' }}>{stat.label}</span>
                   </div>
-                  <span className={`text-xl md:text-2xl font-semibold ${stat.valueClass}`}>{stat.value}</span>
-                  <p className="text-[10px] text-muted-text/60 mt-0.5 leading-tight">{stat.subtext}</p>
+                  <div
+                    className="text-[24px] font-semibold leading-none mb-1"
+                    style={{
+                      color: stat.accent === 'green' ? 'var(--green-success)' : stat.accent === 'amber' ? 'var(--amber-warning)' : 'var(--brand-navy)',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >{stat.value}</div>
+                  <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>{stat.subtext}</p>
                 </div>
               ))}
             </div>
-            {/* Fake pipeline columns */}
-            <div className="flex gap-3 overflow-x-auto pb-2">
+            {/* Pipeline columns — matches real PipelineView */}
+            <div className="flex gap-3 overflow-x-auto pb-1">
               {[
-                { name: 'Wishlist', count: 6, color: '#8B5CF6', cards: ['Google — SWE Intern', 'Meta — PM Intern'] },
-                { name: 'Applied', count: 10, color: '#4361EE', cards: ['Stripe — SWE Intern', 'Airbnb — Design'] },
-                { name: 'OA / Online Assessment', count: 4, color: '#06B6D4', cards: ['Amazon — SDE Intern'] },
-                { name: 'Phone / Recruiter Screen', count: 3, color: '#F59E0B', cards: ['Microsoft — SWE'] },
-                { name: 'Offer', count: 1, color: '#1D9E75', cards: ['Figma — Design Intern'] },
+                { name: 'Wishlist', count: 6, color: '#8B5CF6', cards: [{ company: 'Google', role: 'SWE Intern' }, { company: 'Meta', role: 'PM Intern' }] },
+                { name: 'Applied', count: 10, color: '#4361EE', cards: [{ company: 'Stripe', role: 'SWE Intern' }, { company: 'Airbnb', role: 'Design Intern' }] },
+                { name: 'OA / Online Assessment', count: 4, color: '#06B6D4', cards: [{ company: 'Amazon', role: 'SDE Intern' }] },
+                { name: 'Phone / Recruiter Screen', count: 3, color: '#F59E0B', cards: [{ company: 'Microsoft', role: 'SWE Intern' }] },
+                { name: 'Offer', count: 1, color: '#1D9E75', cards: [{ company: 'Figma', role: 'Design Intern' }] },
               ].map((col) => (
-                <div key={col.name} className="min-w-[180px] md:min-w-[200px] flex-1">
+                <div key={col.name} className="min-w-[176px] w-[176px] flex-shrink-0">
                   <div className="flex items-center gap-2 mb-2 px-1">
-                    <div className="w-2 h-2 rounded-full" style={{ background: col.color }} />
-                    <span className="text-xs font-medium text-muted-text">{col.name}</span>
-                    <span className="text-xs text-muted-text/60 ml-auto">{col.count}</span>
+                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: col.color }} />
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.08em] truncate" style={{ color: 'var(--muted-text)' }}>{col.name}</span>
+                    <span className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded border flex-shrink-0" style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }}>{col.count}</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 rounded-lg p-1.5 border border-border-gray" style={{ background: 'var(--card-bg)', minHeight: 80 }}>
                     {col.cards.map((card) => (
-                      <div key={card} className="bg-card-bg border border-border-gray rounded-lg p-3 shadow-sm">
-                        <div className="text-xs font-medium text-brand-navy">{card.split(' — ')[0]}</div>
-                        <div className="text-[11px] text-muted-text mt-0.5">{card.split(' — ')[1]}</div>
+                      <div key={card.company} className="bg-background border border-border-gray rounded-lg p-2.5">
+                        <div className="text-[13px] font-semibold truncate" style={{ color: 'var(--brand-navy)' }}>{card.company}</div>
+                        <div className="text-[12px] truncate mt-0.5" style={{ color: 'var(--muted-text)' }}>{card.role}</div>
                       </div>
                     ))}
                   </div>
@@ -175,32 +193,35 @@ export default function Home() {
             },
           ].map((benefit) => (
             <div key={benefit.title} className="text-center">
-              <div className="w-12 h-12 rounded-xl bg-light-accent text-accent-blue mx-auto flex items-center justify-center mb-3">
+              <div
+                className="w-10 h-10 rounded-md border border-border-gray mx-auto flex items-center justify-center mb-3"
+                style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}
+              >
                 {benefit.icon}
               </div>
-              <h3 className="text-sm font-medium text-brand-navy mb-1">{benefit.title}</h3>
-              <p className="text-xs text-muted-text leading-relaxed">{benefit.desc}</p>
+              <h3 className="text-[13px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>{benefit.title}</h3>
+              <p className="text-[12px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{benefit.desc}</p>
             </div>
           ))}
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border-gray py-12 bg-surface-gray/30">
-        <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2 opacity-50 grayscale">
-            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
+      <footer className="border-t border-border-gray py-8">
+        <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2" style={{ opacity: 0.4 }}>
+            <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#2563EB"/>
+              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#2563EB" opacity="0.6"/>
+              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#2563EB" opacity="0.3"/>
             </svg>
-            <span className="text-sm font-semibold text-brand-navy tracking-tight">Applyd</span>
+            <span className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
           </div>
-          <div className="flex items-center gap-8">
-            <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help & FAQ</Link>
-            <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Us</Link>
-            <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
-            <span className="text-xs text-muted-text/50">© 2026 Applyd</span>
+          <div className="flex items-center gap-6">
+            <Link href="/help" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Help & FAQ</Link>
+            <Link href="/contact" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Contact</Link>
+            <Link href="/privacy" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Privacy</Link>
+            <span className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>© 2026 Applyd</span>
           </div>
         </div>
       </footer>

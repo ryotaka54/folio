@@ -14,50 +14,60 @@ interface PipelineViewProps {
 }
 
 function DraggableCard({ application, onClick, muted }: { application: Application; onClick: () => void; muted?: boolean }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: application.id,
-    data: { application }
+    data: { application },
   });
 
-  const style = {
-    opacity: isDragging ? 0.3 : undefined,
-  };
-
   return (
-    <div 
-      ref={setNodeRef} 
-      style={style} 
-      {...attributes} 
-      {...listeners} 
-      className={`touch-none draggable-card ${isDragging ? 'draggable-active' : ''} select-none`}
+    <div
+      ref={setNodeRef}
+      style={{ opacity: isDragging ? 0.25 : undefined }}
+      {...attributes}
+      {...listeners}
+      className={`touch-none draggable-card select-none ${isDragging ? 'draggable-active' : ''}`}
     >
-      <div className={isDragging ? 'shadow-xl scale-105 transition-transform' : ''}>
-        <ApplicationCard application={application} onClick={onClick} muted={muted} />
-      </div>
+      <ApplicationCard application={application} onClick={onClick} muted={muted} />
     </div>
   );
 }
 
-function DroppableColumn({ stage, count, color, isRejected, children }: { stage: string, count: number, color: string, isRejected: boolean, children: React.ReactNode }) {
-  const { setNodeRef, isOver } = useDroppable({
-    id: stage,
-    data: { stage }
-  });
+function DroppableColumn({ stage, count, color, isRejected, children }: {
+  stage: string; count: number; color: string; isRejected: boolean; children: React.ReactNode;
+}) {
+  const { setNodeRef, isOver } = useDroppable({ id: stage, data: { stage } });
 
   return (
-    <div className="min-w-[180px] w-[180px] flex-shrink-0 flex flex-col snap-center">
-      <div className="flex items-center gap-2 mb-3 px-1">
-        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-        <span className="text-xs font-medium text-muted-text truncate">{stage}</span>
-        <span className="text-xs text-muted-text/50 ml-auto flex-shrink-0">{count}</span>
+    <div className="min-w-[192px] w-[192px] flex-shrink-0 flex flex-col snap-center">
+      {/* Column header — Linear style */}
+      <div className="flex items-center gap-2 mb-2 px-1">
+        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+        <span
+          className="text-[11px] font-semibold uppercase tracking-[0.08em] truncate"
+          style={{ color: 'var(--muted-text)' }}
+        >
+          {stage}
+        </span>
+        <span
+          className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded border"
+          style={{
+            background: 'var(--surface-gray)',
+            color: 'var(--text-tertiary)',
+            borderColor: 'var(--border-gray)',
+          }}
+        >
+          {count}
+        </span>
       </div>
 
       <div
         ref={setNodeRef}
-        className={`flex-1 space-y-2 overflow-y-auto pipeline-column rounded-lg p-1.5 transition-colors ${
-          isRejected ? 'opacity-60' : ''
-        } ${isOver ? 'ring-2 ring-accent-blue/50' : ''}`}
-        style={{ borderLeft: `2px solid ${color}20`, backgroundColor: isOver ? `${color}15` : `${color}05` }}
+        className={`flex-1 space-y-1.5 overflow-y-auto pipeline-column rounded-lg p-1.5 transition-colors ${isRejected ? 'opacity-50' : ''}`}
+        style={{
+          background: isOver ? `${color}08` : 'var(--card-bg)',
+          border: isOver ? `1px solid ${color}40` : '1px solid var(--border-gray)',
+          minHeight: 120,
+        }}
       >
         {children}
       </div>
@@ -69,59 +79,41 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5, // 5px drag distance before activating, allowing easy native clicks
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250, // 250ms hold to activate dragging on mobile, otherwise it natively scrolls
-        tolerance: 5,
-      },
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
   );
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  };
+  const handleDragStart = (event: DragStartEvent) => setActiveId(event.active.id as string);
 
   const handleDragEnd = (event: DragEndEvent) => {
     setActiveId(null);
     const { active, over } = event;
     if (!over) return;
-
-    const appId = active.id as string;
-    const newStage = over.id as PipelineStage;
-    
-    const app = applications.find(a => a.id === appId);
-    if (app && app.status !== newStage) {
-      onStatusChange(appId, newStage);
+    const app = applications.find(a => a.id === active.id);
+    if (app && app.status !== over.id) {
+      onStatusChange(active.id as string, over.id as PipelineStage);
     }
   };
 
   return (
     <DndContext id="applyd-dnd-context" sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x-mandatory" style={{ minHeight: '400px' }}>
+      <div className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x-mandatory" style={{ minHeight: 400 }}>
         {stages.map((stage) => {
           const stageApps = applications.filter(a => a.status === stage);
           const color = STAGE_COLORS[stage] || '#6B7280';
           const isRejected = stage === 'Rejected' || stage === 'Declined';
 
           return (
-            <DroppableColumn
-              key={stage}
-              stage={stage}
-              count={stageApps.length}
-              color={color}
-              isRejected={isRejected}
-            >
+            <DroppableColumn key={stage} stage={stage} count={stageApps.length} color={color} isRejected={isRejected}>
               {stageApps.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-8 gap-1.5 pointer-events-none">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-text/30">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                  </svg>
-                  <span className="text-xs text-muted-text/40 text-center">No applications yet</span>
+                <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
+                  <div
+                    className="w-4 h-4 rounded border-2 border-dashed"
+                    style={{ borderColor: 'var(--border-gray)' }}
+                  />
+                  <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+                    Drop here
+                  </span>
                 </div>
               )}
               {stageApps.map(app => (
@@ -136,13 +128,11 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
           );
         })}
       </div>
+
       <DragOverlay dropAnimation={null} className="draggable-active select-none">
         {activeId ? (
-          <div className="scale-105 shadow-2xl">
-            <ApplicationCard
-              application={applications.find(a => a.id === activeId)!}
-              onClick={() => {}}
-            />
+          <div style={{ transform: 'rotate(1.5deg)', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', borderRadius: 8 }}>
+            <ApplicationCard application={applications.find(a => a.id === activeId)!} onClick={() => {}} />
           </div>
         ) : null}
       </DragOverlay>

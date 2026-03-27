@@ -123,14 +123,14 @@ function DashboardContent() {
       )}
       {/* Top nav */}
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-14 sm:h-16">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
           <div className="flex items-center gap-2">
             <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
               <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
               <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
             </svg>
-            <span className="text-lg font-semibold text-brand-navy tracking-tight">Applyd</span>
+            <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
           </div>
           <div className="flex items-center gap-3">
             {user?.name && (
@@ -150,7 +150,7 @@ function DashboardContent() {
       <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6">
         {/* Greeting */}
         <div className="mb-6">
-          <h1 className="text-xl font-semibold text-brand-navy tracking-tight">
+          <h1 className="text-[18px] font-semibold tracking-tight" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
             {user?.name ? user.name.split(' ')[0] : 'Hey'}{' '}
             <span className="text-muted-text font-normal">
               {(() => {
@@ -174,32 +174,35 @@ function DashboardContent() {
         <div className="mt-6 flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             {/* View toggle */}
-            <div className="flex bg-surface-gray rounded-lg p-0.5 flex-shrink-0">
-              <button onClick={() => setView('pipeline')} className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${view === 'pipeline' ? 'bg-card-bg text-brand-navy shadow-sm' : 'text-muted-text hover:text-body-text'}`}>
-                <span className="flex items-center gap-1.5">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                  Pipeline
-                </span>
-              </button>
-              <button onClick={() => setView('table')} className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${view === 'table' ? 'bg-card-bg text-brand-navy shadow-sm' : 'text-muted-text hover:text-body-text'}`}>
-                <span className="flex items-center gap-1.5">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                  Table
-                </span>
-              </button>
+            <div className="flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
+              <button
+                onClick={() => setView('pipeline')}
+                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
+              >Pipeline</button>
+              <button
+                onClick={() => setView('table')}
+                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'table' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
+              >Table</button>
             </div>
 
             {/* Search */}
             <div className="relative flex-1">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-text" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by company or role..." className="w-full pl-9 pr-3 py-1.5 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue" />
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search company or role…"
+                className="w-full h-9 pl-9 pr-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+              />
             </div>
 
             {/* Status filter */}
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value as PipelineStage | 'all')}
-              className="py-1.5 px-3 border border-border-gray rounded-lg text-sm text-muted-text focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue bg-background flex-shrink-0"
+              className="h-9 px-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 transition-colors flex-shrink-0"
+              style={{ color: 'var(--muted-text)' }}
             >
               <option value="all">All statuses</option>
               {stages.map(s => <option key={s} value={s}>{s}</option>)}
@@ -208,18 +211,23 @@ function DashboardContent() {
             {/* Hide inactive toggle */}
             <button
               onClick={() => setHideInactive(h => !h)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border flex-shrink-0 transition-colors ${
-                hideInactive
-                  ? 'bg-surface-gray border-border-gray text-muted-text'
-                  : 'bg-accent-blue/10 border-accent-blue/30 text-accent-blue'
-              }`}
+              className="h-9 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 transition-colors"
+              style={hideInactive
+                ? { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }
+                : { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }}
             >
               {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
             </button>
 
             {/* Add button */}
-            <button onClick={() => setShowAddModal(true)} className="sm:ml-auto px-4 py-2 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 flex items-center gap-1.5 shadow-sm active:scale-[0.98] flex-shrink-0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="sm:ml-auto h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors"
+              style={{ background: 'var(--accent-blue)' }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--accent-blue-hover)')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'var(--accent-blue)')}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add
             </button>
           </div>
@@ -230,9 +238,9 @@ function DashboardContent() {
           {applications.length === 0 ? (
             <EmptyState onAdd={() => setShowAddModal(true)} />
           ) : filteredApps.length === 0 ? (
-            <div className="py-20 text-center border-2 border-dashed border-border-gray rounded-xl bg-card-bg/30">
-              <h3 className="text-sm font-medium text-brand-navy mb-1">No matches</h3>
-              <p className="text-xs text-muted-text">Try adjusting your filters.</p>
+            <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">
+              <h3 className="text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>No matches</h3>
+              <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Try adjusting your filters.</p>
             </div>
           ) : view === 'pipeline' ? (
             <PipelineView
@@ -253,28 +261,28 @@ function DashboardContent() {
 
         {/* Bulk action bar */}
         {selectedIds.size > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-brand-navy text-white px-4 py-2.5 rounded-2xl shadow-2xl">
-            <span className="text-sm font-medium mr-1">{selectedIds.size} selected</span>
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border-gray shadow-lg" style={{ background: 'var(--brand-navy)', color: '#fff' }}>
+            <span className="text-[12px] font-medium mr-1">{selectedIds.size} selected</span>
             <select
               value={bulkStatus}
               onChange={e => setBulkStatus(e.target.value as PipelineStage | '')}
-              className="bg-white/10 border border-white/20 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none"
+              className="bg-white/10 border border-white/20 text-white text-[12px] rounded-md px-2 h-7 focus:outline-none"
             >
-              <option value="">Move to...</option>
+              <option value="">Move to…</option>
               {stages.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
             <button
               onClick={handleBulkStatusUpdate}
               disabled={!bulkStatus}
-              className="px-3 py-1.5 bg-accent-blue text-white text-xs font-medium rounded-lg disabled:opacity-40 hover:bg-accent-blue/80"
+              className="px-3 h-7 bg-accent-blue text-white text-[12px] font-medium rounded-md disabled:opacity-40 transition-colors"
             >
               Apply
             </button>
             <div className="w-px h-4 bg-white/20 mx-1" />
-            <button onClick={handleBulkDelete} className="px-3 py-1.5 bg-red-500 text-white text-xs font-medium rounded-lg hover:bg-red-600">
+            <button onClick={handleBulkDelete} className="px-3 h-7 bg-red-500 text-white text-[12px] font-medium rounded-md hover:bg-red-600 transition-colors">
               Delete
             </button>
-            <button onClick={() => setSelectedIds(new Set())} className="ml-1 text-white/60 hover:text-white text-xs">
+            <button onClick={() => setSelectedIds(new Set())} className="ml-1 text-white/60 hover:text-white text-[12px]">
               ✕
             </button>
           </div>
@@ -374,7 +382,7 @@ export default function DashboardPage() {
           {/* Stats skeleton */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="rounded-xl p-4 bg-card-bg border border-border-gray">
+              <div key={i} className="rounded-lg p-4 bg-card-bg border border-border-gray">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-4 h-4 rounded bg-surface-gray animate-pulse" />
                   <div className="w-20 h-3 rounded bg-surface-gray animate-pulse" />

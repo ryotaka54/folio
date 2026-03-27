@@ -44,18 +44,16 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
   const offerRate = applied > 0 ? Math.round((offers / applied) * 100) : 0;
 
   return (
-    <div className="bg-card-bg border border-border-gray rounded-xl p-5 mt-6 mb-2">
+    <div className="bg-card-bg border border-border-gray rounded-lg p-5 mt-6 mb-2">
       <div className="flex items-center justify-between mb-5">
-        <div>
-          <h3 className="text-sm font-semibold text-brand-navy">Your Recruiting Funnel</h3>
-          <p className="text-xs text-muted-text mt-0.5">Every application gets you closer</p>
-        </div>
-        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-          offerRate > 0
-            ? 'text-success-text bg-success-bg border border-success-border'
-            : 'text-muted-text bg-surface-gray border border-border-gray'
-        }`}>
-          {offerRate > 0 ? `${offerRate}% offer rate` : 'Apply to more roles'}
+        <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Pipeline Overview</h3>
+        <span
+          className="text-[11px] font-semibold px-2 py-0.5 rounded border"
+          style={offerRate > 0
+            ? { background: 'var(--success-bg)', color: 'var(--success-text)', borderColor: 'var(--success-border)' }
+            : { background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }}
+        >
+          {offerRate > 0 ? `${offerRate}% offer rate` : 'Keep applying'}
         </span>
       </div>
       <div className="space-y-3">

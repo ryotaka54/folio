@@ -33,12 +33,12 @@ export default function OnboardingPage() {
           <div className="flex justify-center gap-2 mb-8">
             {[1, 2, 3].map(i => <div key={i} className="w-2.5 h-2.5 rounded-full bg-border-gray animate-pulse" />)}
           </div>
-          <div className="bg-card-bg rounded-2xl p-6 md:p-8 border border-border-gray">
+          <div className="bg-card-bg rounded-lg p-6 md:p-8 border border-border-gray">
             <div className="w-40 h-6 rounded bg-surface-gray animate-pulse mb-2" />
             <div className="w-64 h-4 rounded bg-surface-gray animate-pulse mb-6" />
             <div className="grid grid-cols-2 gap-3">
-              <div className="h-32 rounded-xl bg-surface-gray animate-pulse" />
-              <div className="h-32 rounded-xl bg-surface-gray animate-pulse" />
+              <div className="h-32 rounded-lg bg-surface-gray animate-pulse" />
+              <div className="h-32 rounded-lg bg-surface-gray animate-pulse" />
             </div>
           </div>
         </div>
@@ -75,55 +75,54 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        <div className="bg-card-bg rounded-2xl p-6 md:p-8 shadow-sm border border-border-gray modal-enter">
+        <div className="bg-card-bg rounded-lg p-6 md:p-8 border border-border-gray modal-enter">
           {/* Step 1: Mode Selection */}
           {step === 1 && (
             <div>
-              <h1 className="text-xl font-semibold text-brand-navy mb-1">What are you tracking?</h1>
-              <p className="text-sm text-muted-text mb-6">This determines your pipeline stages. You can change it later.</p>
+              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>What are you tracking?</h1>
+              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>This determines your pipeline stages. You can change it later.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <button
                   onClick={() => setMode('internship')}
-                  className={`text-left p-4 rounded-xl border-2 transition-all ${
-                    mode === 'internship'
-                      ? 'border-accent-blue bg-light-accent'
-                      : 'border-border-gray hover:border-accent-blue/30'
-                  }`}
+                  className="text-left p-4 rounded-lg border transition-colors"
+                  style={mode === 'internship'
+                    ? { borderColor: 'var(--accent-blue)', background: 'var(--accent-blue)08' }
+                    : { borderColor: 'var(--border-gray)', background: 'transparent' }}
                 >
-                  <div className="mb-3 text-accent-blue bg-accent-blue/10 w-10 h-10 rounded-full flex items-center justify-center">
-                    <GraduationCap size={20} className="stroke-[2.5px]" />
+                  <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
+                    <GraduationCap size={17} />
                   </div>
-                  <div className="font-medium text-brand-navy text-sm">Internship applications</div>
-                  <div className="text-xs text-muted-text mt-1">Track internship recruiting cycles</div>
+                  <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Internship applications</div>
+                  <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track internship recruiting cycles</div>
                   <div className="flex flex-wrap gap-1 mt-3">
                     {['Summer 2026', 'OA / Screen', 'Return offer'].map(tag => (
-                      <span key={tag} className="text-[10px] px-2 py-0.5 bg-surface-gray rounded-full text-muted-text">{tag}</span>
+                      <span key={tag} className="text-[10px] px-1.5 py-0.5 border border-border-gray rounded" style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)' }}>{tag}</span>
                     ))}
                   </div>
                 </button>
                 <button
                   onClick={() => setMode('job')}
-                  className={`text-left p-4 rounded-xl border-2 transition-all ${
-                    mode === 'job'
-                      ? 'border-accent-blue bg-light-accent'
-                      : 'border-border-gray hover:border-accent-blue/30'
-                  }`}
+                  className="text-left p-4 rounded-lg border transition-colors"
+                  style={mode === 'job'
+                    ? { borderColor: 'var(--accent-blue)', background: 'var(--accent-blue)08' }
+                    : { borderColor: 'var(--border-gray)', background: 'transparent' }}
                 >
-                  <div className="mb-3 text-accent-blue bg-accent-blue/10 w-10 h-10 rounded-full flex items-center justify-center">
-                    <Briefcase size={20} className="stroke-[2.5px]" />
+                  <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
+                    <Briefcase size={17} />
                   </div>
-                  <div className="font-medium text-brand-navy text-sm">Full-time job applications</div>
-                  <div className="text-xs text-muted-text mt-1">Track post-graduation job searches</div>
+                  <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Full-time job applications</div>
+                  <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track post-graduation job searches</div>
                   <div className="flex flex-wrap gap-1 mt-3">
                     {['New Grad', 'Negotiation', 'Offer compare'].map(tag => (
-                      <span key={tag} className="text-[10px] px-2 py-0.5 bg-surface-gray rounded-full text-muted-text">{tag}</span>
+                      <span key={tag} className="text-[10px] px-1.5 py-0.5 border border-border-gray rounded" style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)' }}>{tag}</span>
                     ))}
                   </div>
                 </button>
               </div>
               <button
                 onClick={() => setStep(2)}
-                className="w-full mt-6 py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors"
+                className="w-full mt-5 h-9 text-[14px] font-medium text-white rounded-md transition-colors"
+                style={{ background: 'var(--accent-blue)' }}
               >
                 Continue
               </button>
@@ -133,35 +132,34 @@ export default function OnboardingPage() {
           {/* Step 2: Personal Context */}
           {step === 2 && (
             <div>
-              <h1 className="text-xl font-semibold text-brand-navy mb-1">Tell us about yourself</h1>
-              <p className="text-sm text-muted-text mb-6">Just the basics — takes 30 seconds.</p>
+              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Tell us about yourself</h1>
+              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Just the basics — takes 30 seconds.</p>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-body-text mb-1">Your name</label>
+                  <label htmlFor="name" className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Your name</label>
                   <input
                     id="name"
                     type="text"
                     autoFocus
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                    className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                     placeholder="First name"
                   />
                 </div>
                 {mode === 'internship' ? (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-body-text mb-2">School year</label>
+                      <label className="block text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)' }}>School year</label>
                       <div className="flex flex-wrap gap-2">
                         {SCHOOL_YEARS.map(y => (
                           <button
                             key={y}
                             onClick={() => setSchoolYear(y)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                              schoolYear === y
-                                ? 'bg-accent-blue text-white'
-                                : 'bg-surface-gray text-body-text hover:bg-border-gray'
-                            }`}
+                            className="px-3 h-8 rounded-md text-[12px] font-medium border transition-colors"
+                            style={schoolYear === y
+                              ? { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }
+                              : { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
                           >
                             {y}
                           </button>
@@ -169,17 +167,16 @@ export default function OnboardingPage() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-body-text mb-2">Recruiting season</label>
+                      <label className="block text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)' }}>Recruiting season</label>
                       <div className="flex flex-wrap gap-2">
                         {RECRUITING_SEASONS.map(s => (
                           <button
                             key={s}
                             onClick={() => setRecruitingSeason(s)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                              recruitingSeason === s
-                                ? 'bg-accent-blue text-white'
-                                : 'bg-surface-gray text-body-text hover:bg-border-gray'
-                            }`}
+                            className="px-3 h-8 rounded-md text-[12px] font-medium border transition-colors"
+                            style={recruitingSeason === s
+                              ? { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }
+                              : { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
                           >
                             {s}
                           </button>
@@ -189,17 +186,16 @@ export default function OnboardingPage() {
                   </>
                 ) : (
                   <div>
-                    <label className="block text-sm font-medium text-body-text mb-2">Career level</label>
+                    <label className="block text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)' }}>Career level</label>
                     <div className="flex flex-wrap gap-2">
                       {CAREER_LEVELS.map(l => (
                         <button
                           key={l}
                           onClick={() => setCareerLevel(l)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                            careerLevel === l
-                              ? 'bg-accent-blue text-white'
-                              : 'bg-surface-gray text-body-text hover:bg-border-gray'
-                          }`}
+                          className="px-3 h-8 rounded-md text-[12px] font-medium border transition-colors"
+                          style={careerLevel === l
+                            ? { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }
+                            : { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
                         >
                           {l}
                         </button>
@@ -208,16 +204,18 @@ export default function OnboardingPage() {
                   </div>
                 )}
               </div>
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 mt-5">
                 <button
                   onClick={() => setStep(1)}
-                  className="flex-1 py-2.5 bg-surface-gray text-body-text text-sm font-medium rounded-lg hover:bg-border-gray transition-colors"
+                  className="flex-1 h-9 text-[13px] font-medium rounded-md border transition-colors"
+                  style={{ background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
                 >
                   Back
                 </button>
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors"
+                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors"
+                  style={{ background: 'var(--accent-blue)' }}
                 >
                   Continue
                 </button>
@@ -228,31 +226,34 @@ export default function OnboardingPage() {
           {/* Step 3: Confirmation */}
           {step === 3 && (
             <div>
-              <h1 className="text-xl font-semibold text-brand-navy mb-1">You&apos;re all set{name ? `, ${name}` : ''}!</h1>
-              <p className="text-sm text-muted-text mb-6">Here are the pipeline stages we&apos;ve set up for you:</p>
-              <div className="space-y-2">
+              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>You&apos;re all set{name ? `, ${name}` : ''}!</h1>
+              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Here are your pipeline stages:</p>
+              <div className="space-y-1.5">
                 {stages.map((stage, i) => (
                   <div
                     key={stage}
-                    className="flex items-center gap-3 px-3 py-2 bg-surface-gray rounded-lg"
+                    className="flex items-center gap-3 px-3 py-2 rounded-md border border-border-gray"
+                    style={{ background: 'var(--surface-gray)' }}
                   >
-                    <span className="text-xs text-muted-text font-medium w-5">{i + 1}</span>
-                    <span className="text-sm text-body-text">{stage}</span>
+                    <span className="text-[11px] font-medium w-4" style={{ color: 'var(--text-tertiary)' }}>{i + 1}</span>
+                    <span className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>{stage}</span>
                   </div>
                 ))}
               </div>
-              <div className="flex gap-3 mt-6">
+              <div className="flex gap-3 mt-5">
                 <button
                   onClick={() => setStep(2)}
-                  className="flex-1 py-2.5 bg-surface-gray text-body-text text-sm font-medium rounded-lg hover:bg-border-gray transition-colors"
+                  className="flex-1 h-9 text-[13px] font-medium rounded-md border transition-colors"
+                  style={{ background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
                 >
                   Back
                 </button>
                 <button
                   onClick={handleComplete}
-                  className="flex-1 py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors"
+                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors"
+                  style={{ background: 'var(--accent-blue)' }}
                 >
-                  Add your first application →
+                  Go to dashboard →
                 </button>
               </div>
             </div>

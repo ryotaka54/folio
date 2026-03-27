@@ -1,63 +1,93 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 :root {
-  --brand-navy: #1A1A2E;
-  --accent-blue: #4361EE;
-  --light-accent: #EEF2FF;
+  /* Blue palette */
+  --accent-blue: #2563EB;
+  --accent-blue-hover: #1D4ED8;
+  --light-accent: #EFF6FF;
+  --accent-blue-text: #1E40AF;
+
+  /* Surfaces */
+  --background: #FFFFFF;
+  --card-bg: #F9FAFB;
   --surface-gray: #F3F4F6;
+
+  /* Borders */
   --border-gray: #E5E7EB;
-  --body-text: #374151;
+  --border-emphasis: #D1D5DB;
+
+  /* Text */
+  --brand-navy: #111827;
+  --body-text: #111827;
   --muted-text: #6B7280;
-  --amber-warning: #EF9F27;
-  --green-success: #1D9E75;
-  --background: #ffffff;
-  --foreground: #171717;
-  --card-bg: #ffffff;
-  /* Error state — dark-mode safe */
+  --text-tertiary: #9CA3AF;
+
+  /* Semantic */
+  --amber-warning: #D97706;
+  --green-success: #16A34A;
+  --danger: #DC2626;
+
+  /* Error/Success state */
   --error-bg: #FEF2F2;
   --error-text: #DC2626;
   --error-border: #FECACA;
-  /* Success state — dark-mode safe */
   --success-bg: #F0FDF4;
   --success-text: #16A34A;
   --success-border: #BBF7D0;
+
+  --foreground: #111827;
 }
 
 .dark {
-  --brand-navy: #F8FAFC;
-  --accent-blue: #5B7AF2;
-  --light-accent: #1E293B;
-  --surface-gray: #09090b;
-  --border-gray: #27272a;
-  --body-text: #e4e4e7;
-  --muted-text: #a1a1aa;
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card-bg: #18181b;
-  /* Error state — dark */
+  --accent-blue: #3B82F6;
+  --accent-blue-hover: #60A5FA;
+  --light-accent: #172554;
+  --accent-blue-text: #93C5FD;
+
+  --background: #0A0A0A;
+  --card-bg: #1C1C1E;
+  --surface-gray: #111111;
+
+  --border-gray: #2C2C2E;
+  --border-emphasis: #3F3F46;
+
+  --brand-navy: #F9FAFB;
+  --body-text: #F9FAFB;
+  --muted-text: #A1A1AA;
+  --text-tertiary: #71717A;
+
+  --amber-warning: #FBBF24;
+  --green-success: #4ADE80;
+  --danger: #F87171;
+
   --error-bg: rgba(239, 68, 68, 0.12);
   --error-text: #f87171;
   --error-border: rgba(239, 68, 68, 0.25);
-  /* Success state — dark */
   --success-bg: rgba(34, 197, 94, 0.12);
   --success-text: #4ade80;
   --success-border: rgba(34, 197, 94, 0.25);
+
+  --foreground: #F9FAFB;
 }
 
 @theme inline {
-  --color-brand-navy: var(--brand-navy);
   --color-accent-blue: var(--accent-blue);
+  --color-accent-blue-hover: var(--accent-blue-hover);
   --color-light-accent: var(--light-accent);
+  --color-accent-blue-text: var(--accent-blue-text);
+  --color-background: var(--background);
+  --color-card-bg: var(--card-bg);
   --color-surface-gray: var(--surface-gray);
   --color-border-gray: var(--border-gray);
+  --color-border-emphasis: var(--border-emphasis);
+  --color-brand-navy: var(--brand-navy);
   --color-body-text: var(--body-text);
   --color-muted-text: var(--muted-text);
+  --color-text-tertiary: var(--text-tertiary);
   --color-amber-warning: var(--amber-warning);
   --color-green-success: var(--green-success);
-  --color-background: var(--background);
+  --color-danger: var(--danger);
   --color-foreground: var(--foreground);
-  --color-card-bg: var(--card-bg);
   --color-error-bg: var(--error-bg);
   --color-error-text: var(--error-text);
   --color-error-border: var(--error-border);
@@ -70,29 +100,28 @@
   box-sizing: border-box;
 }
 
-/* Theme transition — applied globally so dark/light switch fades */
+/* Theme transition — fast and snappy */
 html {
-  transition: background-color 0.35s cubic-bezier(0.4,0,0.2,1),
-              color 0.35s cubic-bezier(0.4,0,0.2,1);
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 *:not(svg, path, line, circle, rect, polyline, polygon) {
-  transition-property: background-color, border-color;
-  transition-duration: 0.35s;
-  transition-timing-function: cubic-bezier(0.4,0,0.2,1);
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-geist, 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
   background: var(--background);
   color: var(--body-text);
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Safe area for notched phones */
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
-  /* Prevent pull-to-refresh on mobile */
   overscroll-behavior-y: contain;
 }
 
@@ -101,7 +130,7 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Hide scrollbars on mobile but keep scrolling */
+/* Hide scrollbars on mobile */
 @media (max-width: 768px) {
   .overflow-x-auto::-webkit-scrollbar {
     display: none;
@@ -112,91 +141,89 @@ body {
   }
 }
 
-/* Prevent auto-zoom on iOS by ensuring 16px font size on inputs */
+/* Prevent auto-zoom on iOS */
 @media screen and (max-width: 768px) {
   input, select, textarea {
     font-size: 16px !important;
   }
 }
 
-/* Custom scrollbar for pipeline columns */
-.pipeline-column::-webkit-scrollbar {
-  width: 4px;
-}
-.pipeline-column::-webkit-scrollbar-track {
-  background: transparent;
-}
-.pipeline-column::-webkit-scrollbar-thumb {
-  background: var(--border-gray);
-  border-radius: 2px;
-}
+/* Pipeline column scrollbar */
+.pipeline-column::-webkit-scrollbar { width: 3px; }
+.pipeline-column::-webkit-scrollbar-track { background: transparent; }
+.pipeline-column::-webkit-scrollbar-thumb { background: var(--border-gray); border-radius: 2px; }
 
-/* Modal/drawer backdrop — no blur, just semi-transparent overlay */
+/* Modal/drawer backdrop */
 .backdrop {
-  transition: opacity 0.15s ease-out;
+  transition: opacity 0.15s ease;
 }
 
-/* Transitions */
+/* Slide-in drawer */
 .slide-in {
   animation: slideIn 0.2s ease-out;
 }
 @keyframes slideIn {
   from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  to   { transform: translateX(0); }
 }
 
-.fade-in {
-  animation: fadeIn 0.15s ease-out;
-}
+/* Fade in */
+.fade-in { animation: fadeIn 0.15s ease-out; }
 @keyframes fadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
-.modal-enter {
-  animation: modalEnter 0.2s ease-out;
-}
+/* Modal enter */
+.modal-enter { animation: modalEnter 0.18s ease-out; }
 @keyframes modalEnter {
-  from { opacity: 0; transform: scale(0.95) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.97) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* Scroll Snap Helpers */
+/* Scroll snap */
 .snap-x-mandatory {
   scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
 }
-.snap-center {
-  scroll-snap-align: center;
+.snap-center  { scroll-snap-align: center; }
+.snap-start   { scroll-snap-align: start; }
+
+/* Drag */
+.draggable-active {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
 }
-.snap-start {
-  scroll-snap-align: start;
+.draggable-card {
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* ── Product Walkthrough Animations ──────────────────────────────────────── */
+/* ── Product Walkthrough Animations ─────────────────────────────────────── */
 @keyframes wt-panel-in {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes wt-scale-in {
-  from { opacity: 0; transform: scale(0.94) translateY(6px); }
+  from { opacity: 0; transform: scale(0.95) translateY(4px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 @keyframes wt-fade-up {
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes wt-card-pop {
-  from { opacity: 0; transform: scale(0.88) translateY(6px); }
+  from { opacity: 0; transform: scale(0.9) translateY(4px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 @keyframes wt-btn-press {
   0%   { transform: scale(1); }
-  40%  { transform: scale(0.96); }
+  40%  { transform: scale(0.97); }
   100% { transform: scale(1); }
 }
 @keyframes wt-cursor-blink {
-  0%,49%  { opacity: 1; }
+  0%,49%   { opacity: 1; }
   50%,100% { opacity: 0; }
 }
 @keyframes wt-bar-grow {
@@ -204,20 +231,20 @@ body {
   to   { transform: scaleX(1); }
 }
 @keyframes wt-badge-pulse {
-  0%,100% { box-shadow: 0 0 0 0px rgba(239,68,68,0); }
-  50%     { box-shadow: 0 0 0 4px rgba(239,68,68,0.15); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  50%     { box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
 }
 @keyframes wt-stat-highlight {
-  0%   { box-shadow: 0 0 0 0px rgba(245,158,11,0); }
-  50%  { box-shadow: 0 0 0 4px rgba(245,158,11,0.2); }
+  0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+  50%  { box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
   100% { box-shadow: 0 0 0 2px rgba(245,158,11,0.1); }
 }
 @keyframes wt-slide-left {
-  from { opacity: 0; transform: translateX(-12px); }
+  from { opacity: 0; transform: translateX(-10px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes wt-slide-right {
-  from { opacity: 0; transform: translateX(12px); }
+  from { opacity: 0; transform: translateX(10px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes wt-progress {
@@ -226,15 +253,15 @@ body {
 }
 @keyframes wt-drag-out {
   0%   { transform: translate(0,0) rotate(0deg); opacity: 1; }
-  60%  { transform: translate(6px,-6px) rotate(1.5deg); opacity: 0.4; }
-  100% { transform: translate(6px,-6px) rotate(1.5deg); opacity: 0; }
+  60%  { transform: translate(6px,-4px) rotate(1deg); opacity: 0.4; }
+  100% { transform: translate(6px,-4px) rotate(1deg); opacity: 0; }
 }
 @keyframes wt-drop-glow {
   0%   { opacity: 0; }
   40%  { opacity: 1; }
   100% { opacity: 0; }
 }
-/* Respect reduced motion — freeze all wt- animations */
+
 @media (prefers-reduced-motion: reduce) {
   [style*="animation: wt-"],
   [style*="animation:wt-"] {
@@ -242,16 +269,4 @@ body {
     opacity: 1 !important;
     transform: none !important;
   }
-}
-
-/* Prevent text selection and touch callouts during drag */
-.draggable-active {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -webkit-touch-callout: none !important;
-}
-
-.draggable-card {
-  touch-action: none;
-  -webkit-tap-highlight-color: transparent;
 }

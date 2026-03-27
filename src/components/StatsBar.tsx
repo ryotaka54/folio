@@ -11,7 +11,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
   const total = applications.length;
   const applied = applications.filter(a => a.status !== 'Wishlist');
   const pastApplied = applications.filter(a =>
-    a.status !== 'Wishlist' && a.status !== 'Applied' && a.status !== 'Rejected' && a.status !== 'Declined'
+    !['Wishlist', 'Applied', 'Rejected', 'Declined'].includes(a.status)
   );
   const responseRate = applied.length >= 5
     ? Math.round((pastApplied.length / applied.length) * 100)
@@ -25,7 +25,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
 
   const now = new Date();
   const sevenDaysAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo  = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
   const deadlinesSoon = applications.filter(a => {
     if (!a.deadline) return false;
@@ -43,29 +43,29 @@ export default function StatsBar({ applications }: StatsBarProps) {
       label: 'Total',
       value: total.toString(),
       subtext: thisWeek > 0 ? `+${thisWeek} this week` : 'none this week',
-      icon: <TrendingUp size={16} className="text-accent-blue" />,
-      highlight: false,
+      icon: <TrendingUp size={14} />,
+      accent: null,
     },
     {
       label: 'Response Rate',
       value: responseRate !== null ? `${responseRate}%` : '—',
       subtext: responseRate === null ? `${5 - applied.length} more to unlock` : 'of applications replied',
-      icon: <Zap size={16} className="text-amber-500" />,
-      highlight: false,
+      icon: <Zap size={14} />,
+      accent: null,
     },
     {
       label: 'Interviews',
       value: interviews.toString(),
-      subtext: interviews === 0 ? 'Keep applying' : interviews === 1 ? "You're in the room" : 'You\'re on a roll',
-      icon: <MessageSquare size={16} className="text-emerald-500" />,
-      highlight: interviews > 0,
+      subtext: interviews === 0 ? 'Keep applying' : interviews === 1 ? "You're in the room" : "You're on a roll",
+      icon: <MessageSquare size={14} />,
+      accent: 'green' as const,
     },
     {
       label: 'Act Now',
       value: deadlinesSoon.toString(),
       subtext: deadlinesSoon === 0 ? 'No urgent deadlines' : deadlinesSoon === 1 ? 'deadline this week' : 'deadlines this week',
-      icon: <Clock size={16} className="text-red-500" />,
-      highlight: deadlinesSoon > 0,
+      icon: <Clock size={14} />,
+      accent: 'amber' as const,
     },
   ];
 
@@ -74,21 +74,37 @@ export default function StatsBar({ applications }: StatsBarProps) {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-xl p-4 bg-card-bg border border-border-gray"
+          className="rounded-lg p-4 bg-card-bg border border-border-gray relative overflow-hidden"
+          style={stat.accent === 'green'
+            ? { borderLeft: '3px solid #16A34A' }
+            : stat.accent === 'amber'
+            ? { borderLeft: '3px solid #D97706' }
+            : undefined}
         >
-          <div className="flex items-center gap-2 mb-1">
-            <span className="flex-shrink-0">{stat.icon}</span>
-            <span className="text-xs text-muted-text font-medium">{stat.label}</span>
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-text-tertiary">{stat.icon}</span>
+            <span
+              className="text-[11px] font-semibold uppercase tracking-[0.05em]"
+              style={{ color: 'var(--muted-text)' }}
+            >
+              {stat.label}
+            </span>
           </div>
-          <span className={`text-2xl font-semibold ${
-            stat.highlight
-              ? stat.label === 'Interviews' ? 'text-emerald-600' : 'text-amber-700'
-              : 'text-brand-navy'
-          }`}>
+          <div
+            className="text-[28px] font-semibold leading-none mb-1"
+            style={{
+              color: stat.accent === 'green'
+                ? 'var(--green-success)'
+                : stat.accent === 'amber'
+                ? 'var(--amber-warning)'
+                : 'var(--brand-navy)',
+              letterSpacing: '-0.02em',
+            }}
+          >
             {stat.value}
-          </span>
+          </div>
           {stat.subtext && (
-            <p className="text-[10px] text-muted-text/60 mt-0.5 leading-tight">{stat.subtext}</p>
+            <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>{stat.subtext}</p>
           )}
         </div>
       ))}

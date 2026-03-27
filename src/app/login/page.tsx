@@ -54,27 +54,27 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
+            <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#2563EB"/>
+              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#2563EB" opacity="0.6"/>
+              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#2563EB" opacity="0.3"/>
             </svg>
-            <span className="text-xl font-semibold text-brand-navy">Applyd</span>
+            <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
           </Link>
         </div>
 
-        <div className="bg-card-bg rounded-2xl p-6 shadow-sm border border-border-gray">
-          <h1 className="text-lg font-semibold text-brand-navy mb-1">Welcome back</h1>
-          <p className="text-sm text-muted-text mb-6">Log in to continue tracking your applications.</p>
+        <div className="bg-card-bg rounded-lg p-6 border border-border-gray">
+          <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Welcome back</h1>
+          <p className="text-[13px] mb-6" style={{ color: 'var(--muted-text)' }}>Log in to continue tracking your applications.</p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {error && (
-              <div className="bg-error-bg text-error-text text-sm px-3 py-2 rounded-lg border border-error-border">
+              <div className="text-[13px] px-3 py-2 rounded-md border bg-error-bg text-error-text border-error-border">
                 {error}
               </div>
             )}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-body-text mb-1">Email</label>
+              <label htmlFor="email" className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Email</label>
               <input
                 id="email"
                 name="email"
@@ -83,14 +83,14 @@ export default function LoginPage() {
                 autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                 placeholder="you@university.edu"
               />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label htmlFor="password" className="block text-sm font-medium text-body-text">Password</label>
-                <Link href="/forgot-password" className="text-xs text-accent-blue hover:underline">Forgot password?</Link>
+                <label htmlFor="password" className="block text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Password</label>
+                <Link href="/forgot-password" className="text-[12px] transition-colors" style={{ color: 'var(--accent-blue)' }}>Forgot password?</Link>
               </div>
               <div className="relative">
                 <input
@@ -100,31 +100,33 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3 py-2.5 sm:py-2 pr-10 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                  className="w-full h-9 px-3 pr-10 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                   placeholder="Your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-body-text"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: 'var(--text-tertiary)' }}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors disabled:opacity-50"
+              className="w-full h-9 text-[14px] font-medium text-white rounded-md transition-colors disabled:opacity-50"
+              style={{ background: 'var(--accent-blue)' }}
             >
               {loading ? 'Logging in…' : 'Log in'}
             </button>
           </form>
 
-          <p className="text-center text-sm text-muted-text mt-4">
+          <p className="text-center text-[13px] mt-4" style={{ color: 'var(--muted-text)' }}>
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-accent-blue hover:underline">Sign up</Link>
+            <Link href="/signup" className="hover:underline" style={{ color: 'var(--accent-blue)' }}>Sign up</Link>
           </p>
         </div>
       </div>
