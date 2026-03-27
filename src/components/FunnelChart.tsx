@@ -10,9 +10,6 @@ interface FunnelChartProps {
 
 export default function FunnelChart({ applications }: FunnelChartProps) {
   const data = useMemo(() => {
-    const wishlist = applications.length;
-    const applied = applications.filter(a => a.status !== 'Wishlist').length;
-
     const interviewStages = [
       'OA / Online Assessment',
       'Phone / Recruiter Screen',
@@ -22,26 +19,29 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
       'Final Round',
       'Offer — Negotiating',
     ];
-    const positiveOutcomes = ['Offer', 'Offer — Negotiating', 'Accepted'];
-    const interviews = applications.filter(a =>
-      interviewStages.includes(a.status) || positiveOutcomes.includes(a.status)
-    ).length;
-    const offers = applications.filter(a => positiveOutcomes.includes(a.status)).length;
+    const positiveOutcomes = ['Offer', 'Accepted'];
+
+    // Per-stage counts — each bar reflects exactly what's in the kanban column(s)
+    const wishlistCount   = applications.filter(a => a.status === 'Wishlist').length;
+    const appliedCount    = applications.filter(a => a.status === 'Applied').length;
+    const interviewCount  = applications.filter(a => interviewStages.includes(a.status)).length;
+    const offersCount     = applications.filter(a => positiveOutcomes.includes(a.status)).length;
 
     return [
-      { name: 'Wishlist',    count: wishlist,    color: STAGE_COLORS['Wishlist'] || '#8B5CF6' },
-      { name: 'Applied',     count: applied,     color: STAGE_COLORS['Applied']  || '#4361EE' },
-      { name: 'Interviews',  count: interviews,  color: STAGE_COLORS['Phone / Recruiter Screen'] || '#F59E0B' },
-      { name: 'Offers',      count: offers,      color: STAGE_COLORS['Offer'] || '#1D9E75' },
+      { name: 'Wishlist',   count: wishlistCount,  color: STAGE_COLORS['Wishlist'] || '#8B5CF6' },
+      { name: 'Applied',    count: appliedCount,   color: STAGE_COLORS['Applied']  || '#4361EE' },
+      { name: 'Interviews', count: interviewCount, color: STAGE_COLORS['Phone / Recruiter Screen'] || '#F59E0B' },
+      { name: 'Offers',     count: offersCount,    color: STAGE_COLORS['Offer'] || '#1D9E75' },
     ];
   }, [applications]);
 
   if (applications.length === 0) return null;
 
-  const maxCount = data[0].count || 1;
-  const applied = data[1].count;
+  const maxCount = Math.max(...data.map(d => d.count), 1);
+  // Offer rate: offers vs total apps that left Wishlist (cumulative, not just current stage)
+  const totalSubmitted = applications.filter(a => a.status !== 'Wishlist').length;
   const offers = data[3].count;
-  const offerRate = applied > 0 ? Math.round((offers / applied) * 100) : 0;
+  const offerRate = totalSubmitted >= 5 ? Math.round((offers / totalSubmitted) * 100) : 0;
 
   return (
     <div className="bg-card-bg border border-border-gray rounded-lg p-5 mt-6 mb-2">

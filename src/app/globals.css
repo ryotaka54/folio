@@ -100,13 +100,15 @@
   box-sizing: border-box;
 }
 
-/* Theme transition — fast and snappy */
+/* Theme transition — only on the root, not every element */
 html {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-*:not(svg, path, line, circle, rect, polyline, polygon) {
-  transition-property: background-color, border-color, color;
+/* Targeted transitions: only on interactive elements, not all DOM nodes.
+   The broad * rule was causing 150ms lag on drag-over column highlights. */
+button, a, input, select, textarea, [role="button"] {
+  transition-property: background-color, border-color, color, opacity;
   transition-duration: 0.15s;
   transition-timing-function: ease;
 }
@@ -198,6 +200,11 @@ body {
 .draggable-card {
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+}
+/* Drop column highlight must be instant — no transition delay */
+.pipeline-column {
+  transition: background-color 0s, border-color 0s !important;
 }
 
 /* ── Product Walkthrough Animations ─────────────────────────────────────── */
