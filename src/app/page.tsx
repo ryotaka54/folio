@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { TrendingUp, Zap, MessageSquare, Clock } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import ProductWalkthrough from '@/components/ProductWalkthrough';
 
 export default function Home() {
   const { user } = useAuth();
@@ -129,6 +130,11 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Product Walkthrough */}
+        <div className="-mx-6">
+          <ProductWalkthrough />
         </div>
 
         {/* Benefits Row */}
