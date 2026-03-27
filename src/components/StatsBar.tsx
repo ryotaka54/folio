@@ -79,7 +79,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
               ? stat.label === 'Interviews'
                 ? 'bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900'
                 : 'bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900'
-              : 'bg-surface-gray'
+              : 'bg-card-bg border border-border-gray'
           }`}
         >
           <div className="flex items-center gap-2 mb-1">
