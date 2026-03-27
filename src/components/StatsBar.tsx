@@ -88,7 +88,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
           </div>
           <span className={`text-2xl font-semibold ${
             stat.highlight
-              ? stat.label === 'Interviews' ? 'text-emerald-600' : 'text-amber-500'
+              ? stat.label === 'Interviews' ? 'text-emerald-600' : 'text-amber-700'
               : 'text-brand-navy'
           }`}>
             {stat.value}
