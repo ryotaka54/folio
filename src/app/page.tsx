@@ -189,6 +189,7 @@ export default function Home() {
           <div className="flex items-center gap-8">
             <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help & FAQ</Link>
             <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Us</Link>
+            <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
             <span className="text-xs text-muted-text/50">© 2026 Applyd</span>
           </div>
         </div>

@@ -285,6 +285,7 @@ function DashboardContent() {
           <div className="flex items-center gap-6">
             <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help Center</Link>
             <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Support</Link>
+            <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
           </div>
           <p className="text-[10px] text-muted-text/50 font-medium tracking-wider uppercase">© 2026 Applyd — Made for Students</p>
         </footer>
