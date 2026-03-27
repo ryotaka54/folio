@@ -27,9 +27,17 @@ export type Category =
   | 'Design'
   | 'Data Science'
   | 'Finance'
-  | 'Marketing'
+  | 'Accounting'
   | 'Consulting'
+  | 'Marketing'
+  | 'Sales & Business Development'
+  | 'Human Resources'
   | 'Operations'
+  | 'Supply Chain'
+  | 'Research & Policy'
+  | 'Communications & PR'
+  | 'Legal'
+  | 'Healthcare & Life Sciences'
   | 'Other';
 
 export interface Application {

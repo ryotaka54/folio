@@ -23,13 +23,21 @@ export const JOB_STAGES: JobStage[] = [
 
 export const CATEGORIES: Category[] = [
   'Engineering',
-  'Finance',
-  'Data Science',
   'Product Management',
   'Design',
-  'Marketing',
+  'Data Science',
+  'Finance',
+  'Accounting',
   'Consulting',
+  'Marketing',
+  'Sales & Business Development',
+  'Human Resources',
   'Operations',
+  'Supply Chain',
+  'Research & Policy',
+  'Communications & PR',
+  'Legal',
+  'Healthcare & Life Sciences',
   'Other',
 ];
 
