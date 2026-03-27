@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { TrendingUp, Zap, MessageSquare, Clock } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
+import { Logo } from '@/components/Logo';
 
 export default function Home() {
   const { user } = useAuth();
@@ -27,12 +28,8 @@ export default function Home() {
       {/* Navigation */}
       <nav className="flex items-center justify-between px-6 max-w-[1200px] mx-auto h-[52px] border-b border-border-gray">
         <div className="flex items-center gap-2">
-          <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#2563EB"/>
-            <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#2563EB" opacity="0.6"/>
-            <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#2563EB" opacity="0.3"/>
-          </svg>
-          <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
+          <Logo size={28} variant="dark" />
+          <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
         </div>
         <div className="flex items-center gap-3">
           <ThemeToggle />
@@ -210,12 +207,8 @@ export default function Home() {
       <footer className="border-t border-border-gray py-8">
         <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2" style={{ opacity: 0.4 }}>
-            <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#2563EB"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#2563EB" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#2563EB" opacity="0.3"/>
-            </svg>
-            <span className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
+            <Logo size={20} variant="dark" />
+            <span className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </div>
           <div className="flex items-center gap-6">
             <Link href="/help" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Help & FAQ</Link>

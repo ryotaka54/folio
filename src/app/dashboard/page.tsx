@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { INTERNSHIP_STAGES, JOB_STAGES } from '@/lib/constants';
 import { Application, PipelineStage, Category } from '@/lib/types';
 import StatsBar from '@/components/StatsBar';
+import { Logo } from '@/components/Logo';
 import PipelineView from '@/components/PipelineView';
 import TableView from '@/components/TableView';
 import FunnelChart from '@/components/FunnelChart';
@@ -125,12 +126,8 @@ function DashboardContent() {
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
           <div className="flex items-center gap-2">
-            <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
-            </svg>
-            <span className="text-[15px] font-semibold tracking-tight" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
+            <Logo size={28} variant="dark" />
+            <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </div>
           <div className="flex items-center gap-3">
             {user?.name && (
@@ -368,8 +365,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-background">
         {/* Nav skeleton */}
-        <div className="border-b border-border-gray bg-background h-14 sm:h-16 flex items-center px-4 md:px-6 max-w-[1200px] mx-auto gap-3">
-          <div className="w-6 h-6 rounded bg-surface-gray animate-pulse" />
+        <div className="border-b border-border-gray bg-background h-[52px] flex items-center px-4 md:px-6 max-w-[1200px] mx-auto gap-3">
+          <div className="w-7 h-7 rounded-[7px] bg-surface-gray animate-pulse" />
           <div className="w-16 h-4 rounded bg-surface-gray animate-pulse" />
           <div className="ml-auto flex gap-3">
             <div className="w-8 h-8 rounded-lg bg-surface-gray animate-pulse" />

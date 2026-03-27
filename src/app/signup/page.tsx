@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export default function SignUpPage() {
   const { signUp } = useAuth();
@@ -47,12 +48,8 @@ export default function SignUpPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#2563EB"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#2563EB" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#2563EB" opacity="0.3"/>
-            </svg>
-            <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Applyd</span>
+            <Logo size={28} variant="dark" />
+            <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </Link>
         </div>
 
