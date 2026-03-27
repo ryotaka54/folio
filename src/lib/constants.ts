@@ -28,6 +28,7 @@ export const CATEGORIES: Category[] = [
   'Product Management',
   'Design',
   'Marketing',
+  'Consulting',
   'Operations',
   'Other',
 ];

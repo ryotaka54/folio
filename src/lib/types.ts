@@ -28,6 +28,7 @@ export type Category =
   | 'Data Science'
   | 'Finance'
   | 'Marketing'
+  | 'Consulting'
   | 'Operations'
   | 'Other';
 
