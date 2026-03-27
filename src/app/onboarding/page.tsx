@@ -28,8 +28,20 @@ export default function OnboardingPage() {
 
   if (loading || !user || user.onboarding_complete) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="animate-pulse text-muted-text text-sm">Loading...</div>
+      <div className="min-h-screen bg-surface-gray flex items-center justify-center p-4">
+        <div className="w-full max-w-lg">
+          <div className="flex justify-center gap-2 mb-8">
+            {[1, 2, 3].map(i => <div key={i} className="w-2.5 h-2.5 rounded-full bg-border-gray animate-pulse" />)}
+          </div>
+          <div className="bg-card-bg rounded-2xl p-6 md:p-8 border border-border-gray">
+            <div className="w-40 h-6 rounded bg-surface-gray animate-pulse mb-2" />
+            <div className="w-64 h-4 rounded bg-surface-gray animate-pulse mb-6" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="h-32 rounded-xl bg-surface-gray animate-pulse" />
+              <div className="h-32 rounded-xl bg-surface-gray animate-pulse" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -132,7 +144,7 @@ export default function OnboardingPage() {
                     autoFocus
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
+                    className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                     placeholder="First name"
                   />
                 </div>

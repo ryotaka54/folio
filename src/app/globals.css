@@ -14,6 +14,14 @@
   --background: #ffffff;
   --foreground: #171717;
   --card-bg: #ffffff;
+  /* Error state — dark-mode safe */
+  --error-bg: #FEF2F2;
+  --error-text: #DC2626;
+  --error-border: #FECACA;
+  /* Success state — dark-mode safe */
+  --success-bg: #F0FDF4;
+  --success-text: #16A34A;
+  --success-border: #BBF7D0;
 }
 
 .dark {
@@ -27,6 +35,14 @@
   --background: #09090b;
   --foreground: #fafafa;
   --card-bg: #18181b;
+  /* Error state — dark */
+  --error-bg: rgba(239, 68, 68, 0.12);
+  --error-text: #f87171;
+  --error-border: rgba(239, 68, 68, 0.25);
+  /* Success state — dark */
+  --success-bg: rgba(34, 197, 94, 0.12);
+  --success-text: #4ade80;
+  --success-border: rgba(34, 197, 94, 0.25);
 }
 
 @theme inline {
@@ -42,6 +58,12 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card-bg: var(--card-bg);
+  --color-error-bg: var(--error-bg);
+  --color-error-text: var(--error-text);
+  --color-error-border: var(--error-border);
+  --color-success-bg: var(--success-bg);
+  --color-success-text: var(--success-text);
+  --color-success-border: var(--success-border);
 }
 
 * {

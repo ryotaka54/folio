@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Application, PipelineStage, Category } from '@/lib/types';
+import { Application, PipelineStage } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
+import { ExternalLink } from 'lucide-react';
 
 interface ApplicationDrawerProps {
   application: Application | null;
@@ -13,13 +14,18 @@ interface ApplicationDrawerProps {
   stages: PipelineStage[];
 }
 
+type SaveStatus = 'idle' | 'saving' | 'saved';
+
 export default function ApplicationDrawer({ application, open, onClose, onUpdate, onDelete, stages }: ApplicationDrawerProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const backdropRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setShowDeleteConfirm(false);
+    setSaveStatus('idle');
   }, [application?.id]);
 
   useEffect(() => {
@@ -33,17 +39,34 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
   const debouncedUpdate = useCallback((field: string, value: string) => {
     if (!application) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    setSaveStatus('idle');
     debounceRef.current = setTimeout(() => {
+      setSaveStatus('saving');
       onUpdate(application.id, { [field]: value });
-    }, 500);
+      saveTimerRef.current = setTimeout(() => {
+        setSaveStatus('saved');
+        saveTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+      }, 500);
+    }, 1000);
   }, [application, onUpdate]);
 
   const immediateUpdate = useCallback((field: string, value: string) => {
     if (!application) return;
+    setSaveStatus('saving');
     onUpdate(application.id, { [field]: value });
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      setSaveStatus('saved');
+      saveTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000);
+    }, 400);
   }, [application, onUpdate]);
 
   if (!open || !application) return null;
+
+  const isValidUrl = (url: string) => {
+    try { new URL(url); return true; } catch { return false; }
+  };
 
   const formatTimestamp = (ts: string) => {
     return new Date(ts).toLocaleDateString('en-US', {
@@ -62,11 +85,26 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-brand-navy">Application Details</h2>
-            <button onClick={onClose} className="text-muted-text hover:text-body-text p-1">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Save status indicator */}
+              {saveStatus === 'saving' && (
+                <span className="text-xs text-muted-text flex items-center gap-1">
+                  <svg className="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                  Saving
+                </span>
+              )}
+              {saveStatus === 'saved' && (
+                <span className="text-xs text-green-success flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Saved
+                </span>
+              )}
+              <button onClick={onClose} aria-label="Close" className="text-muted-text hover:text-body-text p-1">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -146,7 +184,19 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
 
             {/* Job Link */}
             <div>
-              <label className="block text-xs font-medium text-muted-text mb-1">Job posting link</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-medium text-muted-text">Job posting link</label>
+                {application.job_link && isValidUrl(application.job_link) && (
+                  <a
+                    href={application.job_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-accent-blue hover:underline flex items-center gap-0.5"
+                  >
+                    Open <ExternalLink size={10} className="inline" />
+                  </a>
+                )}
+              </div>
               <input
                 type="url"
                 defaultValue={application.job_link}
@@ -208,13 +258,13 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
               {!showDeleteConfirm ? (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="text-sm text-red-500 hover:text-red-600 transition-colors"
+                  className="text-sm text-error-text hover:opacity-80 transition-opacity"
                 >
                   Delete this application
                 </button>
               ) : (
-                <div className="bg-red-50 border border-red-100 rounded-lg p-3">
-                  <p className="text-sm text-red-600 mb-2">Are you sure? This cannot be undone.</p>
+                <div className="bg-error-bg border border-error-border rounded-lg p-3">
+                  <p className="text-sm text-error-text mb-2">Are you sure? This cannot be undone.</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => { onDelete(application.id); onClose(); }}

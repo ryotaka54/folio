@@ -19,11 +19,16 @@ const formatDate = (dateStr: string | null) => {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-const isDeadlineSoon = (dateStr: string | null) => {
-  if (!dateStr) return false;
+const deadlineUrgency = (dateStr: string | null): 'overdue' | 'today' | 'soon' | 'normal' | 'none' => {
+  if (!dateStr) return 'none';
   const d = new Date(dateStr);
   const now = new Date();
-  return d >= now && d <= new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const diffMs = d.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return 'overdue';
+  if (diffDays === 0) return 'today';
+  if (diffDays <= 3) return 'soon';
+  return 'normal';
 };
 
 export default function TableView({ applications, selectedIds, onSelectionChange, onRowClick }: TableViewProps) {
@@ -163,7 +168,14 @@ export default function TableView({ applications, selectedIds, onSelectionChange
                       {app.status}
                     </span>
                   </td>
-                  <td className={`px-3 py-2.5 text-xs hidden md:table-cell ${isDeadlineSoon(app.deadline) ? 'text-amber-warning font-medium' : 'text-muted-text'}`}>
+                  <td className={`px-3 py-2.5 text-xs hidden md:table-cell ${
+                    (() => {
+                      const u = deadlineUrgency(app.deadline);
+                      if (u === 'overdue' || u === 'today') return 'text-red-500 font-medium';
+                      if (u === 'soon') return 'text-amber-warning font-medium';
+                      return 'text-muted-text';
+                    })()
+                  }`}>
                     {formatDate(app.deadline)}
                   </td>
                   <td className="px-3 py-2.5 text-xs text-muted-text hidden lg:table-cell">

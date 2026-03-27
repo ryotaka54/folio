@@ -52,7 +52,7 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
         </div>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
           offerRate > 0
-            ? 'text-emerald-600 bg-emerald-50 border border-emerald-100'
+            ? 'text-success-text bg-success-bg border border-success-border'
             : 'text-muted-text bg-surface-gray border border-border-gray'
         }`}>
           {offerRate > 0 ? `${offerRate}% offer rate` : 'Apply to more roles'}

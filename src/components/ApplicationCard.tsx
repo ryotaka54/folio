@@ -17,10 +17,9 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
     const diffMs = d.getTime() - now.getTime();
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
-    // Consistent hierarchy: Overdue → Xd left (≤7d) → "Apr 10" (>7d)
     if (diffDays < 0) return { label: 'Overdue', color: 'text-red-500 bg-red-500/10 border-red-500/20' };
-    if (diffDays === 0) return { label: 'Due today', color: 'text-amber-600 bg-amber-500/10 border-amber-500/20' };
-    if (diffDays <= 7) return { label: `${diffDays}d left`, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20' };
+    if (diffDays === 0) return { label: 'Due today', color: 'text-red-500 bg-red-500/10 border-red-500/20' };
+    if (diffDays <= 3) return { label: `${diffDays}d left`, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20' };
 
     const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     return { label: formatted, color: 'text-muted-text bg-surface-gray border-border-gray' };

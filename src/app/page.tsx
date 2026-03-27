@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { ClipboardList, BarChart2, Target, Clock } from 'lucide-react';
+import { TrendingUp, Zap, MessageSquare, Clock } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Home() {
@@ -76,6 +76,9 @@ export default function Home() {
               Log in
             </Link>
           </div>
+          <p className="mt-4 text-xs text-muted-text/60">
+            Free forever · No credit card · Used by students at 50+ universities
+          </p>
         </div>
 
         {/* Dashboard Preview */}
@@ -84,17 +87,18 @@ export default function Home() {
             {/* Fake stats bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
               {[
-                { label: 'Total Applications', value: '24', icon: <ClipboardList size={16} className="text-accent-blue" /> },
-                { label: 'Response Rate', value: '38%', icon: <BarChart2 size={16} className="text-brand-navy" /> },
-                { label: 'Interviews', value: '5', icon: <Target size={16} className="text-amber-warning" /> },
-                { label: 'Deadlines Soon', value: '3', icon: <Clock size={16} className="text-red-500" /> },
+                { label: 'Total', value: '24', subtext: '+6 this week', icon: <TrendingUp size={16} className="text-accent-blue" />, valueClass: 'text-brand-navy' },
+                { label: 'Response Rate', value: '38%', subtext: 'of applications replied', icon: <Zap size={16} className="text-amber-500" />, valueClass: 'text-brand-navy' },
+                { label: 'Interviews', value: '5', subtext: "You're on a roll", icon: <MessageSquare size={16} className="text-emerald-500" />, valueClass: 'text-emerald-600' },
+                { label: 'Act Now', value: '3', subtext: 'deadlines this week', icon: <Clock size={16} className="text-red-500" />, valueClass: 'text-amber-700' },
               ].map((stat) => (
-                <div key={stat.label} className="bg-surface-gray rounded-xl p-3 md:p-4">
+                <div key={stat.label} className="bg-card-bg border border-border-gray rounded-xl p-3 md:p-4">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="flex-shrink-0">{stat.icon}</span>
                     <span className="text-xs text-muted-text font-medium">{stat.label}</span>
                   </div>
-                  <span className="text-xl md:text-2xl font-semibold text-brand-navy">{stat.value}</span>
+                  <span className={`text-xl md:text-2xl font-semibold ${stat.valueClass}`}>{stat.value}</span>
+                  <p className="text-[10px] text-muted-text/60 mt-0.5 leading-tight">{stat.subtext}</p>
                 </div>
               ))}
             </div>
@@ -103,8 +107,8 @@ export default function Home() {
               {[
                 { name: 'Wishlist', count: 6, color: '#8B5CF6', cards: ['Google — SWE Intern', 'Meta — PM Intern'] },
                 { name: 'Applied', count: 10, color: '#4361EE', cards: ['Stripe — SWE Intern', 'Airbnb — Design'] },
-                { name: 'OA / Assessment', count: 4, color: '#06B6D4', cards: ['Amazon — SDE Intern'] },
-                { name: 'Interviews', count: 3, color: '#F59E0B', cards: ['Microsoft — SWE'] },
+                { name: 'OA / Online Assessment', count: 4, color: '#06B6D4', cards: ['Amazon — SDE Intern'] },
+                { name: 'Phone / Recruiter Screen', count: 3, color: '#F59E0B', cards: ['Microsoft — SWE'] },
                 { name: 'Offer', count: 1, color: '#1D9E75', cards: ['Figma — Design Intern'] },
               ].map((col) => (
                 <div key={col.name} className="min-w-[180px] md:min-w-[200px] flex-1">

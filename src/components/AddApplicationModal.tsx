@@ -141,12 +141,12 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm px-3 py-2 rounded-lg border border-red-100">{error}</div>
+              <div className="bg-error-bg text-error-text text-sm px-3 py-2 rounded-lg border border-error-border">{error}</div>
             )}
 
             <div>
               <label htmlFor="modal-company" className="block text-sm font-medium text-body-text mb-1">
-                Company <span className="text-red-400">*</span>
+                Company <span className="text-error-text opacity-70">*</span>
               </label>
               <input
                 id="modal-company"
@@ -161,7 +161,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
 
             <div>
               <label htmlFor="modal-role" className="block text-sm font-medium text-body-text mb-1">
-                Role <span className="text-red-400">*</span>
+                Role <span className="text-error-text opacity-70">*</span>
               </label>
               <input
                 id="modal-role"
