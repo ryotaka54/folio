@@ -48,6 +48,18 @@
   box-sizing: border-box;
 }
 
+/* Theme transition — applied globally so dark/light switch fades */
+html {
+  transition: background-color 0.35s cubic-bezier(0.4,0,0.2,1),
+              color 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+*:not(svg, path, line, circle, rect, polyline, polygon) {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.4,0,0.2,1);
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--background);

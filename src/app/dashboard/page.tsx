@@ -113,14 +113,16 @@ function DashboardContent() {
         {/* Greeting */}
         <div className="mb-6">
           <h1 className="text-xl font-semibold text-brand-navy tracking-tight">
-            {user?.name ? `Hey ${user.name.split(' ')[0]} —` : 'Hey —'}{' '}
+            {user?.name ? user.name.split(' ')[0] : 'Hey'}{' '}
             <span className="text-muted-text font-normal">
-              {applications.length === 0
-                ? 'your next offer is one application away.'
-                : applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length > 0
-                  ? "you're in the interview stage. Stay sharp."
-                  : `you have ${applications.filter(a => a.status !== 'Wishlist').length} application${applications.filter(a => a.status !== 'Wishlist').length !== 1 ? 's' : ''} out there. Keep pushing.`
-              }
+              {(() => {
+                const submitted = applications.filter(a => a.status !== 'Wishlist').length;
+                const inInterviews = applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length;
+                if (applications.length === 0) return '— start tracking and see where things land.';
+                if (inInterviews > 0) return `— ${inInterviews} interview${inInterviews !== 1 ? 's' : ''} in play.`;
+                if (submitted === 1) return '— 1 application out.';
+                return `— ${submitted} applications out.`;
+              })()}
             </span>
           </h1>
         </div>
