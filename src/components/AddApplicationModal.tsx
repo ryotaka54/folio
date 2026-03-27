@@ -23,7 +23,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
   const [category, setCategory] = useState<Category | ''>('');
-  const [status, setStatus] = useState<PipelineStage>(stages[0]);
+  const [status, setStatus] = useState<PipelineStage>(stages.includes('Applied' as PipelineStage) ? 'Applied' as PipelineStage : stages[0]);
   const [deadline, setDeadline] = useState('');
   const [jobLink, setJobLink] = useState('');
   const [notes, setNotes] = useState('');
@@ -37,7 +37,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
       setCompany('');
       setRole('');
       setCategory('');
-      setStatus(stages[0]);
+      setStatus(stages.includes('Applied' as PipelineStage) ? 'Applied' as PipelineStage : stages[0]);
       setDeadline('');
       setJobLink('');
       setNotes('');
