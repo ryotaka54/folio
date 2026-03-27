@@ -110,6 +110,20 @@ function DashboardContent() {
       </nav>
 
       <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6">
+        {/* Greeting */}
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold text-brand-navy tracking-tight">
+            {user?.name ? `Hey ${user.name.split(' ')[0]} —` : 'Hey —'}{' '}
+            <span className="text-muted-text font-normal">
+              {applications.length === 0
+                ? 'your next offer is one application away.'
+                : applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length > 0
+                  ? "you're in the interview stage. Stay sharp."
+                  : `you have ${applications.filter(a => a.status !== 'Wishlist').length} application${applications.filter(a => a.status !== 'Wishlist').length !== 1 ? 's' : ''} out there. Keep pushing.`
+              }
+            </span>
+          </h1>
+        </div>
         {/* Stats */}
         <StatsBar applications={applications} />
 
