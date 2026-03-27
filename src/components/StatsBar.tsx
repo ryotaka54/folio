@@ -57,14 +57,14 @@ export default function StatsBar({ applications }: StatsBarProps) {
       label: 'Interviews',
       value: interviews.toString(),
       subtext: interviews === 0 ? 'Keep applying' : interviews === 1 ? "You're in the room" : 'You\'re on a roll',
-      icon: <MessageSquare size={16} className="text-emerald-500" />,
+      icon: <MessageSquare size={16} className={interviews > 0 ? 'text-[#15803D] dark:text-emerald-400' : 'text-emerald-500'} />,
       highlight: interviews > 0,
     },
     {
       label: 'Act Now',
       value: deadlinesSoon.toString(),
       subtext: deadlinesSoon === 0 ? 'No urgent deadlines' : deadlinesSoon === 1 ? 'deadline this week' : 'deadlines this week',
-      icon: <Clock size={16} className="text-red-500" />,
+      icon: <Clock size={16} className={deadlinesSoon > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-amber-500'} />,
       highlight: deadlinesSoon > 0,
     },
   ];
@@ -77,8 +77,8 @@ export default function StatsBar({ applications }: StatsBarProps) {
           className={`rounded-xl p-4 transition-colors ${
             stat.highlight
               ? stat.label === 'Interviews'
-                ? 'bg-emerald-50 border-2 border-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-700'
-                : 'bg-amber-50 border-2 border-amber-300 dark:bg-amber-950/30 dark:border-amber-700'
+                ? 'bg-[#F0FDF4] border border-[#86EFAC] dark:bg-emerald-950/40 dark:border-emerald-800'
+                : 'bg-[#FFFBEB] border border-[#FCD34D] dark:bg-amber-950/40 dark:border-amber-800'
               : 'bg-surface-gray'
           }`}
         >
@@ -86,15 +86,17 @@ export default function StatsBar({ applications }: StatsBarProps) {
             <span className="flex-shrink-0">{stat.icon}</span>
             <span className="text-xs text-muted-text font-medium">{stat.label}</span>
           </div>
-          <span className={`text-2xl font-semibold ${
+          <span className={`text-2xl font-bold ${
             stat.highlight
-              ? stat.label === 'Interviews' ? 'text-emerald-700' : 'text-amber-600'
+              ? stat.label === 'Interviews'
+                ? 'text-[#15803D] dark:text-emerald-400'
+                : 'text-[#B45309] dark:text-amber-400'
               : 'text-brand-navy'
           }`}>
             {stat.value}
           </span>
           {stat.subtext && (
-            <p className="text-[10px] text-muted-text/60 mt-0.5 leading-tight">{stat.subtext}</p>
+            <p className="text-[10px] text-muted-text/70 mt-0.5 leading-tight">{stat.subtext}</p>
           )}
         </div>
       ))}

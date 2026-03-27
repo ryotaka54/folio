@@ -47,15 +47,15 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
     <div className="bg-card-bg border border-border-gray rounded-xl p-5 mt-6 mb-2">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-semibold text-brand-navy">Your Path to an Offer</h3>
-          <p className="text-xs text-muted-text mt-0.5">How far you&apos;ve come — keep pushing</p>
+          <h3 className="text-sm font-semibold text-brand-navy">Your Recruiting Funnel</h3>
+          <p className="text-xs text-muted-text mt-0.5">Every application gets you closer</p>
         </div>
         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
           offerRate > 0
             ? 'text-emerald-600 bg-emerald-50 border border-emerald-100'
             : 'text-muted-text bg-surface-gray border border-border-gray'
         }`}>
-          {offerRate > 0 ? `${offerRate}% success rate` : 'Keep applying'}
+          {offerRate > 0 ? `${offerRate}% offer rate` : 'Apply to more roles'}
         </span>
       </div>
       <div className="space-y-3">
