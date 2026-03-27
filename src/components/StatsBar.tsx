@@ -43,29 +43,29 @@ export default function StatsBar({ applications }: StatsBarProps) {
       label: 'Total',
       value: total.toString(),
       subtext: thisWeek > 0 ? `+${thisWeek} this week` : 'none this week',
-      icon: <TrendingUp size={16} className="text-accent-blue" />,
-      highlight: false,
+      icon: <TrendingUp size={16} className="text-muted-text" />,
+      valueColor: 'text-brand-navy',
     },
     {
       label: 'Response Rate',
       value: responseRate !== null ? `${responseRate}%` : '—',
       subtext: responseRate === null ? `${5 - applied.length} more to unlock` : 'of applications replied',
-      icon: <Zap size={16} className="text-amber-500" />,
-      highlight: false,
+      icon: <Zap size={16} className="text-muted-text" />,
+      valueColor: 'text-brand-navy',
     },
     {
       label: 'Interviews',
       value: interviews.toString(),
-      subtext: interviews === 0 ? 'Keep applying' : interviews === 1 ? "You're in the room" : 'You\'re on a roll',
-      icon: <MessageSquare size={16} className={interviews > 0 ? 'text-[#15803D] dark:text-emerald-400' : 'text-emerald-500'} />,
-      highlight: interviews > 0,
+      subtext: interviews === 0 ? 'Keep applying' : interviews === 1 ? "You're in the room" : "You're on a roll",
+      icon: <MessageSquare size={16} className="text-muted-text" />,
+      valueColor: interviews > 0 ? 'text-[#16A34A] dark:text-emerald-400' : 'text-brand-navy',
     },
     {
       label: 'Act Now',
       value: deadlinesSoon.toString(),
       subtext: deadlinesSoon === 0 ? 'No urgent deadlines' : deadlinesSoon === 1 ? 'deadline this week' : 'deadlines this week',
-      icon: <Clock size={16} className={deadlinesSoon > 0 ? 'text-[#B45309] dark:text-amber-400' : 'text-amber-500'} />,
-      highlight: deadlinesSoon > 0,
+      icon: <Clock size={16} className="text-muted-text" />,
+      valueColor: deadlinesSoon > 0 ? 'text-[#D97706] dark:text-amber-400' : 'text-brand-navy',
     },
   ];
 
@@ -74,25 +74,13 @@ export default function StatsBar({ applications }: StatsBarProps) {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className={`rounded-xl p-4 transition-colors ${
-            stat.highlight
-              ? stat.label === 'Interviews'
-                ? 'bg-[#F0FDF4] border border-[#86EFAC] dark:bg-emerald-950/40 dark:border-emerald-800'
-                : 'bg-[#FFFBEB] border border-[#FCD34D] dark:bg-amber-950/40 dark:border-amber-800'
-              : 'bg-surface-gray'
-          }`}
+          className="rounded-xl p-4 bg-surface-gray border border-border-gray"
         >
           <div className="flex items-center gap-2 mb-1">
             <span className="flex-shrink-0">{stat.icon}</span>
             <span className="text-xs text-muted-text font-medium">{stat.label}</span>
           </div>
-          <span className={`text-2xl font-bold ${
-            stat.highlight
-              ? stat.label === 'Interviews'
-                ? 'text-[#15803D] dark:text-emerald-400'
-                : 'text-[#B45309] dark:text-amber-400'
-              : 'text-brand-navy'
-          }`}>
+          <span className={`text-2xl font-bold ${stat.valueColor}`}>
             {stat.value}
           </span>
           {stat.subtext && (
