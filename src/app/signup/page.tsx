@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function SignUpPage() {
   const { signUp } = useAuth();
@@ -11,9 +12,9 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [progressText, setProgressText] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,28 +24,21 @@ export default function SignUpPage() {
       setError('Passwords do not match');
       return;
     }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
 
     setLoading(true);
-    setProgressText('Contacting database...');
-
     try {
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timed out. Check your Vercel Env Variables.')), 20000)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Request timed out. Please check your connection and try again.')), 20000)
       );
-
-      setProgressText('Creating user...');
-      await Promise.race([
-        signUp(email, password),
-        timeoutPromise
-      ]);
-
-      setProgressText('Loading onboarding...');
-      setLoading(false);
+      await Promise.race([signUp(email, password), timeoutPromise]);
       router.push('/onboarding');
     } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+      setError(err.message || 'Something went wrong. Please try again.');
       setLoading(false);
-      setProgressText('');
     }
   };
 
@@ -64,7 +58,7 @@ export default function SignUpPage() {
 
         <div className="bg-card-bg rounded-2xl p-6 shadow-sm border border-border-gray">
           <h1 className="text-lg font-semibold text-brand-navy mb-1">Create your account</h1>
-          <p className="text-sm text-muted-text mb-6">Start tracking your applications in seconds.</p>
+          <p className="text-sm text-muted-text mb-6">Free forever. No credit card needed.</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
@@ -78,6 +72,7 @@ export default function SignUpPage() {
                 id="email"
                 type="email"
                 required
+                autoFocus
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
@@ -86,21 +81,31 @@ export default function SignUpPage() {
             </div>
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-body-text mb-1">Password</label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
-                placeholder="At least 6 characters"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 py-2.5 sm:py-2 pr-10 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                  placeholder="At least 6 characters"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-text hover:text-body-text"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
             <div>
               <label htmlFor="confirm-password" className="block text-sm font-medium text-body-text mb-1">Confirm password</label>
               <input
                 id="confirm-password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -113,7 +118,7 @@ export default function SignUpPage() {
               disabled={loading}
               className="w-full py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors disabled:opacity-50"
             >
-              {loading ? (progressText || 'Creating account...') : 'Create account'}
+              {loading ? 'Creating account…' : 'Create account'}
             </button>
           </form>
 

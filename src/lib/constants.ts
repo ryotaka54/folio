@@ -49,5 +49,5 @@ export const STAGE_COLORS: Record<string, string> = {
 };
 
 export const SCHOOL_YEARS = ['High school', 'Freshman', 'Sophomore', 'Junior', 'Senior', 'Graduate'];
-export const RECRUITING_SEASONS = ['Summer 2025', 'Fall 2025', 'Spring 2026'];
+export const RECRUITING_SEASONS = ['Spring 2026', 'Summer 2026', 'Fall 2026', 'Spring 2027'];
 export const CAREER_LEVELS = ['New grad', 'Early career', 'Mid-career', 'Senior+'];

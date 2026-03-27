@@ -132,7 +132,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
           <div className="w-10 h-1 bg-border-gray rounded-full mx-auto mb-4 sm:hidden" />
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-semibold text-brand-navy">Add Application</h2>
-            <button onClick={onClose} className="text-muted-text hover:text-body-text p-1">
+            <button onClick={onClose} aria-label="Close" className="text-muted-text hover:text-body-text p-1">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
               </svg>
@@ -253,6 +253,9 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 className={`w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background ${isAutofilling ? 'opacity-50 pointer-events-none' : ''}`}
                 placeholder="https://..."
               />
+              {!jobLink && (
+                <p className="text-[11px] text-muted-text/70 mt-1">Paste a job posting URL to autofill company, role &amp; location</p>
+              )}
             </div>
 
             <div>

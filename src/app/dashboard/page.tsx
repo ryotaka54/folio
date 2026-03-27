@@ -22,7 +22,7 @@ function DashboardContent() {
   const { applications, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
   const router = useRouter();
 
-  const [view, setView] = useState<'pipeline' | 'table'>('table');
+  const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
   const [search, setSearch] = useState('');
   const [hideInactive, setHideInactive] = useState(true);
   const [statusFilter, setStatusFilter] = useState<PipelineStage | 'all'>('all');
@@ -31,6 +31,7 @@ function DashboardContent() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const stages = user?.mode === 'job' ? JOB_STAGES : INTERNSHIP_STAGES;
 
@@ -70,6 +71,11 @@ function DashboardContent() {
     setShowDrawer(true);
   };
 
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const handleAddSave = async (data: {
     company: string;
     role: string;
@@ -85,6 +91,7 @@ function DashboardContent() {
       recruiter_name: '',
       recruiter_email: '',
     });
+    showToast(`${data.company} added`);
   };
 
   const handleUpdate = (id: string, updates: Partial<Application>) => {
@@ -105,6 +112,13 @@ function DashboardContent() {
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-red-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
           {storeError}
           <button onClick={clearStoreError} className="ml-1 hover:opacity-75">✕</button>
+        </div>
+      )}
+      {/* Success toast */}
+      {toast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-emerald-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg pointer-events-none">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          {toast}
         </div>
       )}
       {/* Top nav */}

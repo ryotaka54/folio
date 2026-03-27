@@ -1,51 +1,39 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/auth-context';
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 
-export default function LoginPage() {
-  const { signIn, user } = useAuth();
+export default function ResetPasswordPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [loginFired, setLoginFired] = useState(false);
-
-  useEffect(() => {
-    if (loginFired && user) {
-      router.replace(user.onboarding_complete ? '/dashboard' : '/onboarding');
-    }
-  }, [loginFired, user, router]);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
-
-    try {
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timed out. Please check your connection and try again.')), 20000)
-      );
-
-      const form = e.currentTarget as HTMLFormElement;
-      const formData = new FormData(form);
-      const submitEmail = (formData.get('email') as string) || email;
-      const submitPassword = (formData.get('password') as string) || password;
-
-      await Promise.race([
-        signIn(submitEmail, submitPassword),
-        timeoutPromise,
-      ]);
-
-      setLoginFired(true);
-    } catch (err: any) {
-      setError(err.message || 'Invalid email or password');
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      setError(error.message);
       setLoading(false);
+    } else {
+      router.push('/dashboard');
     }
   };
 
@@ -64,8 +52,8 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-card-bg rounded-2xl p-6 shadow-sm border border-border-gray">
-          <h1 className="text-lg font-semibold text-brand-navy mb-1">Welcome back</h1>
-          <p className="text-sm text-muted-text mb-6">Log in to continue tracking your applications.</p>
+          <h1 className="text-lg font-semibold text-brand-navy mb-1">Set a new password</h1>
+          <p className="text-sm text-muted-text mb-6">Choose a strong password for your account.</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
@@ -74,34 +62,17 @@ export default function LoginPage() {
               </div>
             )}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-body-text mb-1">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoFocus
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
-                placeholder="you@university.edu"
-              />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label htmlFor="password" className="block text-sm font-medium text-body-text">Password</label>
-                <Link href="/forgot-password" className="text-xs text-accent-blue hover:underline">Forgot password?</Link>
-              </div>
+              <label htmlFor="password" className="block text-sm font-medium text-body-text mb-1">New password</label>
               <div className="relative">
                 <input
                   id="password"
-                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoFocus
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-2.5 sm:py-2 pr-10 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
-                  placeholder="Your password"
+                  placeholder="At least 6 characters"
                 />
                 <button
                   type="button"
@@ -113,19 +84,26 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+            <div>
+              <label htmlFor="confirm-password" className="block text-sm font-medium text-body-text mb-1">Confirm password</label>
+              <input
+                id="confirm-password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                placeholder="Confirm your password"
+              />
+            </div>
             <button
               type="submit"
               disabled={loading}
               className="w-full py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors disabled:opacity-50"
             >
-              {loading ? 'Logging in…' : 'Log in'}
+              {loading ? 'Updating…' : 'Update password'}
             </button>
           </form>
-
-          <p className="text-center text-sm text-muted-text mt-4">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-accent-blue hover:underline">Sign up</Link>
-          </p>
         </div>
       </div>
     </div>

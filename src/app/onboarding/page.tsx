@@ -8,7 +8,7 @@ import { Mode } from '@/lib/types';
 import { GraduationCap, Briefcase } from 'lucide-react';
 
 export default function OnboardingPage() {
-  const { user, updateProfile, loading, signOut } = useAuth();
+  const { user, updateProfile, loading } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [mode, setMode] = useState<Mode>('internship');
@@ -50,14 +50,6 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-surface-gray flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-lg flex justify-end mb-2">
-        <button 
-          onClick={async () => { await signOut(); router.replace('/login'); }}
-          className="text-sm font-medium text-muted-text hover:text-brand-navy transition-colors"
-        >
-          Log out
-        </button>
-      </div>
       <div className="w-full max-w-lg">
         {/* Progress dots */}
         <div className="flex items-center justify-center gap-2 mb-8">
@@ -92,7 +84,7 @@ export default function OnboardingPage() {
                   <div className="font-medium text-brand-navy text-sm">Internship applications</div>
                   <div className="text-xs text-muted-text mt-1">Track internship recruiting cycles</div>
                   <div className="flex flex-wrap gap-1 mt-3">
-                    {['Summer 2025', 'OA / Screen', 'Return offer'].map(tag => (
+                    {['Summer 2026', 'OA / Screen', 'Return offer'].map(tag => (
                       <span key={tag} className="text-[10px] px-2 py-0.5 bg-surface-gray rounded-full text-muted-text">{tag}</span>
                     ))}
                   </div>
@@ -137,6 +129,7 @@ export default function OnboardingPage() {
                   <input
                     id="name"
                     type="text"
+                    autoFocus
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors"
@@ -247,7 +240,7 @@ export default function OnboardingPage() {
                   onClick={handleComplete}
                   className="flex-1 py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors"
                 >
-                  Go to my dashboard
+                  Add your first application →
                 </button>
               </div>
             </div>

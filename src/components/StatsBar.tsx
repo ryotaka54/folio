@@ -47,9 +47,9 @@ export default function StatsBar({ applications }: StatsBarProps) {
       highlight: false,
     },
     {
-      label: 'Getting Noticed',
+      label: 'Response Rate',
       value: responseRate !== null ? `${responseRate}%` : '—',
-      subtext: responseRate === null ? `${5 - applied.length} more to unlock` : 'response rate',
+      subtext: responseRate === null ? `${5 - applied.length} more to unlock` : 'of applications replied',
       icon: <Zap size={16} className="text-amber-500" />,
       highlight: false,
     },
@@ -77,8 +77,8 @@ export default function StatsBar({ applications }: StatsBarProps) {
           className={`rounded-xl p-4 transition-colors ${
             stat.highlight
               ? stat.label === 'Interviews'
-                ? 'bg-emerald-50 border border-emerald-100'
-                : 'bg-amber-50 border border-amber-200'
+                ? 'bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900'
+                : 'bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900'
               : 'bg-surface-gray'
           }`}
         >
