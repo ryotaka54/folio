@@ -43,29 +43,29 @@ export default function StatsBar({ applications }: StatsBarProps) {
       label: 'Total',
       value: total.toString(),
       subtext: thisWeek > 0 ? `+${thisWeek} this week` : 'none this week',
-      icon: <TrendingUp size={16} className="text-muted-text" />,
-      valueColor: 'text-brand-navy',
+      icon: <TrendingUp size={16} className="text-accent-blue" />,
+      highlight: false,
     },
     {
       label: 'Response Rate',
       value: responseRate !== null ? `${responseRate}%` : '—',
       subtext: responseRate === null ? `${5 - applied.length} more to unlock` : 'of applications replied',
-      icon: <Zap size={16} className="text-muted-text" />,
-      valueColor: 'text-brand-navy',
+      icon: <Zap size={16} className="text-amber-500" />,
+      highlight: false,
     },
     {
       label: 'Interviews',
       value: interviews.toString(),
-      subtext: interviews === 0 ? 'Keep applying' : interviews === 1 ? "You're in the room" : "You're on a roll",
-      icon: <MessageSquare size={16} className="text-muted-text" />,
-      valueColor: interviews > 0 ? 'text-[#16A34A] dark:text-emerald-400' : 'text-brand-navy',
+      subtext: interviews === 0 ? 'Keep applying' : interviews === 1 ? "You're in the room" : 'You\'re on a roll',
+      icon: <MessageSquare size={16} className="text-emerald-500" />,
+      highlight: interviews > 0,
     },
     {
       label: 'Act Now',
       value: deadlinesSoon.toString(),
       subtext: deadlinesSoon === 0 ? 'No urgent deadlines' : deadlinesSoon === 1 ? 'deadline this week' : 'deadlines this week',
-      icon: <Clock size={16} className="text-muted-text" />,
-      valueColor: deadlinesSoon > 0 ? 'text-[#D97706] dark:text-amber-400' : 'text-brand-navy',
+      icon: <Clock size={16} className="text-red-500" />,
+      highlight: deadlinesSoon > 0,
     },
   ];
 
@@ -74,17 +74,27 @@ export default function StatsBar({ applications }: StatsBarProps) {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-xl p-4 bg-surface-gray border border-border-gray"
+          className={`rounded-xl p-4 transition-colors ${
+            stat.highlight
+              ? stat.label === 'Interviews'
+                ? 'bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900'
+                : 'bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900'
+              : 'bg-surface-gray'
+          }`}
         >
           <div className="flex items-center gap-2 mb-1">
             <span className="flex-shrink-0">{stat.icon}</span>
             <span className="text-xs text-muted-text font-medium">{stat.label}</span>
           </div>
-          <span className={`text-2xl font-bold ${stat.valueColor}`}>
+          <span className={`text-2xl font-semibold ${
+            stat.highlight
+              ? stat.label === 'Interviews' ? 'text-emerald-600' : 'text-amber-500'
+              : 'text-brand-navy'
+          }`}>
             {stat.value}
           </span>
           {stat.subtext && (
-            <p className="text-[10px] text-muted-text/70 mt-0.5 leading-tight">{stat.subtext}</p>
+            <p className="text-[10px] text-muted-text/60 mt-0.5 leading-tight">{stat.subtext}</p>
           )}
         </div>
       ))}
