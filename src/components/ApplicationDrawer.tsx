@@ -92,6 +92,18 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
               />
             </div>
 
+            {/* Location */}
+            <div>
+              <label className="block text-xs font-medium text-muted-text mb-1">Location</label>
+              <input
+                type="text"
+                defaultValue={application.location || ''}
+                onChange={(e) => debouncedUpdate('location', e.target.value)}
+                className="w-full px-3 py-2 border border-border-gray rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                placeholder="e.g. New York, NY"
+              />
+            </div>
+
             {/* Category + Status */}
             <div className="grid grid-cols-2 gap-3">
               <div>

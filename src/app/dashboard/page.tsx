@@ -73,6 +73,7 @@ function DashboardContent() {
   const handleAddSave = async (data: {
     company: string;
     role: string;
+    location: string;
     category: Category | '';
     status: PipelineStage;
     deadline: string | null;

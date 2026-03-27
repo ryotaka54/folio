@@ -10,6 +10,7 @@ interface AddApplicationModalProps {
   onSave: (data: {
     company: string;
     role: string;
+    location: string;
     category: Category | '';
     status: PipelineStage;
     deadline: string | null;
@@ -22,6 +23,7 @@ interface AddApplicationModalProps {
 export default function AddApplicationModal({ open, onClose, onSave, stages }: AddApplicationModalProps) {
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
+  const [location, setLocation] = useState('');
   const [category, setCategory] = useState<Category | ''>('');
   const [status, setStatus] = useState<PipelineStage>(stages.includes('Applied' as PipelineStage) ? 'Applied' as PipelineStage : stages[0]);
   const [deadline, setDeadline] = useState('');
@@ -36,6 +38,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
     if (open) {
       setCompany('');
       setRole('');
+      setLocation('');
       setCategory('');
       setStatus(stages.includes('Applied' as PipelineStage) ? 'Applied' as PipelineStage : stages[0]);
       setDeadline('');
@@ -80,6 +83,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
       }
       if (data.company) setCompany(data.company);
       if (data.role) setRole(data.role);
+      if (data.location) setLocation(data.location);
       if (data.category) setCategory(data.category as Category);
     } catch (e: any) {
       setError(e.message || 'Could not autofill from this URL. Please fill in manually.');
@@ -100,6 +104,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
       await onSave({
         company: company.trim(),
         role: role.trim(),
+        location: location.trim(),
         category,
         status,
         deadline: deadline || null,
@@ -165,6 +170,18 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
                 placeholder="e.g. SWE Intern"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="modal-location" className="block text-sm font-medium text-body-text mb-1">Location</label>
+              <input
+                id="modal-location"
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full px-3 py-2.5 sm:py-2 border border-border-gray rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent-blue/30 focus:border-accent-blue transition-colors bg-background"
+                placeholder="e.g. New York, NY"
               />
             </div>
 

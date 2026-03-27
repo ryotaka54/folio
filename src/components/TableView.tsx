@@ -11,7 +11,7 @@ interface TableViewProps {
   onRowClick: (app: Application) => void;
 }
 
-type SortKey = 'company' | 'role' | 'category' | 'status' | 'deadline' | 'created_at';
+type SortKey = 'company' | 'role' | 'location' | 'category' | 'status' | 'deadline' | 'created_at';
 type SortDir = 'asc' | 'desc';
 
 const formatDate = (dateStr: string | null) => {
@@ -73,12 +73,13 @@ export default function TableView({ applications, selectedIds, onSelectionChange
   };
 
   const columns: { key: SortKey; label: string; className: string }[] = [
-    { key: 'company',    label: 'Company',  className: 'w-[18%]' },
-    { key: 'role',       label: 'Role',     className: 'w-[22%]' },
-    { key: 'category',   label: 'Category', className: 'w-[13%] hidden md:table-cell' },
-    { key: 'status',     label: 'Status',   className: 'w-[16%]' },
-    { key: 'deadline',   label: 'Deadline', className: 'w-[11%] hidden md:table-cell' },
-    { key: 'created_at', label: 'Added',    className: 'w-[10%] hidden lg:table-cell' },
+    { key: 'company',    label: 'Company',  className: 'w-[16%]' },
+    { key: 'role',       label: 'Role',     className: 'w-[20%]' },
+    { key: 'location',   label: 'Location', className: 'w-[13%] hidden lg:table-cell' },
+    { key: 'category',   label: 'Category', className: 'w-[12%] hidden md:table-cell' },
+    { key: 'status',     label: 'Status',   className: 'w-[15%]' },
+    { key: 'deadline',   label: 'Deadline', className: 'w-[10%] hidden md:table-cell' },
+    { key: 'created_at', label: 'Added',    className: 'w-[9%] hidden lg:table-cell' },
   ];
 
   const SortIcon = ({ col }: { col: typeof columns[0] }) =>
@@ -119,7 +120,7 @@ export default function TableView({ applications, selectedIds, onSelectionChange
           <tbody>
             {sorted.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center py-12 text-sm text-muted-text">
+                <td colSpan={8} className="text-center py-12 text-sm text-muted-text">
                   No applications match your filters.
                 </td>
               </tr>
@@ -149,6 +150,7 @@ export default function TableView({ applications, selectedIds, onSelectionChange
                   </td>
                   <td className="px-3 py-2.5 text-sm font-medium text-brand-navy truncate max-w-0">{app.company}</td>
                   <td className="px-3 py-2.5 text-sm text-body-text truncate max-w-0">{app.role}</td>
+                  <td className="px-3 py-2.5 text-xs text-muted-text hidden lg:table-cell truncate max-w-0">{app.location || '—'}</td>
                   <td className="px-3 py-2.5 text-xs text-muted-text hidden md:table-cell">{app.category || '—'}</td>
                   <td className="px-3 py-2.5">
                     <span

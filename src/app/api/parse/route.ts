@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
+type ParseResult = { company: string; role: string; location: string };
+
 export async function POST(request: Request) {
   try {
     const { url } = await request.json();
@@ -8,21 +10,25 @@ export async function POST(request: Request) {
 
     let company = '';
     let role = '';
+    let location = '';
 
     // 1. Board-specific extractors — public APIs + URL slug (most accurate)
     const boardResult = await tryBoardSpecific(url);
     if (boardResult.company) company = boardResult.company;
     if (boardResult.role) role = boardResult.role;
+    if (boardResult.location) location = boardResult.location;
 
     // 2. Fallback: direct fetch + cheerio (JSON-LD, og:title, page title)
     if (!company || !role) {
       const htmlResult = await tryCheerio(url, company, role);
       if (!company) company = htmlResult.company;
       if (!role) role = htmlResult.role;
+      if (!location) location = htmlResult.location;
     }
 
     company = cleanCompany(company, url);
     role = cleanRole(role);
+    location = cleanLocation(location);
 
     if (!company && !role) {
       return NextResponse.json(
@@ -31,7 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    return NextResponse.json({ company, role, category: guessCategory(role, url) });
+    return NextResponse.json({ company, role, location, category: guessCategory(role, url) });
 
   } catch (error: any) {
     console.error('Job scraping failed:', error.message);
@@ -39,18 +45,16 @@ export async function POST(request: Request) {
   }
 }
 
-// ─── Jina AI reader ───────────────────────────────────────────────────────────
-
 // ─── Board-specific parsers ───────────────────────────────────────────────────
 
-async function tryBoardSpecific(url: string): Promise<{ company: string; role: string }> {
+async function tryBoardSpecific(url: string): Promise<ParseResult> {
+  const empty: ParseResult = { company: '', role: '', location: '' };
   try {
     const u = new URL(url);
     const host = u.hostname;
     const path = u.pathname;
 
     // Greenhouse: boards.greenhouse.io/{company}/jobs/{jobId}
-    // or {company}.greenhouse.io/jobs/{jobId}
     if (host.includes('greenhouse.io')) {
       const match = host.includes('boards.greenhouse.io')
         ? path.match(/^\/([^/]+)\/jobs\/(\d+)/)
@@ -60,11 +64,9 @@ async function tryBoardSpecific(url: string): Promise<{ company: string; role: s
       let jobId = '';
 
       if (host.includes('boards.greenhouse.io') && match) {
-        companySlug = match[1];
-        jobId = match[2];
+        companySlug = match[1]; jobId = match[2];
       } else if (!host.includes('boards.greenhouse.io') && match) {
-        companySlug = host.split('.')[0];
-        jobId = match[1];
+        companySlug = host.split('.')[0]; jobId = match[1];
       }
 
       if (companySlug && jobId) {
@@ -74,13 +76,14 @@ async function tryBoardSpecific(url: string): Promise<{ company: string; role: s
         );
         if (res.ok) {
           const data = await res.json();
+          const loc = data.location?.name || '';
           return {
             role: data.title || '',
             company: data.company?.name || slugToName(companySlug),
+            location: loc,
           };
         }
-        // API failed — still extract company from slug
-        return { company: slugToName(companySlug), role: '' };
+        return { ...empty, company: slugToName(companySlug) };
       }
     }
 
@@ -99,40 +102,38 @@ async function tryBoardSpecific(url: string): Promise<{ company: string; role: s
           return {
             role: data.text || '',
             company: data.company || slugToName(companySlug),
+            location: data.categories?.location || data.workplaceType || '',
           };
         }
-        return { company: slugToName(companySlug), role: '' };
+        return { ...empty, company: slugToName(companySlug) };
       }
     }
 
-    // Workday: {company}.myworkdayjobs.com/...
+    // Workday
     if (host.includes('myworkdayjobs.com')) {
-      return { company: slugToName(host.split('.')[0]), role: '' };
+      return { ...empty, company: slugToName(host.split('.')[0]) };
     }
 
-    // Ashby: jobs.ashbyhq.com/{company}/{jobId}
+    // Ashby
     if (host === 'jobs.ashbyhq.com') {
       const match = path.match(/^\/([^/]+)/);
-      if (match) return { company: slugToName(match[1]), role: '' };
+      if (match) return { ...empty, company: slugToName(match[1]) };
     }
 
-    // Rippling: ats.rippling.com/jobs/{company}/...
+    // Rippling
     if (host === 'ats.rippling.com') {
       const match = path.match(/^\/jobs\/([^/]+)/);
-      if (match) return { company: slugToName(match[1]), role: '' };
+      if (match) return { ...empty, company: slugToName(match[1]) };
     }
 
-    // SmartRecruiters: jobs.smartrecruiters.com/{Company}/...
+    // SmartRecruiters
     if (host === 'jobs.smartrecruiters.com') {
       const match = path.match(/^\/([^/]+)/);
-      if (match) return { company: slugToName(match[1]), role: '' };
+      if (match) return { ...empty, company: slugToName(match[1]) };
     }
-
-    // LinkedIn: og:title is "Role at Company | LinkedIn" — handled by cheerio
-    // Indeed: og:title is "Role - Company - Location | Indeed" — handled by cheerio
   } catch {}
 
-  return { company: '', role: '' };
+  return empty;
 }
 
 // ─── Cheerio HTML scraper ─────────────────────────────────────────────────────
@@ -141,7 +142,8 @@ async function tryCheerio(
   url: string,
   existingCompany: string,
   existingRole: string
-): Promise<{ company: string; role: string }> {
+): Promise<ParseResult> {
+  const empty: ParseResult = { company: '', role: '', location: '' };
   try {
     const res = await fetch(url, {
       headers: {
@@ -151,16 +153,16 @@ async function tryCheerio(
       signal: AbortSignal.timeout(8000),
     });
 
-    if (!res.ok) return { company: '', role: '' };
+    if (!res.ok) return empty;
     const html = await res.text();
     const $ = cheerio.load(html);
 
     let company = existingCompany;
     let role = existingRole;
+    let location = '';
 
     // JSON-LD structured data (JobPosting schema)
     $('script[type="application/ld+json"]').each((_, el) => {
-      if (company && role) return;
       try {
         const json = JSON.parse($(el).html() || '{}');
         const entries = Array.isArray(json) ? json : [json];
@@ -168,33 +170,44 @@ async function tryCheerio(
           if (entry['@type'] === 'JobPosting' || entry['@type'] === 'Job') {
             if (!role) role = entry.title || entry.name || '';
             if (!company) company = entry.hiringOrganization?.name || entry.employer?.name || '';
+            if (!location) {
+              const loc = entry.jobLocation;
+              if (Array.isArray(loc)) {
+                location = loc[0]?.address?.addressLocality || loc[0]?.name || '';
+              } else {
+                location = loc?.address?.addressLocality || loc?.name || '';
+              }
+            }
           }
         }
       } catch {}
     });
 
-    // og:title / page title
+    // og:title / page title + og:site_name for company
+    const ogTitle = $('meta[property="og:title"]').attr('content') || '';
+    const ogSiteName = $('meta[property="og:site_name"]').attr('content') || '';
+    const pageTitle = $('title').text() || '';
+
+    const host = new URL(url).hostname;
+    const aggregators = ['linkedin', 'indeed', 'glassdoor', 'ziprecruiter', 'handshake'];
+    const isAggregator = aggregators.some(a => host.includes(a));
+
+    // og:site_name is reliable for company career portals (e.g. Goldman Sachs)
+    if (!company && ogSiteName && !isAggregator) company = ogSiteName;
+
     if (!role || !company) {
-      const ogTitle = $('meta[property="og:title"]').attr('content') || '';
-      const ogSiteName = $('meta[property="og:site_name"]').attr('content') || '';
-      const pageTitle = $('title').text() || '';
       const parseStr = ogTitle || pageTitle;
+      // Strip trailing " | SiteName"
+      const stripped = parseStr.replace(/\s*\|\s*[\w][\w\s]*$/, '').trim();
 
-      const aggregators = ['linkedin', 'indeed', 'glassdoor', 'ziprecruiter', 'handshake'];
-      const host = new URL(url).hostname;
-      const isAggregator = aggregators.some(a => host.includes(a));
-
-      if (!company && ogSiteName && !isAggregator) company = ogSiteName;
-
-      // Split title on common separators: "Role at Company | Site" or "Role - Company"
-      // For LinkedIn: "Software Engineer at Stripe | LinkedIn" → role="Software Engineer", company="Stripe"
-      // For Indeed: "Software Engineer - Stripe - Remote | Indeed" → role="Software Engineer", company="Stripe"
-      if (!role || !company) {
-        // Strip trailing " | Site" first
-        const stripped = parseStr.replace(/\s*\|\s*\w[\w\s]*$/, '').trim();
-
-        const separators = [' at ', ' @ ', ' — '];
-        for (const sep of separators) {
+      // If title has 3+ pipe segments (e.g. "2026 | Americas | NYC | Role"),
+      // take the last segment as the role
+      const pipeParts = stripped.split(/\s*\|\s*/);
+      if (pipeParts.length >= 3) {
+        if (!role) role = pipeParts[pipeParts.length - 1].trim();
+      } else {
+        const seps = [' at ', ' @ ', ' — '];
+        for (const sep of seps) {
           const idx = stripped.toLowerCase().indexOf(sep.toLowerCase());
           if (idx !== -1) {
             if (!role) role = stripped.slice(0, idx).trim();
@@ -202,32 +215,25 @@ async function tryCheerio(
             break;
           }
         }
-
-        // Dash separator: split on first " - " (Indeed style: "Role - Company - Location")
         if ((!role || !company) && stripped.includes(' - ')) {
           const parts = stripped.split(' - ');
           if (!role && parts[0]) role = parts[0].trim();
           if (!company && parts[1]) company = parts[1].trim();
         }
-
         if (!role) role = stripped || parseStr;
       }
     }
 
-    return { company, role };
+    return { company, role, location };
   } catch {
-    return { company: '', role: '' };
+    return empty;
   }
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Convert a URL slug like "stripe-inc" → "Stripe Inc" */
 function slugToName(slug: string): string {
-  return slug
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase())
-    .trim();
+  return slug.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim();
 }
 
 function cleanCompany(company: string, url: string): string {
@@ -237,13 +243,10 @@ function cleanCompany(company: string, url: string): string {
     .replace(/\s*(Careers|Jobs|Hiring|Job Board|Talent)\s*$/gi, '')
     .trim();
 
-  // Workday fallback from subdomain
   if (!company || company.length > 50) {
     try {
       const host = new URL(url).hostname;
-      if (host.includes('myworkdayjobs')) {
-        return slugToName(host.split('.')[0]);
-      }
+      if (host.includes('myworkdayjobs')) return slugToName(host.split('.')[0]);
     } catch {}
   }
 
@@ -254,6 +257,12 @@ function cleanRole(role: string): string {
   return role
     .replace(/\s*\(.*?\)\s*/g, '')
     .replace(/\s*[-–]\s*(Remote|Hybrid|On-?site|Contract|Full.?time|Part.?time).*/i, '')
+    .trim();
+}
+
+function cleanLocation(location: string): string {
+  return location
+    .replace(/\s*,?\s*(United States|USA|US)$/i, '')
     .trim();
 }
 
