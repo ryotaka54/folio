@@ -9,19 +9,12 @@ export async function POST(request: Request) {
     let company = '';
     let role = '';
 
-    // 1. Jina AI reader — renders JS pages, returns clean markdown
-    const jinaResult = await tryJina(url);
-    if (jinaResult.company) company = jinaResult.company;
-    if (jinaResult.role) role = jinaResult.role;
+    // 1. Board-specific extractors — public APIs + URL slug (most accurate)
+    const boardResult = await tryBoardSpecific(url);
+    if (boardResult.company) company = boardResult.company;
+    if (boardResult.role) role = boardResult.role;
 
-    // 2. Board-specific extractors (public APIs + URL patterns)
-    if (!company || !role) {
-      const boardResult = await tryBoardSpecific(url);
-      if (!company && boardResult.company) company = boardResult.company;
-      if (!role && boardResult.role) role = boardResult.role;
-    }
-
-    // 3. Fallback: direct fetch + cheerio (JSON-LD, og:title, page title)
+    // 2. Fallback: direct fetch + cheerio (JSON-LD, og:title, page title)
     if (!company || !role) {
       const htmlResult = await tryCheerio(url, company, role);
       if (!company) company = htmlResult.company;
@@ -47,44 +40,6 @@ export async function POST(request: Request) {
 }
 
 // ─── Jina AI reader ───────────────────────────────────────────────────────────
-
-async function tryJina(url: string): Promise<{ company: string; role: string }> {
-  try {
-    const res = await fetch(`https://r.jina.ai/${url}`, {
-      headers: { 'Accept': 'text/plain', 'X-Return-Format': 'text' },
-      signal: AbortSignal.timeout(10000),
-    });
-    if (!res.ok) return { company: '', role: '' };
-    const text = await res.text();
-
-    const titleMatch = text.match(/^Title:\s*(.+)$/m);
-    const titleLine = titleMatch?.[1]?.trim() || '';
-
-    let company = '';
-    let role = '';
-
-    const seps = [' at ', ' @ ', ' — ', ' - ', ' | '];
-    for (const sep of seps) {
-      const idx = titleLine.toLowerCase().indexOf(sep.toLowerCase());
-      if (idx !== -1) {
-        role = titleLine.slice(0, idx).trim();
-        company = titleLine.slice(idx + sep.length).trim();
-        break;
-      }
-    }
-    if (!role) role = titleLine;
-
-    if (!company) {
-      const body = text.slice(0, 3000);
-      const m = body.match(/(?:Company|Employer|Organisation|Organization|Hiring company)[:\s]+([^\n]+)/i);
-      if (m) company = m[1].trim();
-    }
-
-    return { company, role };
-  } catch {
-    return { company: '', role: '' };
-  }
-}
 
 // ─── Board-specific parsers ───────────────────────────────────────────────────
 
