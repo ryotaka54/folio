@@ -55,7 +55,7 @@ html {
 }
 
 *:not(svg, path, line, circle, rect, polyline, polygon) {
-  transition-property: background-color, border-color, color;
+  transition-property: background-color, border-color;
   transition-duration: 0.35s;
   transition-timing-function: cubic-bezier(0.4,0,0.2,1);
 }
