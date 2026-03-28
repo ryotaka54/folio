@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/lib/auth-context';
+import { useTutorial } from '@/lib/tutorial-context';
 
 // TODO: Replace with real Chrome Web Store URL when extension is published
 const EXTENSION_URL = 'https://chromewebstore.google.com/detail/applyd';
@@ -10,7 +10,7 @@ const DISMISSED_KEY = 'applyd_extension_banner_dismissed';
 const INSTALLED_KEY = 'applyd_extension_installed';
 
 export default function ExtensionBanner() {
-  const { user } = useAuth();
+  const { isActive } = useTutorial();
   const [dismissed, setDismissed] = useState(true); // start hidden to avoid SSR flash
   const [extensionActive, setExtensionActive] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -38,10 +38,8 @@ export default function ExtensionBanner() {
     localStorage.setItem(DISMISSED_KEY, 'true');
   };
 
-  // Only show after the user has seen the tour (or skipped it)
-  const tourDone = user?.tutorial_completed === true;
-
-  if (!mounted || dismissed || extensionActive || !tourDone) return null;
+  // Hide while the tour is running; show the moment it ends (skip or complete)
+  if (!mounted || dismissed || extensionActive || isActive) return null;
 
   return (
     <div
