@@ -10,7 +10,7 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  updateProfile: (updates: Partial<UserProfile>) => void;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -228,49 +228,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
-    setUser(prev => {
-      if (!prev) return prev;
-      const updated = { ...prev, ...updates };
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>): Promise<boolean> => {
+    if (!user) return false;
 
-      if (updated.onboarding_complete && typeof window !== 'undefined') {
-        localStorage.setItem(`applyd_onboarding_${updated.id}`, 'true');
+    const updated = { ...user, ...updates };
 
-        // Push securely to Auth JWT Metadata to bypass any `users` table RLS limitations across devices
-        supabase.auth.updateUser({
-          data: { onboarding_complete: true }
-        }).catch(err => console.error('Auth metadata update error:', err));
-      }
+    // Optimistic local update
+    setUser(updated);
 
-      if (updated.tutorial_completed && typeof window !== 'undefined') {
-        localStorage.setItem(`applyd_tutorial_${updated.id}`, 'true');
-      }
+    // localStorage side effects
+    if (updated.onboarding_complete && typeof window !== 'undefined') {
+      localStorage.setItem(`applyd_onboarding_${updated.id}`, 'true');
+      supabase.auth.updateUser({ data: { onboarding_complete: true } })
+        .catch(err => console.error('Auth metadata update error:', err));
+    }
+    if (updated.tutorial_completed && typeof window !== 'undefined') {
+      localStorage.setItem(`applyd_tutorial_${updated.id}`, 'true');
+    }
 
-      // Core fields — must succeed for the app to work correctly
-      supabase.from('users')
-        .upsert({
-          id: updated.id,
-          name: updated.name,
-          mode: updated.mode,
-          school_year: updated.school_year,
-          career_level: updated.career_level,
-          recruiting_season: updated.recruiting_season,
-          onboarding_complete: updated.onboarding_complete,
-          tutorial_completed: updated.tutorial_completed ?? false,
-        })
-        .then(({ error }) => {
-          if (error) {
-            console.error('Profile update error:', error);
-            // Retry with only the absolute minimum fields so name/mode always save
-            supabase.from('users')
-              .upsert({ id: updated.id, name: updated.name, mode: updated.mode, onboarding_complete: updated.onboarding_complete })
-              .then(({ error: retryErr }) => { if (retryErr) console.error('Profile retry error:', retryErr); });
-          }
-        });
-
-      return updated;
+    // Save to Supabase
+    const { error } = await supabase.from('users').upsert({
+      id: updated.id,
+      name: updated.name,
+      mode: updated.mode,
+      school_year: updated.school_year,
+      career_level: updated.career_level,
+      recruiting_season: updated.recruiting_season,
+      onboarding_complete: updated.onboarding_complete,
+      tutorial_completed: updated.tutorial_completed ?? false,
     });
-  }, []);
+
+    if (error) {
+      console.error('Profile update error:', error);
+      // Retry with minimum fields so name/mode always land
+      const { error: retryErr } = await supabase.from('users').upsert({
+        id: updated.id,
+        name: updated.name,
+        mode: updated.mode,
+        onboarding_complete: updated.onboarding_complete,
+      });
+      if (retryErr) {
+        console.error('Profile retry error:', retryErr);
+        return false;
+      }
+    }
+
+    return true;
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut, updateProfile }}>

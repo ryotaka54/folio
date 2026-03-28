@@ -159,14 +159,10 @@ function ProfileSection({ showToast }: { showToast: (msg: string, type?: 'succes
   const handleSave = async () => {
     if (!dirty || saving) return;
     setSaving(true);
-    try {
-      await updateProfile({ name: name.trim() });
-      showToast('Name updated successfully');
-    } catch {
-      showToast('Failed to update name', 'error');
-    } finally {
-      setSaving(false);
-    }
+    const ok = await updateProfile({ name: name.trim() });
+    setSaving(false);
+    if (ok) showToast('Name updated');
+    else showToast('Failed to save — check your connection', 'error');
   };
 
   const initials = (user?.name || email || '?').trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
@@ -236,9 +232,10 @@ function RecruitingSection({ showToast }: { showToast: (msg: string, type?: 'suc
     setTimeout(() => setSavedField(null), 2000);
   };
 
-  const saveField = (updates: Parameters<typeof updateProfile>[0], field: string) => {
-    updateProfile(updates);
-    flashSaved(field);
+  const saveField = async (updates: Parameters<typeof updateProfile>[0], field: string) => {
+    const ok = await updateProfile(updates);
+    if (ok) flashSaved(field);
+    else showToast('Failed to save — check your connection', 'error');
   };
 
   const handleModeChange = (mode: 'internship' | 'job') => {
@@ -247,13 +244,13 @@ function RecruitingSection({ showToast }: { showToast: (msg: string, type?: 'suc
     setModeModal(true);
   };
 
-  const confirmModeChange = () => {
+  const confirmModeChange = async () => {
     if (!pendingMode) return;
-    updateProfile({ mode: pendingMode });
+    const ok = await updateProfile({ mode: pendingMode });
     setModeModal(false);
     setPendingMode(null);
-    showToast('Tracking mode updated');
-    router.refresh();
+    if (ok) { showToast('Tracking mode updated'); router.refresh(); }
+    else showToast('Failed to update mode — check your connection', 'error');
   };
 
   const addCustomSeason = () => {
@@ -414,7 +411,14 @@ function TargetField({ storageKey, placeholder }: { storageKey: string; placehol
 function AppearanceSection() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [themeSaved, setThemeSaved] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  const handleTheme = (id: string) => {
+    setTheme(id);
+    setThemeSaved(true);
+    setTimeout(() => setThemeSaved(false), 2000);
+  };
 
   const themes = [
     { id: 'light', label: 'Light', preview: { bg: '#FFFFFF', border: '#E5E7EB', dot: '#2563EB' } },
@@ -431,7 +435,7 @@ function AppearanceSection() {
             return (
               <button
                 key={t.id}
-                onClick={() => setTheme(t.id)}
+                onClick={() => handleTheme(t.id)}
                 className="flex-1 rounded-lg border-2 overflow-hidden transition-all"
                 style={{ borderColor: active ? 'var(--accent-blue)' : 'var(--border-gray)' }}
               >
@@ -460,6 +464,7 @@ function AppearanceSection() {
               </button>
             );
           })}
+          {mounted && <div className="mt-3 h-4"><SavedIndicator show={themeSaved} /></div>}
         </div>
       </SectionCard>
 

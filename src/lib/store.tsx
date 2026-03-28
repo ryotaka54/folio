@@ -47,6 +47,27 @@ export function StoreProvider({ children, userId }: { children: ReactNode; userI
     loadApplications();
   }, [loadApplications]);
 
+  // Real-time sync — keeps all open tabs in sync
+  useEffect(() => {
+    const channel = supabase
+      .channel(`applications_${userId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'applications', filter: `user_id=eq.${userId}` }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          const incoming = payload.new as Application;
+          setApplications(prev => prev.some(a => a.id === incoming.id) ? prev : [incoming, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          const incoming = payload.new as Application;
+          setApplications(prev => prev.map(a => a.id === incoming.id ? incoming : a));
+        } else if (payload.eventType === 'DELETE') {
+          const gone = (payload.old as Partial<Application>).id;
+          setApplications(prev => prev.filter(a => a.id !== gone));
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [userId]);
+
   const addApplication = useCallback(async (
     appData: Omit<Application, 'id' | 'user_id' | 'created_at' | 'updated_at'>
   ): Promise<Application> => {
