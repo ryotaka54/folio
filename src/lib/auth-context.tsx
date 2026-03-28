@@ -194,7 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         career_level: '',
         recruiting_season: '',
         onboarding_complete: false,
-        tutorial_completed: false,
+        // tutorial_completed is localStorage-only — not a DB column
       });
       if (profileError) console.error('Profile creation error:', profileError);
 
@@ -254,7 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           career_level: updated.career_level,
           recruiting_season: updated.recruiting_season,
           onboarding_complete: updated.onboarding_complete,
-          tutorial_completed: updated.tutorial_completed,
+          // tutorial_completed is localStorage-only — not a DB column
         })
         .then(({ error }) => {
           if (error) console.error('Profile update error:', error);

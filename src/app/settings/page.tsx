@@ -632,8 +632,9 @@ function DangerSection({ showToast }: { showToast: (msg: string, type?: 'success
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email) setUserEmail(data.user.email);
+    // getSession reads from localStorage — reliable, no network needed
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user?.email) setUserEmail(data.session.user.email);
     });
   }, []);
 
@@ -761,19 +762,27 @@ function DangerSection({ showToast }: { showToast: (msg: string, type?: 'success
           <>
             <h3 className="text-[16px] font-semibold mb-2" style={{ color: '#DC2626' }}>Final confirmation</h3>
             <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>
-              Type your email address <strong style={{ color: 'var(--brand-navy)' }}>{userEmail}</strong> to confirm deletion.
+              {userEmail
+                ? <>Type your email address <strong style={{ color: 'var(--brand-navy)' }}>{userEmail}</strong> to confirm deletion.</>
+                : <>Type <strong style={{ color: 'var(--brand-navy)' }}>DELETE</strong> to confirm deletion.</>
+              }
             </p>
             <input
               className={`${input()} mb-4`}
               value={deleteEmail}
               onChange={e => setDeleteEmail(e.target.value)}
-              placeholder={userEmail}
-              type="email"
+              placeholder={userEmail || 'DELETE'}
+              type={userEmail ? 'email' : 'text'}
             />
             <div className="flex gap-2">
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleteEmail.trim().toLowerCase() !== userEmail.toLowerCase() || deleting}
+                disabled={
+                  (userEmail
+                    ? deleteEmail.trim().toLowerCase() !== userEmail.toLowerCase()
+                    : deleteEmail.trim() !== 'DELETE'
+                  ) || deleting
+                }
                 className="flex-1 h-9 rounded-md text-[13px] font-semibold text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 style={{ background: 'var(--danger)' }}
               >
