@@ -73,7 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           recruiting_season: data.recruiting_season || '',
           created_at: data.created_at,
           onboarding_complete: data.onboarding_complete || localOnboarding === 'true',
-          tutorial_completed: data.tutorial_completed ?? localTutorial === 'true',
+          // localStorage wins — we don't write tutorial_completed to DB, so DB default (false) must not override it
+          tutorial_completed: localTutorial === 'true' || data.tutorial_completed === true,
         });
       } else {
         // No profile row exists — auto-create one so future writes succeed
