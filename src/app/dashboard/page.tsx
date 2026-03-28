@@ -21,7 +21,7 @@ import Toast from '@/components/Toast';
 
 function DashboardContent() {
   const { user, signOut } = useAuth();
-  const { applications, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
+  const { applications, loading, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
   const router = useRouter();
 
   const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
@@ -196,15 +196,6 @@ function DashboardContent() {
             {user?.name && (
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name}</span>
             )}
-            {/* Quick add */}
-            <button
-              onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-              className="hidden md:flex items-center gap-1.5 h-7 px-3 text-[12px] font-medium text-white rounded-md transition-colors bg-accent-blue hover:bg-accent-blue-hover"
-              aria-label="Add application"
-            >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Add
-            </button>
             <ThemeToggle />
             <button
               onClick={async () => { await signOut(); router.push('/'); }}
@@ -256,21 +247,9 @@ function DashboardContent() {
         <FunnelChart applications={applications} />
 
         {/* Controls */}
-        <div className="mt-6 flex flex-col gap-3">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            {/* View toggle — hidden on mobile */}
-            <div className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
-              <button
-                onClick={() => setView('pipeline')}
-                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
-              >Pipeline</button>
-              <button
-                onClick={() => setView('table')}
-                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'table' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
-              >Table</button>
-            </div>
-
-            {/* Search */}
+        <div className="mt-6 flex flex-col gap-2">
+          {/* Row 1: Search + Add */}
+          <div className="flex gap-2">
             <div className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input
@@ -281,43 +260,61 @@ function DashboardContent() {
                 className="w-full h-9 pl-9 pr-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
               />
             </div>
-
-            {/* Status filter */}
+            <button
+              onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+              className="h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors bg-accent-blue hover:bg-accent-blue-hover"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add
+            </button>
+          </div>
+          {/* Row 2: View toggle + filters */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
+              <button
+                onClick={() => setView('pipeline')}
+                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
+              >Pipeline</button>
+              <button
+                onClick={() => setView('table')}
+                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'table' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
+              >Table</button>
+            </div>
             <select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value as PipelineStage | 'all')}
-              className="h-9 px-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 transition-colors flex-shrink-0"
+              className="h-8 px-3 bg-background border border-border-gray rounded-md text-[12px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 transition-colors flex-shrink-0"
               style={{ color: 'var(--muted-text)' }}
             >
               <option value="all">All statuses</option>
               {stages.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
-
-            {/* Hide inactive toggle */}
             <button
               onClick={() => setHideInactive(h => !h)}
-              className="h-9 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 transition-colors"
+              className="h-8 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 transition-colors"
               style={hideInactive
                 ? { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }
                 : { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }}
             >
               {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
             </button>
-
-            {/* Add button */}
-            <button
-              onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-              className="sm:ml-auto h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors bg-accent-blue hover:bg-accent-blue-hover"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Add
-            </button>
           </div>
         </div>
 
         {/* Content */}
         <div className="mt-4 flex-1">
-          {applications.length === 0 ? (
+          {loading ? (
+            <div className="flex gap-3 overflow-hidden">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex-1 min-w-[160px] rounded-lg border border-border-gray p-3" style={{ background: 'var(--card-bg)' }}>
+                  <div className="h-3 w-16 rounded mb-3 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+                  {[...Array(i === 1 ? 3 : i === 0 ? 2 : 1)].map((_, j) => (
+                    <div key={j} className="h-16 rounded-md mb-2 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : applications.length === 0 ? (
             <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} />
           ) : filteredApps.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">

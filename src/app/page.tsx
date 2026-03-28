@@ -81,19 +81,6 @@ export default function Home() {
           <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
             Free forever · No credit card · 2-minute setup
           </p>
-
-          {/* Social proof */}
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center max-w-xl mx-auto">
-            {[
-              { quote: "Finally a tracker that doesn't make me want to give up.", name: 'CS junior, recruiting for SWE internships' },
-              { quote: "The URL autofill alone saves me 5 minutes per application.", name: 'CS senior, new grad job search' },
-            ].map((t) => (
-              <div key={t.name} className="flex-1 rounded-lg p-3 border border-border-gray text-left" style={{ background: 'var(--card-bg)' }}>
-                <p className="text-[12px] leading-relaxed mb-2" style={{ color: 'var(--body-text)' }}>&ldquo;{t.quote}&rdquo;</p>
-                <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>— {t.name}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Dashboard Preview */}

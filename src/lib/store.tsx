@@ -6,6 +6,7 @@ import { supabase } from './supabase';
 
 interface StoreContextType {
   applications: Application[];
+  loading: boolean;
   storeError: string | null;
   clearStoreError: () => void;
   addApplication: (app: Omit<Application, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<Application>;
@@ -17,6 +18,7 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export function StoreProvider({ children, userId }: { children: ReactNode; userId: string }) {
   const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
   const [storeError, setStoreError] = useState<string | null>(null);
   const loadingRef = useRef(false);
 
@@ -34,6 +36,7 @@ export function StoreProvider({ children, userId }: { children: ReactNode; userI
       if (error) console.error('Load applications error:', error);
     } finally {
       loadingRef.current = false;
+      setLoading(false);
     }
   }, [userId]);
 
@@ -107,7 +110,7 @@ export function StoreProvider({ children, userId }: { children: ReactNode; userI
   const clearStoreError = useCallback(() => setStoreError(null), []);
 
   return (
-    <StoreContext.Provider value={{ applications, storeError, clearStoreError, addApplication, updateApplication, deleteApplication }}>
+    <StoreContext.Provider value={{ applications, loading, storeError, clearStoreError, addApplication, updateApplication, deleteApplication }}>
       {children}
     </StoreContext.Provider>
   );

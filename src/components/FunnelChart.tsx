@@ -37,6 +37,22 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
 
   if (applications.length === 0) return null;
 
+  if (applications.length < 5) {
+    return (
+      <div className="border border-dashed border-border-gray rounded-lg px-5 py-4 mt-6 mb-2 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-[13px] font-semibold mb-0.5" style={{ color: 'var(--brand-navy)' }}>Recruiting Funnel</p>
+          <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Add {5 - applications.length} more application{5 - applications.length !== 1 ? 's' : ''} to unlock your funnel chart.</p>
+        </div>
+        <div className="flex gap-1 items-end flex-shrink-0">
+          {[40, 28, 16, 8].map((h, i) => (
+            <div key={i} className="w-4 rounded-sm opacity-20 animate-pulse" style={{ height: h, background: 'var(--accent-blue)' }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   const maxCount = Math.max(...data.map(d => d.count), 1);
   // Offer rate: offers vs total apps that left Wishlist (cumulative, not just current stage)
   const totalSubmitted = applications.filter(a => a.status !== 'Wishlist').length;
