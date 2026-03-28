@@ -36,6 +36,7 @@
   --success-border: #BBF7D0;
 
   --foreground: #111827;
+  --bmac-bg: #FFFDF7;
 }
 
 .dark {
@@ -68,6 +69,7 @@
   --success-border: rgba(34, 197, 94, 0.25);
 
   --foreground: #F9FAFB;
+  --bmac-bg: #1A1914;
 }
 
 @theme inline {

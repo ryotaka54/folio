@@ -9,6 +9,14 @@ import ThemeToggle from '@/components/ThemeToggle';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
 import { Logo } from '@/components/Logo';
 
+function trackSupport(location: 'landing_page' | 'dashboard_footer' | 'settings_page') {
+  // Simple click tracking — wire to your analytics provider (Posthog, Plausible, etc.) when ready
+  try {
+    console.log('[analytics] support_click', { location });
+    // e.g. window.posthog?.capture('support_click', { location });
+  } catch { /* silent */ }
+}
+
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
@@ -202,6 +210,36 @@ export default function Home() {
           ))}
         </div>
       </main>
+
+      {/* Buy Me a Coffee */}
+      <section style={{ background: 'var(--bmac-bg)', borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)' }}>
+        <div className="max-w-[480px] mx-auto px-6 py-16 text-center">
+          <div className="flex justify-center mb-5">
+            <Logo size={36} variant="dark" />
+          </div>
+          <h2 className="text-[20px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
+            Applyd is free — and always will be for students.
+          </h2>
+          <p className="text-[14px] leading-relaxed mb-6" style={{ color: 'var(--muted-text)' }}>
+            Building and maintaining Applyd takes time and care. If it&apos;s helped your recruiting season even a little, buying me a coffee means the world. Every coffee goes directly back into making the app better for students.
+          </p>
+          <a
+            href="https://buymeacoffee.com/applyd"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackSupport('landing_page')}
+            className="inline-flex items-center gap-2 font-semibold transition-colors"
+            style={{ background: '#FFDD00', color: '#000', borderRadius: 8, padding: '10px 22px', fontSize: 14 }}
+            onMouseEnter={e => (e.currentTarget.style.background = '#F0D000')}
+            onMouseLeave={e => (e.currentTarget.style.background = '#FFDD00')}
+          >
+            ☕ Buy me a coffee
+          </a>
+          <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
+            No pressure at all — Applyd will always be free.
+          </p>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-border-gray py-8">

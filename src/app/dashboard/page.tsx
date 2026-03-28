@@ -432,7 +432,19 @@ function DashboardContent() {
             <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Support</Link>
             <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
           </div>
-          <p className="text-[10px] text-muted-text/50 font-medium tracking-wider uppercase">© {new Date().getFullYear()} Applyd — Made for Students</p>
+          <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+            Made with care by a student —{' '}
+            <a
+              href="https://buymeacoffee.com/applyd"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => { try { console.log('[analytics] support_click', { location: 'dashboard_footer' }); } catch { /* silent */ } }}
+              className="underline underline-offset-2 hover:opacity-80 transition-opacity"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
+              support Applyd with a coffee
+            </a>
+          </p>
         </footer>
       </main>
 
