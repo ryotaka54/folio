@@ -1,301 +1,457 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Logo } from './Logo';
 
+// ── Feature list ──────────────────────────────────────────────────────────────
 const FEATURES = [
-  { title: 'Add in seconds',        desc: 'Log any application in under 30 seconds', duration: 4000 },
-  { title: 'Track your pipeline',   desc: 'Drag cards between stages as you progress', duration: 4000 },
-  { title: 'Never miss a deadline', desc: 'Urgent deadlines surface automatically', duration: 3500 },
-  { title: 'See your funnel',       desc: 'Watch your recruiting funnel update live', duration: 3500 },
-  { title: 'Works on any device',   desc: 'Mobile-first design, always in sync', duration: 3000 },
+  { title: 'Add in seconds',        desc: 'Log any application in under 30 seconds',   duration: 4800 },
+  { title: 'Track your pipeline',   desc: 'Drag cards between stages as you progress', duration: 4800 },
+  { title: 'Never miss a deadline', desc: 'Urgent deadlines surface automatically',     duration: 4200 },
+  { title: 'See your funnel',       desc: 'Watch your recruiting funnel update live',   duration: 4200 },
+  { title: 'Works on any device',   desc: 'Mobile-first design, always in sync',       duration: 3600 },
 ] as const;
 
 function ani(name: string, dur: string, delay = '0s', extra = 'ease-out both') {
   return `${name} ${dur} ${delay} ${extra}`;
 }
 
-// ── Shared design tokens ──────────────────────────────────────────────────────
-const BLUE = '#2563EB';
-const STAGE_COLORS: Record<string, string> = {
-  'Wishlist':  '#8B5CF6',
-  'Applied':   '#2563EB',
-  'OA':        '#06B6D4',
-  'Interviews':'#F59E0B',
-  'Offer':     '#16A34A',
+// ── Real design tokens ────────────────────────────────────────────────────────
+// Sourced directly from src/lib/constants.ts and src/app/globals.css
+
+// STAGE_COLORS from constants.ts — exact hex values
+const SC: Record<string, string> = {
+  'Wishlist':                '#8B5CF6',
+  'Applied':                 '#4361EE',
+  'OA / Online Assessment':  '#06B6D4',
+  'Phone / Recruiter Screen':'#F59E0B',
+  'Final Round Interviews':  '#EF4444',
+  'Offer':                   '#1D9E75',
+  'Rejected':                '#9CA3AF',
 };
 
-// ── Panel 1: Add Application ──────────────────────────────────────────────────
-// Mirrors the real AddApplicationModal: rounded-lg bottom sheet, h-9 inputs,
-// 13px labels in brand-navy, rounded-md button
-function Panel1({ k }: { k: number }) {
+// UI accent (not a stage color — used for inputs, buttons)
+const ACCENT = '#2563EB';
+
+// Deadline badge styles — exact match from ApplicationCard.tsx
+const deadlineBadge = {
+  red:   { background: '#FEF2F2', color: '#991B1B', border: '1px solid #FECACA' },
+  amber: { background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' },
+  muted: { background: 'var(--surface-gray)', color: 'var(--text-tertiary)', border: '1px solid var(--border-gray)' },
+};
+
+// ── Shared mini-components ────────────────────────────────────────────────────
+
+// Real navbar — matches dashboard nav exactly (h-[52px], Logo, wordmark, Hi, ThemeToggle, Log out)
+function MockNav() {
   return (
-    <div key={k} className="absolute inset-0 flex flex-col items-end justify-end p-3 overflow-hidden">
-      {/* Ghost pipeline bg */}
-      <div className="absolute inset-0 flex gap-2 p-3 pointer-events-none" style={{ opacity: 0.06 }}>
-        {Object.entries(STAGE_COLORS).map(([, c], i) => (
-          <div key={i} className="flex-1 rounded-lg" style={{ background: c + '20', border: `1px solid ${c}` }}>
-            <div className="m-1.5 h-7 rounded-md" style={{ background: c }} />
-            {i < 3 && <div className="m-1.5 mt-1 h-7 rounded-md" style={{ background: c + '80' }} />}
-          </div>
-        ))}
+    <div style={{
+      height: 38,
+      borderBottom: '1px solid var(--border-gray)',
+      background: 'var(--background)',
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 14px',
+      gap: 8,
+      flexShrink: 0,
+    }}>
+      <Logo size={20} variant="dark" />
+      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+      <div style={{ flex: 1 }} />
+      <span style={{ fontSize: 9, color: 'var(--muted-text)' }}>Hi, Alex</span>
+      {/* ThemeToggle: p-2.5 rounded-xl border bg-surface-gray/50 */}
+      <div style={{
+        width: 24, height: 24,
+        borderRadius: 8,
+        border: '1px solid var(--border-gray)',
+        background: 'var(--surface-gray)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--muted-text)' }}>
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
       </div>
-
-      {/* Modal — bottom sheet style matching real AddApplicationModal */}
-      <div
-        className="relative z-10 w-full"
-        style={{
-          background: 'var(--card-bg)',
-          border: '1px solid var(--border-gray)',
-          borderRadius: '12px 12px 0 0',
-          animation: ani('wt-scale-in', '0.3s'),
-        }}
-      >
-        {/* Drag handle */}
-        <div className="w-6 h-1 rounded-full mx-auto mt-2.5 mb-1" style={{ background: 'var(--border-gray)' }} />
-
-        <div className="px-4 pb-4 pt-1">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Add Application</span>
-            <div className="w-4 h-4 rounded" style={{ background: 'var(--surface-gray)' }} />
-          </div>
-
-          <div className="space-y-2.5">
-            {/* Company */}
-            <div style={{ animation: ani('wt-fade-up', '0.22s', '0.2s') }}>
-              <div className="text-[9px] font-medium mb-0.5" style={{ color: 'var(--brand-navy)' }}>
-                Company <span style={{ color: '#EF4444', opacity: 0.7 }}>*</span>
-              </div>
-              <div className="h-7 px-2 rounded-md border flex items-center gap-0.5 text-[10px] font-semibold" style={{ background: 'var(--background)', borderColor: BLUE, color: 'var(--brand-navy)' }}>
-                <span style={{ animation: ani('wt-fade-up', '0.18s', '0.5s') }}>Google</span>
-                <span className="inline-block w-px h-3 ml-0.5" style={{ background: BLUE, animation: `wt-cursor-blink 0.7s step-end 0.5s 4, wt-fade-up 0s 1.4s both` }} />
-              </div>
-            </div>
-
-            {/* Role */}
-            <div style={{ animation: ani('wt-fade-up', '0.22s', '1.1s') }}>
-              <div className="text-[9px] font-medium mb-0.5" style={{ color: 'var(--brand-navy)' }}>
-                Role <span style={{ color: '#EF4444', opacity: 0.7 }}>*</span>
-              </div>
-              <div className="h-7 px-2 rounded-md border flex items-center gap-0.5 text-[10px] font-semibold" style={{ background: 'var(--background)', borderColor: BLUE, color: 'var(--brand-navy)' }}>
-                <span style={{ animation: ani('wt-fade-up', '0.18s', '1.3s') }}>SWE Intern</span>
-                <span className="inline-block w-px h-3 ml-0.5" style={{ background: BLUE, animation: `wt-cursor-blink 0.7s step-end 1.3s 4` }} />
-              </div>
-            </div>
-
-            {/* Category + Status row */}
-            <div className="grid grid-cols-2 gap-2" style={{ animation: ani('wt-fade-up', '0.22s', '2.1s') }}>
-              <div>
-                <div className="text-[9px] font-medium mb-0.5" style={{ color: 'var(--brand-navy)' }}>Category</div>
-                <div className="h-7 px-2 rounded-md border text-[10px] flex items-center" style={{ background: 'var(--background)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}>Tech</div>
-              </div>
-              <div>
-                <div className="text-[9px] font-medium mb-0.5" style={{ color: 'var(--brand-navy)' }}>Status</div>
-                <div className="h-7 px-2 rounded-md border text-[10px] font-semibold flex items-center" style={{ background: 'var(--background)', borderColor: 'var(--border-gray)', color: BLUE }}>Applied</div>
-              </div>
-            </div>
-
-            {/* Save button */}
-            <div style={{ animation: ani('wt-fade-up', '0.22s', '2.5s') }}>
-              <button
-                className="w-full h-7 rounded-md text-white text-[10px] font-semibold"
-                style={{ background: BLUE, animation: ani('wt-btn-press', '0.25s', '3.2s', 'ease-in-out both') }}
-              >
-                Save Application
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* New card popping into pipeline */}
-      <div
-        className="absolute top-4 left-[72px] rounded-lg p-2"
-        style={{
-          background: 'var(--background)',
-          border: '1px solid var(--border-gray)',
-          width: 110,
-          animation: ani('wt-card-pop', '0.32s', '3.5s', 'cubic-bezier(0.34,1.56,0.64,1) both'),
-        }}
-      >
-        <div className="text-[10px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Google</div>
-        <div className="text-[9px] mt-0.5" style={{ color: 'var(--muted-text)' }}>SWE Intern</div>
-        <div className="flex items-center gap-1 mt-1.5">
-          <span className="text-[8px] px-1.5 py-0.5 rounded font-medium" style={{ background: `${BLUE}12`, color: BLUE }}>Applied</span>
-        </div>
-      </div>
+      <span style={{ fontSize: 9, color: 'var(--muted-text)' }}>Log out</span>
     </div>
   );
 }
 
-// ── Panel 2: Pipeline ─────────────────────────────────────────────────────────
-// Mirrors real PipelineView: 11px uppercase tracking-[0.08em] headers,
-// count pill with border, flat bg-card-bg column containers
-const COLS = [
-  { label: 'Wishlist',   color: STAGE_COLORS['Wishlist'],    cards: ['Stripe', 'Adobe'] },
-  { label: 'Applied',    color: STAGE_COLORS['Applied'],     cards: ['Google', 'Airbnb'] },
-  { label: 'OA',         color: STAGE_COLORS['OA'],          cards: ['Amazon'] },
-  { label: 'Interviews', color: STAGE_COLORS['Interviews'],  cards: ['Microsoft'] },
-  { label: 'Offer',      color: STAGE_COLORS['Offer'],       cards: ['Figma'] },
-];
-
-function Panel2({ k }: { k: number }) {
+// Real StatsBar — matches exactly:
+// grid-cols-4 gap-3, rounded-lg p-4, border border-border-gray, bg-card-bg
+// Interviews: borderLeft 3px solid #16A34A  |  Act Now: borderLeft 3px solid #D97706
+// Label: text-[11px] font-semibold uppercase tracking-[0.05em] muted-text
+// Value: text-[28px] font-semibold letterSpacing -0.02em
+// Subtext: text-[12px] text-tertiary
+function MockStats({ anim = true }: { anim?: boolean }) {
+  const stats = [
+    { label: 'Total',         value: '24', subtext: '+6 this week',       accent: null as null | 'green' | 'amber', valColor: 'var(--brand-navy)' },
+    { label: 'Response Rate', value: '38%', subtext: 'of apps replied',   accent: null,  valColor: 'var(--brand-navy)' },
+    { label: 'Interviews',    value: '5',  subtext: "You're on a roll",   accent: 'green' as 'green', valColor: 'var(--green-success)' },
+    { label: 'Act Now',       value: '3',  subtext: 'deadlines this week', accent: 'amber' as 'amber', valColor: 'var(--amber-warning)' },
+  ];
   return (
-    <div key={k} className="absolute inset-0 flex p-3 gap-2 overflow-hidden" style={{ animation: ani('wt-panel-in', '0.3s') }}>
-      {COLS.map((col, ci) => (
-        <div key={col.label} className="flex flex-col flex-1 min-w-0">
-          {/* Column header — matches real PipelineView */}
-          <div className="flex items-center gap-1.5 mb-1.5 px-0.5">
-            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: col.color }} />
-            <span
-              className="text-[7px] font-semibold uppercase truncate flex-1"
-              style={{ color: 'var(--muted-text)', letterSpacing: '0.08em' }}
-            >
-              {col.label}
-            </span>
-            <span
-              className="text-[7px] font-medium px-1 py-0.5 rounded border flex-shrink-0"
-              style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }}
-            >
-              {ci === 1 ? col.cards.length - 1 : col.cards.length}
-            </span>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 5 }}>
+      {stats.map((s, i) => (
+        <div key={s.label} style={{
+          borderRadius: 8,
+          padding: '8px 8px',
+          background: 'var(--card-bg)',
+          border: '1px solid var(--border-gray)',
+          borderLeft: s.accent === 'green' ? '3px solid #16A34A' : s.accent === 'amber' ? '3px solid #D97706' : '1px solid var(--border-gray)',
+          ...(anim ? { animation: ani('wt-fade-up', '0.2s', `${i * 0.07}s`) } : {}),
+        }}>
+          <div style={{ fontSize: 7, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.05em', color: 'var(--muted-text)', marginBottom: 4 }}>
+            {s.label}
           </div>
-
-          {/* Column body */}
-          <div
-            className="flex-1 rounded-lg p-1 space-y-1 relative overflow-visible"
-            style={{
-              background: 'var(--card-bg)',
-              border: '1px solid var(--border-gray)',
-              minHeight: 60,
-            }}
-          >
-            {col.cards.map((card, cardI) => {
-              const isDragged = ci === 1 && cardI === 0;
-              return (
-                <div
-                  key={card}
-                  className="rounded-md p-1.5 text-[9px] font-semibold"
-                  style={{
-                    background: 'var(--background)',
-                    border: '1px solid var(--border-gray)',
-                    color: 'var(--brand-navy)',
-                    ...(isDragged
-                      ? { animation: ani('wt-drag-out', '0.5s', '1s', 'ease-in both'), position: 'relative', zIndex: 20 }
-                      : { animation: ani('wt-fade-up', '0.2s', `${ci * 0.07 + cardI * 0.05 + 0.1}s`) }),
-                  }}
-                >
-                  {card}
-                </div>
-              );
-            })}
-
-            {/* Drop glow on OA column */}
-            {ci === 2 && (
-              <div
-                className="absolute inset-0 rounded-lg pointer-events-none"
-                style={{
-                  border: `2px solid ${col.color}`,
-                  background: `${col.color}18`,
-                  opacity: 0,
-                  animation: ani('wt-drop-glow', '0.6s', '1.4s', 'ease-out both'),
-                }}
-              />
-            )}
-            {/* Card landing in OA after drag */}
-            {ci === 2 && (
-              <div
-                className="rounded-md p-1.5 text-[9px] font-semibold"
-                style={{
-                  background: 'var(--background)',
-                  border: '1px solid var(--border-gray)',
-                  color: 'var(--brand-navy)',
-                  opacity: 0,
-                  animation: ani('wt-card-pop', '0.3s', '1.9s', 'cubic-bezier(0.34,1.56,0.64,1) both'),
-                }}
-              >
-                Google
-              </div>
-            )}
+          <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: s.valColor, marginBottom: 2 }}>
+            {s.value}
           </div>
+          <div style={{ fontSize: 8, color: 'var(--text-tertiary)' }}>{s.subtext}</div>
         </div>
       ))}
     </div>
   );
 }
 
-// ── Panel 3: Deadlines ────────────────────────────────────────────────────────
-// Mirrors real StatsBar (left-border accents, 11px uppercase, 28px values)
-// and ApplicationCard (flat border, rounded badge not rounded-full)
-function Panel3({ k }: { k: number }) {
+// Real column header — matches PipelineView:
+// flex items-center gap-2 mb-2 px-1
+// dot: w-2 h-2 rounded-full
+// label: text-[11px] font-semibold uppercase tracking-[0.08em] truncate muted-text
+// count: ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded border surface-gray text-tertiary border-gray
+function ColHead({ label, color, count }: { label: string; color: string; count: number }) {
   return (
-    <div key={k} className="absolute inset-0 flex flex-col p-3 gap-2.5" style={{ animation: ani('wt-panel-in', '0.3s') }}>
-      {/* Stat cards — match real StatsBar */}
-      <div className="grid grid-cols-4 gap-1.5">
-        {[
-          { label: 'Total',     val: '18', accent: null,    color: 'var(--brand-navy)' },
-          { label: 'Resp. Rate',val: '38%', accent: null,   color: 'var(--brand-navy)' },
-          { label: 'Interviews',val: '4',  accent: 'green', color: 'var(--green-success)' },
-          { label: 'Act Now',   val: '2',  accent: 'amber', color: 'var(--amber-warning)' },
-        ].map(({ label, val, accent, color }, i) => (
-          <div
-            key={label}
-            className="rounded-lg p-1.5 border"
-            style={{
-              background: 'var(--card-bg)',
-              borderColor: 'var(--border-gray)',
-              borderLeft: accent === 'green' ? '2px solid #16A34A' : accent === 'amber' ? '2px solid #D97706' : undefined,
-              animation: ani('wt-fade-up', '0.22s', `${i * 0.07}s`),
-            }}
-          >
-            <div className="text-[7px] font-semibold uppercase mb-0.5" style={{ color: 'var(--muted-text)', letterSpacing: '0.05em' }}>{label}</div>
-            <div className="text-[14px] font-semibold leading-none" style={{ color, letterSpacing: '-0.02em' }}>{val}</div>
-          </div>
-        ))}
-      </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 5, padding: '0 2px' }}>
+      <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
+      <span style={{
+        fontSize: 8, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.08em',
+        color: 'var(--muted-text)', flex: 1, overflow: 'hidden', whiteSpace: 'nowrap' as const, textOverflow: 'ellipsis',
+      }}>
+        {label}
+      </span>
+      <span style={{
+        fontSize: 8, fontWeight: 500, padding: '1px 5px', borderRadius: 4,
+        border: '1px solid var(--border-gray)', background: 'var(--surface-gray)', color: 'var(--text-tertiary)', flexShrink: 0,
+      }}>
+        {count}
+      </span>
+    </div>
+  );
+}
 
-      {/* Application cards — match real ApplicationCard */}
-      <div className="space-y-1.5 flex-1">
-        {[
-          { co: 'Amazon', role: 'SDE Intern',    badge: '2d left',   red: false, delay: '0.28s' },
-          { co: 'Meta',   role: 'PM Intern',     badge: 'Overdue',   red: true,  delay: '0.44s' },
-          { co: 'Apple',  role: 'Design Intern', badge: 'Due today', red: true,  delay: '0.6s' },
-        ].map(({ co, role, badge, red, delay }) => (
-          <div
-            key={co}
-            className="rounded-lg p-2 flex items-center justify-between"
-            style={{
-              background: 'var(--background)',
-              border: '1px solid var(--border-gray)',
-              animation: ani('wt-fade-up', '0.22s', delay),
-            }}
-          >
-            <div>
-              <div className="text-[10px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{co}</div>
-              <div className="text-[9px]" style={{ color: 'var(--muted-text)' }}>{role}</div>
+// Real column body — matches PipelineView:
+// rounded-lg p-1.5 space-y-1.5 bg-card-bg border border-border-gray
+// on isOver: bg color08, border color40
+function ColBody({ color, isOver, children, minH = 80 }: {
+  color: string; isOver?: boolean; children?: React.ReactNode; minH?: number;
+}) {
+  return (
+    <div style={{
+      flex: 1, borderRadius: 8, padding: 5, display: 'flex', flexDirection: 'column' as const, gap: 5,
+      background: isOver ? `${color}08` : 'var(--card-bg)',
+      border: isOver ? `1px solid ${color}40` : '1px solid var(--border-gray)',
+      minHeight: minH, position: 'relative', overflow: 'hidden',
+    }}>
+      {children}
+    </div>
+  );
+}
+
+// Real ApplicationCard at mini scale — matches exactly:
+// bg-background border border-border-gray rounded-lg p-3
+// Company: text-[14px] font-semibold color: brand-navy
+// Role: text-[13px] color: muted-text mt-0.5
+// Deadline badge: text-[11px] px-1.5 py-0.5 rounded font-medium ml-auto
+function MiniCard({
+  company, role, deadlineBadgeStyle, deadlineLabel, delayAnim, isDragged,
+}: {
+  company: string; role: string;
+  deadlineBadgeStyle?: React.CSSProperties; deadlineLabel?: string;
+  delayAnim?: string; isDragged?: boolean;
+}) {
+  return (
+    <div style={{
+      background: 'var(--background)',
+      border: '1px solid var(--border-gray)',
+      borderRadius: 8,
+      padding: '7px 9px',
+      ...(isDragged
+        ? { animation: ani('wt-drag-out', '0.5s', '1.2s', 'ease-in both'), position: 'relative', zIndex: 20 }
+        : { animation: delayAnim }),
+    }}>
+      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--brand-navy)', lineHeight: 1.3, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {company}
+      </div>
+      <div style={{ fontSize: 9, color: 'var(--muted-text)', marginTop: 2, whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {role}
+      </div>
+      {deadlineBadgeStyle && deadlineLabel && (
+        <div style={{ display: 'flex', marginTop: 5 }}>
+          <span style={{
+            fontSize: 8, fontWeight: 600, padding: '2px 5px', borderRadius: 4, marginLeft: 'auto',
+            ...deadlineBadgeStyle,
+          }}>
+            {deadlineLabel}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Panel 1: Add Application ──────────────────────────────────────────────────
+// Matches real AddApplicationModal exactly:
+// backdrop rgba(0,0,0,0.4) | modal: bg-card-bg border border-border-gray
+// borderRadius '12px 12px 0 0' | drag handle | p-5 content
+// inputCls: h-9 px-3 bg-background border border-border-gray rounded-md text-sm
+// focused: border-accent-blue ring-2 ring-accent-blue/20
+// button: w-full h-9 text-[14px] font-medium text-white rounded-md bg-accent-blue
+function Panel1({ k }: { k: number }) {
+  const inputBase: React.CSSProperties = {
+    height: 30, padding: '0 10px', background: 'var(--background)',
+    border: '1px solid var(--border-gray)', borderRadius: 6, fontSize: 10,
+    color: 'var(--brand-navy)', display: 'flex', alignItems: 'center',
+  };
+  const inputActive: React.CSSProperties = {
+    ...inputBase, border: `1px solid ${ACCENT}`, boxShadow: `0 0 0 3px rgba(37,99,235,0.12)`,
+  };
+
+  return (
+    <div key={k} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' as const, animation: ani('wt-panel-in', '0.3s') }}>
+      <MockNav />
+
+      {/* Dashboard body behind modal */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        {/* Ghost stats (dimmed) */}
+        <div style={{ padding: '10px 14px', opacity: 0.25, pointerEvents: 'none' }}>
+          <MockStats anim={false} />
+        </div>
+
+        {/* Backdrop: rgba(0,0,0,0.4) */}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.38)', zIndex: 10 }} />
+
+        {/* Modal */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20,
+          background: 'var(--card-bg)',
+          border: '1px solid var(--border-gray)',
+          borderRadius: '12px 12px 0 0',
+          animation: ani('wt-scale-in', '0.28s'),
+        }}>
+          {/* Drag handle: w-8 h-1 bg-border-gray rounded-full mx-auto mt-3 mb-1 */}
+          <div style={{ width: 28, height: 4, background: 'var(--border-gray)', borderRadius: 2, margin: '9px auto 3px' }} />
+
+          <div style={{ padding: '4px 16px 16px' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Add Application</span>
+              {/* X icon */}
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--muted-text)' }}>
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
             </div>
-            <span
-              className="text-[9px] px-1.5 py-0.5 rounded font-semibold border"
-              style={red
-                ? { color: '#991B1B', background: '#FEF2F2', borderColor: '#FECACA', animation: ani('wt-badge-pulse', '1.4s', delay, 'ease-in-out infinite') }
-                : { color: '#92400E', background: '#FEF3C7', borderColor: '#FDE68A' }}
-            >
-              {badge}
-            </span>
+
+            {/* Company */}
+            <div style={{ marginBottom: 8, animation: ani('wt-fade-up', '0.2s', '0.15s') }}>
+              <div style={{ fontSize: 9, fontWeight: 500, color: 'var(--brand-navy)', marginBottom: 3 }}>
+                Company <span style={{ color: '#EF4444', opacity: 0.6 }}>*</span>
+              </div>
+              <div style={{ ...inputActive, gap: 0 }}>
+                <span style={{ animation: ani('wt-fade-up', '0.18s', '0.4s') }}>Google</span>
+                <span style={{
+                  display: 'inline-block', width: 1, height: 11,
+                  background: ACCENT, marginLeft: 2,
+                  animation: `wt-cursor-blink 0.7s step-end 0.4s 4, wt-fade-up 0s 1.2s both`,
+                }} />
+              </div>
+            </div>
+
+            {/* Role */}
+            <div style={{ marginBottom: 8, animation: ani('wt-fade-up', '0.2s', '1.05s') }}>
+              <div style={{ fontSize: 9, fontWeight: 500, color: 'var(--brand-navy)', marginBottom: 3 }}>
+                Role <span style={{ color: '#EF4444', opacity: 0.6 }}>*</span>
+              </div>
+              <div style={{ ...inputActive, gap: 0 }}>
+                <span style={{ animation: ani('wt-fade-up', '0.18s', '1.25s') }}>SWE Intern</span>
+                <span style={{
+                  display: 'inline-block', width: 1, height: 11,
+                  background: ACCENT, marginLeft: 2,
+                  animation: `wt-cursor-blink 0.7s step-end 1.25s 4`,
+                }} />
+              </div>
+            </div>
+
+            {/* Category + Status */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10, animation: ani('wt-fade-up', '0.2s', '2.0s') }}>
+              <div>
+                <div style={{ fontSize: 9, fontWeight: 500, color: 'var(--brand-navy)', marginBottom: 3 }}>Category</div>
+                <div style={{ ...inputBase, color: 'var(--muted-text)' }}>Engineering</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 9, fontWeight: 500, color: 'var(--brand-navy)', marginBottom: 3 }}>Status</div>
+                <div style={{ ...inputBase, color: SC['Applied'], fontWeight: 600 }}>Applied</div>
+              </div>
+            </div>
+
+            {/* Save button: h-9 rounded-md font-medium text-white bg-accent-blue */}
+            <div style={{ animation: ani('wt-fade-up', '0.2s', '2.4s') }}>
+              <div style={{
+                height: 30, background: ACCENT, borderRadius: 6,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'white', fontSize: 11, fontWeight: 600,
+                animation: ani('wt-btn-press', '0.25s', '3.4s', 'ease-in-out both'),
+              }}>
+                Save Application
+              </div>
+            </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
 }
 
-// ── Panel 4: Pipeline Overview (Funnel) ───────────────────────────────────────
-// Matches real FunnelChart: "Pipeline Overview" title, per-stage counts,
-// flat border badge, h-5 bars inside bg-surface-gray track
-const BARS = [
-  { label: 'Wishlist',   pct: 100, color: STAGE_COLORS['Wishlist'],   count: 6,  delay: '0.28s' },
-  { label: 'Applied',    pct: 67,  color: STAGE_COLORS['Applied'],    count: 4,  delay: '0.5s' },
-  { label: 'Interviews', pct: 33,  color: STAGE_COLORS['Interviews'], count: 2,  delay: '0.72s' },
-  { label: 'Offers',     pct: 17,  color: STAGE_COLORS['Offer'],      count: 1,  delay: '0.94s' },
+// ── Panel 2: Pipeline kanban ───────────────────────────────────────────────────
+// Real INTERNSHIP_STAGES: Wishlist, Applied, OA / Online Assessment,
+//   Phone / Recruiter Screen, Final Round Interviews, Offer (skip Rejected in demo)
+// Real column: min-w-[192px] w-[192px] — scaled proportionally here
+// Real drag: opacity 0.25, DragOverlay rotate(1.5deg) shadow
+const P2_COLS = [
+  {
+    stage: 'Wishlist', color: SC['Wishlist'],
+    cards: [
+      { company: 'Stripe',  role: 'SWE Intern' },
+      { company: 'Adobe',   role: 'PM Intern' },
+    ],
+  },
+  {
+    stage: 'Applied', color: SC['Applied'],
+    cards: [
+      { company: 'Google',  role: 'SWE Intern', isDragged: true },
+      { company: 'Airbnb',  role: 'Design Intern' },
+    ],
+    adjustCount: -1,
+  },
+  {
+    stage: 'OA / Online Assessment', color: SC['OA / Online Assessment'],
+    cards: [{ company: 'Amazon', role: 'SDE Intern' }],
+    dropTarget: true,
+    willReceive: { company: 'Google', role: 'SWE Intern' },
+  },
+  {
+    stage: 'Phone / Recruiter Screen', color: SC['Phone / Recruiter Screen'],
+    cards: [{ company: 'Microsoft', role: 'SWE Intern' }],
+  },
+  {
+    stage: 'Offer', color: SC['Offer'],
+    cards: [{ company: 'Figma', role: 'Design Intern' }],
+  },
+];
+
+function Panel2({ k }: { k: number }) {
+  return (
+    <div key={k} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' as const, animation: ani('wt-panel-in', '0.3s') }}>
+      <MockNav />
+      <div style={{ flex: 1, padding: '10px 12px', overflow: 'hidden', display: 'flex', flexDirection: 'column' as const }}>
+        <div style={{ display: 'flex', gap: 7, flex: 1 }}>
+          {P2_COLS.map((col, ci) => {
+            const displayCount = col.cards.length + (col.adjustCount ?? 0) + (col.willReceive ? 1 : 0);
+            return (
+              <div key={col.stage} style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, minWidth: 0 }}>
+                <ColHead label={col.stage} color={col.color} count={displayCount} />
+                <ColBody color={col.color} isOver={col.dropTarget}>
+                  {col.cards.map((card, cardI) => (
+                    <MiniCard
+                      key={card.company}
+                      company={card.company}
+                      role={card.role}
+                      isDragged={(card as any).isDragged}
+                      delayAnim={ani('wt-fade-up', '0.18s', `${ci * 0.06 + cardI * 0.05 + 0.1}s`)}
+                    />
+                  ))}
+                  {/* Drop zone highlight */}
+                  {col.dropTarget && (
+                    <div style={{
+                      position: 'absolute', inset: 0, borderRadius: 8,
+                      border: `2px solid ${col.color}`,
+                      background: `${col.color}15`,
+                      pointerEvents: 'none', opacity: 0,
+                      animation: ani('wt-drop-glow', '0.55s', '1.6s', 'ease-out both'),
+                    }} />
+                  )}
+                  {/* Incoming card after drag */}
+                  {col.willReceive && (
+                    <MiniCard
+                      company={col.willReceive.company}
+                      role={col.willReceive.role}
+                      delayAnim={`wt-card-pop 0.3s 2.1s cubic-bezier(0.34,1.56,0.64,1) both`}
+                    />
+                  )}
+                </ColBody>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Panel 3: Deadlines ────────────────────────────────────────────────────────
+// Shows full dashboard: nav + stat cards + application cards with real badge styles
+// Act Now stat card highlighted
+function Panel3({ k }: { k: number }) {
+  return (
+    <div key={k} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' as const, animation: ani('wt-panel-in', '0.3s') }}>
+      <MockNav />
+      <div style={{ flex: 1, padding: '10px 14px', display: 'flex', flexDirection: 'column' as const, gap: 9, overflow: 'hidden' }}>
+        <MockStats />
+        {/* Application cards with real deadline badges */}
+        <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 6 }}>
+          {[
+            { co: 'Amazon', role: 'SDE Intern',    badge: '2d left',   bs: deadlineBadge.amber, delay: '0.3s' },
+            { co: 'Meta',   role: 'PM Intern',     badge: 'Overdue',   bs: deadlineBadge.red,   delay: '0.46s' },
+            { co: 'Apple',  role: 'Design Intern', badge: 'Due today', bs: deadlineBadge.red,   delay: '0.62s' },
+          ].map(({ co, role, badge, bs, delay }) => (
+            <div
+              key={co}
+              style={{
+                background: 'var(--background)', border: '1px solid var(--border-gray)', borderRadius: 8,
+                padding: '8px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                animation: ani('wt-fade-up', '0.2s', delay),
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--brand-navy)', lineHeight: 1.3 }}>{co}</div>
+                <div style={{ fontSize: 9, color: 'var(--muted-text)', marginTop: 2 }}>{role}</div>
+              </div>
+              <span style={{
+                fontSize: 9, fontWeight: 600, padding: '3px 7px', borderRadius: 4,
+                ...(badge === 'Overdue' || badge === 'Due today'
+                  ? { ...bs, animation: ani('wt-badge-pulse', '1.4s', delay, 'ease-in-out infinite') }
+                  : bs),
+              }}>
+                {badge}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Panel 4: Pipeline Overview (FunnelChart) ──────────────────────────────────
+// Matches real FunnelChart exactly:
+// bg-card-bg border border-border-gray rounded-lg p-5
+// bars: space-y-3, label w-20 text-right text-xs, track bg-surface-gray rounded-full h-5
+// bar: rounded-full, count text-[10px] font-bold text-white inside pr-2
+// per-stage counts (not cumulative)
+const FUNNEL_BARS = [
+  { label: 'Wishlist',   count: 8, color: SC['Wishlist']                  },
+  { label: 'Applied',    count: 6, color: SC['Applied']                   },
+  { label: 'Interviews', count: 3, color: SC['Phone / Recruiter Screen']  },
+  { label: 'Offers',     count: 1, color: SC['Offer']                     },
 ];
 
 function Panel4({ k, active }: { k: number; active: boolean }) {
@@ -305,115 +461,151 @@ function Panel4({ k, active }: { k: number; active: boolean }) {
     if (!active) { setRate(0); return; }
     let raf: number;
     let start: number | null = null;
-    const target = 25, totalMs = 1400;
+    const target = 17, totalMs = 1200;
     const tick = (ts: number) => {
       if (!start) start = ts;
       const p = Math.min((ts - start) / totalMs, 1);
       setRate(Math.round(p * target));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
-    const t = setTimeout(() => { raf = requestAnimationFrame(tick); }, 1000);
+    const t = setTimeout(() => { raf = requestAnimationFrame(tick); }, 1100);
     return () => { clearTimeout(t); cancelAnimationFrame(raf); };
   }, [active, k]);
 
-  return (
-    <div key={k} className="absolute inset-0 flex flex-col p-4" style={{ animation: ani('wt-panel-in', '0.3s') }}>
-      {/* Header — matches real FunnelChart */}
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Pipeline Overview</span>
-        <span
-          className="text-[10px] font-semibold px-2 py-0.5 rounded border"
-          style={rate > 0
-            ? { background: 'var(--success-bg)', color: 'var(--success-text)', borderColor: 'var(--success-border)' }
-            : { background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }}
-        >
-          {rate > 0 ? `${rate}% offer rate` : 'Keep applying'}
-        </span>
-      </div>
+  const maxCount = Math.max(...FUNNEL_BARS.map(b => b.count), 1);
 
-      {/* Bars — matches real FunnelChart row layout */}
-      <div className="space-y-3 flex-1 flex flex-col justify-center">
-        {BARS.map(({ label, pct, color, count, delay }) => (
-          <div key={label} className="flex items-center gap-2.5">
-            <span className="text-[9px] font-medium w-14 text-right flex-shrink-0" style={{ color: 'var(--muted-text)' }}>{label}</span>
-            <div className="flex-1 rounded-full h-4 overflow-hidden" style={{ background: 'var(--surface-gray)' }}>
-              <div
-                className="h-full rounded-full flex items-center justify-end pr-1.5"
-                style={{
-                  width: `${pct}%`,
-                  background: color,
-                  transformOrigin: 'left center',
-                  animation: ani('wt-bar-grow', '0.5s', delay),
-                }}
-              >
-                {count > 0 && (
-                  <span className="text-[8px] font-bold text-white">{count}</span>
-                )}
-              </div>
-            </div>
+  return (
+    <div key={k} style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' as const, animation: ani('wt-panel-in', '0.3s') }}>
+      <MockNav />
+      <div style={{ flex: 1, padding: '10px 14px', display: 'flex', flexDirection: 'column' as const, gap: 9, overflow: 'hidden' }}>
+        <MockStats />
+
+        {/* FunnelChart — bg-card-bg border border-border-gray rounded-lg p-5 */}
+        <div style={{
+          background: 'var(--card-bg)', border: '1px solid var(--border-gray)', borderRadius: 8,
+          padding: '12px 14px', flex: 1, display: 'flex', flexDirection: 'column' as const,
+          animation: ani('wt-fade-up', '0.25s', '0.3s'),
+        }}>
+          {/* Header: flex items-center justify-between mb-5
+              title text-[13px] font-semibold brand-navy
+              badge text-[11px] font-semibold px-2 py-0.5 rounded border */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--brand-navy)' }}>Pipeline Overview</span>
+            <span style={{
+              fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 4, border: '1px solid',
+              ...(rate > 0
+                ? { background: 'var(--success-bg)', color: 'var(--success-text)', borderColor: 'var(--success-border)' }
+                : { background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }),
+            }}>
+              {rate > 0 ? `${rate}% offer rate` : 'Keep applying'}
+            </span>
           </div>
-        ))}
+
+          {/* Bars: space-y-3
+              label: text-xs font-medium text-muted-text w-20 text-right
+              track: flex-1 bg-surface-gray rounded-full h-5
+              bar fill: h-full rounded-full, count pr-2 text-[10px] font-bold text-white */}
+          <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10, flex: 1, justifyContent: 'center' }}>
+            {FUNNEL_BARS.map(({ label, count, color }, i) => {
+              const pct = Math.max((count / maxCount) * 100, count > 0 ? 4 : 0);
+              return (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{
+                    fontSize: 9, fontWeight: 500, color: 'var(--muted-text)',
+                    width: 58, textAlign: 'right' as const, flexShrink: 0,
+                  }}>
+                    {label}
+                  </span>
+                  {/* Track: bg-surface-gray rounded-full h-5 */}
+                  <div style={{ flex: 1, background: 'var(--surface-gray)', borderRadius: 999, height: 18, overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%', borderRadius: 999, background: color,
+                      width: `${pct}%`, transformOrigin: 'left center',
+                      display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 6,
+                      animation: ani('wt-bar-grow', '0.5s', `${0.28 + i * 0.22}s`),
+                    }}>
+                      {count > 0 && <span style={{ fontSize: 8, fontWeight: 700, color: 'white' }}>{count}</span>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-// ── Panel 5: Any Device ───────────────────────────────────────────────────────
-// Desktop mockup mirrors dashboard: 52px nav, stat cards with left-border
-// accents, pipeline columns with flat card-bg style
+// ── Panel 5: Devices ──────────────────────────────────────────────────────────
+// Desktop browser with real nav (Logo + wordmark), real stat cards with accents,
+// real pipeline columns. Phone with real nav.
 function Panel5({ k }: { k: number }) {
   return (
-    <div key={k} className="absolute inset-0 flex items-center justify-center gap-4 p-4" style={{ animation: ani('wt-panel-in', '0.3s') }}>
+    <div key={k} style={{
+      position: 'absolute', inset: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, padding: 14,
+      animation: ani('wt-panel-in', '0.3s'),
+    }}>
       {/* Desktop */}
-      <div
-        className="border border-border-gray rounded-lg overflow-hidden"
-        style={{ width: 210, background: 'var(--card-bg)', animation: ani('wt-slide-left', '0.4s', '0.15s') }}
-      >
-        {/* Nav bar — 52px equivalent scaled */}
-        <div className="flex items-center gap-1.5 px-2.5 border-b" style={{ height: 22, background: 'var(--background)', borderColor: 'var(--border-gray)' }}>
-          <div className="w-4 h-4 rounded-[4px]" style={{ background: '#111827' }} />
-          <div className="w-8 h-2 rounded" style={{ background: 'var(--surface-gray)' }} />
-          <div className="ml-auto flex gap-1.5">
-            <div className="w-5 h-2 rounded" style={{ background: 'var(--surface-gray)' }} />
-            <div className="w-8 h-2 rounded" style={{ background: 'var(--surface-gray)' }} />
-          </div>
+      <div style={{
+        width: 245, border: '1px solid var(--border-gray)', borderRadius: 8, overflow: 'hidden',
+        background: 'var(--background)',
+        animation: ani('wt-slide-left', '0.4s', '0.15s'), flexShrink: 0,
+      }}>
+        {/* Browser chrome */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 8px', background: 'var(--surface-gray)', borderBottom: '1px solid var(--border-gray)' }}>
+          {['#FF5F57','#FEBC2E','#28C840'].map(c => (
+            <div key={c} style={{ width: 7, height: 7, borderRadius: '50%', background: c }} />
+          ))}
+          <div style={{ flex: 1, marginLeft: 6, height: 12, background: 'var(--background)', border: '1px solid var(--border-gray)', borderRadius: 4 }} />
         </div>
-        <div className="p-2">
-          {/* Stat cards with left-border accents */}
-          <div className="grid grid-cols-4 gap-1 mb-2">
+        {/* Nav: Logo + wordmark + right items */}
+        <div style={{
+          height: 28, background: 'var(--background)', borderBottom: '1px solid var(--border-gray)',
+          display: 'flex', alignItems: 'center', padding: '0 10px', gap: 5,
+        }}>
+          <Logo size={16} variant="dark" />
+          <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+          <div style={{ flex: 1 }} />
+          <div style={{ width: 18, height: 14, borderRadius: 4, border: '1px solid var(--border-gray)', background: 'var(--surface-gray)' }} />
+          <div style={{ width: 18, height: 9, borderRadius: 3, background: 'var(--surface-gray)' }} />
+        </div>
+        <div style={{ padding: 8 }}>
+          {/* Stat cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 4, marginBottom: 8 }}>
             {[
-              { v: '18', accent: null },
-              { v: '38%', accent: null },
-              { v: '4', accent: 'green' },
-              { v: '2', accent: 'amber' },
-            ].map(({ v, accent }, i) => (
-              <div
-                key={i}
-                className="rounded-md p-1 border border-border-gray"
-                style={{
-                  background: 'var(--background)',
-                  borderLeft: accent === 'green' ? '2px solid #16A34A' : accent === 'amber' ? '2px solid #D97706' : undefined,
-                }}
-              >
-                <div className="w-full h-1 rounded mb-1" style={{ background: 'var(--surface-gray)' }} />
-                <div
-                  className="text-[8px] font-bold"
-                  style={{ color: accent === 'green' ? '#16A34A' : accent === 'amber' ? '#D97706' : 'var(--brand-navy)' }}
-                >
-                  {v}
-                </div>
+              { v: '24', a: null }, { v: '38%', a: null },
+              { v: '5', a: 'green' }, { v: '3', a: 'amber' },
+            ].map(({ v, a }, i) => (
+              <div key={i} style={{
+                borderRadius: 5, padding: '5px 5px',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--border-gray)',
+                borderLeft: a === 'green' ? '2px solid #16A34A' : a === 'amber' ? '2px solid #D97706' : undefined,
+              }}>
+                <div style={{ height: 4, background: 'var(--surface-gray)', borderRadius: 2, marginBottom: 3, width: '75%' }} />
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '-0.01em', color: a === 'green' ? '#16A34A' : a === 'amber' ? '#D97706' : 'var(--brand-navy)' }}>{v}</div>
+                <div style={{ height: 3, background: 'var(--surface-gray)', borderRadius: 2, marginTop: 2, width: '90%' }} />
               </div>
             ))}
           </div>
-          {/* Pipeline */}
-          <div className="flex gap-1" style={{ height: 72 }}>
-            {Object.entries(STAGE_COLORS).map(([, c]) => (
-              <div key={c} className="flex-1 rounded-md p-1 space-y-1 border border-border-gray" style={{ background: 'var(--card-bg)' }}>
-                <div className="flex items-center gap-0.5 mb-0.5">
-                  <div className="w-1 h-1 rounded-full" style={{ background: c }} />
+          {/* Pipeline columns */}
+          <div style={{ display: 'flex', gap: 4, height: 84 }}>
+            {Object.entries(SC).slice(0, 5).map(([name, color]) => (
+              <div key={name} style={{
+                flex: 1, borderRadius: 5, padding: 4,
+                background: 'var(--card-bg)', border: '1px solid var(--border-gray)',
+                display: 'flex', flexDirection: 'column' as const, gap: 4,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: color }} />
+                  <div style={{ flex: 1, height: 4, background: 'var(--surface-gray)', borderRadius: 2 }} />
                 </div>
-                <div className="rounded h-6 border border-border-gray" style={{ background: 'var(--background)' }} />
-                <div className="rounded h-4 border border-border-gray" style={{ background: 'var(--background)', opacity: 0.6 }} />
+                <div style={{ flex: 1, background: 'var(--background)', border: '1px solid var(--border-gray)', borderRadius: 3 }} />
+                {name !== 'Offer' && (
+                  <div style={{ height: 14, background: 'var(--background)', border: '1px solid var(--border-gray)', borderRadius: 3, opacity: 0.7 }} />
+                )}
               </div>
             ))}
           </div>
@@ -421,28 +613,42 @@ function Panel5({ k }: { k: number }) {
       </div>
 
       {/* Phone */}
-      <div
-        className="border-2 border-border-gray rounded-[18px] overflow-hidden flex flex-col"
-        style={{ width: 70, height: 144, background: 'var(--card-bg)', animation: ani('wt-slide-right', '0.4s', '0.4s') }}
-      >
-        {/* Notch */}
-        <div className="flex justify-center items-center border-b border-border-gray" style={{ height: 18, background: 'var(--background)' }}>
-          <div className="w-7 h-1 rounded-full" style={{ background: 'var(--border-gray)' }} />
+      <div style={{
+        width: 78, height: 156,
+        border: '2px solid var(--border-gray)', borderRadius: 20, overflow: 'hidden',
+        background: 'var(--card-bg)',
+        display: 'flex', flexDirection: 'column' as const,
+        animation: ani('wt-slide-right', '0.4s', '0.4s'), flexShrink: 0,
+      }}>
+        <div style={{ height: 17, background: 'var(--background)', borderBottom: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 22, height: 3, borderRadius: 2, background: 'var(--border-gray)' }} />
         </div>
-        <div className="flex-1 p-1.5 space-y-1 overflow-hidden">
-          {/* Mini stat grid */}
-          <div className="grid grid-cols-2 gap-0.5 mb-1">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="rounded h-4 border border-border-gray" style={{ background: 'var(--background)' }} />
+        <div style={{ flex: 1, padding: 6, display: 'flex', flexDirection: 'column' as const, gap: 4, overflow: 'hidden' }}>
+          {/* Mini nav */}
+          <div style={{ height: 18, background: 'var(--background)', border: '1px solid var(--border-gray)', borderRadius: 4, display: 'flex', alignItems: 'center', padding: '0 5px', gap: 3 }}>
+            <Logo size={11} variant="dark" />
+            <div style={{ flex: 1, height: 4, background: 'var(--surface-gray)', borderRadius: 2 }} />
+          </div>
+          {/* Stats 2×2 with accents */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+            {[
+              { a: null }, { a: null },
+              { a: 'green' }, { a: 'amber' },
+            ].map(({ a }, i) => (
+              <div key={i} style={{
+                height: 22, borderRadius: 4,
+                background: 'var(--card-bg)', border: '1px solid var(--border-gray)',
+                borderLeft: a === 'green' ? '2px solid #16A34A' : a === 'amber' ? '2px solid #D97706' : undefined,
+              }} />
             ))}
           </div>
-          {/* App cards */}
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-md h-5 border border-border-gray" style={{ background: 'var(--background)' }} />
+          {/* App card list */}
+          {[...Array(5)].map((_, i) => (
+            <div key={i} style={{ height: 16, borderRadius: 4, background: 'var(--background)', border: '1px solid var(--border-gray)' }} />
           ))}
         </div>
-        <div className="flex justify-center pb-1.5 pt-1 border-t border-border-gray" style={{ background: 'var(--background)' }}>
-          <div className="w-7 h-1 rounded-full" style={{ background: 'var(--border-gray)' }} />
+        <div style={{ height: 15, background: 'var(--background)', borderTop: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 22, height: 3, borderRadius: 2, background: 'var(--border-gray)' }} />
         </div>
       </div>
     </div>
@@ -450,7 +656,6 @@ function Panel5({ k }: { k: number }) {
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-
 export default function ProductWalkthrough() {
   const [active, setActive] = useState(0);
   const [animKey, setAnimKey] = useState(0);
@@ -491,9 +696,8 @@ export default function ProductWalkthrough() {
   return (
     <section className="py-20 px-6">
       <div className="max-w-[1100px] mx-auto">
-        {/* Heading */}
         <div className="text-center mb-12">
-          <p className="text-[11px] font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--accent-blue)' }}>Product tour</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest mb-3" style={{ color: ACCENT }}>Product tour</p>
           <h2 className="text-[28px] md:text-[36px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
             See how it works in 30 seconds
           </h2>
@@ -501,18 +705,17 @@ export default function ProductWalkthrough() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-stretch">
-
           {/* Mobile: horizontal pills */}
           <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 -mx-1 px-1">
             {FEATURES.map((f, i) => (
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                className="flex-shrink-0 h-8 px-3 rounded-md text-[12px] font-medium border transition-colors"
+                className="flex-shrink-0 h-8 px-3 rounded-md text-[12px] font-medium border"
                 style={{
-                  background: i === active ? BLUE : 'var(--surface-gray)',
+                  background: i === active ? ACCENT : 'var(--surface-gray)',
                   color: i === active ? '#fff' : 'var(--muted-text)',
-                  borderColor: i === active ? BLUE : 'var(--border-gray)',
+                  borderColor: i === active ? ACCENT : 'var(--border-gray)',
                 }}
               >
                 {f.title}
@@ -520,22 +723,22 @@ export default function ProductWalkthrough() {
             ))}
           </div>
 
-          {/* Desktop: stacked tabs */}
+          {/* Desktop: stacked feature tabs */}
           <div className="hidden lg:flex flex-col gap-1 w-56 flex-shrink-0 justify-center">
             {FEATURES.map((f, i) => (
               <button
                 key={i}
                 onClick={() => goTo(i)}
-                className="text-left rounded-lg px-4 py-3 relative overflow-hidden border transition-colors"
+                className="text-left rounded-lg px-4 py-3 relative overflow-hidden border"
                 style={{
-                  background: i === active ? `${BLUE}08` : 'transparent',
-                  borderColor: i === active ? `${BLUE}30` : 'transparent',
+                  background: i === active ? `${ACCENT}08` : 'transparent',
+                  borderColor: i === active ? `${ACCENT}30` : 'transparent',
                 }}
               >
-                <div className="text-[13px] font-semibold mb-0.5" style={{ color: i === active ? BLUE : 'var(--brand-navy)' }}>
+                <div className="text-[13px] font-semibold mb-0.5" style={{ color: i === active ? ACCENT : 'var(--brand-navy)' }}>
                   {f.title}
                 </div>
-                <div className="text-[12px]" style={{ color: i === active ? `${BLUE}99` : 'var(--muted-text)' }}>
+                <div className="text-[12px]" style={{ color: i === active ? `${ACCENT}99` : 'var(--muted-text)' }}>
                   {f.desc}
                 </div>
                 {i === active && !reducedMotion && (
@@ -543,7 +746,7 @@ export default function ProductWalkthrough() {
                     <div
                       key={`pb-${animKey}`}
                       className="h-full"
-                      style={{ width: '0%', background: BLUE, animation: `wt-progress ${f.duration}ms linear both` }}
+                      style={{ width: '0%', background: ACCENT, animation: `wt-progress ${f.duration}ms linear both` }}
                     />
                   </div>
                 )}
@@ -552,50 +755,35 @@ export default function ProductWalkthrough() {
           </div>
 
           {/* Mockup window */}
-          <div className="flex-1 min-h-[320px] lg:min-h-[360px]">
+          <div className="flex-1 min-h-[340px] lg:min-h-[420px]">
             <div
               className="relative w-full h-full rounded-lg overflow-hidden"
-              style={{
-                border: '1px solid var(--border-gray)',
-                background: 'var(--card-bg)',
-                minHeight: 320,
-              }}
+              style={{ border: '1px solid var(--border-gray)', background: 'var(--background)', minHeight: 340 }}
             >
               {/* Browser chrome */}
-              <div
-                className="flex items-center gap-1.5 px-3 py-2 border-b"
-                style={{ borderColor: 'var(--border-gray)', background: 'var(--surface-gray)' }}
-              >
+              <div className="flex items-center gap-1.5 px-3 py-2 border-b" style={{ borderColor: 'var(--border-gray)', background: 'var(--surface-gray)' }}>
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF5F57' }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FEBC2E' }} />
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#28C840' }} />
-                <div
-                  className="flex-1 mx-3 rounded px-3 py-0.5 text-[10px]"
-                  style={{ background: 'var(--background)', border: '1px solid var(--border-gray)', color: 'var(--text-tertiary)' }}
-                >
+                <div className="flex-1 mx-3 rounded px-3 py-0.5 text-[10px]" style={{ background: 'var(--background)', border: '1px solid var(--border-gray)', color: 'var(--text-tertiary)' }}>
                   useapplyd.com/dashboard
                 </div>
               </div>
-
-              <div className="relative" style={{ height: 'calc(100% - 33px)', minHeight: 287 }}>
+              <div className="relative overflow-hidden" style={{ height: 'calc(100% - 33px)', minHeight: 307 }}>
                 {panels[active]}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Mobile progress dots */}
+        {/* Mobile dots */}
         <div className="flex justify-center gap-2 mt-5 lg:hidden">
           {FEATURES.map((_, i) => (
             <button
               key={i}
               onClick={() => goTo(i)}
-              className="rounded-full transition-all"
-              style={{
-                width: i === active ? 20 : 6,
-                height: 6,
-                background: i === active ? BLUE : 'var(--border-gray)',
-              }}
+              className="rounded-full"
+              style={{ width: i === active ? 20 : 6, height: 6, background: i === active ? ACCENT : 'var(--border-gray)' }}
               aria-label={`Go to feature ${i + 1}`}
             />
           ))}
