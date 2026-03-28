@@ -12,7 +12,7 @@ import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS } from '@/lib/constants
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type Section = 'profile' | 'recruiting' | 'notifications' | 'appearance' | 'data' | 'account' | 'danger';
+type Section = 'profile' | 'recruiting' | 'appearance' | 'data' | 'account' | 'danger';
 
 interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: boolean }
 
@@ -20,7 +20,6 @@ interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: bo
 
 const UserIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
 const BriefcaseIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
-const BellIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
 const PaletteIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>;
 const DatabaseIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>;
 const ShieldIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
@@ -35,7 +34,6 @@ export { GearIcon };
 const SECTIONS: SectionMeta[] = [
   { id: 'profile', label: 'Profile', icon: <UserIcon /> },
   { id: 'recruiting', label: 'Recruiting', icon: <BriefcaseIcon /> },
-  { id: 'notifications', label: 'Notifications', icon: <BellIcon /> },
   { id: 'appearance', label: 'Appearance', icon: <PaletteIcon /> },
   { id: 'data', label: 'Data', icon: <DatabaseIcon /> },
   { id: 'account', label: 'Account', icon: <ShieldIcon /> },
@@ -410,77 +408,6 @@ function TargetField({ storageKey, placeholder }: { storageKey: string; placehol
 // ─── Section: Notifications ───────────────────────────────────────────────────
 // TODO: Add email_notifications, deadline_reminders, weekly_digest columns to users table in Supabase.
 // Currently saved to localStorage as fallback.
-
-function NotificationsSection({ userId }: { userId: string }) {
-  const key = `applyd_notifications_${userId}`;
-  const load = () => {
-    try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch { return {}; }
-  };
-
-  const [emailOn, setEmailOn] = useState(() => load().emailOn ?? true);
-  const [reminders, setReminders] = useState<string[]>(() => load().reminders ?? ['7d', '3d', 'day']);
-  const [digest, setDigest] = useState(() => load().digest ?? false);
-
-  const save = useCallback((patch: object) => {
-    const current = load();
-    localStorage.setItem(key, JSON.stringify({ ...current, ...patch }));
-  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const toggleReminder = (r: string) => {
-    const next = reminders.includes(r) ? reminders.filter(x => x !== r) : [...reminders, r];
-    setReminders(next);
-    save({ reminders: next });
-  };
-
-  return (
-    <div>
-      <SectionCard title="Email notifications" description="Receive email reminders for upcoming deadlines.">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Deadline reminders</p>
-            <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Get notified before application deadlines.</p>
-          </div>
-          <Toggle checked={emailOn} onChange={v => { setEmailOn(v); save({ emailOn: v }); }} />
-        </div>
-
-        {emailOn && (
-          <div className="mt-4 pt-4 border-t border-border-gray">
-            <p className="text-[12px] font-medium mb-3" style={{ color: 'var(--muted-text)' }}>Send reminders:</p>
-            {[
-              { id: '7d', label: '7 days before deadline' },
-              { id: '3d', label: '3 days before deadline' },
-              { id: 'day', label: 'Day of deadline' },
-            ].map(opt => (
-              <label key={opt.id} className="flex items-center gap-3 mb-2.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={reminders.includes(opt.id)}
-                  onChange={() => toggleReminder(opt.id)}
-                  className="w-4 h-4 rounded border-border-gray accent-accent-blue cursor-pointer"
-                />
-                <span className="text-[13px]" style={{ color: 'var(--body-text)' }}>{opt.label}</span>
-              </label>
-            ))}
-          </div>
-        )}
-      </SectionCard>
-
-      <SectionCard title="Weekly digest" description="A weekly summary of your application activity.">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Weekly summary email</p>
-            <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Sent every Monday morning.</p>
-          </div>
-          <Toggle checked={digest} onChange={v => { setDigest(v); save({ digest: v }); }} />
-        </div>
-      </SectionCard>
-
-      <div className="rounded-lg px-4 py-3 text-[12px]" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)' }}>
-        Note: Notification delivery requires server-side setup. Settings saved locally for now.
-      </div>
-    </div>
-  );
-}
 
 // ─── Section: Appearance ──────────────────────────────────────────────────────
 
@@ -1123,7 +1050,6 @@ export default function SettingsPage() {
   const sectionContent: Record<Section, ReactNode> = {
     profile: <ProfileSection showToast={showToast} />,
     recruiting: <RecruitingSection showToast={showToast} />,
-    notifications: <NotificationsSection userId={user.id} />,
     appearance: <AppearanceSection />,
     data: <DataSection showToast={showToast} />,
     account: <AccountSection showToast={showToast} />,
