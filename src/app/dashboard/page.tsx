@@ -21,6 +21,7 @@ import Toast from '@/components/Toast';
 import ExtensionBanner from '@/components/ExtensionBanner';
 import { useTutorial } from '@/lib/tutorial-context';
 import { ExtensionStatusProvider, useExtensionStatus } from '@/lib/extension-status-context';
+import { capture } from '@/lib/analytics';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
@@ -40,7 +41,7 @@ const DEMO_APPS_JOB: Application[] = [
 
 function DashboardContent() {
   const { user, signOut } = useAuth();
-  const { applications, loading, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
+  const { applications, loading, addApplication, updateApplication, deleteApplication, storeError, clearStoreError, retryLoad } = useStore();
   const { start: startTutorial, isActive, demoApplications } = useTutorial();
   const { isInstalled: extInstalled, isDismissed: extDismissed, isBannerEligible } = useExtensionStatus();
   const router = useRouter();
@@ -137,16 +138,14 @@ function DashboardContent() {
     notes: string;
   }) => {
     const isFirstApp = applications.length === 0;
-    await addApplication({
-      ...data,
-      recruiter_name: '',
-      recruiter_email: '',
-    });
+    await addApplication({ ...data, recruiter_name: '', recruiter_email: '' });
+    capture('application_added', { status: data.status, has_job_link: !!data.job_link });
     showToast(`${data.company} added`);
     if (isFirstApp && !localStorage.getItem('first_app_celebration_shown')) {
       localStorage.setItem('first_app_celebration_shown', 'true');
       setShowFirstAppTip(true);
       setTimeout(() => setShowFirstAppTip(false), 5000);
+      capture('first_application_logged');
     }
   };
 
@@ -232,6 +231,12 @@ function DashboardContent() {
       {storeError && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-red-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
           {storeError}
+          <button
+            onClick={() => { clearStoreError(); retryLoad(); }}
+            className="underline underline-offset-2 hover:opacity-80 text-sm font-semibold"
+          >
+            Retry
+          </button>
           <button onClick={clearStoreError} className="ml-1 hover:opacity-75">✕</button>
         </div>
       )}
@@ -453,7 +458,7 @@ function DashboardContent() {
               href="https://buymeacoffee.com/applyd"
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => { try { console.log('[analytics] support_click', { location: 'dashboard_footer' }); } catch { /* silent */ } }}
+              onClick={() => capture('support_click', { location: 'dashboard_footer' })}
               className="underline underline-offset-2 hover:opacity-80 transition-opacity"
               style={{ color: 'var(--text-tertiary)' }}
             >

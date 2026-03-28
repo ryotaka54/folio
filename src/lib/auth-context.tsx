@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { UserProfile, Mode } from './types';
 import { supabase } from './supabase';
+import { identify, capture, reset as analyticsReset } from './analytics';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -64,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const localTutorial = typeof window !== 'undefined' ? localStorage.getItem(`applyd_tutorial_${userId}`) : null;
 
       if (data) {
+        identify(data.id, { mode: data.mode, onboarding_complete: data.onboarding_complete });
         setUser({
           id: data.id,
           name: data.name || '',
@@ -195,9 +197,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         career_level: '',
         recruiting_season: '',
         onboarding_complete: false,
-        // tutorial_completed is localStorage-only — not a DB column
       });
       if (profileError) console.error('Profile creation error:', profileError);
+
+      identify(data.user.id, { email: cleanEmail });
+      capture('sign_up', { email: cleanEmail });
 
       setUser({
         id: data.user.id,
@@ -213,18 +217,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    // Clear any stale tokens from localStorage before signing in
     clearStaleAuthTokens();
     const cleanEmail = email.trim();
 
     const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
     if (error) throw new Error(error.message);
+    capture('sign_in');
     // Profile loading is handled by the onAuthStateChange SIGNED_IN listener
   }, []);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
     clearStaleAuthTokens();
+    analyticsReset();
     setUser(null);
   }, []);
 

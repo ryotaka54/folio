@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useTutorial } from '@/lib/tutorial-context';
 import { useAuth } from '@/lib/auth-context';
+import { capture } from '@/lib/analytics';
 
 // TODO: Replace with real Chrome Web Store URL when extension is published
 const EXTENSION_URL = 'https://chromewebstore.google.com/detail/applyd';
@@ -809,18 +810,21 @@ export default function TutorialOverlay() {
 
   // Completion handler
   const handleComplete = useCallback(() => {
+    capture('tutorial_completed', { total_steps: activeSteps.length });
     skip();
     updateProfile({ tutorial_completed: true });
-  }, [skip, updateProfile]);
+  }, [skip, updateProfile, activeSteps.length]);
 
   // Skip handler (same outcome — marks tutorial done)
   const handleSkip = useCallback(() => {
+    capture('tutorial_skipped', { at_step: currentStep, step_id: activeSteps[currentStep]?.id });
     skip();
     updateProfile({ tutorial_completed: true });
-  }, [skip, updateProfile]);
+  }, [skip, updateProfile, currentStep, activeSteps]);
 
   // Install extension handler — open store, complete tutorial
   const handleInstall = useCallback(() => {
+    capture('extension_install_clicked', { source: 'tutorial' });
     window.open(EXTENSION_URL, '_blank', 'noopener,noreferrer');
     handleComplete();
   }, [handleComplete]);
@@ -939,7 +943,7 @@ export default function TutorialOverlay() {
   // ── Desktop: welcome modal ────────────────────────────────────────────────
   if (step.id === 'welcome') {
     return createPortal(
-      <WelcomeModal onStart={next} onSkip={handleSkip} />,
+      <WelcomeModal onStart={() => { capture('tutorial_started'); next(); }} onSkip={handleSkip} />,
       document.body
     );
   }

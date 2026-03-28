@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { capture } from '@/lib/analytics';
 import { INTERNSHIP_STAGES, JOB_STAGES, SCHOOL_YEARS, RECRUITING_SEASONS, CAREER_LEVELS, STAGE_COLORS } from '@/lib/constants';
 import { Mode } from '@/lib/types';
 import { GraduationCap, Briefcase, ArrowRight } from 'lucide-react';
@@ -118,6 +119,7 @@ function OnboardingContent() {
   }
 
   const handleComplete = () => {
+    capture('onboarding_complete', { mode });
     updateProfile({
       name,
       mode,

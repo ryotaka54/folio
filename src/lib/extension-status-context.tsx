@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAuth } from './auth-context';
 import { supabase } from './supabase';
+import { capture } from './analytics';
 
 const LS_INSTALLED = 'applyd_extension_installed';
 const LS_DISMISSED = 'applyd_extension_banner_dismissed';
@@ -46,13 +47,17 @@ export function ExtensionStatusProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
     const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'APPLYD_EXTENSION_ACTIVE') markInstalled();
+      if (e.data?.type === 'APPLYD_EXTENSION_ACTIVE') {
+        capture('extension_detected');
+        markInstalled();
+      }
     };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
   }, [mounted, markInstalled]);
 
   const markDismissed = useCallback(() => {
+    capture('extension_banner_dismissed');
     setIsDismissed(true);
     localStorage.setItem(LS_DISMISSED, 'true');
     if (user?.id) {

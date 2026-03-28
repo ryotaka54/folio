@@ -9,6 +9,7 @@ interface StoreContextType {
   loading: boolean;
   storeError: string | null;
   clearStoreError: () => void;
+  retryLoad: () => void;
   addApplication: (app: Omit<Application, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => Promise<Application>;
   updateApplication: (id: string, updates: Partial<Application>) => Promise<void>;
   deleteApplication: (id: string) => Promise<void>;
@@ -133,8 +134,14 @@ export function StoreProvider({ children, userId }: { children: ReactNode; userI
 
   const clearStoreError = useCallback(() => setStoreError(null), []);
 
+  const retryLoad = useCallback(() => {
+    loadingRef.current = false;
+    setStoreError(null);
+    loadApplications();
+  }, [loadApplications]);
+
   return (
-    <StoreContext.Provider value={{ applications, loading, storeError, clearStoreError, addApplication, updateApplication, deleteApplication }}>
+    <StoreContext.Provider value={{ applications, loading, storeError, clearStoreError, retryLoad, addApplication, updateApplication, deleteApplication }}>
       {children}
     </StoreContext.Provider>
   );
