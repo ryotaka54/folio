@@ -10,6 +10,10 @@ CREATE TABLE IF NOT EXISTS users (
   career_level TEXT DEFAULT '',
   recruiting_season TEXT DEFAULT '',
   onboarding_complete BOOLEAN DEFAULT false,
+  tutorial_completed BOOLEAN DEFAULT false,
+  extension_installed BOOLEAN DEFAULT false,
+  extension_banner_dismissed BOOLEAN DEFAULT false,
+  extension_hint_count INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -19,6 +23,7 @@ CREATE TABLE IF NOT EXISTS applications (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   company TEXT NOT NULL,
   role TEXT NOT NULL,
+  location TEXT DEFAULT '',
   category TEXT DEFAULT '',
   status TEXT NOT NULL DEFAULT 'Wishlist',
   deadline DATE,
@@ -67,3 +72,13 @@ CREATE POLICY "Users can delete own applications"
 -- 6. Index for fast queries
 CREATE INDEX IF NOT EXISTS idx_applications_user_id ON applications(user_id);
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
+
+-- ─── Migrations (run these if you already have the tables above) ──────────────
+-- If you set up the DB before these columns existed, run the ALTER TABLE
+-- statements below. They are safe to run even if columns already exist.
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS tutorial_completed BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS extension_installed BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS extension_banner_dismissed BOOLEAN DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS extension_hint_count INTEGER DEFAULT 0;
+ALTER TABLE applications ADD COLUMN IF NOT EXISTS location TEXT DEFAULT '';

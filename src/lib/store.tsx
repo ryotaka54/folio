@@ -33,7 +33,10 @@ export function StoreProvider({ children, userId }: { children: ReactNode; userI
         .order('created_at', { ascending: false });
 
       if (data) setApplications(data as Application[]);
-      if (error) console.error('Load applications error:', error);
+      if (error) {
+        console.error('Load applications error:', error);
+        setStoreError('Could not load your applications. Check your connection and refresh.');
+      }
     } finally {
       loadingRef.current = false;
       setLoading(false);

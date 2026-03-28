@@ -46,6 +46,10 @@ function DashboardContent() {
   const router = useRouter();
 
   const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
+  // Default to table view on mobile — runs after mount to avoid SSR mismatch
+  useEffect(() => {
+    if (window.innerWidth < 768) setView('table');
+  }, []);
   const [showFirstAppTip, setShowFirstAppTip] = useState(false);
   const [search, setSearch] = useState('');
   const [hideInactive, setHideInactive] = useState(true);

@@ -246,6 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(`applyd_tutorial_${updated.id}`, 'true');
       }
 
+      // Core fields — must succeed for the app to work correctly
       supabase.from('users')
         .upsert({
           id: updated.id,
@@ -255,10 +256,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           career_level: updated.career_level,
           recruiting_season: updated.recruiting_season,
           onboarding_complete: updated.onboarding_complete,
-          // tutorial_completed is localStorage-only — not a DB column
+          tutorial_completed: updated.tutorial_completed ?? false,
         })
         .then(({ error }) => {
-          if (error) console.error('Profile update error:', error);
+          if (error) {
+            console.error('Profile update error:', error);
+            // Retry with only the absolute minimum fields so name/mode always save
+            supabase.from('users')
+              .upsert({ id: updated.id, name: updated.name, mode: updated.mode, onboarding_complete: updated.onboarding_complete })
+              .then(({ error: retryErr }) => { if (retryErr) console.error('Profile retry error:', retryErr); });
+          }
         });
 
       return updated;
