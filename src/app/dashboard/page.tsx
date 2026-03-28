@@ -21,10 +21,26 @@ import Toast from '@/components/Toast';
 import ExtensionBanner from '@/components/ExtensionBanner';
 import { useTutorial } from '@/lib/tutorial-context';
 
+const DEMO_APPS_INTERNSHIP: Application[] = [
+  { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-2', user_id: 'demo', company: 'Google', role: 'PM Intern', location: 'Mountain View, CA', category: 'Product Management', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-3', user_id: 'demo', company: 'Microsoft', role: 'Software Engineer Intern', location: 'Redmond, WA', category: 'Engineering', status: 'OA / Online Assessment', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-4', user_id: 'demo', company: 'Amazon', role: 'SDE Intern', location: 'Seattle, WA', category: 'Engineering', status: 'Phone / Recruiter Screen', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-5', user_id: 'demo', company: 'Meta', role: 'Software Engineer Intern', location: 'Menlo Park, CA', category: 'Engineering', status: 'Final Round Interviews', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+];
+
+const DEMO_APPS_JOB: Application[] = [
+  { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-2', user_id: 'demo', company: 'Google', role: 'Product Manager', location: 'Mountain View, CA', category: 'Product Management', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-3', user_id: 'demo', company: 'Microsoft', role: 'Software Engineer', location: 'Redmond, WA', category: 'Engineering', status: 'Recruiter Screen', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-4', user_id: 'demo', company: 'Amazon', role: 'SDE', location: 'Seattle, WA', category: 'Engineering', status: 'Technical / Case Interview', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-5', user_id: 'demo', company: 'Meta', role: 'Software Engineer', location: 'Menlo Park, CA', category: 'Engineering', status: 'Final Round', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+];
+
 function DashboardContent() {
   const { user, signOut } = useAuth();
   const { applications, loading, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
-  const { start: startTutorial } = useTutorial();
+  const { start: startTutorial, isActive, demoApplications } = useTutorial();
   const router = useRouter();
 
   const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
@@ -47,8 +63,13 @@ function DashboardContent() {
   const stages = user?.mode === 'job' ? JOB_STAGES : INTERNSHIP_STAGES;
   const inactiveStatuses = ['Rejected', 'Declined'];
 
+  const displayApplications = useMemo(
+    () => isActive && demoApplications.length > 0 ? [...applications, ...demoApplications] : applications,
+    [isActive, demoApplications, applications]
+  );
+
   const filteredApps = useMemo(() => {
-    return applications.filter(app => {
+    return displayApplications.filter(app => {
       if (hideInactive && inactiveStatuses.includes(app.status)) return false;
       if (statusFilter !== 'all' && app.status !== statusFilter) return false;
       if (search) {
@@ -57,11 +78,11 @@ function DashboardContent() {
       }
       return true;
     });
-  }, [applications, search, hideInactive, statusFilter]);
+  }, [displayApplications, search, hideInactive, statusFilter]);
 
   const hiddenCount = useMemo(() =>
-    applications.filter(a => inactiveStatuses.includes(a.status)).length,
-  [applications]);
+    displayApplications.filter(a => inactiveStatuses.includes(a.status)).length,
+  [displayApplications]);
 
   const showToast = (msg: string, undoFn?: () => void) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -170,7 +191,12 @@ function DashboardContent() {
     if (user?.onboarding_complete && user?.tutorial_completed === false) {
       tutorialStartedRef.current = true;
       // Brief delay so the dashboard has fully rendered before the overlay appears
-      const t = setTimeout(() => startTutorial(), 600);
+      const t = setTimeout(() => {
+        const demos = applications.length < 5
+          ? (user?.mode === 'job' ? DEMO_APPS_JOB : DEMO_APPS_INTERNSHIP)
+          : [];
+        startTutorial(demos);
+      }, 600);
       return () => clearTimeout(t);
     }
   }, [user, startTutorial]);
@@ -214,6 +240,13 @@ function DashboardContent() {
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name}</span>
             )}
             <ThemeToggle />
+            <Link
+              href="/settings"
+              className="p-2 rounded-lg border border-transparent text-muted-text hover:text-accent-blue hover:bg-surface-gray transition-all"
+              aria-label="Settings"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </Link>
             <button
               onClick={async () => { await signOut(); router.push('/'); }}
               className="text-xs text-muted-text hover:text-body-text transition-colors"
@@ -259,12 +292,12 @@ function DashboardContent() {
 
         {/* Stats */}
         <div data-tutorial-id="stats-bar">
-          <StatsBar applications={applications} />
+          <StatsBar applications={displayApplications} />
         </div>
 
         {/* Funnel */}
         <div data-tutorial-id="funnel-chart">
-          <FunnelChart applications={applications} />
+          <FunnelChart applications={displayApplications} />
         </div>
 
         {/* Controls */}
@@ -336,7 +369,7 @@ function DashboardContent() {
                 </div>
               ))}
             </div>
-          ) : applications.length === 0 ? (
+          ) : displayApplications.length === 0 ? (
             <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} />
           ) : filteredApps.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">
@@ -394,6 +427,7 @@ function DashboardContent() {
         {/* Dashboard Footer */}
         <footer className="mt-20 py-8 border-t border-border-gray flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6">
+            <Link href="/settings" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Settings</Link>
             <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help Center</Link>
             <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Support</Link>
             <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>

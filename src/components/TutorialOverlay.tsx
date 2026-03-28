@@ -31,29 +31,29 @@ const STEPS: TutorialStep[] = [
     id: 'stats-bar',
     type: 'spotlight',
     title: 'Your recruiting at a glance',
-    description: 'These four cards update in real time as you add and move applications. Total shows everything you have logged. Response Rate shows how many companies have responded. Interviews tracks your active interview pipeline. Act Now highlights deadlines coming up this week so nothing slips through.',
+    description: 'Live counts of total apps, response rate, active interviews, and deadlines due this week.',
     includeOnMobile: true,
   },
   {
     id: 'funnel-chart',
     type: 'spotlight',
     fallbackId: 'stats-bar',
-    title: 'Your path to an offer',
-    description: 'This chart shows how your applications are converting through each stage. As you move applications forward the bars update automatically. The goal is to see that Interviews bar grow.',
+    title: 'Your conversion funnel',
+    description: 'See how applications convert stage by stage. The goal is to grow that Interviews bar.',
     includeOnMobile: false,
   },
   {
     id: 'view-toggle',
     type: 'spotlight',
-    title: 'Two ways to see your apps',
-    description: 'Pipeline view shows your applications as cards organized by stage — great for a visual overview. Table view shows everything in a sortable list — great for scanning and sorting by deadline or company name. Switch between them anytime.',
+    title: 'Two ways to view your apps',
+    description: 'Pipeline is visual and great for a quick overview. Table is sortable — useful for scanning by deadline or company.',
     includeOnMobile: false,
   },
   {
     id: 'pipeline-board',
     type: 'spotlight',
     title: 'Your application pipeline',
-    description: 'Each column is a stage in your recruiting journey. Drag cards between columns as your status updates or click any card to edit it. The colored dots help you scan stages instantly.',
+    description: 'Drag cards between columns as your status changes. Click any card to edit it.',
     includeOnMobile: true,
   },
   {
@@ -61,21 +61,21 @@ const STEPS: TutorialStep[] = [
     type: 'spotlight',
     fallbackId: 'pipeline-board',
     title: 'Every application in one card',
-    description: 'Each card shows the company, role, and deadline at a glance. Cards with amber badges mean a deadline is coming up soon. Red means overdue. Click any card to see full details, add notes, or store recruiter contact information.',
+    description: 'Amber badge = deadline soon, red = overdue. Click to open full details, notes, and recruiter info.',
     includeOnMobile: false,
   },
   {
     id: 'add-button',
     type: 'spotlight',
-    title: 'Log an application in seconds',
-    description: 'Click here to add a new application. You only need a company name and role to get started — everything else is optional. The fastest way to stay on top of your search is to log every application the moment you submit it.',
+    title: 'Log an application',
+    description: 'Only a company and role are required. Log it the moment you apply so nothing gets forgotten.',
     includeOnMobile: true,
   },
   {
     id: 'search-input',
     type: 'spotlight',
     title: 'Find anything instantly',
-    description: 'Search by company name or role title to filter your applications in real time. Use this when you have a lot of applications and need to quickly find a specific one before an interview or follow up.',
+    description: 'Filter by company or role in real time. Handy before interviews or when following up.',
     includeOnMobile: true,
   },
   {
@@ -299,7 +299,7 @@ function WelcomeModal({
           Welcome to Applyd
         </h2>
         <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.6, marginBottom: 24 }}>
-          This is your command center for internship and job recruiting. We&apos;ll show you around in about 90 seconds.
+          Your command center for recruiting. We&apos;ll walk through every feature — takes about 60 seconds.
         </p>
         <div style={{ display: 'flex', gap: 10 }}>
           <button
@@ -403,18 +403,8 @@ function ExtensionModal({
         >
           Get the Applyd extension
         </h2>
-        <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.6, marginBottom: 10 }}>
-          Right now adding an application takes about 30 seconds of copying and pasting. With the Applyd extension you click once on any job posting and it&apos;s logged instantly. Works on LinkedIn, Handshake, and hundreds of company career pages.
-        </p>
-        <p
-          style={{
-            fontSize: 12,
-            color: 'var(--text-tertiary)',
-            marginBottom: 20,
-            fontStyle: 'italic',
-          }}
-        >
-          Join students who use the extension to log applications in one click.
+        <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.6, marginBottom: 20 }}>
+          Click once on any job posting and it&apos;s instantly saved to Applyd — no copy-pasting. Works on LinkedIn, Handshake, Greenhouse, and more.
         </p>
 
         <button
@@ -714,17 +704,12 @@ function MobileSheet({
 
         <p style={{ fontSize: 14, color: 'var(--muted-text)', lineHeight: 1.6, marginBottom: 16 }}>
           {isWelcome
-            ? "This is your command center for internship and job recruiting. We'll show you around in about 90 seconds."
+            ? "Your command center for recruiting. We'll walk through every feature — takes about 60 seconds."
             : isExtension
-            ? "Right now adding an application takes about 30 seconds of copying and pasting. With the Applyd extension you click once on any job posting and it's logged instantly. Works on LinkedIn, Handshake, and hundreds of company career pages."
+            ? "Click once on any job posting and it's instantly saved to Applyd — no copy-pasting. Works on LinkedIn, Handshake, Greenhouse, and more."
             : step.description}
         </p>
 
-        {isExtension && (
-          <p style={{ fontSize: 12, color: 'var(--text-tertiary)', fontStyle: 'italic', marginBottom: 20 }}>
-            Join students who use the extension to log applications in one click.
-          </p>
-        )}
 
         {/* Buttons */}
         {isWelcome ? (

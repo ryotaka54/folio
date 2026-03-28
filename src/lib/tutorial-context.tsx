@@ -1,11 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { Application } from './types';
 
 interface TutorialContextType {
   isActive: boolean;
   currentStep: number;
-  start: () => void;
+  demoApplications: Application[];
+  start: (demos?: Application[]) => void;
   next: () => void;
   prev: () => void;
   skip: () => void;
@@ -17,8 +19,10 @@ const TutorialContext = createContext<TutorialContextType | undefined>(undefined
 export function TutorialProvider({ children }: { children: ReactNode }) {
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [demoApplications, setDemoApplications] = useState<Application[]>([]);
 
-  const start = useCallback(() => {
+  const start = useCallback((demos?: Application[]) => {
+    setDemoApplications(demos ?? []);
     setCurrentStep(0);
     setIsActive(true);
   }, []);
@@ -34,6 +38,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   const skip = useCallback(() => {
     setIsActive(false);
     setCurrentStep(0);
+    setDemoApplications([]);
   }, []);
 
   const goToStep = useCallback((step: number) => {
@@ -42,7 +47,7 @@ export function TutorialProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <TutorialContext.Provider value={{ isActive, currentStep, start, next, prev, skip, goToStep }}>
+    <TutorialContext.Provider value={{ isActive, currentStep, demoApplications, start, next, prev, skip, goToStep }}>
       {children}
     </TutorialContext.Provider>
   );
