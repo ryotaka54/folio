@@ -20,6 +20,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import ExtensionBanner from '@/components/ExtensionBanner';
 import { useTutorial } from '@/lib/tutorial-context';
+import { ExtensionStatusProvider, useExtensionStatus } from '@/lib/extension-status-context';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
@@ -41,9 +42,11 @@ function DashboardContent() {
   const { user, signOut } = useAuth();
   const { applications, loading, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
   const { start: startTutorial, isActive, demoApplications } = useTutorial();
+  const { isInstalled: extInstalled, isDismissed: extDismissed, isBannerEligible } = useExtensionStatus();
   const router = useRouter();
 
   const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
+  const [showFirstAppTip, setShowFirstAppTip] = useState(false);
   const [search, setSearch] = useState('');
   const [hideInactive, setHideInactive] = useState(true);
   const [statusFilter, setStatusFilter] = useState<PipelineStage | 'all'>('all');
@@ -117,6 +120,8 @@ function DashboardContent() {
     setShowDrawer(true);
   };
 
+  const bannerVisible = !extInstalled && !extDismissed && isBannerEligible(user?.created_at) && !isActive;
+
   const handleAddSave = async (data: {
     company: string;
     role: string;
@@ -127,12 +132,18 @@ function DashboardContent() {
     job_link: string;
     notes: string;
   }) => {
+    const isFirstApp = applications.length === 0;
     await addApplication({
       ...data,
       recruiter_name: '',
       recruiter_email: '',
     });
     showToast(`${data.company} added`);
+    if (isFirstApp && !localStorage.getItem('first_app_celebration_shown')) {
+      localStorage.setItem('first_app_celebration_shown', 'true');
+      setShowFirstAppTip(true);
+      setTimeout(() => setShowFirstAppTip(false), 5000);
+    }
   };
 
   // Drawer edits — silent, no toast
@@ -370,7 +381,7 @@ function DashboardContent() {
               ))}
             </div>
           ) : displayApplications.length === 0 ? (
-            <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} />
+            <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} hideExtensionHint={bannerVisible} />
           ) : filteredApps.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">
               <h3 className="text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>No matches</h3>
@@ -467,6 +478,17 @@ function DashboardContent() {
         onDelete={handleDelete}
         stages={stages as PipelineStage[]}
       />
+
+      {/* First-app celebration tooltip — appears once, fades after 5s */}
+      {showFirstAppTip && (
+        <div
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 px-4 py-3 rounded-xl shadow-xl fade-in"
+          style={{ background: '#111827', color: '#fff', fontSize: 12, textAlign: 'center', lineHeight: 1.5, maxWidth: 320, width: 'calc(100% - 2rem)' }}
+        >
+          <span style={{ color: '#4ADE80', marginRight: 6 }}>✓</span>
+          First application logged! Pro tip: the extension does this automatically from any job board.
+        </div>
+      )}
     </div>
   );
 }
@@ -557,7 +579,9 @@ export default function DashboardPage() {
 
   return (
     <StoreProvider userId={user.id}>
-      <DashboardContent />
+      <ExtensionStatusProvider>
+        <DashboardContent />
+      </ExtensionStatusProvider>
     </StoreProvider>
   );
 }

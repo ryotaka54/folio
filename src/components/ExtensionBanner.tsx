@@ -1,45 +1,24 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useExtensionStatus } from '@/lib/extension-status-context';
+import { useAuth } from '@/lib/auth-context';
 import { useTutorial } from '@/lib/tutorial-context';
 
-// TODO: Replace with real Chrome Web Store URL when extension is published
 const EXTENSION_URL = 'https://chromewebstore.google.com/detail/applyd';
 
-const DISMISSED_KEY = 'applyd_extension_banner_dismissed';
-const INSTALLED_KEY = 'applyd_extension_installed';
-
 export default function ExtensionBanner() {
+  const { isInstalled, isDismissed, mounted, markDismissed, isBannerEligible } = useExtensionStatus();
+  const { user } = useAuth();
   const { isActive } = useTutorial();
-  const [dismissed, setDismissed] = useState(true); // start hidden to avoid SSR flash
-  const [extensionActive, setExtensionActive] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    setDismissed(localStorage.getItem(DISMISSED_KEY) === 'true');
-    setExtensionActive(localStorage.getItem(INSTALLED_KEY) === 'true');
-  }, []);
+  const show = mounted && !isInstalled && !isDismissed && isBannerEligible(user?.created_at) && !isActive;
 
-  // Listen for extension presence signal
-  useEffect(() => {
-    const handler = (e: MessageEvent) => {
-      if (e.data?.type === 'APPLYD_EXTENSION_ACTIVE') {
-        setExtensionActive(true);
-        localStorage.setItem(INSTALLED_KEY, 'true');
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, []);
+  if (!show) return null;
 
-  const handleDismiss = () => {
-    setDismissed(true);
-    localStorage.setItem(DISMISSED_KEY, 'true');
+  const handleInstall = () => {
+    window.open(EXTENSION_URL, '_blank', 'noopener,noreferrer');
+    markDismissed();
   };
-
-  // Hide while the tour is running; show the moment it ends (skip or complete)
-  if (!mounted || dismissed || extensionActive || isActive) return null;
 
   return (
     <div
@@ -52,53 +31,65 @@ export default function ExtensionBanner() {
         fontWeight: 500,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-        padding: '8px 16px',
-        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        gap: 8,
+        padding: '0 12px',
+        maxHeight: 44,
+        height: 44,
+        animation: 'ext-banner-slide-in 300ms ease both',
+        overflow: 'hidden',
+        flexShrink: 0,
       }}
     >
-      <span>
-        Log applications 10x faster — install the free Applyd extension
+      {/* Left icon */}
+      <span style={{ fontSize: 15, flexShrink: 0 }}>⚡</span>
+
+      {/* Center message */}
+      <span style={{ flex: 1, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span className="hidden sm:inline">
+          Log applications instantly from any job board — get the free Applyd extension
+        </span>
+        <span className="sm:hidden">
+          Log apps in one click — get the extension
+        </span>
       </span>
-      <a
-        href={EXTENSION_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          height: 26,
-          padding: '0 12px',
-          borderRadius: 5,
-          background: 'rgba(255,255,255,0.2)',
-          border: '1px solid rgba(255,255,255,0.3)',
-          color: '#fff',
-          fontSize: 12,
-          fontWeight: 600,
-          display: 'inline-flex',
-          alignItems: 'center',
-          textDecoration: 'none',
-          flexShrink: 0,
-        }}
-      >
-        Install now
-      </a>
-      <button
-        onClick={handleDismiss}
-        aria-label="Dismiss extension banner"
-        style={{
-          marginLeft: 4,
-          background: 'none',
-          border: 'none',
-          color: 'rgba(255,255,255,0.7)',
-          cursor: 'pointer',
-          fontSize: 16,
-          lineHeight: 1,
-          padding: 2,
-          flexShrink: 0,
-        }}
-      >
-        ×
-      </button>
+
+      {/* Right actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+        <button
+          onClick={handleInstall}
+          style={{
+            height: 26,
+            padding: '0 10px',
+            borderRadius: 5,
+            background: '#fff',
+            border: 'none',
+            color: 'var(--accent-blue)',
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: 'pointer',
+            flexShrink: 0,
+          }}
+        >
+          Install
+        </button>
+        <button
+          onClick={markDismissed}
+          aria-label="Dismiss extension banner"
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'rgba(255,255,255,0.85)',
+            cursor: 'pointer',
+            fontSize: 18,
+            lineHeight: 1,
+            padding: '0 2px',
+            flexShrink: 0,
+          }}
+        >
+          ×
+        </button>
+      </div>
     </div>
   );
 }

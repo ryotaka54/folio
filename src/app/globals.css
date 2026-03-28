@@ -305,6 +305,12 @@ body {
   to   { opacity: 1; }
 }
 
+/* Extension banner slide-in */
+@keyframes ext-banner-slide-in {
+  from { transform: translateY(-100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
 /* Extension animation — 3 s looping demo */
 @keyframes ext-job-card-in {
   0%          { opacity: 0; transform: translateY(6px); }

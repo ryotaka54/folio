@@ -2,15 +2,18 @@
 
 import { useState } from 'react';
 import { STAGE_COLORS } from '@/lib/constants';
+import { useExtensionStatus } from '@/lib/extension-status-context';
 
 const GHOST_STAGES = ['Wishlist', 'Applied', 'OA / Online Assessment', 'Phone / Recruiter Screen', 'Offer'];
 
 interface EmptyStateProps {
   onAdd: () => void;
   onAutofillUrl?: (url: string) => void;
+  hideExtensionHint?: boolean;
 }
 
-export default function EmptyState({ onAdd, onAutofillUrl }: EmptyStateProps) {
+export default function EmptyState({ onAdd, onAutofillUrl, hideExtensionHint }: EmptyStateProps) {
+  const { isInstalled } = useExtensionStatus();
   const [url, setUrl] = useState('');
 
   const isValidUrl = (u: string) => { try { new URL(u); return true; } catch { return false; } };
@@ -76,6 +79,22 @@ export default function EmptyState({ onAdd, onAutofillUrl }: EmptyStateProps) {
       >
         or add manually
       </button>
+
+      {/* Extension hint — only if banner isn't already showing and extension not installed */}
+      {!hideExtensionHint && !isInstalled && (
+        <p className="mt-5 text-[11px] text-center max-w-xs" style={{ color: 'var(--text-tertiary)' }}>
+          Already found jobs to apply to? The{' '}
+          <a
+            href="https://chromewebstore.google.com/detail/applyd"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--muted-text)', textDecoration: 'underline', textUnderlineOffset: 2 }}
+          >
+            Applyd extension
+          </a>
+          {' '}lets you log them directly from LinkedIn or Handshake in one click.
+        </p>
+      )}
     </div>
   );
 }

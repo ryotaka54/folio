@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { PipelineStage, Category } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
 import { X } from 'lucide-react';
+import { useExtensionStatus } from '@/lib/extension-status-context';
 
 interface AddApplicationModalProps {
   open: boolean;
@@ -44,6 +45,7 @@ function guessCategory(role: string): Category | '' {
 
 export default function AddApplicationModal({ open, onClose, onSave, stages, initialJobLink }: AddApplicationModalProps) {
   const defaultStatus = (stages.includes('Wishlist' as PipelineStage) ? 'Wishlist' : stages[0]) as PipelineStage;
+  const { isInstalled, hintCount, incrementHintCount } = useExtensionStatus();
 
   const [company,  setCompany]  = useState('');
   const [role,     setRole]     = useState('');
@@ -67,6 +69,9 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
       setDeadline(''); setNotes(''); setError('');
       setIsAutofilling(false); setIsSaving(false);
       setJobLink(initialJobLink || '');
+      if (!isInstalled && hintCount < 3) {
+        incrementHintCount();
+      }
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -232,6 +237,24 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
               <input type="text" value={notes} onChange={e => setNotes(e.target.value)}
                 className={inputCls} placeholder="Quick note…" />
             </div>
+
+            {/* Extension tip — shows first 3 times the modal opens, then disappears */}
+            {!isInstalled && hintCount <= 3 && (
+              <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 12, marginTop: 4 }}>
+                <p className="text-[11px]" style={{ color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
+                  ⚡ Tip — use the{' '}
+                  <a
+                    href="https://chromewebstore.google.com/detail/applyd"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'var(--muted-text)', textDecoration: 'underline', textUnderlineOffset: 2 }}
+                  >
+                    Applyd extension
+                  </a>
+                  {' '}to fill this form automatically from any job posting.
+                </p>
+              </div>
+            )}
 
             <button
               type="submit"
