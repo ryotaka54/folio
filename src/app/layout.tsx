@@ -3,7 +3,9 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { TutorialProvider } from "@/lib/tutorial-context";
 import CommandPalette from "@/components/CommandPalette";
+import TutorialOverlay from "@/components/TutorialOverlay";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -45,8 +47,11 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
-            {children}
-            <CommandPalette />
+            <TutorialProvider>
+              {children}
+              <CommandPalette />
+              <TutorialOverlay />
+            </TutorialProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

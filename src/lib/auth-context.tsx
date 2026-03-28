@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     recruiting_season: '',
     created_at: new Date().toISOString(),
     onboarding_complete: false,
+    tutorial_completed: false,
   });
 
   const loadProfile = async (userId: string) => {
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const localOnboarding = typeof window !== 'undefined' ? localStorage.getItem(`applyd_onboarding_${userId}`) : null;
+      const localTutorial = typeof window !== 'undefined' ? localStorage.getItem(`applyd_tutorial_${userId}`) : null;
 
       if (data) {
         setUser({
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           recruiting_season: data.recruiting_season || '',
           created_at: data.created_at,
           onboarding_complete: data.onboarding_complete || localOnboarding === 'true',
+          tutorial_completed: data.tutorial_completed ?? localTutorial === 'true',
         });
       } else {
         // No profile row exists — auto-create one so future writes succeed
@@ -86,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.from('users').upsert(newProfile).then(({ error: upsertErr }) => {
           if (upsertErr) console.error('Auto-create profile error:', upsertErr);
         });
-        setUser({ ...defaultProfile(userId), onboarding_complete: localOnboarding === 'true' });
+        setUser({ ...defaultProfile(userId), onboarding_complete: localOnboarding === 'true', tutorial_completed: localTutorial === 'true' });
       }
     } catch (err) {
       console.error('Load profile error:', err);
@@ -191,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         career_level: '',
         recruiting_season: '',
         onboarding_complete: false,
+        tutorial_completed: false,
       });
       if (profileError) console.error('Profile creation error:', profileError);
 
@@ -230,11 +234,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (updated.onboarding_complete && typeof window !== 'undefined') {
         localStorage.setItem(`applyd_onboarding_${updated.id}`, 'true');
-        
+
         // Push securely to Auth JWT Metadata to bypass any `users` table RLS limitations across devices
         supabase.auth.updateUser({
           data: { onboarding_complete: true }
         }).catch(err => console.error('Auth metadata update error:', err));
+      }
+
+      if (updated.tutorial_completed && typeof window !== 'undefined') {
+        localStorage.setItem(`applyd_tutorial_${updated.id}`, 'true');
       }
 
       supabase.from('users')
@@ -246,6 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           career_level: updated.career_level,
           recruiting_season: updated.recruiting_season,
           onboarding_complete: updated.onboarding_complete,
+          tutorial_completed: updated.tutorial_completed,
         })
         .then(({ error }) => {
           if (error) console.error('Profile update error:', error);

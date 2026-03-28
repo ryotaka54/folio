@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import { Logo } from '@/components/Logo';
+import { useTutorial } from '@/lib/tutorial-context';
+import { useAuth } from '@/lib/auth-context';
 
 const FAQS = [
   {
@@ -32,6 +35,17 @@ const FAQS = [
 ];
 
 export default function HelpPage() {
+  const router = useRouter();
+  const { start: startTutorial } = useTutorial();
+  const { updateProfile } = useAuth();
+
+  const handleReplayTutorial = () => {
+    updateProfile({ tutorial_completed: false });
+    router.push('/dashboard');
+    // Brief delay so navigation completes before tutorial fires
+    setTimeout(() => startTutorial(), 800);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
@@ -63,7 +77,18 @@ export default function HelpPage() {
           ))}
         </div>
 
-        <div className="mt-10 p-6 rounded-lg border border-border-gray text-center" style={{ background: 'var(--card-bg)' }}>
+        <div className="mt-10 p-6 rounded-lg border border-border-gray" style={{ background: 'var(--card-bg)' }}>
+          <h2 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Take the product tour</h2>
+          <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>Walk through every feature of the dashboard in about 90 seconds.</p>
+          <button
+            onClick={handleReplayTutorial}
+            className="inline-flex items-center h-9 px-4 text-[13px] font-medium text-white rounded-md transition-colors bg-accent-blue hover:bg-accent-blue-hover"
+          >
+            Replay tour →
+          </button>
+        </div>
+
+        <div className="mt-4 p-6 rounded-lg border border-border-gray text-center" style={{ background: 'var(--card-bg)' }}>
           <h2 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Still have questions?</h2>
           <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>We read every email.</p>
           <Link

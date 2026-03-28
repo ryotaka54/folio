@@ -66,4 +66,5 @@ export interface UserProfile {
   recruiting_season: string;
   created_at: string;
   onboarding_complete: boolean;
+  tutorial_completed?: boolean;
 }

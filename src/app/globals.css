@@ -284,3 +284,57 @@ body {
     transform: none !important;
   }
 }
+
+/* ── Tutorial Overlay Animations ─────────────────────────────────────────── */
+@keyframes tutorial-tooltip-in {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+@keyframes tutorial-modal-in {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+@keyframes tutorial-sheet-in {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes tutorial-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Extension animation — 3 s looping demo */
+@keyframes ext-job-card-in {
+  0%          { opacity: 0; transform: translateY(6px); }
+  10%, 85%    { opacity: 1; transform: translateY(0); }
+  95%, 100%   { opacity: 0; transform: translateY(6px); }
+}
+@keyframes ext-icon-click {
+  0%, 30%     { opacity: 0; transform: scale(0.8); }
+  42%         { opacity: 1; transform: scale(1.1); }
+  52%, 75%    { opacity: 1; transform: scale(1); }
+  88%, 100%   { opacity: 0; transform: scale(0.8); }
+}
+@keyframes ext-ripple {
+  0%, 38%     { opacity: 0; transform: scale(0.6); }
+  50%         { opacity: 0.6; transform: scale(1); }
+  65%, 100%   { opacity: 0; transform: scale(1.4); }
+}
+@keyframes ext-card-appear {
+  0%, 55%     { opacity: 0; transform: translateX(10px); }
+  68%, 80%    { opacity: 1; transform: translateX(0); }
+  92%, 100%   { opacity: 0; transform: translateX(10px); }
+}
+@keyframes ext-arrow-pulse {
+  0%, 45%     { opacity: 0; }
+  55%, 75%    { opacity: 1; }
+  88%, 100%   { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [class*="tutorial-"], [style*="tutorial-"] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

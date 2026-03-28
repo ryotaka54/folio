@@ -18,10 +18,13 @@ import ApplicationDrawer from '@/components/ApplicationDrawer';
 import EmptyState from '@/components/EmptyState';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
+import ExtensionBanner from '@/components/ExtensionBanner';
+import { useTutorial } from '@/lib/tutorial-context';
 
 function DashboardContent() {
   const { user, signOut } = useAuth();
   const { applications, loading, addApplication, updateApplication, deleteApplication, storeError, clearStoreError } = useStore();
+  const { start: startTutorial } = useTutorial();
   const router = useRouter();
 
   const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
@@ -160,6 +163,18 @@ function DashboardContent() {
     return () => document.removeEventListener('applyd:add', handler);
   }, []);
 
+  // Auto-start tutorial for new users who haven't seen it yet
+  const tutorialStartedRef = useRef(false);
+  useEffect(() => {
+    if (tutorialStartedRef.current) return;
+    if (user?.onboarding_complete && user?.tutorial_completed === false) {
+      tutorialStartedRef.current = true;
+      // Brief delay so the dashboard has fully rendered before the overlay appears
+      const t = setTimeout(() => startTutorial(), 600);
+      return () => clearTimeout(t);
+    }
+  }, [user, startTutorial]);
+
   // Cleanup timers on unmount
   useEffect(() => {
     return () => {
@@ -170,6 +185,8 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-background">
+      <ExtensionBanner />
+
       {/* Store error banner */}
       {storeError && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-red-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
@@ -241,16 +258,20 @@ function DashboardContent() {
         </div>
 
         {/* Stats */}
-        <StatsBar applications={applications} />
+        <div data-tutorial-id="stats-bar">
+          <StatsBar applications={applications} />
+        </div>
 
         {/* Funnel */}
-        <FunnelChart applications={applications} />
+        <div data-tutorial-id="funnel-chart">
+          <FunnelChart applications={applications} />
+        </div>
 
         {/* Controls */}
         <div className="mt-6 flex flex-col gap-2">
           {/* Row 1: Search + Add */}
           <div className="flex gap-2">
-            <div className="relative flex-1">
+            <div data-tutorial-id="search-input" className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input
                 type="text"
@@ -261,6 +282,7 @@ function DashboardContent() {
               />
             </div>
             <button
+              data-tutorial-id="add-button"
               onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
               className="h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors bg-accent-blue hover:bg-accent-blue-hover"
             >
@@ -270,7 +292,7 @@ function DashboardContent() {
           </div>
           {/* Row 2: View toggle + filters */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
+            <div data-tutorial-id="view-toggle" className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
               <button
                 onClick={() => setView('pipeline')}
                 className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
@@ -322,12 +344,14 @@ function DashboardContent() {
               <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Try adjusting your filters.</p>
             </div>
           ) : view === 'pipeline' ? (
-            <PipelineView
-              applications={filteredApps}
-              stages={stages as PipelineStage[]}
-              onCardClick={handleCardClick}
-              onStatusChange={(id, status) => handleStatusChange(id, status)}
-            />
+            <div data-tutorial-id="pipeline-board">
+              <PipelineView
+                applications={filteredApps}
+                stages={stages as PipelineStage[]}
+                onCardClick={handleCardClick}
+                onStatusChange={(id, status) => handleStatusChange(id, status)}
+              />
+            </div>
           ) : (
             <TableView
               applications={filteredApps}

@@ -77,6 +77,8 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
 
 export default function PipelineView({ applications, stages, onCardClick, onStatusChange }: PipelineViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  // Track which card gets the tutorial anchor — the first one rendered
+  let firstCardTagged = false;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -135,14 +137,19 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
                   </span>
                 </div>
               )}
-              {stageApps.map(app => (
-                <DraggableCard
-                  key={app.id}
-                  application={app}
-                  onClick={() => onCardClick(app)}
-                  muted={isRejected}
-                />
-              ))}
+              {stageApps.map(app => {
+                const isFirst = !firstCardTagged;
+                if (isFirst) firstCardTagged = true;
+                return (
+                  <div key={app.id} {...(isFirst ? { 'data-tutorial-id': 'first-card' } : {})}>
+                    <DraggableCard
+                      application={app}
+                      onClick={() => onCardClick(app)}
+                      muted={isRejected}
+                    />
+                  </div>
+                );
+              })}
             </DroppableColumn>
           );
         })}
