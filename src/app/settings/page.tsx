@@ -12,7 +12,7 @@ import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS } from '@/lib/constants
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type Section = 'profile' | 'recruiting' | 'appearance' | 'data' | 'account' | 'danger';
+type Section = 'profile' | 'recruiting' | 'appearance' | 'account' | 'danger';
 
 interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: boolean }
 
@@ -21,7 +21,6 @@ interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: bo
 const UserIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
 const BriefcaseIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
 const PaletteIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>;
-const DatabaseIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>;
 const ShieldIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
 const TrashIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
 const CheckIcon = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
@@ -35,7 +34,6 @@ const SECTIONS: SectionMeta[] = [
   { id: 'profile', label: 'Profile', icon: <UserIcon /> },
   { id: 'recruiting', label: 'Recruiting', icon: <BriefcaseIcon /> },
   { id: 'appearance', label: 'Appearance', icon: <PaletteIcon /> },
-  { id: 'data', label: 'Data', icon: <DatabaseIcon /> },
   { id: 'account', label: 'Account', icon: <ShieldIcon /> },
   { id: 'danger', label: 'Danger Zone', icon: <TrashIcon />, danger: true },
 ];
@@ -482,228 +480,6 @@ function AppearanceSection() {
   );
 }
 
-// ─── Section: Data ────────────────────────────────────────────────────────────
-
-function DataSection({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
-  const { user } = useAuth();
-  const [exporting, setExporting] = useState(false);
-  const [importFile, setImportFile] = useState<File | null>(null);
-  const [importPreview, setImportPreview] = useState<string[][] | null>(null);
-  const [importCols, setImportCols] = useState<string[]>([]);
-  const [importing, setImporting] = useState(false);
-  const [importResult, setImportResult] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleExport = async () => {
-    if (!user?.id || exporting) return;
-    setExporting(true);
-    try {
-      const { data, error } = await supabase
-        .from('applications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      const cols = ['company', 'role', 'category', 'status', 'location', 'deadline', 'notes', 'recruiter_name', 'recruiter_email', 'job_link', 'created_at', 'updated_at'];
-      const escape = (v: unknown) => {
-        const s = v == null ? '' : String(v);
-        return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
-      };
-      const rows = (data ?? []).map(app => cols.map(c => escape((app as Record<string, unknown>)[c])).join(','));
-      const csv = [cols.join(','), ...rows].join('\n');
-
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `applyd-applications-${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Export downloaded');
-    } catch {
-      showToast('Export failed — please try again', 'error');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const parseCSV = (text: string): string[][] => {
-    const lines = text.split(/\r?\n/).filter(l => l.trim());
-    return lines.map(line => {
-      const cols: string[] = [];
-      let cur = '', inQ = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') { inQ = !inQ; }
-        else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
-        else { cur += ch; }
-      }
-      cols.push(cur.trim());
-      return cols;
-    });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImportFile(file);
-    setImportResult(null);
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const text = ev.target?.result as string;
-      const rows = parseCSV(text);
-      if (rows.length < 2) { showToast('CSV has no data rows', 'error'); return; }
-      setImportCols(rows[0]);
-      setImportPreview(rows.slice(1, 6));
-    };
-    reader.readAsText(file);
-  };
-
-  const handleImport = async () => {
-    if (!importFile || !user?.id || importing) return;
-    setImporting(true);
-    setImportResult(null);
-    try {
-      const text = await importFile.text();
-      const rows = parseCSV(text);
-      if (rows.length < 2) { showToast('CSV has no data rows', 'error'); return; }
-      const headers = rows[0].map(h => h.toLowerCase().trim());
-      const col = (name: string) => {
-        const i = headers.indexOf(name);
-        return (row: string[]) => (i >= 0 ? (row[i] ?? '') : '');
-      };
-
-      const now = new Date().toISOString();
-      let imported = 0, skipped = 0;
-      const batch = rows.slice(1).map(row => {
-        const company = col('company')(row);
-        const role = col('role')(row);
-        if (!company || !role) { skipped++; return null; }
-        return {
-          user_id: user.id,
-          company,
-          role,
-          category: col('category')(row) || '',
-          status: col('status')(row) || 'Applied',
-          location: col('location')(row) || '',
-          deadline: col('deadline')(row) || null,
-          notes: col('notes')(row) || '',
-          recruiter_name: col('recruiter_name')(row) || '',
-          recruiter_email: col('recruiter_email')(row) || '',
-          job_link: col('job_link')(row) || '',
-          created_at: now,
-          updated_at: now,
-        };
-      }).filter(Boolean);
-
-      if (batch.length > 0) {
-        const { error } = await supabase.from('applications').insert(batch as object[]);
-        if (error) throw error;
-        imported = batch.length;
-      }
-
-      setImportResult(`Imported ${imported} application${imported !== 1 ? 's' : ''}${skipped > 0 ? `, skipped ${skipped} row${skipped !== 1 ? 's' : ''} (missing company or role)` : ''}.`);
-      setImportFile(null);
-      setImportPreview(null);
-      setImportCols([]);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    } catch {
-      showToast('Import failed — please check your CSV format', 'error');
-    } finally {
-      setImporting(false);
-    }
-  };
-
-  return (
-    <div>
-      {/* Export */}
-      <SectionCard title="Export my data" description="Download all your applications as a CSV file. Compatible with Google Sheets and Excel.">
-        <button
-          onClick={handleExport}
-          disabled={exporting}
-          className="h-9 px-4 rounded-md text-[13px] font-medium text-white transition-colors bg-accent-blue hover:bg-accent-blue-hover disabled:opacity-40"
-        >
-          {exporting ? 'Generating…' : 'Download CSV'}
-        </button>
-      </SectionCard>
-
-      {/* Import */}
-      <SectionCard title="Import applications" description="Upload a CSV with columns: company, role, category, status, location, deadline, notes. Company and role are required.">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          className="hidden"
-          id="import-file"
-        />
-        {!importPreview ? (
-          <label
-            htmlFor="import-file"
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-md text-[13px] font-medium border border-border-gray bg-background text-muted-text hover:border-accent-blue/40 cursor-pointer transition-colors"
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Choose CSV file
-          </label>
-        ) : (
-          <div>
-            <p className="text-[12px] font-medium mb-2" style={{ color: 'var(--muted-text)' }}>Preview (first {importPreview.length} rows):</p>
-            <div className="overflow-x-auto rounded-md border border-border-gray mb-4">
-              <table className="text-[12px] w-full">
-                <thead>
-                  <tr style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
-                    {importCols.slice(0, 5).map((c, i) => <th key={i} className="px-3 py-2 text-left font-medium">{c}</th>)}
-                    {importCols.length > 5 && <th className="px-3 py-2 text-left font-medium">+{importCols.length - 5} more</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {importPreview.map((row, i) => (
-                    <tr key={i} className="border-t border-border-gray" style={{ color: 'var(--body-text)' }}>
-                      {row.slice(0, 5).map((cell, j) => <td key={j} className="px-3 py-2 truncate max-w-[120px]">{cell || '—'}</td>)}
-                      {importCols.length > 5 && <td className="px-3 py-2" style={{ color: 'var(--text-tertiary)' }}>…</td>}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleImport}
-                disabled={importing}
-                className="h-9 px-4 rounded-md text-[13px] font-semibold text-white bg-accent-blue hover:bg-accent-blue-hover disabled:opacity-40 transition-colors"
-              >
-                {importing ? 'Importing…' : `Import ${importFile?.name}`}
-              </button>
-              <button
-                onClick={() => { setImportFile(null); setImportPreview(null); setImportCols([]); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                className="h-9 px-3 rounded-md text-[13px] font-medium border border-border-gray bg-background text-muted-text hover:border-accent-blue/40 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-        {importResult && (
-          <p className="mt-3 text-[13px] font-medium" style={{ color: 'var(--green-success)' }}>{importResult}</p>
-        )}
-      </SectionCard>
-
-      {/* Application history */}
-      <SectionCard title="Application history" description="Keep completed recruiting cycles visible in your dashboard. When off, archived cycles are hidden from the main view.">
-        <div className="flex items-center justify-between">
-          <p className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>Keep application history</p>
-          <Toggle
-            checked={typeof window !== 'undefined' ? (localStorage.getItem('applyd_keep_history') ?? 'true') === 'true' : true}
-            onChange={v => localStorage.setItem('applyd_keep_history', String(v))}
-          />
-        </div>
-      </SectionCard>
-    </div>
-  );
-}
-
 // ─── Section: Account ─────────────────────────────────────────────────────────
 
 function AccountSection({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
@@ -1051,7 +827,6 @@ export default function SettingsPage() {
     profile: <ProfileSection showToast={showToast} />,
     recruiting: <RecruitingSection showToast={showToast} />,
     appearance: <AppearanceSection />,
-    data: <DataSection showToast={showToast} />,
     account: <AccountSection showToast={showToast} />,
     danger: <DangerSection showToast={showToast} />,
   };
