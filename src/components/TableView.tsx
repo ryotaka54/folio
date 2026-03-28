@@ -125,7 +125,7 @@ export default function TableView({ applications, selectedIds, onSelectionChange
           <tbody>
             {sorted.length === 0 && (
               <tr>
-                <td colSpan={8} className="text-center py-12 text-sm text-muted-text">
+                <td colSpan={8} className="text-center py-12 text-[13px] text-muted-text">
                   No applications match your filters.
                 </td>
               </tr>
@@ -153,10 +153,10 @@ export default function TableView({ applications, selectedIds, onSelectionChange
                       className="w-3.5 h-3.5 rounded accent-accent-blue cursor-pointer"
                     />
                   </td>
-                  <td className="px-3 py-2.5 text-sm font-medium text-brand-navy truncate max-w-0">{app.company}</td>
-                  <td className="px-3 py-2.5 text-sm text-body-text truncate max-w-0">{app.role}</td>
-                  <td className="px-3 py-2.5 text-xs text-muted-text hidden lg:table-cell truncate max-w-0">{app.location || '—'}</td>
-                  <td className="px-3 py-2.5 text-xs text-muted-text hidden md:table-cell">{app.category || '—'}</td>
+                  <td className="px-3 py-2.5 text-[13px] font-medium text-brand-navy truncate max-w-0">{app.company}</td>
+                  <td className="px-3 py-2.5 text-[13px] text-body-text truncate max-w-0">{app.role}</td>
+                  <td className="px-3 py-2.5 text-[11px] text-muted-text hidden lg:table-cell truncate max-w-0">{app.location || '—'}</td>
+                  <td className="px-3 py-2.5 text-[11px] text-muted-text hidden md:table-cell">{app.category || '—'}</td>
                   <td className="px-3 py-2.5">
                     <span
                       className="text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap"

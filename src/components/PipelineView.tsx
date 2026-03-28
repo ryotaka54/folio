@@ -110,7 +110,8 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
               style={{ background: 'var(--surface-gray)' }}
             >
               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-              <span className="text-[11px] font-medium" style={{ color: 'var(--muted-text)' }}>{count}</span>
+              <span className="text-[11px] font-medium max-w-[80px] truncate" style={{ color: 'var(--muted-text)' }}>{stage}</span>
+              <span className="text-[11px] font-medium" style={{ color: 'var(--text-tertiary)' }}>{count}</span>
             </button>
           );
         })}

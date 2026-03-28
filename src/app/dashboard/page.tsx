@@ -111,12 +111,16 @@ function DashboardContent() {
     showToast(`${data.company} added`);
   };
 
+  // Drawer edits — silent, no toast
   const handleUpdate = (id: string, updates: Partial<Application>) => {
     updateApplication(id, updates).catch(() => {});
     setSelectedApp(prev => prev && prev.id === id ? { ...prev, ...updates } : prev);
-    if (updates.status) {
-      showToast(`Moved to ${updates.status}`);
-    }
+  };
+
+  // Drag-and-drop status change — shows toast
+  const handleStatusChange = (id: string, status: PipelineStage) => {
+    handleUpdate(id, { status });
+    showToast(`Moved to ${status}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -148,6 +152,13 @@ function DashboardContent() {
     setAddModalInitialUrl(url);
     setShowAddModal(true);
   };
+
+  // Listen for command palette "Add Application"
+  useEffect(() => {
+    const handler = () => { setAddModalInitialUrl(''); setShowAddModal(true); };
+    document.addEventListener('applyd:add', handler);
+    return () => document.removeEventListener('applyd:add', handler);
+  }, []);
 
   // Cleanup timers on unmount
   useEffect(() => {
@@ -185,6 +196,15 @@ function DashboardContent() {
             {user?.name && (
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name}</span>
             )}
+            {/* Quick add */}
+            <button
+              onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+              className="hidden md:flex items-center gap-1.5 h-7 px-3 text-[12px] font-medium text-white rounded-md transition-colors bg-accent-blue hover:bg-accent-blue-hover"
+              aria-label="Add application"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add
+            </button>
             {/* Cmd+K hint */}
             <button
               onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))}
@@ -209,17 +229,32 @@ function DashboardContent() {
         {/* Greeting */}
         <div className="mb-6">
           <h1 className="text-[18px] font-semibold tracking-tight" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-            {user?.name ? user.name.split(' ')[0] : 'Hey'}{' '}
-            <span className="text-muted-text font-normal">
-              {(() => {
-                const submitted = applications.filter(a => a.status !== 'Wishlist').length;
-                const inInterviews = applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length;
-                if (applications.length === 0) return '— start tracking and see where things land.';
-                if (inInterviews > 0) return `— ${inInterviews} interview${inInterviews !== 1 ? 's' : ''} in play.`;
-                if (submitted === 1) return '— 1 application out.';
-                return `— ${submitted} applications out.`;
-              })()}
-            </span>
+            {user?.name ? (
+              <>
+                {user.name.split(' ')[0]}{' '}
+                <span className="font-normal" style={{ color: 'var(--muted-text)' }}>
+                  {(() => {
+                    const submitted = applications.filter(a => a.status !== 'Wishlist').length;
+                    const inInterviews = applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length;
+                    if (applications.length === 0) return '— start tracking and see where things land.';
+                    if (inInterviews > 0) return `— ${inInterviews} interview${inInterviews !== 1 ? 's' : ''} in play.`;
+                    if (submitted === 1) return '— 1 application out.';
+                    return `— ${submitted} applications out.`;
+                  })()}
+                </span>
+              </>
+            ) : (
+              <span className="font-normal" style={{ color: 'var(--muted-text)' }}>
+                {(() => {
+                  const submitted = applications.filter(a => a.status !== 'Wishlist').length;
+                  const inInterviews = applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length;
+                  if (applications.length === 0) return 'Start tracking and see where things land.';
+                  if (inInterviews > 0) return `${inInterviews} interview${inInterviews !== 1 ? 's' : ''} in play.`;
+                  if (submitted === 1) return '1 application out.';
+                  return `${submitted} applications out.`;
+                })()}
+              </span>
+            )}
           </h1>
         </div>
 
@@ -281,8 +316,7 @@ function DashboardContent() {
             {/* Add button */}
             <button
               onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-              className="sm:ml-auto h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors hover:[background:var(--accent-blue-hover)]"
-              style={{ background: 'var(--accent-blue)' }}
+              className="sm:ml-auto h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors bg-accent-blue hover:bg-accent-blue-hover"
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add
@@ -304,7 +338,7 @@ function DashboardContent() {
               applications={filteredApps}
               stages={stages as PipelineStage[]}
               onCardClick={handleCardClick}
-              onStatusChange={(id, status) => handleUpdate(id, { status })}
+              onStatusChange={(id, status) => handleStatusChange(id, status)}
             />
           ) : (
             <TableView
@@ -352,7 +386,7 @@ function DashboardContent() {
             <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Support</Link>
             <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
           </div>
-          <p className="text-[10px] text-muted-text/50 font-medium tracking-wider uppercase">© 2026 Applyd — Made for Students</p>
+          <p className="text-[10px] text-muted-text/50 font-medium tracking-wider uppercase">© {new Date().getFullYear()} Applyd — Made for Students</p>
         </footer>
       </main>
 

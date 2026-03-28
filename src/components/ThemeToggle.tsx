@@ -10,7 +10,7 @@ export default function ThemeToggle() {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <div className="w-8 h-8" />;
+  if (!mounted) return <div className="w-10 h-10" />;
 
   return (
     <button

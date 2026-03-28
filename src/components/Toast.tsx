@@ -10,8 +10,8 @@ export default function Toast({ message, onDismiss, onUndo }: ToastProps) {
   if (!message) return null;
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-lg border border-border-gray shadow-lg fade-in pointer-events-auto"
-      style={{ background: 'var(--brand-navy)', color: '#fff' }}
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-lg shadow-lg fade-in pointer-events-auto"
+      style={{ background: '#0F172A', color: '#F9FAFB', border: '1px solid rgba(255,255,255,0.08)' }}
     >
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="20 6 9 17 4 12" />

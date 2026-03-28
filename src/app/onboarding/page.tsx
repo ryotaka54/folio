@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { INTERNSHIP_STAGES, JOB_STAGES, SCHOOL_YEARS, RECRUITING_SEASONS, CAREER_LEVELS, STAGE_COLORS } from '@/lib/constants';
 import { Mode } from '@/lib/types';
 import { GraduationCap, Briefcase, ArrowRight } from 'lucide-react';
+import { Suspense } from 'react';
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const { user, updateProfile, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const changeMode = searchParams.get('change') === 'true';
+
   const [step, setStep] = useState(1);
   const [mode, setMode] = useState<Mode>('internship');
   const [name, setName] = useState('');
@@ -21,12 +25,17 @@ export default function OnboardingPage() {
     if (!loading && !user) {
       router.replace('/login');
     }
-    if (!loading && user?.onboarding_complete) {
+    // If already onboarded and not in change-mode flow, redirect to dashboard
+    if (!loading && user?.onboarding_complete && !changeMode) {
       router.replace('/dashboard');
     }
-  }, [user, loading, router]);
+    // In change-mode flow, pre-populate current mode
+    if (user && changeMode) {
+      setMode(user.mode ?? 'internship');
+    }
+  }, [user, loading, router, changeMode]);
 
-  if (loading || !user || user.onboarding_complete) {
+  if (loading || !user || (user.onboarding_complete && !changeMode)) {
     return (
       <div className="min-h-screen bg-surface-gray flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
@@ -39,6 +48,68 @@ export default function OnboardingPage() {
             <div className="grid grid-cols-2 gap-3">
               <div className="h-32 rounded-lg bg-surface-gray animate-pulse" />
               <div className="h-32 rounded-lg bg-surface-gray animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mode-change-only flow: just show step 1 and save
+  if (changeMode) {
+    const handleSaveMode = () => {
+      updateProfile({ mode });
+      router.push('/dashboard');
+    };
+
+    return (
+      <div className="min-h-screen bg-surface-gray flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-lg">
+          <div className="bg-card-bg rounded-lg p-6 md:p-8 border border-border-gray modal-enter">
+            <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Change your track</h1>
+            <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>This updates your pipeline stages.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
+              <button
+                onClick={() => setMode('internship')}
+                className="text-left p-4 rounded-lg border transition-colors"
+                style={mode === 'internship'
+                  ? { borderColor: 'var(--accent-blue)', background: 'var(--accent-blue)08' }
+                  : { borderColor: 'var(--border-gray)', background: 'transparent' }}
+              >
+                <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
+                  <GraduationCap size={17} />
+                </div>
+                <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Internship applications</div>
+                <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track internship recruiting cycles</div>
+              </button>
+              <button
+                onClick={() => setMode('job')}
+                className="text-left p-4 rounded-lg border transition-colors"
+                style={mode === 'job'
+                  ? { borderColor: 'var(--accent-blue)', background: 'var(--accent-blue)08' }
+                  : { borderColor: 'var(--border-gray)', background: 'transparent' }}
+              >
+                <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
+                  <Briefcase size={17} />
+                </div>
+                <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Full-time job applications</div>
+                <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track post-graduation job searches</div>
+              </button>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="flex-1 h-9 text-[13px] font-medium rounded-md border transition-colors"
+                style={{ background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveMode}
+                className="flex-1 h-9 text-[13px] font-medium text-white rounded-md bg-accent-blue hover:bg-accent-blue-hover transition-colors"
+              >
+                Save
+              </button>
             </div>
           </div>
         </div>
@@ -120,8 +191,7 @@ export default function OnboardingPage() {
               </div>
               <button
                 onClick={() => setStep(2)}
-                className="w-full mt-5 h-9 text-[14px] font-medium text-white rounded-md transition-colors"
-                style={{ background: 'var(--accent-blue)' }}
+                className="w-full mt-5 h-9 text-[13px] font-medium text-white rounded-md bg-accent-blue hover:bg-accent-blue-hover transition-colors"
               >
                 Continue
               </button>
@@ -142,7 +212,7 @@ export default function OnboardingPage() {
                     autoFocus
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+                    className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                     placeholder="First name"
                   />
                 </div>
@@ -214,8 +284,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep(3)}
                   disabled={!step2CanContinue}
-                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{ background: 'var(--accent-blue)' }}
+                  className="flex-1 h-9 text-[13px] font-medium text-white rounded-md bg-accent-blue hover:bg-accent-blue-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Continue
                 </button>
@@ -231,29 +300,40 @@ export default function OnboardingPage() {
               </h1>
               <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Your pipeline is ready to go.</p>
 
-              {/* Mini pipeline preview */}
-              <div className="flex gap-3 overflow-x-auto pb-2 mb-4" style={{ scrollbarWidth: 'none' }}>
-                {stages.map((stage) => {
-                  const color = STAGE_COLORS[stage] || '#6B7280';
-                  return (
-                    <div key={stage} className="flex flex-col items-center gap-1.5 flex-shrink-0 min-w-[56px]">
-                      <div className="w-8 h-8 rounded-lg border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)' }}>
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
+              {/* Mini pipeline preview — scrollable with scroll indicator */}
+              <div className="relative mb-4">
+                <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+                  {stages.map((stage) => {
+                    const color = STAGE_COLORS[stage] || '#6B7280';
+                    return (
+                      <div key={stage} className="flex flex-col items-center gap-1.5 flex-shrink-0 min-w-[64px]">
+                        <div className="w-8 h-8 rounded-lg border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)' }}>
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
+                        </div>
+                        <span className="text-[10px] font-medium text-center leading-tight w-[64px]"
+                          style={{ color: 'var(--muted-text)' }}>
+                          {stage}
+                        </span>
                       </div>
-                      <span className="text-[10px] font-medium text-center leading-tight max-w-[60px]"
-                        style={{ color: 'var(--muted-text)' }}>
-                        {stage}
-                      </span>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+                {/* Fade-right scroll hint */}
+                <div className="absolute right-0 top-0 bottom-2 w-8 pointer-events-none" style={{ background: 'linear-gradient(to right, transparent, var(--card-bg))' }} />
               </div>
 
-              {/* Autofill tip */}
-              <div className="p-3 rounded-lg border border-border-gray text-[12px] mb-5"
-                style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
-                <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Tip:</span>{' '}
-                Paste any job URL when adding an application — Applyd will autofill the company, role, and location for you.
+              {/* Tips */}
+              <div className="space-y-2 mb-5">
+                <div className="p-3 rounded-lg border border-border-gray text-[12px]"
+                  style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
+                  <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Tip:</span>{' '}
+                  Paste any job URL when adding an application — Applyd will autofill the company, role, and location for you.
+                </div>
+                <div className="p-3 rounded-lg border border-border-gray text-[12px]"
+                  style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
+                  <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Tip:</span>{' '}
+                  Drag cards between columns to move them through your pipeline as you progress.
+                </div>
               </div>
 
               <div className="flex gap-3">
@@ -266,8 +346,7 @@ export default function OnboardingPage() {
                 </button>
                 <button
                   onClick={handleComplete}
-                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors flex items-center justify-center gap-1.5"
-                  style={{ background: 'var(--accent-blue)' }}
+                  className="flex-1 h-9 text-[13px] font-medium text-white rounded-md bg-accent-blue hover:bg-accent-blue-hover transition-colors flex items-center justify-center gap-1.5"
                 >
                   Start tracking
                   <ArrowRight size={14} />
@@ -278,5 +357,17 @@ export default function OnboardingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-surface-gray flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-accent-blue border-t-transparent animate-spin" />
+      </div>
+    }>
+      <OnboardingContent />
+    </Suspense>
   );
 }

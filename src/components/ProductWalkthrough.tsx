@@ -22,7 +22,7 @@ function ani(name: string, dur: string, delay = '0s', extra = 'ease-out both') {
 // STAGE_COLORS from constants.ts — exact hex values
 const SC: Record<string, string> = {
   'Wishlist':                '#8B5CF6',
-  'Applied':                 '#4361EE',
+  'Applied':                 '#2563EB',
   'OA / Online Assessment':  '#06B6D4',
   'Phone / Recruiter Screen':'#F59E0B',
   'Final Round Interviews':  '#EF4444',
@@ -614,29 +614,29 @@ function Panel5({ k }: { k: number }) {
 
       {/* Phone */}
       <div style={{
-        width: 78, height: 156,
-        border: '2px solid var(--border-gray)', borderRadius: 20, overflow: 'hidden',
+        width: 110, height: 210,
+        border: '2px solid var(--border-gray)', borderRadius: 22, overflow: 'hidden',
         background: 'var(--card-bg)',
         display: 'flex', flexDirection: 'column' as const,
         animation: ani('wt-slide-right', '0.4s', '0.4s'), flexShrink: 0,
       }}>
-        <div style={{ height: 17, background: 'var(--background)', borderBottom: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 22, height: 3, borderRadius: 2, background: 'var(--border-gray)' }} />
+        <div style={{ height: 20, background: 'var(--background)', borderBottom: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 28, height: 3, borderRadius: 2, background: 'var(--border-gray)' }} />
         </div>
-        <div style={{ flex: 1, padding: 6, display: 'flex', flexDirection: 'column' as const, gap: 4, overflow: 'hidden' }}>
+        <div style={{ flex: 1, padding: 7, display: 'flex', flexDirection: 'column' as const, gap: 5, overflow: 'hidden' }}>
           {/* Mini nav */}
-          <div style={{ height: 18, background: 'var(--background)', border: '1px solid var(--border-gray)', borderRadius: 4, display: 'flex', alignItems: 'center', padding: '0 5px', gap: 3 }}>
-            <Logo size={11} variant="dark" />
+          <div style={{ height: 22, background: 'var(--background)', border: '1px solid var(--border-gray)', borderRadius: 5, display: 'flex', alignItems: 'center', padding: '0 6px', gap: 4 }}>
+            <Logo size={13} variant="dark" />
             <div style={{ flex: 1, height: 4, background: 'var(--surface-gray)', borderRadius: 2 }} />
           </div>
           {/* Stats 2×2 with accents */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
             {[
               { a: null }, { a: null },
               { a: 'green' }, { a: 'amber' },
             ].map(({ a }, i) => (
               <div key={i} style={{
-                height: 22, borderRadius: 4,
+                height: 26, borderRadius: 5,
                 background: 'var(--card-bg)', border: '1px solid var(--border-gray)',
                 borderLeft: a === 'green' ? '2px solid #16A34A' : a === 'amber' ? '2px solid #D97706' : undefined,
               }} />
@@ -644,11 +644,11 @@ function Panel5({ k }: { k: number }) {
           </div>
           {/* App card list */}
           {[...Array(5)].map((_, i) => (
-            <div key={i} style={{ height: 16, borderRadius: 4, background: 'var(--background)', border: '1px solid var(--border-gray)' }} />
+            <div key={i} style={{ height: 18, borderRadius: 5, background: 'var(--background)', border: '1px solid var(--border-gray)' }} />
           ))}
         </div>
-        <div style={{ height: 15, background: 'var(--background)', borderTop: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ width: 22, height: 3, borderRadius: 2, background: 'var(--border-gray)' }} />
+        <div style={{ height: 18, background: 'var(--background)', borderTop: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 28, height: 3, borderRadius: 2, background: 'var(--border-gray)' }} />
         </div>
       </div>
     </div>
@@ -742,11 +742,11 @@ export default function ProductWalkthrough() {
                   {f.desc}
                 </div>
                 {i === active && !reducedMotion && (
-                  <div className="absolute bottom-0 left-0 right-0 h-px overflow-hidden" style={{ background: 'var(--border-gray)' }}>
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 overflow-hidden" style={{ background: 'var(--border-gray)' }}>
                     <div
                       key={`pb-${animKey}`}
                       className="h-full"
-                      style={{ width: '0%', background: ACCENT, animation: `wt-progress ${f.duration}ms linear both` }}
+                      style={{ width: '0%', background: 'var(--accent-blue)', animation: `wt-progress ${f.duration}ms linear both` }}
                     />
                   </div>
                 )}

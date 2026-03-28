@@ -290,7 +290,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 </button>
               ) : (
                 <div className="bg-error-bg border border-error-border rounded-lg p-3">
-                  <p className="text-sm text-error-text mb-2">Are you sure? This cannot be undone.</p>
+                  <p className="text-[13px] mb-2" style={{ color: 'var(--error-text)' }}>Remove this application? You&apos;ll have a moment to undo.</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => { onDelete(application.id); onClose(); }}

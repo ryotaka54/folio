@@ -81,6 +81,19 @@ export default function Home() {
           <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
             Free forever · No credit card · 2-minute setup
           </p>
+
+          {/* Social proof */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 items-center justify-center max-w-xl mx-auto">
+            {[
+              { quote: "Finally a tracker that doesn't make me want to give up.", name: 'CS junior, recruiting for SWE internships' },
+              { quote: "The URL autofill alone saves me 5 minutes per application.", name: 'CS senior, new grad job search' },
+            ].map((t) => (
+              <div key={t.name} className="flex-1 rounded-lg p-3 border border-border-gray text-left" style={{ background: 'var(--card-bg)' }}>
+                <p className="text-[12px] leading-relaxed mb-2" style={{ color: 'var(--body-text)' }}>&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>— {t.name}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Dashboard Preview */}
@@ -122,7 +135,7 @@ export default function Home() {
             <div className="flex gap-3 overflow-x-auto pb-1">
               {[
                 { name: 'Wishlist', count: 6, color: '#8B5CF6', cards: [{ company: 'Google', role: 'SWE Intern' }, { company: 'Meta', role: 'PM Intern' }] },
-                { name: 'Applied', count: 10, color: '#4361EE', cards: [{ company: 'Stripe', role: 'SWE Intern' }, { company: 'Airbnb', role: 'Design Intern' }] },
+                { name: 'Applied', count: 10, color: '#2563EB', cards: [{ company: 'Stripe', role: 'SWE Intern' }, { company: 'Airbnb', role: 'Design Intern' }] },
                 { name: 'OA / Online Assessment', count: 4, color: '#06B6D4', cards: [{ company: 'Amazon', role: 'SDE Intern' }] },
                 { name: 'Phone / Recruiter Screen', count: 3, color: '#F59E0B', cards: [{ company: 'Microsoft', role: 'SWE Intern' }] },
                 { name: 'Offer', count: 1, color: '#1D9E75', cards: [{ company: 'Figma', role: 'Design Intern' }] },
@@ -164,7 +177,7 @@ export default function Home() {
                 </svg>
               ),
               title: 'Add applications fast',
-              desc: 'Log a new application in under 30 seconds. Just company, role, and go.',
+              desc: 'Paste a job URL and Applyd autofills the company, role, and location for you. Or add manually in seconds.',
             },
             {
               icon: (
@@ -214,7 +227,7 @@ export default function Home() {
             <Link href="/help" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Help & FAQ</Link>
             <Link href="/contact" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Contact</Link>
             <Link href="/privacy" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Privacy</Link>
-            <span className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>© 2026 Applyd</span>
+            <span className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>© {new Date().getFullYear()} Applyd</span>
           </div>
         </div>
       </footer>

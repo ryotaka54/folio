@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     q: "What are the pipeline stages?",
-    a: "Internship mode: Wishlist → Applied → OA → Phone Screen → Final Round → Offer → Rejected. Job mode: Wishlist → Applied → Recruiter Screen → Technical Interview → Final Round → Offer. You pick your mode during onboarding and can change it anytime from the command palette (⌘K).",
+    a: "Internship mode: Wishlist → Applied → OA / Online Assessment → Phone / Recruiter Screen → Final Round Interviews → Offer → Rejected. Job mode: Wishlist → Applied → Recruiter Screen → Technical / Case Interview → Final Round → Offer. You pick your mode during onboarding and can change it anytime from the command palette (⌘K).",
   },
   {
     q: "Is my data private?",
