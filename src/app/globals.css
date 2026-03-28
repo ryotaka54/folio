@@ -46,7 +46,7 @@
 
   --background: #0A0A0A;
   --card-bg: #1C1C1E;
-  --surface-gray: #111111;
+  --surface-gray: #1A1A1A;
 
   --border-gray: #2C2C2E;
   --border-emphasis: #3F3F46;
@@ -160,13 +160,20 @@ body {
   transition: opacity 0.15s ease;
 }
 
-/* Slide-in drawer */
+/* Slide-in/out drawer */
 .slide-in {
   animation: slideIn 0.2s ease-out;
 }
 @keyframes slideIn {
   from { transform: translateX(100%); }
   to   { transform: translateX(0); }
+}
+.slide-out {
+  animation: slideOut 0.2s ease-in forwards;
+}
+@keyframes slideOut {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
 }
 
 /* Fade in */

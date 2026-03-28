@@ -43,7 +43,7 @@ export const CATEGORIES: Category[] = [
 
 export const STAGE_COLORS: Record<string, string> = {
   'Wishlist': '#8B5CF6',
-  'Applied': '#4361EE',
+  'Applied': '#2563EB',
   'OA / Online Assessment': '#06B6D4',
   'Phone / Recruiter Screen': '#F59E0B',
   'Final Round Interviews': '#EF4444',

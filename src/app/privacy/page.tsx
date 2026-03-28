@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export default function PrivacyPage() {
   return (
@@ -8,12 +9,8 @@ export default function PrivacyPage() {
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30">
         <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-14">
           <Link href="/" className="flex items-center gap-2">
-            <svg width="22" height="22" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
-            </svg>
-            <span className="text-lg font-semibold text-brand-navy tracking-tight">Applyd</span>
+            <Logo size={22} variant="dark" />
+            <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </Link>
           <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-text hover:text-brand-navy transition-colors">
             <ArrowLeft size={15} />
@@ -25,7 +22,7 @@ export default function PrivacyPage() {
       <main className="max-w-2xl mx-auto px-6 py-14">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-3xl font-bold text-brand-navy mb-2">Privacy Policy</h1>
+          <h1 className="text-[22px] font-semibold mb-2" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Privacy Policy</h1>
           <p className="text-sm text-muted-text">Last updated: March 27, 2026</p>
           <p className="mt-4 text-sm text-body-text leading-relaxed">
             We built Applyd for students — so we&apos;ll keep this plain and simple. No legal jargon, no surprises.
@@ -222,13 +219,9 @@ export default function PrivacyPage() {
       {/* Footer */}
       <footer className="border-t border-border-gray py-10 bg-surface-gray/30 mt-10">
         <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 opacity-50 grayscale">
-            <svg width="18" height="18" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
-            </svg>
-            <span className="text-sm font-semibold text-brand-navy">Applyd</span>
+          <div className="flex items-center gap-2" style={{ opacity: 0.4 }}>
+            <Logo size={18} variant="dark" />
+            <span className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </div>
           <div className="flex items-center gap-6">
             <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help & FAQ</Link>

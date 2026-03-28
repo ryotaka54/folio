@@ -42,14 +42,14 @@ export default function StatsBar({ applications }: StatsBarProps) {
     {
       label: 'Total',
       value: total.toString(),
-      subtext: thisWeek > 0 ? `+${thisWeek} this week` : 'none this week',
+      subtext: total === 0 ? 'Add your first' : thisWeek > 0 ? `+${thisWeek} this week` : 'no new this week',
       icon: <TrendingUp size={14} />,
       accent: null,
     },
     {
       label: 'Response Rate',
       value: responseRate !== null ? `${responseRate}%` : '—',
-      subtext: responseRate === null ? `${5 - applied.length} more to unlock` : 'of applications replied',
+      subtext: responseRate === null ? `Track ${5 - applied.length} more to see` : 'of applications replied',
       icon: <Zap size={14} />,
       accent: null,
     },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { StoreProvider, useStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
@@ -17,6 +17,7 @@ import AddApplicationModal from '@/components/AddApplicationModal';
 import ApplicationDrawer from '@/components/ApplicationDrawer';
 import EmptyState from '@/components/EmptyState';
 import ThemeToggle from '@/components/ThemeToggle';
+import Toast from '@/components/Toast';
 
 function DashboardContent() {
   const { user, signOut } = useAuth();
@@ -30,12 +31,17 @@ function DashboardContent() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<PipelineStage | ''>('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addModalInitialUrl, setAddModalInitialUrl] = useState('');
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [toastUndo, setToastUndo] = useState<(() => void) | null>(null);
+
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingDeleteRef = useRef<{ id: string; app: Application } | null>(null);
+  const deleteTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const stages = user?.mode === 'job' ? JOB_STAGES : INTERNSHIP_STAGES;
-
   const inactiveStatuses = ['Rejected', 'Declined'];
 
   const filteredApps = useMemo(() => {
@@ -54,6 +60,21 @@ function DashboardContent() {
     applications.filter(a => inactiveStatuses.includes(a.status)).length,
   [applications]);
 
+  const showToast = (msg: string, undoFn?: () => void) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast(msg);
+    setToastUndo(undoFn ? () => undoFn : null);
+    toastTimerRef.current = setTimeout(() => {
+      setToast(null);
+      setToastUndo(null);
+      // If there's a pending delete and the timer fires (no undo clicked), execute it
+      if (pendingDeleteRef.current) {
+        deleteApplication(pendingDeleteRef.current.id).catch(() => {});
+        pendingDeleteRef.current = null;
+      }
+    }, 5000);
+  };
+
   const handleBulkStatusUpdate = async () => {
     if (!bulkStatus) return;
     await Promise.all([...selectedIds].map(id => updateApplication(id, { status: bulkStatus as PipelineStage }).catch(() => {})));
@@ -70,11 +91,6 @@ function DashboardContent() {
   const handleCardClick = (app: Application) => {
     setSelectedApp(app);
     setShowDrawer(true);
-  };
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
   };
 
   const handleAddSave = async (data: {
@@ -98,13 +114,48 @@ function DashboardContent() {
   const handleUpdate = (id: string, updates: Partial<Application>) => {
     updateApplication(id, updates).catch(() => {});
     setSelectedApp(prev => prev && prev.id === id ? { ...prev, ...updates } : prev);
+    if (updates.status) {
+      showToast(`Moved to ${updates.status}`);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await deleteApplication(id);
+    const app = applications.find(a => a.id === id);
+    if (!app) return;
+
+    // Optimistically close the drawer
     setShowDrawer(false);
     setSelectedApp(null);
+
+    // Stage the delete with undo window
+    pendingDeleteRef.current = { id, app };
+    if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+
+    showToast(`${app.company} removed`, () => {
+      // Undo: cancel the pending delete
+      if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+      pendingDeleteRef.current = null;
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      setToast(null);
+      setToastUndo(null);
+      // Re-open drawer since app still exists in store (delete hasn't fired)
+      setSelectedApp(app);
+      setShowDrawer(true);
+    });
   };
+
+  const handleAutofillUrl = (url: string) => {
+    setAddModalInitialUrl(url);
+    setShowAddModal(true);
+  };
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,24 +166,34 @@ function DashboardContent() {
           <button onClick={clearStoreError} className="ml-1 hover:opacity-75">✕</button>
         </div>
       )}
-      {/* Success toast */}
-      {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-emerald-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg pointer-events-none">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          {toast}
-        </div>
-      )}
+
+      {/* Toast */}
+      <Toast
+        message={toast}
+        onDismiss={() => { setToast(null); setToastUndo(null); if (toastTimerRef.current) clearTimeout(toastTimerRef.current); }}
+        onUndo={toastUndo ?? undefined}
+      />
+
       {/* Top nav */}
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
-          <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Logo size={28} variant="dark" />
             <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-3">
             {user?.name && (
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name}</span>
             )}
+            {/* Cmd+K hint */}
+            <button
+              onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))}
+              className="hidden md:flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded border border-border-gray transition-colors"
+              style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}
+              aria-label="Open command palette"
+            >
+              ⌘K
+            </button>
             <ThemeToggle />
             <button
               onClick={async () => { await signOut(); router.push('/'); }}
@@ -161,17 +222,18 @@ function DashboardContent() {
             </span>
           </h1>
         </div>
+
         {/* Stats */}
         <StatsBar applications={applications} />
 
-        {/* Gamified Pipeline Funnel */}
+        {/* Funnel */}
         <FunnelChart applications={applications} />
 
         {/* Controls */}
         <div className="mt-6 flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            {/* View toggle */}
-            <div className="flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
+            {/* View toggle — hidden on mobile */}
+            <div className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
               <button
                 onClick={() => setView('pipeline')}
                 className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
@@ -218,11 +280,9 @@ function DashboardContent() {
 
             {/* Add button */}
             <button
-              onClick={() => setShowAddModal(true)}
-              className="sm:ml-auto h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors"
+              onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+              className="sm:ml-auto h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors hover:[background:var(--accent-blue-hover)]"
               style={{ background: 'var(--accent-blue)' }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'var(--accent-blue-hover)')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'var(--accent-blue)')}
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add
@@ -233,7 +293,7 @@ function DashboardContent() {
         {/* Content */}
         <div className="mt-4 flex-1">
           {applications.length === 0 ? (
-            <EmptyState onAdd={() => setShowAddModal(true)} />
+            <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} />
           ) : filteredApps.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">
               <h3 className="text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>No matches</h3>
@@ -299,9 +359,10 @@ function DashboardContent() {
       {/* Add Modal */}
       <AddApplicationModal
         open={showAddModal}
-        onClose={() => setShowAddModal(false)}
+        onClose={() => { setShowAddModal(false); setAddModalInitialUrl(''); }}
         onSave={handleAddSave}
         stages={stages as PipelineStage[]}
+        initialJobLink={addModalInitialUrl}
       />
 
       {/* Detail Drawer */}
@@ -347,7 +408,6 @@ export default function DashboardPage() {
       if (!active) return;
 
       if (data && data.length > 0) {
-        // Auto-complete onboarding for legacy power users
         updateProfile({ onboarding_complete: true });
         setCheckingLegacy(false);
       } else {
@@ -374,9 +434,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-6">
-          {/* Greeting skeleton */}
           <div className="mb-6 w-48 h-6 rounded bg-surface-gray animate-pulse" />
-          {/* Stats skeleton */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="rounded-lg p-4 bg-card-bg border border-border-gray">
@@ -388,7 +446,6 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
-          {/* Pipeline skeleton */}
           <div className="mt-8 flex gap-3 overflow-hidden">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="min-w-[180px] w-[180px] flex-shrink-0">

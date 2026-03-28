@@ -19,6 +19,7 @@ interface AddApplicationModalProps {
     notes: string;
   }) => Promise<void>;
   stages: PipelineStage[];
+  initialJobLink?: string;
 }
 
 const inputCls = [
@@ -28,36 +29,59 @@ const inputCls = [
   'h-9',
 ].join(' ');
 
-export default function AddApplicationModal({ open, onClose, onSave, stages }: AddApplicationModalProps) {
+function guessCategory(role: string): Category | '' {
+  const r = role.toLowerCase();
+  if (/engineer|software|swe|dev|backend|frontend|fullstack|ml\b|data eng/.test(r)) return 'Engineering';
+  if (/product manager|product mgr|\bpm\b/.test(r)) return 'Product Management';
+  if (/design|ux\b|ui\b/.test(r)) return 'Design';
+  if (/data sci|analyst|analytics|machine learn/.test(r)) return 'Data Science';
+  if (/financ|invest|banking|equity|trader/.test(r)) return 'Finance';
+  if (/consult/.test(r)) return 'Consulting';
+  if (/market/.test(r)) return 'Marketing';
+  if (/research|policy/.test(r)) return 'Research & Policy';
+  return '';
+}
+
+export default function AddApplicationModal({ open, onClose, onSave, stages, initialJobLink }: AddApplicationModalProps) {
+  const defaultStatus = (stages.includes('Wishlist' as PipelineStage) ? 'Wishlist' : stages[0]) as PipelineStage;
+
   const [company,  setCompany]  = useState('');
   const [role,     setRole]     = useState('');
   const [location, setLocation] = useState('');
   const [category, setCategory] = useState<Category | ''>('');
-  const [status,   setStatus]   = useState<PipelineStage>(
-    stages.includes('Applied' as PipelineStage) ? 'Applied' as PipelineStage : stages[0]
-  );
+  const [status,   setStatus]   = useState<PipelineStage>(defaultStatus);
   const [deadline, setDeadline] = useState('');
   const [jobLink,  setJobLink]  = useState('');
   const [notes,    setNotes]    = useState('');
   const [error,    setError]    = useState('');
   const [isAutofilling, setIsAutofilling] = useState(false);
   const [isSaving,      setIsSaving]      = useState(false);
+  const userPickedCategory = useRef(false);
   const backdropRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
-      setCompany(''); setRole(''); setLocation(''); setCategory('');
-      setStatus(stages.includes('Applied' as PipelineStage) ? 'Applied' as PipelineStage : stages[0]);
-      setDeadline(''); setJobLink(''); setNotes(''); setError('');
+      setCompany(''); setRole(''); setLocation('');
+      setCategory(''); userPickedCategory.current = false;
+      setStatus(defaultStatus);
+      setDeadline(''); setNotes(''); setError('');
       setIsAutofilling(false); setIsSaving(false);
+      setJobLink(initialJobLink || '');
     }
-  }, [open, stages]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     if (open) window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [open, onClose]);
+
+  // Auto-suggest category from role text if user hasn't manually picked one
+  useEffect(() => {
+    if (!role || userPickedCategory.current) return;
+    const suggestion = guessCategory(role);
+    if (suggestion) setCategory(suggestion);
+  }, [role]);
 
   if (!open) return null;
 
@@ -73,7 +97,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
       if (data.company)  setCompany(data.company);
       if (data.role)     setRole(data.role);
       if (data.location) setLocation(data.location);
-      if (data.category) setCategory(data.category as Category);
+      if (data.category) { setCategory(data.category as Category); userPickedCategory.current = true; }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Could not autofill. Fill in manually.');
     } finally {
@@ -126,19 +150,49 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
               </div>
             )}
 
+            {/* Job URL — first field, most valuable feature */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Job posting URL</label>
+                <button
+                  type="button"
+                  onClick={handleAutofill}
+                  disabled={!isValidUrl(jobLink) || isAutofilling}
+                  className="text-[12px] font-medium px-2.5 py-1 rounded-md text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: 'var(--accent-blue)' }}
+                >
+                  {isAutofilling ? (
+                    <span className="flex items-center gap-1">
+                      <svg className="animate-spin" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                      Scanning…
+                    </span>
+                  ) : '✨ Autofill'}
+                </button>
+              </div>
+              <input
+                type="url"
+                value={jobLink}
+                onChange={e => setJobLink(e.target.value)}
+                className={`${inputCls} ${isAutofilling ? 'opacity-50 pointer-events-none' : ''}`}
+                placeholder="Paste a job link to autofill →"
+                autoFocus
+              />
+            </div>
+
             <div>
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>
                 Company <span className="text-error-text opacity-60">*</span>
               </label>
               <input id="modal-company" type="text" value={company} onChange={e => setCompany(e.target.value)}
-                className={inputCls} placeholder="e.g. Google" autoFocus />
+                className={inputCls} placeholder="e.g. Google" />
             </div>
 
             <div>
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>
                 Role <span className="text-error-text opacity-60">*</span>
               </label>
-              <input id="modal-role" type="text" value={role} onChange={e => setRole(e.target.value)}
+              <input id="modal-role" type="text" value={role}
+                onChange={e => setRole(e.target.value)}
                 className={inputCls} placeholder="e.g. SWE Intern" />
             </div>
 
@@ -151,7 +205,11 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Category</label>
-                <select value={category} onChange={e => setCategory(e.target.value as Category | '')} className={inputCls}>
+                <select
+                  value={category}
+                  onChange={e => { userPickedCategory.current = true; setCategory(e.target.value as Category | ''); }}
+                  className={inputCls}
+                >
                   <option value="">Select…</option>
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -170,33 +228,6 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Job posting URL</label>
-                {isValidUrl(jobLink) && !isAutofilling && (
-                  <button type="button" onClick={handleAutofill}
-                    className="text-[12px] font-medium transition-colors"
-                    style={{ color: 'var(--accent-blue)' }}>
-                    ✨ Autofill
-                  </button>
-                )}
-                {isAutofilling && (
-                  <span className="text-[12px] flex items-center gap-1" style={{ color: 'var(--muted-text)' }}>
-                    <svg className="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-                    Scanning…
-                  </span>
-                )}
-              </div>
-              <input type="url" value={jobLink} onChange={e => setJobLink(e.target.value)}
-                className={`${inputCls} ${isAutofilling ? 'opacity-50 pointer-events-none' : ''}`}
-                placeholder="https://…" />
-              {!jobLink && (
-                <p className="text-[11px] mt-1" style={{ color: 'var(--text-tertiary)' }}>
-                  Paste a job URL to autofill company, role &amp; location
-                </p>
-              )}
-            </div>
-
-            <div>
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Notes</label>
               <input type="text" value={notes} onChange={e => setNotes(e.target.value)}
                 className={inputCls} placeholder="Quick note…" />
@@ -205,10 +236,8 @@ export default function AddApplicationModal({ open, onClose, onSave, stages }: A
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full h-9 text-[14px] font-medium text-white rounded-md transition-colors disabled:opacity-50 mt-1"
-              style={{ background: isSaving ? 'var(--accent-blue)' : 'var(--accent-blue)' }}
-              onMouseEnter={e => !isSaving && ((e.target as HTMLElement).style.background = 'var(--accent-blue-hover)')}
-              onMouseLeave={e => ((e.target as HTMLElement).style.background = 'var(--accent-blue)')}
+              className="w-full h-9 text-[14px] font-medium text-white rounded-md transition-colors disabled:opacity-50 mt-1 hover:[background:var(--accent-blue-hover)]"
+              style={{ background: 'var(--accent-blue)' }}
             >
               {isSaving ? 'Saving…' : 'Save Application'}
             </button>

@@ -2,49 +2,46 @@
 
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
+import { Logo } from '@/components/Logo';
 
 const FAQS = [
   {
     q: "What is Applyd?",
-    a: "Applyd is a simple, high-performance job tracker designed for students. It helps you manage internship and job applications in one place, so you never miss a deadline."
+    a: "Applyd is a job tracker built for students. Add applications in seconds, move them through your pipeline as things progress, and never lose track of a deadline.",
   },
   {
     q: "How do I track a new application?",
-    a: "Click 'Add Application' on your dashboard. You can manually enter details or paste a job link (from Greenhouse, Lever, etc.) and click 'Autofill' to pull the info automatically."
+    a: "Click \"Add Application\" on your dashboard. Paste a job link and click Autofill to pull in the company, role, and location automatically — or fill it in manually. Takes about 15 seconds.",
   },
   {
-    q: "What do the different pipeline stages mean?",
-    a: "We provide two modes: Internship (Summer/Fall recruiting) and Jobs (Full-time). Each has stages like Wishlist, Applied, Interviewing, and Offer to help you visualize your progress."
+    q: "What are the pipeline stages?",
+    a: "Internship mode: Wishlist → Applied → OA → Phone Screen → Final Round → Offer → Rejected. Job mode: Wishlist → Applied → Recruiter Screen → Technical Interview → Final Round → Offer. You pick your mode during onboarding and can change it anytime from the command palette (⌘K).",
   },
   {
-    q: "Is my data secure?",
-    a: "Yes. We use Supabase with Row Level Security (RLS) to ensure that only you can access your data. Your application history is private and protected."
+    q: "Is my data private?",
+    a: "Yes. Your applications are stored with row-level security on Supabase — only your account can read them. We don't sell your data and we don't share it with anyone.",
   },
   {
     q: "How do I edit or delete an application?",
-    a: "Click on any application card in your pipeline to open the details view. From there, you can update notes, change status, or delete the application entirely."
+    a: "Click any card in the pipeline to open its detail panel. You can update every field there, including notes and recruiter info. Scroll to the bottom of the panel to delete it.",
   },
   {
-    q: "Can I use Applyd for free?",
-    a: "Absolutely. Applyd is built for students, by students, and is free to use for tracking all your career opportunities."
-  }
+    q: "Is Applyd free?",
+    a: "Yes, completely free. No trial, no credit card, no paywall. Built for students.",
+  },
 ];
 
 export default function HelpPage() {
   return (
     <div className="min-h-screen bg-background">
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-[800px] mx-auto px-4 md:px-6 flex items-center h-14 sm:h-16">
+        <div className="max-w-[800px] mx-auto px-4 md:px-6 flex items-center h-[52px] gap-2">
           <Link href="/" className="flex items-center gap-2">
-            <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="4" y="10" width="40" height="5" rx="2.5" fill="#4361EE"/>
-              <rect x="4" y="22" width="28" height="5" rx="2.5" fill="#4361EE" opacity="0.6"/>
-              <rect x="4" y="34" width="16" height="5" rx="2.5" fill="#4361EE" opacity="0.3"/>
-            </svg>
-            <span className="text-lg font-semibold text-brand-navy tracking-tight">Applyd</span>
+            <Logo size={22} variant="dark" />
+            <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </Link>
-          <span className="mx-3 text-border-gray">/</span>
-          <span className="text-sm font-medium text-muted-text">Help & FAQ</span>
+          <span className="text-[13px]" style={{ color: 'var(--border-gray)' }}>/</span>
+          <span className="text-[13px] font-medium" style={{ color: 'var(--muted-text)' }}>Help & FAQ</span>
           <div className="ml-auto">
             <ThemeToggle />
           </div>
@@ -52,28 +49,29 @@ export default function HelpPage() {
       </nav>
 
       <main className="max-w-[800px] mx-auto px-4 md:px-6 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-brand-navy mb-3">Help Center</h1>
-          <p className="text-muted-text">Everything you need to know about Applyd.</p>
+        <div className="mb-10">
+          <h1 className="text-[22px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Help Center</h1>
+          <p className="text-[14px]" style={{ color: 'var(--muted-text)' }}>Everything you need to know about Applyd.</p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-3">
           {FAQS.map((faq, i) => (
-            <div key={i} className="bg-card-bg border border-border-gray rounded-2xl p-6 shadow-sm">
-              <h3 className="text-base font-semibold text-brand-navy mb-2">{faq.q}</h3>
-              <p className="text-sm text-body-text leading-relaxed">{faq.a}</p>
+            <div key={i} className="bg-card-bg border border-border-gray rounded-lg p-5">
+              <h3 className="text-[14px] font-semibold mb-2" style={{ color: 'var(--brand-navy)' }}>{faq.q}</h3>
+              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{faq.a}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 p-8 bg-surface-gray rounded-3xl text-center">
-          <h2 className="text-lg font-semibold text-brand-navy mb-2">Still have questions?</h2>
-          <p className="text-sm text-muted-text mb-6">We're here to help you land your next big role with Applyd.</p>
-          <Link 
-            href="/contact" 
-            className="inline-block px-6 py-2.5 bg-accent-blue text-white text-sm font-medium rounded-lg hover:bg-accent-blue/90 transition-colors"
+        <div className="mt-10 p-6 rounded-lg border border-border-gray text-center" style={{ background: 'var(--card-bg)' }}>
+          <h2 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Still have questions?</h2>
+          <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>We read every email.</p>
+          <Link
+            href="/contact"
+            className="inline-flex items-center h-9 px-4 text-[13px] font-medium text-white rounded-md transition-colors"
+            style={{ background: 'var(--accent-blue)' }}
           >
-            Contact Support
+            Contact us
           </Link>
         </div>
       </main>

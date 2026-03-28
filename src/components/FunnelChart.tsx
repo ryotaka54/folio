@@ -46,7 +46,7 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
   return (
     <div className="bg-card-bg border border-border-gray rounded-lg p-5 mt-6 mb-2">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Pipeline Overview</h3>
+        <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Recruiting Funnel</h3>
         <span
           className="text-[11px] font-semibold px-2 py-0.5 rounded border"
           style={offerRate > 0
@@ -79,6 +79,11 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
           );
         })}
       </div>
+      {offerRate > 0 && (
+        <p className="text-[11px] mt-3" style={{ color: 'var(--muted-text)' }}>
+          You&apos;re converting {offerRate}% of applications to offers — keep pushing.
+        </p>
+      )}
     </div>
   );
 }

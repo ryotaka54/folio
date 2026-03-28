@@ -1,40 +1,48 @@
 'use client';
 
 import Link from 'next/link';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <Link href="/" className="fixed top-8 left-8 flex items-center gap-2 text-sm text-muted-text hover:text-brand-navy transition-colors">
-        <ArrowLeft size={16} />
-        Back to home
-      </Link>
-
-      <div className="w-full max-w-md text-center">
-        <div className="w-16 h-16 bg-light-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <Mail className="text-accent-blue" size={32} />
+    <div className="min-h-screen bg-background">
+      <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-[800px] mx-auto px-4 md:px-6 flex items-center h-[52px] gap-2">
+          <Link href="/" className="flex items-center gap-2">
+            <Logo size={22} variant="dark" />
+            <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+          </Link>
+          <span className="text-[13px]" style={{ color: 'var(--border-gray)' }}>/</span>
+          <span className="text-[13px] font-medium" style={{ color: 'var(--muted-text)' }}>Contact</span>
+          <Link href="/" className="ml-auto flex items-center gap-1.5 text-[13px] transition-colors" style={{ color: 'var(--muted-text)' }}>
+            <ArrowLeft size={14} />
+            Back
+          </Link>
         </div>
-        
-        <h1 className="text-2xl font-bold text-brand-navy mb-2">Contact Us</h1>
-        <p className="text-muted-text mb-8">Have feedback, questions, or just want to say hi? We'd love to hear from you.</p>
+      </nav>
 
-        <div className="bg-card-bg border border-border-gray rounded-2xl p-8 shadow-sm">
-          <p className="text-sm text-muted-text mb-2 font-medium uppercase tracking-wider">Email us at</p>
-          <a 
+      <main className="max-w-[480px] mx-auto px-4 md:px-6 py-16">
+        <h1 className="text-[22px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Contact us</h1>
+        <p className="text-[14px] mb-8" style={{ color: 'var(--muted-text)' }}>Have feedback or a question? We'd love to hear from you.</p>
+
+        <div className="bg-card-bg border border-border-gray rounded-lg p-6">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.06em] mb-2" style={{ color: 'var(--text-tertiary)' }}>Email us at</p>
+          <a
             href="mailto:hello@useapplyd.com"
-            className="text-xl md:text-2xl font-semibold text-accent-blue hover:underline break-all"
+            className="text-[18px] font-semibold transition-colors"
+            style={{ color: 'var(--accent-blue)' }}
           >
             hello@useapplyd.com
           </a>
         </div>
 
-        <div className="mt-8">
-          <Link href="/help" className="text-sm text-accent-blue hover:underline font-medium">
-            Visit the Help Center
+        <p className="text-[13px] mt-6 text-center">
+          <Link href="/help" className="transition-colors" style={{ color: 'var(--accent-blue)' }}>
+            Visit the Help Center →
           </Link>
-        </div>
-      </div>
+        </p>
+      </main>
     </div>
   );
 }

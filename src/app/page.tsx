@@ -79,7 +79,7 @@ export default function Home() {
             </Link>
           </div>
           <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-            Free forever · No credit card · Used by students at 50+ universities
+            Free forever · No credit card · 2-minute setup
           </p>
         </div>
 

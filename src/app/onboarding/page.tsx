@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { INTERNSHIP_STAGES, JOB_STAGES, SCHOOL_YEARS, RECRUITING_SEASONS, CAREER_LEVELS } from '@/lib/constants';
+import { INTERNSHIP_STAGES, JOB_STAGES, SCHOOL_YEARS, RECRUITING_SEASONS, CAREER_LEVELS, STAGE_COLORS } from '@/lib/constants';
 import { Mode } from '@/lib/types';
-import { GraduationCap, Briefcase } from 'lucide-react';
+import { GraduationCap, Briefcase, ArrowRight } from 'lucide-react';
 
 export default function OnboardingPage() {
   const { user, updateProfile, loading } = useAuth();
@@ -30,8 +30,8 @@ export default function OnboardingPage() {
     return (
       <div className="min-h-screen bg-surface-gray flex items-center justify-center p-4">
         <div className="w-full max-w-lg">
-          <div className="flex justify-center gap-2 mb-8">
-            {[1, 2, 3].map(i => <div key={i} className="w-2.5 h-2.5 rounded-full bg-border-gray animate-pulse" />)}
+          <div className="flex justify-center mb-8">
+            <div className="w-20 h-4 rounded bg-border-gray animate-pulse" />
           </div>
           <div className="bg-card-bg rounded-lg p-6 md:p-8 border border-border-gray">
             <div className="w-40 h-6 rounded bg-surface-gray animate-pulse mb-2" />
@@ -60,19 +60,18 @@ export default function OnboardingPage() {
 
   const stages = mode === 'internship' ? INTERNSHIP_STAGES : JOB_STAGES;
 
+  const step2CanContinue = mode === 'internship'
+    ? (!!schoolYear && !!recruitingSeason)
+    : !!careerLevel;
+
   return (
     <div className="min-h-screen bg-surface-gray flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg">
-        {/* Progress dots */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                s === step ? 'bg-accent-blue' : s < step ? 'bg-accent-blue/40' : 'bg-border-gray'
-              }`}
-            />
-          ))}
+        {/* Step indicator */}
+        <div className="flex items-center justify-center mb-8">
+          <span className="text-[13px] font-medium" style={{ color: 'var(--muted-text)' }}>
+            Step {step} of 3
+          </span>
         </div>
 
         <div className="bg-card-bg rounded-lg p-6 md:p-8 border border-border-gray modal-enter">
@@ -214,7 +213,8 @@ export default function OnboardingPage() {
                 </button>
                 <button
                   onClick={() => setStep(3)}
-                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors"
+                  disabled={!step2CanContinue}
+                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   style={{ background: 'var(--accent-blue)' }}
                 >
                   Continue
@@ -223,24 +223,40 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 3: Confirmation */}
+          {/* Step 3: Confirmation — mini pipeline preview + autofill tip */}
           {step === 3 && (
             <div>
-              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>You&apos;re all set{name ? `, ${name}` : ''}!</h1>
-              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Here are your pipeline stages:</p>
-              <div className="space-y-1.5">
-                {stages.map((stage, i) => (
-                  <div
-                    key={stage}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md border border-border-gray"
-                    style={{ background: 'var(--surface-gray)' }}
-                  >
-                    <span className="text-[11px] font-medium w-4" style={{ color: 'var(--text-tertiary)' }}>{i + 1}</span>
-                    <span className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>{stage}</span>
-                  </div>
-                ))}
+              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>
+                You&apos;re all set{name ? `, ${name}` : ''}!
+              </h1>
+              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Your pipeline is ready to go.</p>
+
+              {/* Mini pipeline preview */}
+              <div className="flex gap-3 overflow-x-auto pb-2 mb-4" style={{ scrollbarWidth: 'none' }}>
+                {stages.map((stage) => {
+                  const color = STAGE_COLORS[stage] || '#6B7280';
+                  return (
+                    <div key={stage} className="flex flex-col items-center gap-1.5 flex-shrink-0 min-w-[56px]">
+                      <div className="w-8 h-8 rounded-lg border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)' }}>
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
+                      </div>
+                      <span className="text-[10px] font-medium text-center leading-tight max-w-[60px]"
+                        style={{ color: 'var(--muted-text)' }}>
+                        {stage}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="flex gap-3 mt-5">
+
+              {/* Autofill tip */}
+              <div className="p-3 rounded-lg border border-border-gray text-[12px] mb-5"
+                style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
+                <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Tip:</span>{' '}
+                Paste any job URL when adding an application — Applyd will autofill the company, role, and location for you.
+              </div>
+
+              <div className="flex gap-3">
                 <button
                   onClick={() => setStep(2)}
                   className="flex-1 h-9 text-[13px] font-medium rounded-md border transition-colors"
@@ -250,10 +266,11 @@ export default function OnboardingPage() {
                 </button>
                 <button
                   onClick={handleComplete}
-                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors"
+                  className="flex-1 h-9 text-[14px] font-medium text-white rounded-md transition-colors flex items-center justify-center gap-1.5"
                   style={{ background: 'var(--accent-blue)' }}
                 >
-                  Go to dashboard →
+                  Start tracking
+                  <ArrowRight size={14} />
                 </button>
               </div>
             </div>

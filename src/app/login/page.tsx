@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     try {
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timed out. Please check your connection and try again.')), 20000)
+        setTimeout(() => reject(new Error('Request timed out. Please check your connection and try again.')), 8000)
       );
 
       const form = e.currentTarget as HTMLFormElement;

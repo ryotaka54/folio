@@ -38,7 +38,7 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
   const { setNodeRef, isOver } = useDroppable({ id: stage, data: { stage } });
 
   return (
-    <div className="min-w-[192px] w-[192px] flex-shrink-0 flex flex-col snap-center">
+    <div id={`pipeline-col-${stage}`} className="min-w-[192px] w-[192px] flex-shrink-0 flex flex-col snap-center">
       {/* Column header — Linear style */}
       <div className="flex items-center gap-2 mb-2 px-1">
         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
@@ -97,6 +97,24 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
 
   return (
     <DndContext id="applyd-dnd-context" sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      {/* Mobile stage summary — tap to scroll column into view */}
+      <div className="lg:hidden flex gap-2 overflow-x-auto pb-2 mb-3" style={{ scrollbarWidth: 'none' }}>
+        {stages.map((stage) => {
+          const count = applications.filter(a => a.status === stage).length;
+          const color = STAGE_COLORS[stage] || '#6B7280';
+          return (
+            <button
+              key={stage}
+              onClick={() => document.getElementById(`pipeline-col-${stage}`)?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border-gray flex-shrink-0 transition-colors"
+              style={{ background: 'var(--surface-gray)' }}
+            >
+              <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+              <span className="text-[11px] font-medium" style={{ color: 'var(--muted-text)' }}>{count}</span>
+            </button>
+          );
+        })}
+      </div>
       <div className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x-mandatory" style={{ minHeight: 400 }}>
         {stages.map((stage) => {
           const stageApps = applications.filter(a => a.status === stage);

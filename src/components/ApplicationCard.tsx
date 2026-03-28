@@ -27,14 +27,7 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-background border border-border-gray rounded-lg p-3 group relative"
-      style={{ transition: 'border-color 0.15s ease, background-color 0.15s ease' }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-emphasis)';
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-gray)';
-      }}
+      className="w-full text-left bg-background border border-border-gray rounded-lg p-3 group relative hover:[border-color:var(--border-emphasis)] transition-colors"
     >
       {/* Drag handle — visible on hover */}
       <div

@@ -13,6 +13,18 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "Applyd — Track Every Application",
   description: "The simplest way for students to track internship and job applications. Never miss a deadline.",
+  openGraph: {
+    title: "Applyd — Track Every Application",
+    description: "The simplest way for students to track internship and job applications. Never miss a deadline.",
+    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Applyd — Track Every Application",
+    description: "The simplest way for students to track internship and job applications. Never miss a deadline.",
+    images: ['/og-image.png'],
+  },
 };
 
 export default function RootLayout({

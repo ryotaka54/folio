@@ -26,9 +26,26 @@ type SaveStatus = 'idle' | 'saving' | 'saved';
 export default function ApplicationDrawer({ application, open, onClose, onUpdate, onDelete, stages }: ApplicationDrawerProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [visible, setVisible] = useState(false);
+  const [closing, setClosing] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setClosing(false);
+      setVisible(true);
+    } else if (visible) {
+      setClosing(true);
+      closeTimerRef.current = setTimeout(() => {
+        setVisible(false);
+        setClosing(false);
+      }, 200);
+    }
+    return () => { if (closeTimerRef.current) clearTimeout(closeTimerRef.current); };
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setShowDeleteConfirm(false);
@@ -69,7 +86,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
     }, 400);
   }, [application, onUpdate]);
 
-  if (!open || !application) return null;
+  if (!visible || !application) return null;
 
   const isValidUrl = (url: string) => {
     try { new URL(url); return true; } catch { return false; }
@@ -87,7 +104,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
       className="fixed inset-0 z-50 flex justify-end"
     >
       <div className="absolute inset-0 bg-brand-navy/20 backdrop z-0" onClick={onClose} />
-      <div className="relative z-10 w-full sm:max-w-md bg-card-bg shadow-2xl h-full overflow-y-auto slide-in" onClick={(e) => e.stopPropagation()}>
+      <div className={`relative z-10 w-full sm:max-w-md bg-card-bg shadow-2xl h-full overflow-y-auto ${closing ? 'slide-out' : 'slide-in'}`} onClick={(e) => e.stopPropagation()}>
         <div className="p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           {/* Header */}
           <div className="flex items-center justify-between mb-5">
@@ -226,7 +243,10 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
 
             {/* Recruiter Contact */}
             <div className="border-t border-border-gray pt-4 mt-4">
-              <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-3" style={{ color: 'var(--muted-text)' }}>Recruiter Contact</h3>
+              <div className="flex items-center gap-2 mb-3">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-text)' }}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Recruiter</h3>
+              </div>
               <div className="space-y-3">
                 <div>
                   <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Name</label>
