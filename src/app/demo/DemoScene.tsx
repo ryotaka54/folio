@@ -916,22 +916,24 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
           to   { opacity: 1; transform: translateX(0); }
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { background: #0A0A0A !important; overflow: hidden !important; }
         ::-webkit-scrollbar { display: none; }
       `}</style>
 
-      {/* Outer wrapper — forces 1080×1920 */}
+      {/* Outer wrapper */}
       <div style={{
         width: '100vw', height: '100vh',
         background: C.bg, overflow: 'hidden',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        position: 'relative',
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}>
-        {/* 1080×1920 canvas, scaled to fit viewport */}
+        {/* 1080×1920 canvas, scaled from center to fit viewport */}
         <div style={{
           width: 1080, height: 1920,
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          position: 'relative',
+          transform: `translate(-50%, -50%) scale(${scale})`,
+          transformOrigin: 'center center',
+          position: 'absolute',
+          left: '50%', top: '50%',
           overflow: 'hidden',
           background: C.bg,
         }}>
