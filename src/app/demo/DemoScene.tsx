@@ -1,61 +1,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { Application, PipelineStage, Category } from '@/lib/types';
+import { INTERNSHIP_STAGES, STAGE_COLORS } from '@/lib/constants';
+import StatsBar from '@/components/StatsBar';
+import FunnelChart from '@/components/FunnelChart';
+import ApplicationCard from '@/components/ApplicationCard';
 
-// ─── Color palette ─────────────────────────────────────────────────────────────
-const C = {
-  bg: '#0A0A0A',
-  card: '#1C1C1E',
-  surface: '#111113',
-  border: '#2C2C2E',
-  borderEmphasis: '#3F3F46',
-  blue: '#3B82F6',
-  blueHover: '#60A5FA',
-  navy: '#F9FAFB',
-  muted: '#A1A1AA',
-  tertiary: '#71717A',
-  amber: '#FBBF24',
-  green: '#4ADE80',
-  danger: '#F87171',
-};
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const STAGE_COLORS: Record<string, string> = {
-  'Wishlist': '#8B5CF6',
-  'Applied': '#3B82F6',
-  'OA / Online Assessment': '#06B6D4',
-  'Phone / Recruiter Screen': '#F59E0B',
-  'Final Round Interviews': '#EF4444',
-  'Offer': '#10B981',
-  'Rejected': '#6B7280',
-};
-
-// ─── Data ──────────────────────────────────────────────────────────────────────
-interface DemoCard {
-  id: string; company: string; role: string; category: string;
-  status: string; deadline?: string; deadlineDaysLeft?: number;
-}
-
-const EN_CARDS: DemoCard[] = [
-  { id: 'google',    company: 'Google',    role: 'Software Engineer Intern',  category: 'Engineering',        status: 'Applied' },
-  { id: 'meta',      company: 'Meta',      role: 'SWE Intern',               category: 'Engineering',        status: 'Applied' },
-  { id: 'stripe',    company: 'Stripe',    role: 'Product Manager Intern',   category: 'Product Management', status: 'Wishlist' },
-  { id: 'airbnb',    company: 'Airbnb',    role: 'Design Intern',            category: 'Design',             status: 'OA / Online Assessment', deadline: '5d left', deadlineDaysLeft: 5 },
-  { id: 'anthropic', company: 'Anthropic', role: 'Research Intern',          category: 'Engineering',        status: 'Phone / Recruiter Screen' },
-  { id: 'apple',     company: 'Apple',     role: 'Software Engineer Intern', category: 'Engineering',        status: 'Applied' },
-];
-
-const JP_CARDS: DemoCard[] = [
-  { id: 'recruit',  company: 'リクルート', role: 'ソフトウェアエンジニア インターン', category: 'エンジニアリング', status: 'Applied' },
-  { id: 'mercari',  company: 'メルカリ',   role: 'エンジニア インターン',           category: 'エンジニアリング', status: 'Applied' },
-  { id: 'sony',     company: 'ソニー',     role: 'プロダクトマネージャー インターン', category: 'プロダクト',      status: 'Wishlist' },
-  { id: 'dena',     company: 'DeNA',      role: 'デザイナー インターン',           category: 'デザイン',        status: 'OA / Online Assessment', deadline: '5d left', deadlineDaysLeft: 5 },
-  { id: 'line',     company: 'LINE',      role: 'リサーチ インターン',            category: 'エンジニアリング', status: 'Phone / Recruiter Screen' },
-  { id: 'rakuten',  company: '楽天',       role: 'ソフトウェアエンジニア インターン', category: 'エンジニアリング', status: 'Applied' },
-];
-
-const COLUMNS = ['Wishlist', 'Applied', 'OA / Online Assessment', 'Phone / Recruiter Screen', 'Final Round Interviews'];
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 
 async function typeInto(setter: (v: string) => void, text: string, sig: { cancelled: boolean }) {
@@ -66,102 +19,74 @@ async function typeInto(setter: (v: string) => void, text: string, sig: { cancel
   }
 }
 
-// ─── Sub-components ────────────────────────────────────────────────────────────
+// ─── Mock application factory ─────────────────────────────────────────────────
 
-function StatCard({ label, value, unit = '', pulse = false, color, icon, subtext, accent }: {
-  label: string; value: number; unit?: string; pulse?: boolean;
-  color?: string; icon: string; subtext: string; accent?: 'green' | 'amber' | null;
-}) {
-  return (
-    <div style={{
-      background: C.card,
-      border: `1px solid ${pulse ? C.amber : C.border}`,
-      borderLeft: accent === 'green' ? `3px solid #4ADE80` : accent === 'amber' ? `3px solid #FBBF24` : `1px solid ${C.border}`,
-      borderRadius: 8, padding: '14px 16px', flex: 1, minWidth: 0,
-      boxShadow: pulse ? `0 0 0 3px ${C.amber}28` : undefined,
-      transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-        <span style={{ fontSize: 13, color: C.tertiary }}>{icon}</span>
-        <span style={{ fontSize: 10, fontWeight: 600, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
-      </div>
-      <div style={{ fontSize: 28, fontWeight: 600, color: color ?? C.navy, letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 4 }}>
-        {value}{unit}
-      </div>
-      <div style={{ fontSize: 11, color: C.tertiary }}>{subtext}</div>
-    </div>
-  );
+const NOW = new Date().toISOString();
+const IN5DAYS = new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0];
+
+function makeApp(overrides: Partial<Application> & { id: string; company: string; role: string; status: PipelineStage }): Application {
+  return {
+    user_id: 'demo', location: '', category: 'Engineering' as Category,
+    deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '',
+    created_at: NOW, updated_at: NOW,
+    ...overrides,
+  };
 }
 
-function AppCard({ card, moving = false, pulsing = false }: {
-  card: DemoCard; moving?: boolean; pulsing?: boolean;
-}) {
-  const statusColor = STAGE_COLORS[card.status] ?? C.blue;
-  const isUrgent = (card.deadlineDaysLeft ?? 99) <= 3;
-  return (
-    <div style={{
-      background: C.bg,
-      border: `1px solid ${pulsing ? C.amber : C.border}`,
-      borderRadius: 8, padding: '10px 12px', width: '100%',
-      boxShadow: moving ? '0 8px 32px rgba(0,0,0,0.6)' : pulsing ? `0 0 0 2px ${C.amber}44` : undefined,
-      transform: moving ? 'rotate(1.5deg) scale(1.04)' : undefined,
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease',
-      animation: 'cardIn 0.35s cubic-bezier(0.22,1,0.36,1) both',
-    }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: C.navy, lineHeight: 1.3, marginBottom: 2 }}>{card.company}</div>
-      <div style={{ fontSize: 12, color: C.muted, marginBottom: 8, lineHeight: 1.3 }}>{card.role}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-        {card.category && (
-          <span style={{
-            fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 4,
-            background: `${statusColor}1a`, color: statusColor,
-          }}>{card.category}</span>
-        )}
-        {card.deadline && (
-          <span style={{
-            fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 4, marginLeft: 'auto',
-            background: isUrgent ? '#FEF2F218' : '#FEF3C718',
-            color: isUrgent ? C.danger : C.amber,
-            border: `1px solid ${isUrgent ? C.danger + '55' : C.amber + '55'}`,
-            animation: pulsing ? 'amberPulse 1.5s ease-in-out 3' : undefined,
-          }}>{card.deadline}</span>
-        )}
-      </div>
-    </div>
-  );
-}
+const EN_APPS: Application[] = [
+  makeApp({ id: 'google',    company: 'Google',    role: 'Software Engineer Intern',  status: 'Applied',                  category: 'Engineering' }),
+  makeApp({ id: 'meta',      company: 'Meta',      role: 'SWE Intern',               status: 'Applied',                  category: 'Engineering' }),
+  makeApp({ id: 'stripe',    company: 'Stripe',    role: 'Product Manager Intern',   status: 'Wishlist',                 category: 'Product Management' }),
+  makeApp({ id: 'airbnb',    company: 'Airbnb',    role: 'Design Intern',            status: 'OA / Online Assessment',   category: 'Design',           deadline: IN5DAYS }),
+  makeApp({ id: 'anthropic', company: 'Anthropic', role: 'Research Intern',          status: 'Phone / Recruiter Screen', category: 'Engineering' }),
+  makeApp({ id: 'apple',     company: 'Apple',     role: 'Software Engineer Intern', status: 'Applied',                  category: 'Engineering' }),
+];
 
-function KanbanColumn({ name, cards, movingCardId, pulseCardId, isTarget }: {
-  name: string; cards: DemoCard[]; movingCardId?: string | null;
-  pulseCardId?: string | null; isTarget?: boolean;
+const JP_APPS: Application[] = [
+  makeApp({ id: 'recruit',  company: 'リクルート', role: 'ソフトウェアエンジニア インターン', status: 'Applied',                  category: 'Engineering' }),
+  makeApp({ id: 'mercari',  company: 'メルカリ',   role: 'エンジニア インターン',           status: 'Applied',                  category: 'Engineering' }),
+  makeApp({ id: 'sony',     company: 'ソニー',     role: 'プロダクトマネージャー インターン', status: 'Wishlist',                 category: 'Product Management' }),
+  makeApp({ id: 'dena',     company: 'DeNA',      role: 'デザイナー インターン',           status: 'OA / Online Assessment',   category: 'Design',           deadline: IN5DAYS }),
+  makeApp({ id: 'line',     company: 'LINE',      role: 'リサーチ インターン',            status: 'Phone / Recruiter Screen', category: 'Engineering' }),
+  makeApp({ id: 'rakuten',  company: '楽天',       role: 'ソフトウェアエンジニア インターン', status: 'Applied',                  category: 'Engineering' }),
+];
+
+const DISPLAY_STAGES: PipelineStage[] = [
+  'Wishlist', 'Applied', 'OA / Online Assessment', 'Phone / Recruiter Screen', 'Final Round Interviews',
+];
+
+// ─── Static Pipeline Column (no dnd-kit — demo only) ─────────────────────────
+
+function DemoColumn({ stage, apps, highlightCardId }: {
+  stage: PipelineStage; apps: Application[]; highlightCardId?: string | null;
 }) {
-  const color = STAGE_COLORS[name] ?? C.blue;
+  const color = STAGE_COLORS[stage] ?? '#6B7280';
   return (
-    <div style={{
-      flex: 1, minWidth: 0,
-      background: isTarget ? `${color}12` : C.surface,
-      border: `1px solid ${isTarget ? color + '60' : C.border}`,
-      borderRadius: 12, padding: '12px 10px', minHeight: 220,
-      transition: 'background 0.3s ease, border-color 0.3s ease',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-        <div style={{ width: 7, height: 7, borderRadius: '50%', background: color }} />
-        <span style={{ fontSize: 11, fontWeight: 600, color: C.muted, letterSpacing: '0.01em', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
-        <span style={{
-          fontSize: 10, fontWeight: 600, minWidth: 18, height: 18,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: 5, background: `${color}22`, color,
-        }}>{cards.length}</span>
+    <div className="flex-1 min-w-0 flex flex-col">
+      {/* Exact header from PipelineView */}
+      <div className="flex items-center gap-2 mb-2 px-1">
+        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] truncate" style={{ color: 'var(--muted-text)' }}>
+          {stage}
+        </span>
+        <span className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded border"
+          style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }}>
+          {apps.length}
+        </span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {cards.length === 0
-          ? <div style={{ textAlign: 'center', padding: '24px 0', color: C.tertiary, fontSize: 11 }}>No applications yet</div>
-          : cards.map(c => (
-            <AppCard key={c.id} card={c}
-              moving={movingCardId === c.id}
-              pulsing={pulseCardId === c.id}
-            />
+      {/* Exact body from PipelineView */}
+      <div className="flex-1 space-y-1.5 overflow-y-auto pipeline-column rounded-lg p-1.5"
+        style={{ background: 'var(--card-bg)', border: '1px solid var(--border-gray)', minHeight: 120 }}>
+        {apps.length === 0
+          ? <p className="text-center text-[12px] py-8" style={{ color: 'var(--text-tertiary)' }}>No applications yet</p>
+          : apps.map(app => (
+            <div key={app.id} style={{
+              boxShadow: highlightCardId === app.id ? '0 0 0 2px var(--amber-warning)' : undefined,
+              borderRadius: 8,
+              animation: 'demoCardIn 0.35s cubic-bezier(0.22,1,0.36,1) both',
+            }}>
+              <ApplicationCard application={app} onClick={() => {}} />
+            </div>
           ))
         }
       </div>
@@ -169,88 +94,72 @@ function KanbanColumn({ name, cards, movingCardId, pulseCardId, isTarget }: {
   );
 }
 
-function DemoCursor({ x, y, visible }: { x: number; y: number; visible: boolean }) {
-  return (
-    <div style={{
-      position: 'absolute', left: x, top: y,
-      width: 18, height: 18, borderRadius: '50%',
-      background: 'rgba(59,130,246,0.9)', border: '2px solid rgba(255,255,255,0.95)',
-      boxShadow: '0 2px 14px rgba(59,130,246,0.6)',
-      transform: 'translate(-50%,-50%)', pointerEvents: 'none', zIndex: 9000,
-      opacity: visible ? 1 : 0,
-      transition: 'left 0.55s cubic-bezier(0.25,0.46,0.45,0.94), top 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease',
-    }} />
-  );
-}
+// ─── Demo Add Modal (simplified — real one needs ExtensionStatusProvider) ────
 
-function AddModal({ fields, highlightSave }: {
+function DemoAddModal({ fields, highlightSave }: {
   fields: { company: string; role: string; category: string; status: string; deadline: string };
   highlightSave: boolean;
 }) {
-  const showCursor = (val: string, maxLen: number) => val.length > 0 && val.length < maxLen;
+  const showCaret = (val: string, max: number) => val.length > 0 && val.length < max;
+  const inputStyle = (filled: boolean): React.CSSProperties => ({
+    width: '100%', height: 36, borderRadius: 6,
+    border: `1px solid ${filled ? 'var(--accent-blue)' : 'var(--border-gray)'}`,
+    background: 'var(--background)', padding: '0 12px',
+    display: 'flex', alignItems: 'center',
+    fontSize: 13, color: 'var(--brand-navy)',
+    transition: 'border-color 0.2s',
+  });
+
   return (
     <div style={{
       position: 'absolute', inset: 0, zIndex: 500,
       display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-      background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)',
+      background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
       animation: 'bgFadeIn 0.2s ease',
     }}>
       <div style={{
-        width: '100%', maxWidth: 480, background: C.card,
-        border: `1px solid ${C.border}`, borderRadius: '16px 16px 0 0',
-        padding: '24px 24px 40px', animation: 'slideUp 0.3s cubic-bezier(0.22,1,0.36,1)',
+        width: '100%', maxWidth: 480,
+        background: 'var(--card-bg)', border: '1px solid var(--border-gray)',
+        borderRadius: '12px 12px 0 0', padding: '20px 20px 36px',
+        animation: 'slideUp 0.3s cubic-bezier(0.22,1,0.36,1)',
       }}>
-        <div style={{ width: 36, height: 4, borderRadius: 2, background: C.borderEmphasis, margin: '0 auto 22px' }} />
-        <div style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 20, letterSpacing: '-0.01em' }}>Log Application</div>
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--border-emphasis)', margin: '0 auto 18px' }} />
+        <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--brand-navy)', marginBottom: 16 }}>Log Application</p>
 
         {[{ label: 'Company', val: fields.company, max: 7 }, { label: 'Role', val: fields.role, max: 24 }].map(f => (
-          <div key={f.label} style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.muted, marginBottom: 6 }}>{f.label}</label>
-            <div style={{
-              height: 40, borderRadius: 8, border: `1px solid ${f.val ? C.blue : C.border}`,
-              background: C.bg, padding: '0 12px', display: 'flex', alignItems: 'center',
-              fontSize: 13, color: C.navy, transition: 'border-color 0.2s',
-            }}>
+          <div key={f.label} style={{ marginBottom: 12 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted-text)', marginBottom: 5 }}>{f.label}</label>
+            <div style={inputStyle(!!f.val)}>
               <span>{f.val}</span>
-              {showCursor(f.val, f.max) && (
-                <span style={{ display: 'inline-block', width: 1.5, height: 14, background: C.blue, marginLeft: 1, animation: 'blink 0.75s step-end infinite' }} />
-              )}
+              {showCaret(f.val, f.max) && <span style={{ display: 'inline-block', width: 1.5, height: 14, background: 'var(--accent-blue)', marginLeft: 1, animation: 'blink 0.75s step-end infinite' }} />}
             </div>
           </div>
         ))}
 
-        <div style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
           {[{ label: 'Category', val: fields.category }, { label: 'Status', val: fields.status }].map(f => (
             <div key={f.label} style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.muted, marginBottom: 6 }}>{f.label}</label>
-              <div style={{
-                height: 40, borderRadius: 8, border: `1px solid ${f.val ? C.blue : C.border}`,
-                background: C.bg, padding: '0 12px', display: 'flex', alignItems: 'center',
-                fontSize: 12, color: f.val ? C.navy : C.tertiary,
-              }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted-text)', marginBottom: 5 }}>{f.label}</label>
+              <div style={{ ...inputStyle(!!f.val), fontSize: 12, color: f.val ? 'var(--brand-navy)' : 'var(--text-tertiary)' }}>
                 {f.val || 'Select…'}
               </div>
             </div>
           ))}
         </div>
 
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: C.muted, marginBottom: 6 }}>Deadline</label>
-          <div style={{
-            height: 40, borderRadius: 8, border: `1px solid ${fields.deadline ? C.blue : C.border}`,
-            background: C.bg, padding: '0 12px', display: 'flex', alignItems: 'center',
-            fontSize: 12, color: fields.deadline ? C.navy : C.tertiary,
-          }}>
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--muted-text)', marginBottom: 5 }}>Deadline</label>
+          <div style={{ ...inputStyle(!!fields.deadline), fontSize: 12, color: fields.deadline ? 'var(--brand-navy)' : 'var(--text-tertiary)' }}>
             {fields.deadline || 'mm/dd/yyyy'}
           </div>
         </div>
 
         <button style={{
-          width: '100%', height: 44, borderRadius: 10,
-          background: highlightSave ? C.blueHover : C.blue,
-          color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', cursor: 'pointer',
+          width: '100%', height: 40, borderRadius: 8,
+          background: 'var(--accent-blue)', color: '#fff', fontSize: 13, fontWeight: 600,
+          border: 'none', cursor: 'pointer',
           transform: highlightSave ? 'scale(0.98)' : undefined,
-          boxShadow: highlightSave ? `0 0 0 3px ${C.blue}44` : undefined,
+          boxShadow: highlightSave ? '0 0 0 3px rgba(59,130,246,0.35)' : undefined,
           transition: 'all 0.15s ease',
         }}>Save Application</button>
       </div>
@@ -258,192 +167,144 @@ function AddModal({ fields, highlightSave }: {
   );
 }
 
-// Chrome browser window showing the extension in action
-function ChromeExtensionMockup({ stage }: { stage: 'hidden' | 'in' | 'tapping' | 'popup' | 'out' }) {
+// ─── Chrome Extension Mockup ──────────────────────────────────────────────────
+
+function ChromeMockup({ stage }: { stage: 'hidden' | 'in' | 'tapping' | 'popup' | 'out' }) {
   if (stage === 'hidden') return null;
   const visible = stage === 'in' || stage === 'tapping' || stage === 'popup';
-  const tapped = stage === 'tapping' || stage === 'popup';
+  const tapped  = stage === 'tapping' || stage === 'popup';
   const showPopup = stage === 'popup';
 
   return (
     <div style={{
-      position: 'absolute',
-      right: visible ? 28 : -500,
-      top: '50%', transform: 'translateY(-50%)',
-      width: 380,
-      background: '#1E1E1E',
-      borderRadius: 10,
-      border: '1px solid #3A3A3C',
-      boxShadow: '0 24px 80px rgba(0,0,0,0.75)',
-      overflow: 'visible',
-      zIndex: 600,
+      position: 'absolute', right: visible ? 24 : -520, top: '50%',
+      transform: 'translateY(-50%)', width: 400,
+      background: '#1E1E1E', borderRadius: 10, border: '1px solid #3A3A3C',
+      boxShadow: '0 24px 80px rgba(0,0,0,0.8)',
+      overflow: 'visible', zIndex: 600,
       transition: 'right 0.55s cubic-bezier(0.22,1,0.36,1)',
     }}>
       {/* Chrome title bar */}
       <div style={{ background: '#292929', borderRadius: '10px 10px 0 0', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
-        {/* Traffic lights */}
         <div style={{ display: 'flex', gap: 5 }}>
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF5F57' }} />
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FEBC2E' }} />
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#28C840' }} />
+          {['#FF5F57','#FEBC2E','#28C840'].map(c => (
+            <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c }} />
+          ))}
         </div>
-        {/* Address bar */}
-        <div style={{
-          flex: 1, height: 24, borderRadius: 12, background: '#3A3A3C',
-          display: 'flex', alignItems: 'center', padding: '0 10px', gap: 6,
-        }}>
-          <span style={{ fontSize: 9, color: '#A1A1AA' }}>🔒</span>
+        <div style={{ flex: 1, height: 24, borderRadius: 12, background: '#3A3A3C', display: 'flex', alignItems: 'center', padding: '0 10px', gap: 5 }}>
+          <span style={{ fontSize: 9, color: '#71717A' }}>🔒</span>
           <span style={{ fontSize: 10, color: '#A1A1AA' }}>linkedin.com/jobs/view/apple-software-engineer-intern</span>
         </div>
-        {/* Extension icons in toolbar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, position: 'relative' }}>
-          {/* Puzzle piece (extensions menu) */}
-          <div style={{ width: 22, height: 22, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#A1A1AA' }}>🧩</div>
-          {/* Applyd extension icon */}
+        {/* Toolbar icons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, position: 'relative' }}>
+          <div style={{ fontSize: 13, color: '#A1A1AA' }}>🧩</div>
+          {/* Applyd icon */}
           <div style={{
-            width: 24, height: 24, borderRadius: 5, background: tapped ? C.blueHover : C.blue,
+            width: 24, height: 24, borderRadius: 5,
+            background: tapped ? '#60A5FA' : '#3B82F6',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 11, fontWeight: 800, color: '#fff', cursor: 'pointer',
-            boxShadow: tapped ? `0 0 0 2px ${C.blue}88, 0 0 12px ${C.blue}66` : undefined,
+            fontSize: 11, fontWeight: 800, color: '#fff',
+            boxShadow: tapped ? '0 0 0 2px rgba(59,130,246,0.5), 0 0 12px rgba(59,130,246,0.4)' : undefined,
             animation: tapped ? 'extPulse 0.35s ease' : undefined,
-            transition: 'background 0.2s ease, box-shadow 0.2s ease',
+            transition: 'background 0.2s, box-shadow 0.2s',
           }}>A</div>
 
-          {/* Extension popup — drops down from the icon */}
+          {/* Extension popup */}
           {showPopup && (
             <div style={{
-              position: 'absolute', top: 30, right: 0,
-              width: 220,
-              background: C.card,
-              border: `1px solid ${C.border}`,
-              borderRadius: 10,
-              boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-              overflow: 'hidden',
+              position: 'absolute', top: 30, right: 0, width: 230,
+              background: 'var(--card-bg)', border: '1px solid var(--border-gray)',
+              borderRadius: 10, boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+              overflow: 'hidden', zIndex: 10,
               animation: 'popupIn 0.2s cubic-bezier(0.22,1,0.36,1)',
-              zIndex: 10,
             }}>
-              {/* Popup header */}
-              <div style={{ background: C.surface, padding: '10px 12px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 20, height: 20, borderRadius: 5, background: C.blue, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>A</div>
-                <span style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>Applyd</span>
-                <span style={{ marginLeft: 'auto', fontSize: 10, color: C.green, fontWeight: 600 }}>● Job detected</span>
+              <div style={{ background: 'var(--surface-gray)', padding: '10px 12px', borderBottom: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 20, height: 20, borderRadius: 5, background: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>A</div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-navy)' }}>Applyd</span>
+                <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 600, color: 'var(--green-success)' }}>● Job detected</span>
               </div>
-              {/* Pre-filled fields */}
-              <div style={{ padding: '12px 12px 8px' }}>
-                <div style={{ marginBottom: 8 }}>
-                  <div style={{ fontSize: 10, color: C.muted, marginBottom: 3 }}>Company</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, background: C.surface, borderRadius: 5, padding: '5px 8px', border: `1px solid ${C.blue}` }}>Apple</div>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <div style={{ fontSize: 10, color: C.muted, marginBottom: 3 }}>Role</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, background: C.surface, borderRadius: 5, padding: '5px 8px', border: `1px solid ${C.blue}` }}>Software Engineer Intern</div>
-                </div>
+              <div style={{ padding: '12px' }}>
+                {[{ label: 'Company', val: 'Apple' }, { label: 'Role', val: 'Software Engineer Intern' }].map(f => (
+                  <div key={f.label} style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 10, color: 'var(--muted-text)', marginBottom: 3 }}>{f.label}</div>
+                    <div style={{
+                      fontSize: 12, fontWeight: 600, color: 'var(--brand-navy)',
+                      background: 'var(--background)', borderRadius: 5, padding: '5px 8px',
+                      border: '1px solid var(--accent-blue)',
+                    }}>{f.val}</div>
+                  </div>
+                ))}
                 <button style={{
-                  width: '100%', height: 34, borderRadius: 7, background: C.blue,
-                  color: '#fff', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                }}>
-                  <span>✓</span> Save to Applyd
-                </button>
+                  width: '100%', height: 34, marginTop: 4, borderRadius: 7,
+                  background: '#3B82F6', color: '#fff', fontSize: 12, fontWeight: 600,
+                  border: 'none', cursor: 'pointer',
+                }}>✓ Save to Applyd</button>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Webpage content — LinkedIn job posting */}
-      <div style={{ background: '#111113', padding: '16px', borderRadius: '0 0 10px 10px' }}>
-        {/* LinkedIn nav mock */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
+      {/* LinkedIn job page */}
+      <div style={{ background: '#111113', padding: '14px', borderRadius: '0 0 10px 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid #2C2C2E' }}>
           <div style={{ width: 20, height: 20, borderRadius: 3, background: '#0A66C2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff' }}>in</div>
           <div style={{ flex: 1, height: 18, background: '#2C2C2E', borderRadius: 9, display: 'flex', alignItems: 'center', padding: '0 8px' }}>
-            <span style={{ fontSize: 9, color: C.tertiary }}>Search</span>
+            <span style={{ fontSize: 9, color: '#71717A' }}>Search</span>
           </div>
         </div>
-        {/* Job listing card */}
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 4 }}>Software Engineer Intern</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 4, background: '#2C2C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: C.navy }}>🍎</div>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: C.navy }}>Apple</div>
-              <div style={{ fontSize: 10, color: C.muted }}>Cupertino, CA · Internship · On-site</div>
-            </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: '#F9FAFB', marginBottom: 6 }}>Software Engineer Intern</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 5, background: '#2C2C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>🍎</div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#F9FAFB' }}>Apple</div>
+            <div style={{ fontSize: 11, color: '#A1A1AA' }}>Cupertino, CA · Internship · On-site</div>
           </div>
-          <div style={{ fontSize: 11, color: C.tertiary, lineHeight: 1.6, marginBottom: 12 }}>
-            Join Apple&apos;s world-class engineering teams. Work on innovative products used by over a billion people every day. Collaborate with the best engineers in the industry...
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div style={{ height: 28, padding: '0 14px', borderRadius: 14, background: '#0A66C2', display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 600, color: '#fff' }}>Apply</div>
-            <div style={{ height: 28, padding: '0 14px', borderRadius: 14, border: '1px solid #3A3A3C', display: 'flex', alignItems: 'center', fontSize: 11, color: C.muted }}>Save</div>
-          </div>
+        </div>
+        <div style={{ fontSize: 12, color: '#71717A', lineHeight: 1.6, marginBottom: 12 }}>
+          Join Apple&apos;s world-class engineering teams. Work on innovative products used by over a billion people every day...
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ height: 30, padding: '0 16px', borderRadius: 15, background: '#0A66C2', display: 'flex', alignItems: 'center', fontSize: 12, fontWeight: 600, color: '#fff' }}>Apply</div>
+          <div style={{ height: 30, padding: '0 16px', borderRadius: 15, border: '1px solid #3A3A3C', display: 'flex', alignItems: 'center', fontSize: 12, color: '#A1A1AA' }}>Save</div>
         </div>
       </div>
     </div>
   );
 }
 
-function RecruitingFunnel({ visible, byCol }: { visible: boolean; byCol: Record<string, DemoCard[]> }) {
-  const data = [
-    { name: 'Wishlist',   count: byCol['Wishlist']?.length ?? 0,               color: STAGE_COLORS['Wishlist'] },
-    { name: 'Applied',    count: byCol['Applied']?.length ?? 0,                color: STAGE_COLORS['Applied'] },
-    { name: 'Interviews', count: (byCol['OA / Online Assessment']?.length ?? 0) + (byCol['Phone / Recruiter Screen']?.length ?? 0) + (byCol['Final Round Interviews']?.length ?? 0), color: STAGE_COLORS['Phone / Recruiter Screen'] },
-    { name: 'Offers',     count: 0,                                            color: STAGE_COLORS['Offer'] ?? '#10B981' },
-  ];
-  const maxCount = Math.max(...data.map(d => d.count), 1);
+// ─── Demo cursor ──────────────────────────────────────────────────────────────
 
+function DemoCursor({ x, y, visible }: { x: number; y: number; visible: boolean }) {
   return (
-    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: '18px 20px', marginTop: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>Recruiting Funnel</span>
-        <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 5, background: `${C.green}18`, color: C.green, border: `1px solid ${C.green}44` }}>
-          Keep applying
-        </span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {data.map(item => {
-          const pct = maxCount > 0 ? Math.max((item.count / maxCount) * 100, item.count > 0 ? 5 : 0) : 0;
-          return (
-            <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ fontSize: 12, fontWeight: 500, color: C.muted, width: 72, textAlign: 'right', flexShrink: 0 }}>{item.name}</span>
-              <div style={{ flex: 1, background: C.surface, borderRadius: 20, height: 20, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%', borderRadius: 20,
-                  width: visible ? `${pct}%` : '0%',
-                  background: item.color,
-                  display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8,
-                  transition: 'width 0.9s cubic-bezier(0.22,1,0.36,1)',
-                }}>
-                  {item.count > 0 && visible && (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: '#fff' }}>{item.count}</span>
-                  )}
-                </div>
-              </div>
-              {item.count === 0 && <span style={{ fontSize: 11, color: C.tertiary, opacity: 0.5 }}>0</span>}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <div style={{
+      position: 'absolute', left: x, top: y, zIndex: 9000,
+      width: 18, height: 18, borderRadius: '50%',
+      background: 'rgba(59,130,246,0.9)', border: '2px solid rgba(255,255,255,0.95)',
+      boxShadow: '0 2px 14px rgba(59,130,246,0.55)',
+      transform: 'translate(-50%,-50%)', pointerEvents: 'none',
+      opacity: visible ? 1 : 0,
+      transition: 'left 0.55s cubic-bezier(0.25,0.46,0.45,0.94), top 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease',
+    }} />
   );
 }
 
 function Particles() {
-  const pts = Array.from({ length: 18 }, (_, i) => ({
+  const pts = Array.from({ length: 16 }, (_, i) => ({
     id: i,
-    x: ((i * 5.7 + Math.sin(i * 1.3) * 12) % 100 + 100) % 100,
-    y: ((i * 6.1 + Math.cos(i * 0.8) * 15) % 100 + 100) % 100,
-    size: 1 + (i % 3) * 0.6,
-    delay: (i * 0.35) % 5,
+    x: ((i * 6.3 + Math.sin(i * 1.2) * 14) % 100 + 100) % 100,
+    y: ((i * 7.1 + Math.cos(i * 0.9) * 18) % 100 + 100) % 100,
+    size: 1 + (i % 3) * 0.5,
+    delay: (i * 0.4) % 5,
     dur: 7 + (i % 5) * 1.5,
   }));
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
+    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
       {pts.map(p => (
         <div key={p.id} style={{
           position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
           width: p.size, height: p.size, borderRadius: '50%',
-          background: C.blue, opacity: 0,
+          background: '#3B82F6', opacity: 0,
           animation: `particleFloat ${p.dur}s ${p.delay}s ease-in-out infinite`,
         }} />
       ))}
@@ -451,61 +312,49 @@ function Particles() {
   );
 }
 
-// ─── Main ──────────────────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'extension' | 'japan' }) {
-  const isJapan  = variant === 'japan';
-  const isShort  = variant === 'short';
-  const isExt    = variant === 'extension';
+  const isJapan = variant === 'japan';
+  const isShort = variant === 'short';
+  const isExt   = variant === 'extension';
 
-  const CARDS        = isJapan ? JP_CARDS : EN_CARDS;
+  const ALL_APPS     = isJapan ? JP_APPS : EN_APPS;
   const GREETING     = isJapan ? 'こんにちは、田中さん' : 'Hi, Alex 👋';
   const FIRST_COMPANY = isJapan ? 'リクルート' : 'Google';
   const FIRST_ROLE    = isJapan ? 'ソフトウェアエンジニア インターン' : 'Software Engineer Intern';
   const FIRST_CAT     = isJapan ? 'エンジニアリング' : 'Engineering';
-  const EXT_COMPANY   = isJapan ? '楽天' : 'Apple';
-  const EXT_ROLE      = isJapan ? 'ソフトウェアエンジニア インターン' : 'Software Engineer Intern';
 
   const PHASE_LIST = isShort ? [1, 2, 3] : isExt ? [1, 6] : [1, 2, 3, 4, 5, 6, 7, 8];
 
-  // ── State ────────────────────────────────────────────────────────────────────
-  const [phase,         setPhase]         = useState(0);
-  const [cards,         setCards]         = useState<DemoCard[]>([]);
-  const [totalApps,     setTotalApps]     = useState(0);
-  const [responseRate,  setResponseRate]  = useState(0);
-  const [interviews,    setInterviews]    = useState(0);
-  const [actNow,        setActNow]        = useState(0);
+  // ── State ─────────────────────────────────────────────────────────────────
+  const [apps,          setApps]          = useState<Application[]>([]);
   const [modalOpen,     setModalOpen]     = useState(false);
   const [modalFields,   setModalFields]   = useState({ company: '', role: '', category: '', status: '', deadline: '' });
   const [highlightSave, setHighlightSave] = useState(false);
   const [cursorX,       setCursorX]       = useState(700);
-  const [cursorY,       setCursorY]       = useState(80);
+  const [cursorY,       setCursorY]       = useState(40);
   const [cursorVisible, setCursorVisible] = useState(false);
   const [highlightBtn,  setHighlightBtn]  = useState(false);
   const [movingCardId,  setMovingCardId]  = useState<string | null>(null);
-  const [movingTarget,  setMovingTarget]  = useState<string | null>(null);
   const [actNowPulse,   setActNowPulse]   = useState(false);
-  const [deadlinePulse, setDeadlinePulse] = useState(false);
-  const [tooltipVisible,setTooltipVisible]= useState(false);
+  const [highlightCard, setHighlightCard] = useState<string | null>(null);
+  const [tooltipText,   setTooltipText]   = useState<string | null>(null);
   const [phoneStage,    setPhoneStage]    = useState<'hidden'|'in'|'tapping'|'popup'|'out'>('hidden');
   const [funnelVisible, setFunnelVisible] = useState(false);
   const [endSlate,      setEndSlate]      = useState(false);
   const [fadingOut,     setFadingOut]     = useState(false);
   const [paused,        setPaused]        = useState(false);
   const [running,       setRunning]       = useState(false);
+  const [phase,         setPhase]         = useState(0);
 
   const pausedRef = useRef(false);
   const cancelRef = useRef({ cancelled: false });
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // ── Cursor ref for animation ──────────────────────────────────────────────────
-  // We track cursor in a ref-based position so the add-button position is dynamic
-  const addBtnRef = useRef<HTMLButtonElement>(null);
-
-  // ── Helpers ───────────────────────────────────────────────────────────────────
+  // ── Pause-aware sleep ─────────────────────────────────────────────────────
   const psleep = useCallback(async (ms: number) => {
-    const chunk = 50;
-    let elapsed = 0;
+    const chunk = 50; let elapsed = 0;
     while (elapsed < ms) {
       if (cancelRef.current.cancelled) throw new Error('cancelled');
       if (!pausedRef.current) elapsed += chunk;
@@ -514,54 +363,36 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
   }, []);
 
   const moveCursor = useCallback(async (x: number, y: number, ms = 500) => {
-    setCursorX(x); setCursorY(y);
-    await psleep(ms);
+    setCursorX(x); setCursorY(y); await psleep(ms);
   }, [psleep]);
 
-  const countUp = useCallback((setter: (v: number) => void, from: number, to: number) => {
-    const steps = 12, dur = 300;
-    for (let i = 1; i <= steps; i++) {
-      setTimeout(() => setter(Math.round(from + (to - from) * (i / steps))), i * (dur / steps));
-    }
-  }, []);
-
   const resetState = useCallback(() => {
-    setPhase(0); setCards([]); setTotalApps(0); setResponseRate(0);
-    setInterviews(0); setActNow(0); setModalOpen(false);
+    setApps([]); setModalOpen(false);
     setModalFields({ company: '', role: '', category: '', status: '', deadline: '' });
     setHighlightSave(false); setCursorVisible(false); setHighlightBtn(false);
-    setMovingCardId(null); setMovingTarget(null);
-    setActNowPulse(false); setDeadlinePulse(false); setTooltipVisible(false);
-    setPhoneStage('hidden'); setFunnelVisible(false); setEndSlate(false); setFadingOut(false);
+    setMovingCardId(null); setActNowPulse(false); setHighlightCard(null);
+    setTooltipText(null); setPhoneStage('hidden'); setFunnelVisible(false);
+    setEndSlate(false); setFadingOut(false); setPhase(0);
   }, []);
 
-  // ── Sequence ──────────────────────────────────────────────────────────────────
+  // ── Sequence ──────────────────────────────────────────────────────────────
   const runSequence = useCallback(async () => {
     const sig = cancelRef.current;
     try {
-      // Phase 1 — reveal
-      if (PHASE_LIST.includes(1)) {
-        setPhase(1);
-        await psleep(1500);
-      }
+      if (PHASE_LIST.includes(1)) { setPhase(1); await psleep(1400); }
 
-      // Phase 2 — add first app
+      // Phase 2 — add first app via modal
       if (PHASE_LIST.includes(2)) {
         setPhase(2);
         setCursorVisible(true);
-        // Move cursor to the Add Application button (top-right navbar)
-        await moveCursor(window.innerWidth - 100, 28, 700);
+        await moveCursor(window.innerWidth - 110, 28, 700);
         setHighlightBtn(true);
         await psleep(350);
-        setModalOpen(true);
-        setHighlightBtn(false);
+        setModalOpen(true); setHighlightBtn(false);
         await psleep(500);
-
-        const setComp = (v: string) => setModalFields(f => ({ ...f, company: v }));
-        const setRole = (v: string) => setModalFields(f => ({ ...f, role: v }));
-        await typeInto(setComp, FIRST_COMPANY, sig);
-        await psleep(250);
-        await typeInto(setRole, FIRST_ROLE, sig);
+        await typeInto(v => setModalFields(f => ({ ...f, company: v })), FIRST_COMPANY, sig);
+        await psleep(220);
+        await typeInto(v => setModalFields(f => ({ ...f, role: v })), FIRST_ROLE, sig);
         await psleep(200);
         setModalFields(f => ({ ...f, category: FIRST_CAT }));
         await psleep(280);
@@ -569,47 +400,37 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
         await psleep(220);
         const dl = new Date(Date.now() + 14 * 86400000);
         setModalFields(f => ({ ...f, deadline: `${dl.getMonth() + 1}/${dl.getDate()}/${dl.getFullYear()}` }));
-        await psleep(350);
-
-        // Move cursor to Save button — roughly center-x, 80% down the viewport
-        await moveCursor(window.innerWidth / 2, window.innerHeight * 0.82, 400);
-        setHighlightSave(true);
         await psleep(320);
-        setHighlightSave(false);
-        setModalOpen(false);
+        await moveCursor(window.innerWidth / 2, window.innerHeight * 0.8, 380);
+        setHighlightSave(true);
+        await psleep(300);
+        setHighlightSave(false); setModalOpen(false);
         setModalFields({ company: '', role: '', category: '', status: '', deadline: '' });
-        await psleep(200);
-        setCards([CARDS[0]]);
-        countUp(setTotalApps, 0, 1);
+        await psleep(180);
+        setApps([ALL_APPS[0]]);
         setCursorVisible(false);
-        await psleep(1000);
+        await psleep(900);
       }
 
-      // Phase 3 — more apps
+      // Phase 3 — more apps appear
       if (PHASE_LIST.includes(3)) {
         setPhase(3);
-        const rest = CARDS.slice(1, 5);
-        for (let i = 0; i < rest.length; i++) {
-          await psleep(450);
-          setCards(prev => [...prev, rest[i]]);
-          const total = i + 2;
-          countUp(setTotalApps, i + 1, total);
-          if (i === 2) { countUp(setResponseRate, 0, 60); countUp(setActNow, 0, 1); setActNowPulse(true); setTimeout(() => setActNowPulse(false), 1600); }
-          if (i === 3) { countUp(setInterviews, 0, 2); }
+        for (let i = 1; i <= 4; i++) {
+          await psleep(440);
+          setApps(prev => [...prev, ALL_APPS[i]]);
+          if (i === 3) { setActNowPulse(true); setTimeout(() => setActNowPulse(false), 1800); }
         }
         await psleep(1200);
       }
 
-      // Phase 4 — card moves
+      // Phase 4 — Meta card moves to OA
       if (PHASE_LIST.includes(4)) {
         setPhase(4);
-        setMovingCardId(CARDS[1].id);
-        setMovingTarget('OA / Online Assessment');
-        await psleep(1100);
-        setCards(prev => prev.map(c => c.id === CARDS[1].id ? { ...c, status: 'OA / Online Assessment' } : c));
+        const movingId = ALL_APPS[1].id;
+        setMovingCardId(movingId);
+        await psleep(1000);
+        setApps(prev => prev.map(a => a.id === movingId ? { ...a, status: 'OA / Online Assessment' as PipelineStage } : a));
         setMovingCardId(null);
-        setMovingTarget(null);
-        countUp(setResponseRate, 60, 80);
         await psleep(1200);
       }
 
@@ -618,32 +439,25 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
         setPhase(5);
         setActNowPulse(true);
         await psleep(700);
-        setDeadlinePulse(true);
-        await psleep(700);
-        setTooltipVisible(true);
-        await psleep(2300);
-        setTooltipVisible(false);
-        setActNowPulse(false);
-        setDeadlinePulse(false);
-        await psleep(700);
+        const dlCardId = ALL_APPS[3].id;
+        setHighlightCard(dlCardId);
+        await psleep(600);
+        setTooltipText(`⚠ Deadline approaching — ${ALL_APPS[3].company}`);
+        await psleep(2200);
+        setTooltipText(null); setActNowPulse(false); setHighlightCard(null);
+        await psleep(600);
       }
 
-      // Phase 6 — extension
+      // Phase 6 — Chrome extension moment
       if (PHASE_LIST.includes(6)) {
         setPhase(6);
         await psleep(300);
-        setPhoneStage('in');
-        await psleep(1200);
-        setPhoneStage('tapping');
-        await psleep(650);
-        setPhoneStage('popup');
-        await psleep(2500);
-        setPhoneStage('out');
-        await psleep(700);
+        setPhoneStage('in');   await psleep(1200);
+        setPhoneStage('tapping'); await psleep(650);
+        setPhoneStage('popup');   await psleep(2500);
+        setPhoneStage('out');     await psleep(700);
         setPhoneStage('hidden');
-        const extCard: DemoCard = { ...CARDS[5], company: EXT_COMPANY, role: EXT_ROLE };
-        setCards(prev => [...prev, extCard]);
-        countUp(setTotalApps, 5, 6);
+        setApps(prev => [...prev, ALL_APPS[5]]);
         await psleep(1000);
       }
 
@@ -651,9 +465,7 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
       if (PHASE_LIST.includes(7)) {
         setPhase(7);
         if (scrollRef.current) scrollRef.current.scrollTo({ top: 600, behavior: 'smooth' });
-        await psleep(600);
-        setFunnelVisible(true);
-        await psleep(2800);
+        await psleep(600); setFunnelVisible(true); await psleep(2800);
       }
 
       // Phase 8 — end slate
@@ -661,124 +473,95 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
         setPhase(8);
         if (scrollRef.current) scrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
         await psleep(2000);
-        setFadingOut(true);
-        await psleep(700);
-        setEndSlate(true);
-        await psleep(3200);
-        setEndSlate(false);
-        setFadingOut(false);
+        setFadingOut(true); await psleep(700);
+        setEndSlate(true);  await psleep(3200);
+        setEndSlate(false); setFadingOut(false);
         await psleep(500);
       }
 
-      // Loop
-      await psleep(400);
-      resetState();
-      await psleep(300);
-      setRunning(false);
-    } catch {
-      // cancelled
-    }
+      await psleep(400); resetState(); await psleep(300); setRunning(false);
+    } catch { /* cancelled */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variant]);
 
   const start = useCallback(() => {
     cancelRef.current.cancelled = true;
     cancelRef.current = { cancelled: false };
-    resetState();
-    setRunning(true);
+    resetState(); setRunning(true);
   }, [resetState]);
 
   useEffect(() => { if (running) runSequence(); }, [running, runSequence]);
+  useEffect(() => { const t = setTimeout(() => start(), 600); return () => clearTimeout(t); }, [start]);
+  useEffect(() => { if (!running && phase === 0) { const t = setTimeout(() => setRunning(true), 500); return () => clearTimeout(t); } }, [running, phase]);
 
-  // Auto-start
   useEffect(() => {
-    const t = setTimeout(() => start(), 600);
-    return () => clearTimeout(t);
-  }, [start]);
+    // Force dark mode on the HTML element for this page
+    document.documentElement.classList.add('dark');
+    return () => document.documentElement.classList.remove('dark');
+  }, []);
 
-  // Re-loop
-  useEffect(() => {
-    if (!running && phase === 0) {
-      const t = setTimeout(() => setRunning(true), 500);
-      return () => clearTimeout(t);
-    }
-  }, [running, phase]);
-
-  // Keyboard shortcuts
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
       if (e.key === 'r' || e.key === 'R') start();
       if (e.key === 'p' || e.key === 'P') { pausedRef.current = !pausedRef.current; setPaused(p => !p); }
     };
-    window.addEventListener('keydown', fn);
-    return () => window.removeEventListener('keydown', fn);
+    window.addEventListener('keydown', fn); return () => window.removeEventListener('keydown', fn);
   }, [start]);
 
-  // ── Derived ───────────────────────────────────────────────────────────────────
-  const byCol = COLUMNS.reduce((acc, col) => {
-    acc[col] = cards.filter(c => c.status === col);
+  // ── Derived ───────────────────────────────────────────────────────────────
+  const byStage = DISPLAY_STAGES.reduce((acc, s) => {
+    acc[s] = apps.filter(a => a.status === s);
     return acc;
-  }, {} as Record<string, DemoCard[]>);
+  }, {} as Record<string, Application[]>);
 
-  const dlCard = cards.find(c => c.id === 'airbnb' || c.id === 'dena');
-
-
-  // ── Render ────────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <>
       <style>{`
-        @keyframes cardIn {
-          from { opacity: 0; transform: translateY(-8px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes bgFadeIn   { from { opacity: 0 } to { opacity: 1 } }
-        @keyframes slideUp    { from { transform: translateY(100%) } to { transform: translateY(0) } }
-        @keyframes blink      { 0%,49% { opacity:1 } 50%,100% { opacity:0 } }
-        @keyframes amberPulse { 0%,100% { box-shadow:0 0 0 0 rgba(251,191,36,0) } 50% { box-shadow:0 0 0 4px rgba(251,191,36,0.35) } }
-        @keyframes extPulse   { 0% { transform:scale(1) } 50% { transform:scale(1.22) } 100% { transform:scale(1) } }
-        @keyframes popupIn    { from { opacity:0; transform:scale(0.9) translateY(4px) } to { opacity:1; transform:scale(1) translateY(0) } }
-        @keyframes particleFloat { 0%,100% { opacity:0; transform:translateY(0) } 40%,60% { opacity:0.1 } 50% { transform:translateY(-22px) } }
-        @keyframes logoGlow   { 0%,100% { box-shadow:0 0 40px rgba(59,130,246,0.3) } 50% { box-shadow:0 0 70px rgba(59,130,246,0.65) } }
-        @keyframes tooltipIn  { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:translateY(0) } }
-        @keyframes fadeBlack  { from { opacity:0 } to { opacity:1 } }
-        html, body { background: #0A0A0A !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { display: none; }
+        @keyframes demoCardIn { from { opacity:0; transform:translateY(-8px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes bgFadeIn   { from { opacity:0 } to { opacity:1 } }
+        @keyframes slideUp    { from { transform:translateY(100%) } to { transform:translateY(0) } }
+        @keyframes blink      { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+        @keyframes extPulse   { 0%{transform:scale(1)} 50%{transform:scale(1.22)} 100%{transform:scale(1)} }
+        @keyframes popupIn    { from{opacity:0;transform:scale(0.92) translateY(4px)} to{opacity:1;transform:scale(1) translateY(0)} }
+        @keyframes particleFloat { 0%,100%{opacity:0;transform:translateY(0)} 40%,60%{opacity:0.08} 50%{transform:translateY(-20px)} }
+        @keyframes logoGlow   { 0%,100%{box-shadow:0 0 40px rgba(59,130,246,0.3)} 50%{box-shadow:0 0 70px rgba(59,130,246,0.65)} }
+        @keyframes fadeBlack  { from{opacity:0} to{opacity:1} }
+        html, body { background:#0A0A0A !important; margin:0 !important; padding:0 !important; overflow:hidden !important; }
+        * { box-sizing:border-box; }
+        ::-webkit-scrollbar { display:none; }
       `}</style>
 
-      {/* Full-viewport dark canvas */}
       <div style={{
-        width: '100vw', height: '100vh', background: C.bg, overflow: 'hidden',
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        width: '100vw', height: '100vh',
+        background: 'var(--background)', overflow: 'hidden',
+        fontFamily: "var(--font-geist, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif)",
         position: 'relative',
       }}>
         <Particles />
 
-        {/* Scrollable content area */}
         <div ref={scrollRef} style={{ position: 'absolute', inset: 0, overflowY: 'auto', overflowX: 'hidden' }}>
 
-          {/* Navbar */}
+          {/* Navbar — matches real dashboard */}
           <nav style={{
             position: 'sticky', top: 0, zIndex: 100,
-            background: `${C.bg}ee`, backdropFilter: 'blur(14px)',
-            borderBottom: `1px solid ${C.border}`,
-            height: 56, padding: '0 28px',
+            background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(14px)',
+            borderBottom: '1px solid var(--border-gray)',
+            height: 56, padding: '0 24px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 7, background: C.blue, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: '#fff' }}>A</div>
-              <span style={{ fontSize: 15, fontWeight: 700, color: C.navy, letterSpacing: '-0.02em' }}>Applyd</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#fff' }}>A</div>
+              <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <span style={{ fontSize: 13, color: C.muted }}>{GREETING}</span>
+              <span style={{ fontSize: 13, color: 'var(--muted-text)' }}>{GREETING}</span>
               <button
-                ref={addBtnRef}
                 style={{
-                  height: 34, padding: '0 16px', borderRadius: 8,
-                  background: highlightBtn ? C.blueHover : C.blue,
-                  color: '#fff', fontSize: 13, fontWeight: 600,
-                  border: 'none', cursor: 'pointer',
-                  boxShadow: highlightBtn ? `0 0 0 3px ${C.blue}44` : undefined,
+                  height: 34, padding: '0 14px', borderRadius: 7,
+                  background: highlightBtn ? 'var(--accent-blue-hover)' : 'var(--accent-blue)',
+                  color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer',
+                  boxShadow: highlightBtn ? '0 0 0 3px rgba(59,130,246,0.35)' : undefined,
                   transform: highlightBtn ? 'scale(1.04)' : undefined,
                   transition: 'all 0.2s ease',
                 }}
@@ -786,95 +569,87 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
             </div>
           </nav>
 
-          {/* Page body */}
-          <div style={{ padding: '24px 28px', maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ padding: '20px 24px', maxWidth: 1200, margin: '0 auto' }}>
 
-            {/* Stat row */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
-              <StatCard label="Total" value={totalApps} icon="📈"
-                subtext={totalApps === 0 ? 'Add your first' : `+${totalApps} this week`} />
-              <StatCard label="Response Rate" value={responseRate} unit="%" icon="⚡"
-                subtext={responseRate === 0 ? 'Track 5 more to see' : 'of applications replied'} />
-              <StatCard label="Interviews" value={interviews} icon="💬"
-                color={interviews > 0 ? C.green : undefined} accent={interviews > 0 ? 'green' : null}
-                subtext={interviews === 0 ? 'Keep applying' : "You're in the room"} />
-              <StatCard label="Act Now" value={actNow} icon="🕐"
-                pulse={actNowPulse} color={actNow > 0 ? C.amber : undefined} accent={actNow > 0 ? 'amber' : null}
-                subtext={actNow === 0 ? 'No urgent deadlines' : 'deadline this week'} />
+            {/* Real StatsBar */}
+            <div style={{ marginBottom: 20 }} data-tutorial-id="stats-bar">
+              <StatsBar applications={apps} />
             </div>
 
-            {/* Kanban */}
+            {/* Pipeline — real ApplicationCard inside custom static column */}
             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              {COLUMNS.map(col => (
-                <KanbanColumn
-                  key={col} name={col} cards={byCol[col] ?? []}
-                  movingCardId={movingCardId}
-                  pulseCardId={deadlinePulse && dlCard ? dlCard.id : null}
-                  isTarget={movingTarget === col}
+              {DISPLAY_STAGES.map(stage => (
+                <DemoColumn
+                  key={stage}
+                  stage={stage}
+                  apps={byStage[stage] ?? []}
+                  highlightCardId={highlightCard}
                 />
               ))}
             </div>
 
-            {/* Deadline tooltip */}
-            {tooltipVisible && dlCard && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20, animation: 'tooltipIn 0.3s ease' }}>
+            {/* Tooltip */}
+            {tooltipText && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
                 <div style={{
-                  background: C.amber, color: '#000',
-                  fontSize: 13, fontWeight: 600,
-                  padding: '9px 22px', borderRadius: 24,
-                  boxShadow: `0 4px 24px ${C.amber}55`,
-                }}>⚠ Deadline approaching — {dlCard.company}</div>
+                  background: 'var(--amber-warning)', color: '#000',
+                  fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 24,
+                  boxShadow: '0 4px 24px rgba(251,191,36,0.4)',
+                  animation: 'bgFadeIn 0.3s ease',
+                }}>{tooltipText}</div>
               </div>
             )}
 
-            {/* Recruiting Funnel — matches real FunnelChart component */}
+            {/* Real FunnelChart */}
             {(phase >= 7 || funnelVisible) && (
-              <RecruitingFunnel visible={funnelVisible} byCol={byCol} />
+              <div style={{ opacity: funnelVisible ? 1 : 0, transition: 'opacity 0.5s ease' }}>
+                <FunnelChart applications={apps} />
+              </div>
             )}
 
             <div style={{ height: 80 }} />
           </div>
         </div>
 
-        {/* Modal overlay */}
-        {modalOpen && <AddModal fields={modalFields} highlightSave={highlightSave} />}
+        {/* Modal */}
+        {modalOpen && <DemoAddModal fields={modalFields} highlightSave={highlightSave} />}
 
-        {/* Chrome extension mockup */}
-        <ChromeExtensionMockup stage={phoneStage} />
+        {/* Chrome extension */}
+        <ChromeMockup stage={phoneStage} />
 
-        {/* Cursor dot */}
+        {/* Cursor */}
         <DemoCursor x={cursorX} y={cursorY} visible={cursorVisible} />
 
-        {/* Fade-to-black overlay */}
+        {/* Fade to black */}
         {fadingOut && (
-          <div style={{ position: 'absolute', inset: 0, background: C.bg, zIndex: 700, animation: 'fadeBlack 0.8s ease both' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'var(--background)', zIndex: 700, animation: 'fadeBlack 0.8s ease both' }} />
         )}
 
         {/* End slate */}
         {endSlate && (
           <div style={{
-            position: 'absolute', inset: 0, zIndex: 800, background: C.bg,
+            position: 'absolute', inset: 0, zIndex: 800, background: 'var(--background)',
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             animation: 'bgFadeIn 0.3s ease',
           }}>
             <div style={{
-              width: 72, height: 72, borderRadius: 18, background: C.blue,
+              width: 72, height: 72, borderRadius: 18, background: 'var(--accent-blue)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 38, fontWeight: 800, color: '#fff',
-              animation: 'logoGlow 2s ease-in-out infinite', marginBottom: 22,
+              fontSize: 38, fontWeight: 800, color: '#fff', marginBottom: 22,
+              animation: 'logoGlow 2s ease-in-out infinite',
             }}>A</div>
-            <div style={{ fontSize: 34, fontWeight: 700, color: C.navy, letterSpacing: '-0.04em', marginBottom: 12 }}>Applyd</div>
-            <div style={{ fontSize: 16, color: C.tertiary }}>useapplyd.com</div>
+            <div style={{ fontSize: 34, fontWeight: 700, color: 'var(--brand-navy)', letterSpacing: '-0.04em', marginBottom: 12 }}>Applyd</div>
+            <div style={{ fontSize: 16, color: 'var(--text-tertiary)' }}>useapplyd.com</div>
           </div>
         )}
 
         {/* Pause badge */}
         {paused && (
           <div style={{
-            position: 'absolute', top: 70, left: '50%', transform: 'translateX(-50%)',
+            position: 'absolute', top: 66, left: '50%', transform: 'translateX(-50%)',
             background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)',
-            border: `1px solid ${C.border}`, borderRadius: 20, padding: '8px 22px',
-            fontSize: 12, fontWeight: 600, color: C.muted, zIndex: 9000,
+            border: '1px solid var(--border-gray)', borderRadius: 20, padding: '8px 22px',
+            fontSize: 12, fontWeight: 600, color: 'var(--muted-text)', zIndex: 9000,
           }}>⏸ Paused — press P to resume</div>
         )}
       </div>
