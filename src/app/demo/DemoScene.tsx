@@ -68,20 +68,28 @@ async function typeInto(setter: (v: string) => void, text: string, sig: { cancel
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
-function StatCard({ label, value, unit = '', pulse = false, color }: {
-  label: string; value: number; unit?: string; pulse?: boolean; color?: string;
+function StatCard({ label, value, unit = '', pulse = false, color, icon, subtext, accent }: {
+  label: string; value: number; unit?: string; pulse?: boolean;
+  color?: string; icon: string; subtext: string; accent?: 'green' | 'amber' | null;
 }) {
   return (
     <div style={{
-      background: C.card, border: `1px solid ${pulse ? C.amber : C.border}`,
-      borderRadius: 10, padding: '14px 18px', flex: 1, minWidth: 0,
+      background: C.card,
+      border: `1px solid ${pulse ? C.amber : C.border}`,
+      borderLeft: accent === 'green' ? `3px solid #4ADE80` : accent === 'amber' ? `3px solid #FBBF24` : `1px solid ${C.border}`,
+      borderRadius: 8, padding: '14px 16px', flex: 1, minWidth: 0,
       boxShadow: pulse ? `0 0 0 3px ${C.amber}28` : undefined,
       transition: 'border-color 0.4s ease, box-shadow 0.4s ease',
+      position: 'relative', overflow: 'hidden',
     }}>
-      <div style={{ fontSize: 10, color: C.muted, fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 8 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: color ?? C.navy, letterSpacing: '-0.03em', lineHeight: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+        <span style={{ fontSize: 13, color: C.tertiary }}>{icon}</span>
+        <span style={{ fontSize: 10, fontWeight: 600, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+      </div>
+      <div style={{ fontSize: 28, fontWeight: 600, color: color ?? C.navy, letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 4 }}>
         {value}{unit}
       </div>
+      <div style={{ fontSize: 11, color: C.tertiary }}>{subtext}</div>
     </div>
   );
 }
@@ -250,83 +258,172 @@ function AddModal({ fields, highlightSave }: {
   );
 }
 
-function PhoneMockup({ stage }: { stage: 'hidden' | 'in' | 'tapping' | 'popup' | 'out' }) {
+// Chrome browser window showing the extension in action
+function ChromeExtensionMockup({ stage }: { stage: 'hidden' | 'in' | 'tapping' | 'popup' | 'out' }) {
   if (stage === 'hidden') return null;
   const visible = stage === 'in' || stage === 'tapping' || stage === 'popup';
+  const tapped = stage === 'tapping' || stage === 'popup';
+  const showPopup = stage === 'popup';
+
   return (
     <div style={{
-      position: 'absolute', right: visible ? 24 : -240, top: '50%',
-      transform: 'translateY(-50%)',
-      width: 180, background: '#0D0D0F',
-      borderRadius: 28, border: '2px solid #3A3A3C',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
-      overflow: 'hidden', zIndex: 600,
-      transition: 'right 0.5s cubic-bezier(0.22,1,0.36,1)',
+      position: 'absolute',
+      right: visible ? 28 : -500,
+      top: '50%', transform: 'translateY(-50%)',
+      width: 380,
+      background: '#1E1E1E',
+      borderRadius: 10,
+      border: '1px solid #3A3A3C',
+      boxShadow: '0 24px 80px rgba(0,0,0,0.75)',
+      overflow: 'visible',
+      zIndex: 600,
+      transition: 'right 0.55s cubic-bezier(0.22,1,0.36,1)',
     }}>
-      <div style={{ height: 36, background: '#0D0D0F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 64, height: 18, borderRadius: 9, background: '#000' }} />
-      </div>
-      <div style={{ background: '#1C1C1E', padding: '5px 7px', borderBottom: '1px solid #2C2C2E', display: 'flex', alignItems: 'center', gap: 5 }}>
-        <div style={{ flex: 1, height: 20, borderRadius: 5, background: '#2C2C2E', display: 'flex', alignItems: 'center', padding: '0 7px' }}>
-          <span style={{ fontSize: 8, color: C.tertiary }}>linkedin.com/jobs</span>
+      {/* Chrome title bar */}
+      <div style={{ background: '#292929', borderRadius: '10px 10px 0 0', padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Traffic lights */}
+        <div style={{ display: 'flex', gap: 5 }}>
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF5F57' }} />
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FEBC2E' }} />
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#28C840' }} />
         </div>
+        {/* Address bar */}
         <div style={{
-          width: 20, height: 20, borderRadius: 5, background: C.blue,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 9, fontWeight: 800, color: '#fff',
-          animation: (stage === 'tapping' || stage === 'popup') ? 'extPulse 0.35s ease' : undefined,
-          boxShadow: (stage === 'tapping' || stage === 'popup') ? `0 0 0 2px ${C.blue}66` : undefined,
-        }}>A</div>
-      </div>
-      <div style={{ background: '#111113', padding: '10px 10px 6px', minHeight: 110 }}>
-        <div style={{ fontSize: 8, fontWeight: 700, color: C.navy, marginBottom: 2 }}>Apple — Software Engineer Intern</div>
-        <div style={{ fontSize: 7, color: C.muted, marginBottom: 8 }}>Cupertino, CA · Internship</div>
-        <div style={{ fontSize: 7, color: C.tertiary, lineHeight: 1.5, marginBottom: 8 }}>
-          Join Apple&apos;s engineering team. Work on real products used by billions of people worldwide...
+          flex: 1, height: 24, borderRadius: 12, background: '#3A3A3C',
+          display: 'flex', alignItems: 'center', padding: '0 10px', gap: 6,
+        }}>
+          <span style={{ fontSize: 9, color: '#A1A1AA' }}>🔒</span>
+          <span style={{ fontSize: 10, color: '#A1A1AA' }}>linkedin.com/jobs/view/apple-software-engineer-intern</span>
         </div>
-        {stage === 'popup' && (
+        {/* Extension icons in toolbar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, position: 'relative' }}>
+          {/* Puzzle piece (extensions menu) */}
+          <div style={{ width: 22, height: 22, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#A1A1AA' }}>🧩</div>
+          {/* Applyd extension icon */}
           <div style={{
-            background: C.card, border: `1px solid ${C.blue}`,
-            borderRadius: 7, padding: '8px 8px',
-            animation: 'popupIn 0.25s cubic-bezier(0.22,1,0.36,1)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-              <div style={{ width: 13, height: 13, borderRadius: 3, background: C.blue, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 6, fontWeight: 800, color: '#fff' }}>A</div>
-              <span style={{ fontSize: 8, fontWeight: 700, color: C.navy }}>Applyd</span>
-            </div>
-            <div style={{ fontSize: 7, color: C.muted, marginBottom: 2 }}>Detected:</div>
-            <div style={{ fontSize: 8, fontWeight: 700, color: C.navy }}>Apple</div>
-            <div style={{ fontSize: 7, color: C.muted, marginBottom: 8 }}>Software Engineer Intern</div>
+            width: 24, height: 24, borderRadius: 5, background: tapped ? C.blueHover : C.blue,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, fontWeight: 800, color: '#fff', cursor: 'pointer',
+            boxShadow: tapped ? `0 0 0 2px ${C.blue}88, 0 0 12px ${C.blue}66` : undefined,
+            animation: tapped ? 'extPulse 0.35s ease' : undefined,
+            transition: 'background 0.2s ease, box-shadow 0.2s ease',
+          }}>A</div>
+
+          {/* Extension popup — drops down from the icon */}
+          {showPopup && (
             <div style={{
-              width: '100%', height: 20, borderRadius: 4, background: C.blue,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 7, fontWeight: 600, color: '#fff',
-            }}>✓ Saved to Applyd</div>
-          </div>
-        )}
+              position: 'absolute', top: 30, right: 0,
+              width: 220,
+              background: C.card,
+              border: `1px solid ${C.border}`,
+              borderRadius: 10,
+              boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+              overflow: 'hidden',
+              animation: 'popupIn 0.2s cubic-bezier(0.22,1,0.36,1)',
+              zIndex: 10,
+            }}>
+              {/* Popup header */}
+              <div style={{ background: C.surface, padding: '10px 12px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 20, height: 20, borderRadius: 5, background: C.blue, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>A</div>
+                <span style={{ fontSize: 12, fontWeight: 700, color: C.navy }}>Applyd</span>
+                <span style={{ marginLeft: 'auto', fontSize: 10, color: C.green, fontWeight: 600 }}>● Job detected</span>
+              </div>
+              {/* Pre-filled fields */}
+              <div style={{ padding: '12px 12px 8px' }}>
+                <div style={{ marginBottom: 8 }}>
+                  <div style={{ fontSize: 10, color: C.muted, marginBottom: 3 }}>Company</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, background: C.surface, borderRadius: 5, padding: '5px 8px', border: `1px solid ${C.blue}` }}>Apple</div>
+                </div>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 10, color: C.muted, marginBottom: 3 }}>Role</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: C.navy, background: C.surface, borderRadius: 5, padding: '5px 8px', border: `1px solid ${C.blue}` }}>Software Engineer Intern</div>
+                </div>
+                <button style={{
+                  width: '100%', height: 34, borderRadius: 7, background: C.blue,
+                  color: '#fff', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}>
+                  <span>✓</span> Save to Applyd
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-      <div style={{ height: 20, background: '#0D0D0F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: 40, height: 3, borderRadius: 2, background: '#3A3A3C' }} />
+
+      {/* Webpage content — LinkedIn job posting */}
+      <div style={{ background: '#111113', padding: '16px', borderRadius: '0 0 10px 10px' }}>
+        {/* LinkedIn nav mock */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${C.border}` }}>
+          <div style={{ width: 20, height: 20, borderRadius: 3, background: '#0A66C2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#fff' }}>in</div>
+          <div style={{ flex: 1, height: 18, background: '#2C2C2E', borderRadius: 9, display: 'flex', alignItems: 'center', padding: '0 8px' }}>
+            <span style={{ fontSize: 9, color: C.tertiary }}>Search</span>
+          </div>
+        </div>
+        {/* Job listing card */}
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 4 }}>Software Engineer Intern</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 4, background: '#2C2C2E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: C.navy }}>🍎</div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: C.navy }}>Apple</div>
+              <div style={{ fontSize: 10, color: C.muted }}>Cupertino, CA · Internship · On-site</div>
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: C.tertiary, lineHeight: 1.6, marginBottom: 12 }}>
+            Join Apple&apos;s world-class engineering teams. Work on innovative products used by over a billion people every day. Collaborate with the best engineers in the industry...
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ height: 28, padding: '0 14px', borderRadius: 14, background: '#0A66C2', display: 'flex', alignItems: 'center', fontSize: 11, fontWeight: 600, color: '#fff' }}>Apply</div>
+            <div style={{ height: 28, padding: '0 14px', borderRadius: 14, border: '1px solid #3A3A3C', display: 'flex', alignItems: 'center', fontSize: 11, color: C.muted }}>Save</div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function FunnelBar({ label, count, color, pct, visible }: {
-  label: string; count: number; color: string; pct: number; visible: boolean;
-}) {
+function RecruitingFunnel({ visible, byCol }: { visible: boolean; byCol: Record<string, DemoCard[]> }) {
+  const data = [
+    { name: 'Wishlist',   count: byCol['Wishlist']?.length ?? 0,               color: STAGE_COLORS['Wishlist'] },
+    { name: 'Applied',    count: byCol['Applied']?.length ?? 0,                color: STAGE_COLORS['Applied'] },
+    { name: 'Interviews', count: (byCol['OA / Online Assessment']?.length ?? 0) + (byCol['Phone / Recruiter Screen']?.length ?? 0) + (byCol['Final Round Interviews']?.length ?? 0), color: STAGE_COLORS['Phone / Recruiter Screen'] },
+    { name: 'Offers',     count: 0,                                            color: STAGE_COLORS['Offer'] ?? '#10B981' },
+  ];
+  const maxCount = Math.max(...data.map(d => d.count), 1);
+
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{visible ? count : 0}</div>
-      <div style={{ width: '100%', height: 100, background: C.surface, borderRadius: 6, overflow: 'hidden', position: 'relative' }}>
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          height: visible ? `${pct}%` : '0%',
-          background: color, borderRadius: '4px 4px 0 0',
-          transition: 'height 0.9s cubic-bezier(0.22,1,0.36,1)',
-        }} />
+    <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 10, padding: '18px 20px', marginTop: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+        <span style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>Recruiting Funnel</span>
+        <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 9px', borderRadius: 5, background: `${C.green}18`, color: C.green, border: `1px solid ${C.green}44` }}>
+          Keep applying
+        </span>
       </div>
-      <div style={{ fontSize: 11, color: C.muted, textAlign: 'center', lineHeight: 1.3 }}>{label}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {data.map(item => {
+          const pct = maxCount > 0 ? Math.max((item.count / maxCount) * 100, item.count > 0 ? 5 : 0) : 0;
+          return (
+            <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontSize: 12, fontWeight: 500, color: C.muted, width: 72, textAlign: 'right', flexShrink: 0 }}>{item.name}</span>
+              <div style={{ flex: 1, background: C.surface, borderRadius: 20, height: 20, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%', borderRadius: 20,
+                  width: visible ? `${pct}%` : '0%',
+                  background: item.color,
+                  display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 8,
+                  transition: 'width 0.9s cubic-bezier(0.22,1,0.36,1)',
+                }}>
+                  {item.count > 0 && visible && (
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#fff' }}>{item.count}</span>
+                  )}
+                </div>
+              </div>
+              {item.count === 0 && <span style={{ fontSize: 11, color: C.tertiary, opacity: 0.5 }}>0</span>}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -452,8 +549,8 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
       if (PHASE_LIST.includes(2)) {
         setPhase(2);
         setCursorVisible(true);
-        // Move cursor to add button top-right area
-        await moveCursor(window.innerWidth - 120, 44, 700);
+        // Move cursor to the Add Application button (top-right navbar)
+        await moveCursor(window.innerWidth - 100, 28, 700);
         setHighlightBtn(true);
         await psleep(350);
         setModalOpen(true);
@@ -474,7 +571,8 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
         setModalFields(f => ({ ...f, deadline: `${dl.getMonth() + 1}/${dl.getDate()}/${dl.getFullYear()}` }));
         await psleep(350);
 
-        await moveCursor(window.innerWidth / 2, window.innerHeight - 60, 400);
+        // Move cursor to Save button — roughly center-x, 80% down the viewport
+        await moveCursor(window.innerWidth / 2, window.innerHeight * 0.82, 400);
         setHighlightSave(true);
         await psleep(320);
         setHighlightSave(false);
@@ -624,13 +722,6 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
 
   const dlCard = cards.find(c => c.id === 'airbnb' || c.id === 'dena');
 
-  const funnelBars = [
-    { label: 'Wishlist', count: byCol['Wishlist']?.length ?? 0,                  color: STAGE_COLORS['Wishlist'],                  pct: 18 },
-    { label: 'Applied',  count: byCol['Applied']?.length ?? 0,                   color: STAGE_COLORS['Applied'],                   pct: 55 },
-    { label: 'OA',       count: byCol['OA / Online Assessment']?.length ?? 0,    color: STAGE_COLORS['OA / Online Assessment'],    pct: 38 },
-    { label: 'Phone',    count: byCol['Phone / Recruiter Screen']?.length ?? 0,  color: STAGE_COLORS['Phone / Recruiter Screen'],  pct: 26 },
-    { label: 'Final',    count: byCol['Final Round Interviews']?.length ?? 0,    color: STAGE_COLORS['Final Round Interviews'],    pct: 10 },
-  ];
 
   // ── Render ────────────────────────────────────────────────────────────────────
   return (
@@ -699,11 +790,17 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
           <div style={{ padding: '24px 28px', maxWidth: 1200, margin: '0 auto' }}>
 
             {/* Stat row */}
-            <div style={{ display: 'flex', gap: 14, marginBottom: 24 }}>
-              <StatCard label="Total Apps"    value={totalApps} />
-              <StatCard label="Response Rate" value={responseRate} unit="%" />
-              <StatCard label="Interviews"    value={interviews} color={interviews > 0 ? C.green : undefined} />
-              <StatCard label="Act Now"       value={actNow} pulse={actNowPulse} color={actNow > 0 ? C.amber : undefined} />
+            <div style={{ display: 'flex', gap: 12, marginBottom: 24 }}>
+              <StatCard label="Total" value={totalApps} icon="📈"
+                subtext={totalApps === 0 ? 'Add your first' : `+${totalApps} this week`} />
+              <StatCard label="Response Rate" value={responseRate} unit="%" icon="⚡"
+                subtext={responseRate === 0 ? 'Track 5 more to see' : 'of applications replied'} />
+              <StatCard label="Interviews" value={interviews} icon="💬"
+                color={interviews > 0 ? C.green : undefined} accent={interviews > 0 ? 'green' : null}
+                subtext={interviews === 0 ? 'Keep applying' : "You're in the room"} />
+              <StatCard label="Act Now" value={actNow} icon="🕐"
+                pulse={actNowPulse} color={actNow > 0 ? C.amber : undefined} accent={actNow > 0 ? 'amber' : null}
+                subtext={actNow === 0 ? 'No urgent deadlines' : 'deadline this week'} />
             </div>
 
             {/* Kanban */}
@@ -730,26 +827,9 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
               </div>
             )}
 
-            {/* Funnel chart */}
+            {/* Recruiting Funnel — matches real FunnelChart component */}
             {(phase >= 7 || funnelVisible) && (
-              <div style={{
-                marginTop: 28, background: C.card,
-                border: `1px solid ${C.border}`, borderRadius: 14, padding: '22px 24px',
-              }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 20, letterSpacing: '-0.01em' }}>Application Funnel</div>
-                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-end' }}>
-                  {funnelBars.map(b => (
-                    <FunnelBar key={b.label} label={b.label} count={b.count}
-                      color={b.color} pct={b.pct} visible={funnelVisible} />
-                  ))}
-                </div>
-                <div style={{ marginTop: 16 }}>
-                  <span style={{
-                    fontSize: 12, fontWeight: 700, color: C.green,
-                    background: `${C.green}18`, padding: '4px 12px', borderRadius: 20,
-                  }}>{responseRate}% response rate</span>
-                </div>
-              </div>
+              <RecruitingFunnel visible={funnelVisible} byCol={byCol} />
             )}
 
             <div style={{ height: 80 }} />
@@ -759,8 +839,8 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
         {/* Modal overlay */}
         {modalOpen && <AddModal fields={modalFields} highlightSave={highlightSave} />}
 
-        {/* Phone */}
-        <PhoneMockup stage={phoneStage} />
+        {/* Chrome extension mockup */}
+        <ChromeExtensionMockup stage={phoneStage} />
 
         {/* Cursor dot */}
         <DemoCursor x={cursorX} y={cursorY} visible={cursorVisible} />
