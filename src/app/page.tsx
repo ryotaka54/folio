@@ -89,6 +89,9 @@ export default function Home() {
           <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
             Free forever · No credit card · 2-minute setup
           </p>
+          <p className="mt-2 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
+            Trusted by 500+ students
+          </p>
         </div>
 
         {/* Dashboard Preview */}
