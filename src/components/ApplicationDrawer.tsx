@@ -200,7 +200,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
               <input
                 type="date"
                 defaultValue={application.deadline || ''}
-                onChange={(e) => immediateUpdate('deadline', e.target.value)}
+                onChange={(e) => e.target.value ? immediateUpdate('deadline', e.target.value) : onUpdate(application.id, { deadline: null })}
                 className={inputCls}
               />
             </div>
