@@ -227,9 +227,11 @@ function RecruitingSection({ showToast }: { showToast: (msg: string, type?: 'suc
   const [savedField, setSavedField] = useState<string | null>(null);
   const [customSeason, setCustomSeason] = useState('');
 
+  const flashSavedTimer = useRef<NodeJS.Timeout | null>(null);
   const flashSaved = (field: string) => {
+    if (flashSavedTimer.current) clearTimeout(flashSavedTimer.current);
     setSavedField(field);
-    setTimeout(() => setSavedField(null), 2000);
+    flashSavedTimer.current = setTimeout(() => setSavedField(null), 2000);
   };
 
   const saveField = async (updates: Parameters<typeof updateProfile>[0], field: string) => {
@@ -376,16 +378,19 @@ function RecruitingSection({ showToast }: { showToast: (msg: string, type?: 'suc
 function TargetField({ storageKey, placeholder }: { storageKey: string; placeholder: string }) {
   const [value, setValue] = useState('');
   const [saved, setSaved] = useState(false);
+  const savedTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (storageKey) setValue(localStorage.getItem(storageKey) ?? '');
+    return () => { if (savedTimer.current) clearTimeout(savedTimer.current); };
   }, [storageKey]);
 
   const handleBlur = () => {
     if (!storageKey) return;
     localStorage.setItem(storageKey, value);
+    if (savedTimer.current) clearTimeout(savedTimer.current);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    savedTimer.current = setTimeout(() => setSaved(false), 2000);
   };
 
   return (
@@ -412,12 +417,17 @@ function AppearanceSection() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [themeSaved, setThemeSaved] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const themeSavedTimer = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    setMounted(true);
+    return () => { if (themeSavedTimer.current) clearTimeout(themeSavedTimer.current); };
+  }, []);
 
   const handleTheme = (id: string) => {
     setTheme(id);
+    if (themeSavedTimer.current) clearTimeout(themeSavedTimer.current);
     setThemeSaved(true);
-    setTimeout(() => setThemeSaved(false), 2000);
+    themeSavedTimer.current = setTimeout(() => setThemeSaved(false), 2000);
   };
 
   const themes = [

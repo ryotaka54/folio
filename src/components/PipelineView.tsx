@@ -118,7 +118,7 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
           );
         })}
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x-mandatory" style={{ minHeight: 400 }}>
+      <div className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory" style={{ minHeight: 400 }}>
         {stages.map((stage) => {
           const stageApps = applications.filter(a => a.status === stage);
           const color = STAGE_COLORS[stage] || '#6B7280';

@@ -29,7 +29,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
 
   const deadlinesSoon = applications.filter(a => {
     if (!a.deadline) return false;
-    const d = new Date(a.deadline);
+    const d = new Date(a.deadline + 'T00:00:00');
     return d >= now && d <= sevenDaysAhead;
   }).length;
 

@@ -67,6 +67,7 @@ function DashboardContent() {
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
   const pendingDeleteRef = useRef<{ id: string; app: Application } | null>(null);
   const deleteTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const firstAppTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const stages = user?.mode === 'job' ? JOB_STAGES : INTERNSHIP_STAGES;
   const inactiveStatuses = ['Rejected', 'Declined'];
@@ -144,7 +145,7 @@ function DashboardContent() {
     if (isFirstApp && !localStorage.getItem('first_app_celebration_shown')) {
       localStorage.setItem('first_app_celebration_shown', 'true');
       setShowFirstAppTip(true);
-      setTimeout(() => setShowFirstAppTip(false), 5000);
+      firstAppTimerRef.current = setTimeout(() => setShowFirstAppTip(false), 5000);
       capture('first_application_logged');
     }
   };
@@ -213,13 +214,14 @@ function DashboardContent() {
       }, 600);
       return () => clearTimeout(t);
     }
-  }, [user, startTutorial]);
+  }, [user, startTutorial, applications]);
 
   // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+      if (firstAppTimerRef.current) clearTimeout(firstAppTimerRef.current);
     };
   }, []);
 

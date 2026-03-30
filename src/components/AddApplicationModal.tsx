@@ -131,8 +131,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
       onClick={e => { if (e.target === backdropRef.current) onClose(); }}
     >
       <div
-        className="bg-card-bg border border-border-gray w-full sm:max-w-md shadow-lg modal-enter max-h-[92vh] overflow-y-auto"
-        style={{ borderRadius: '12px 12px 0 0' }}
+        className="bg-card-bg border border-border-gray w-full sm:max-w-md shadow-lg modal-enter max-h-[92vh] overflow-y-auto rounded-t-xl sm:rounded-xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Mobile drag handle */}

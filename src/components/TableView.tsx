@@ -16,12 +16,15 @@ type SortDir = 'asc' | 'desc';
 
 const formatDate = (dateStr: string | null) => {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  // Append T00:00:00 to parse as local midnight, not UTC midnight
+  const iso = dateStr.length === 10 ? dateStr + 'T00:00:00' : dateStr;
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
 const deadlineUrgency = (dateStr: string | null): 'overdue' | 'today' | 'soon' | 'normal' | 'none' => {
   if (!dateStr) return 'none';
-  const d = new Date(dateStr);
+  const iso = dateStr.length === 10 ? dateStr + 'T00:00:00' : dateStr;
+  const d = new Date(iso);
   const now = new Date();
   const diffMs = d.getTime() - now.getTime();
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
