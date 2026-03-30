@@ -174,7 +174,19 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
         );
       })}
 
-      <div className="pagination flex gap-2 justify-center absolute bottom-0 left-0 right-0">
+      {/* Prev / Next arrows */}
+      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-3">
+        <button
+          onClick={() => navigate(activeIndex - 1)}
+          aria-label="Previous testimonial"
+          className="flex items-center justify-center w-8 h-8 rounded-full border transition-colors"
+          style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+          onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--border-emphasis)')}
+          onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-gray)')}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+
         {testimonials.map((_, index) => (
           <button
             key={index}
@@ -183,7 +195,23 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
             className={`pagination-dot ${activeIndex === index ? 'active' : ''}`}
           />
         ))}
+
+        <button
+          onClick={() => navigate(activeIndex + 1)}
+          aria-label="Next testimonial"
+          className="flex items-center justify-center w-8 h-8 rounded-full border transition-colors"
+          style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+          onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--border-emphasis)')}
+          onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-gray)')}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
+
+      {/* Drag hint — mobile only */}
+      <p className="text-center mt-2 sm:hidden" style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+        Drag to browse
+      </p>
     </section>
   );
 };
