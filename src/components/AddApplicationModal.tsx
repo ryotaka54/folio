@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { PipelineStage, Category } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
-import { X } from 'lucide-react';
+import { X, Sparkles } from 'lucide-react';
 import { useExtensionStatus } from '@/lib/extension-status-context';
 import { capture } from '@/lib/analytics';
 
@@ -175,7 +175,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
                       <svg className="animate-spin" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                       Scanning…
                     </span>
-                  ) : '✨ Autofill'}
+                  ) : <span className="flex items-center gap-1"><Sparkles size={11} />Autofill</span>}
                 </button>
               </div>
               <input
@@ -192,23 +192,35 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>
                 Company <span className="text-error-text opacity-60">*</span>
               </label>
-              <input id="modal-company" type="text" value={company} onChange={e => setCompany(e.target.value)}
-                className={inputCls} placeholder="e.g. Google" />
+              {isAutofilling && !company ? (
+                <div className="h-9 rounded-md animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+              ) : (
+                <input id="modal-company" type="text" value={company} onChange={e => setCompany(e.target.value)}
+                  className={inputCls} placeholder="e.g. Google" />
+              )}
             </div>
 
             <div>
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>
                 Role <span className="text-error-text opacity-60">*</span>
               </label>
-              <input id="modal-role" type="text" value={role}
-                onChange={e => setRole(e.target.value)}
-                className={inputCls} placeholder="e.g. SWE Intern" />
+              {isAutofilling && !role ? (
+                <div className="h-9 rounded-md animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+              ) : (
+                <input id="modal-role" type="text" value={role}
+                  onChange={e => setRole(e.target.value)}
+                  className={inputCls} placeholder="e.g. SWE Intern" />
+              )}
             </div>
 
             <div>
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Location</label>
-              <input id="modal-location" type="text" value={location} onChange={e => setLocation(e.target.value)}
-                className={inputCls} placeholder="e.g. New York, NY" />
+              {isAutofilling && !location ? (
+                <div className="h-9 rounded-md animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+              ) : (
+                <input id="modal-location" type="text" value={location} onChange={e => setLocation(e.target.value)}
+                  className={inputCls} placeholder="e.g. New York, NY" />
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -233,7 +245,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
 
             <div>
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Deadline</label>
-              <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} className={inputCls} />
+              <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} className={inputCls} min={new Date().toISOString().split('T')[0]} />
             </div>
 
             <div>

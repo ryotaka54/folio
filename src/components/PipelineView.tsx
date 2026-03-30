@@ -43,17 +43,16 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
       <div className="flex items-center gap-2 mb-2 px-1">
         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
         <span
-          className="text-[11px] font-semibold uppercase tracking-[0.08em] truncate"
-          style={{ color: 'var(--muted-text)' }}
+          className="text-[12px] font-semibold truncate"
+          style={{ color: 'var(--brand-navy)' }}
         >
           {stage}
         </span>
         <span
-          className="ml-auto text-[10px] font-medium px-1.5 py-0.5 rounded border"
+          className="ml-auto text-[11px] font-medium px-1.5 py-0.5 rounded-full"
           style={{
             background: 'var(--surface-gray)',
-            color: 'var(--text-tertiary)',
-            borderColor: 'var(--border-gray)',
+            color: 'var(--muted-text)',
           }}
         >
           {count}

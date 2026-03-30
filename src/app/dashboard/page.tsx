@@ -16,6 +16,7 @@ import FunnelChart from '@/components/FunnelChart';
 import AddApplicationModal from '@/components/AddApplicationModal';
 import ApplicationDrawer from '@/components/ApplicationDrawer';
 import EmptyState from '@/components/EmptyState';
+import MobileCardList from '@/components/MobileCardList';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import ExtensionBanner from '@/components/ExtensionBanner';
@@ -47,9 +48,13 @@ function DashboardContent() {
   const router = useRouter();
 
   const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
-  // Default to table view on mobile — runs after mount to avoid SSR mismatch
+  const [isMobile, setIsMobile] = useState(false);
+  // Detect mobile after mount to avoid SSR mismatch
   useEffect(() => {
-    if (window.innerWidth < 768) setView('table');
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
   const [showFirstAppTip, setShowFirstAppTip] = useState(false);
   const [search, setSearch] = useState('');
@@ -199,6 +204,21 @@ function DashboardContent() {
     const handler = () => { setAddModalInitialUrl(''); setShowAddModal(true); };
     document.addEventListener('applyd:add', handler);
     return () => document.removeEventListener('applyd:add', handler);
+  }, []);
+
+  // Keyboard shortcut: N opens add modal (when no input is focused)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        setAddModalInitialUrl('');
+        setShowAddModal(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, []);
 
   // Auto-start tutorial for new users who haven't seen it yet
@@ -397,9 +417,18 @@ function DashboardContent() {
             <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} hideExtensionHint={bannerVisible} />
           ) : filteredApps.length === 0 ? (
             <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">
-              <h3 className="text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>No matches</h3>
-              <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Try adjusting your filters.</p>
+              <h3 className="text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)' }}>No matches</h3>
+              <p className="text-[12px] mb-4" style={{ color: 'var(--muted-text)' }}>Try adjusting your filters.</p>
+              <button
+                onClick={() => { setSearch(''); setStatusFilter('all'); setHideInactive(true); }}
+                className="inline-flex items-center h-8 px-3 text-[12px] font-medium rounded-md border border-border-gray transition-colors hover:bg-surface-gray"
+                style={{ color: 'var(--muted-text)' }}
+              >
+                Clear filters
+              </button>
             </div>
+          ) : isMobile ? (
+            <MobileCardList applications={filteredApps} onCardClick={handleCardClick} />
           ) : view === 'pipeline' ? (
             <div data-tutorial-id="pipeline-board">
               <PipelineView

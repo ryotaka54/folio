@@ -44,8 +44,13 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-gray flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-20 dark:opacity-10 -z-0"
+        style={{ background: 'radial-gradient(ellipse at center, var(--accent-blue) 0%, transparent 70%)' }}
+      />
+      <div className="w-full max-w-sm relative z-10">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
             <Logo size={28} variant="dark" />
@@ -55,7 +60,7 @@ export default function SignUpPage() {
 
         <div className="bg-card-bg rounded-lg p-6 border border-border-gray">
           <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Create your account</h1>
-          <p className="text-[13px] mb-6" style={{ color: 'var(--muted-text)' }}>Free forever. No credit card needed.</p>
+          <p className="text-[13px] mb-6" style={{ color: 'var(--muted-text)' }}>Free to use. No credit card needed.</p>
 
           <form onSubmit={handleSubmit} className="space-y-3.5">
             {error && (

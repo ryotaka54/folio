@@ -195,7 +195,7 @@ export default function Home() {
                 style={{ background: 'var(--card-bg)' }}
               >
                 <span className="text-[12px] font-medium" style={{ color: 'var(--muted-text)' }}>
-                  Free forever for students
+                  No credit card needed
                 </span>
                 <span className="h-3.5 w-px" style={{ background: 'var(--border-gray)' }} />
                 <span className="flex size-5 items-center justify-center overflow-hidden rounded-full" style={{ background: 'var(--surface-gray)' }}>
@@ -224,7 +224,7 @@ export default function Home() {
               <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
                 <div className="rounded-[14px] border border-border-gray p-0.5" style={{ background: 'var(--surface-gray)' }}>
                   <Button asChild size="lg" className="rounded-xl px-6">
-                    <Link href="/signup">Get started — it&apos;s free</Link>
+                    <Link href="/signup">Start tracking</Link>
                   </Button>
                 </div>
                 <Button asChild size="lg" variant="ghost" className="rounded-xl px-6">
@@ -405,7 +405,7 @@ export default function Home() {
               <Logo size={36} variant="dark" />
             </div>
             <h2 className="text-[20px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-              Applyd is free — and always will be for students.
+              Applyd is free to use.
             </h2>
             <p className="text-[14px] leading-relaxed mb-6" style={{ color: 'var(--muted-text)' }}>
               Building and maintaining Applyd takes time and care. If it&apos;s helped your recruiting season even a little, buying me a coffee means the world.
@@ -423,7 +423,7 @@ export default function Home() {
               ☕ Buy me a coffee
             </a>
             <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-              No pressure at all — Applyd will always be free.
+              No pressure. No paywall.
             </p>
           </div>
         </section>

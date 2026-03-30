@@ -1,7 +1,7 @@
 'use client';
 
 import { Application } from '@/lib/types';
-import { STAGE_COLORS } from '@/lib/constants';
+
 import { GripVertical } from 'lucide-react';
 
 interface ApplicationCardProps {
@@ -58,8 +58,8 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
           <span
             className="text-[11px] px-1.5 py-0.5 rounded font-medium"
             style={{
-              background: `${STAGE_COLORS[application.status] || '#6B7280'}12`,
-              color: STAGE_COLORS[application.status] || '#6B7280',
+              background: 'var(--surface-gray)',
+              color: 'var(--text-tertiary)',
             }}
           >
             {application.category}
