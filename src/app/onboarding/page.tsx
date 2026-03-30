@@ -59,6 +59,7 @@ function OnboardingContent() {
   // Mode-change-only flow: just show step 1 and save
   if (changeMode) {
     const handleSaveMode = () => {
+      capture('mode_changed', { mode });
       updateProfile({ mode });
       router.push('/dashboard');
     };

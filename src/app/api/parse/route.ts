@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 type ParseResult = { company: string; role: string; location: string };
 
 export async function POST(request: Request) {
+  const ph = getPostHogClient();
   try {
     const { url } = await request.json();
     if (!url) return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+
+    ph.capture({ distinctId: 'server', event: 'autofill_requested' });
 
     let company = '';
     let role = '';
@@ -31,15 +35,18 @@ export async function POST(request: Request) {
     location = cleanLocation(location);
 
     if (!company && !role) {
+      ph.capture({ distinctId: 'server', event: 'autofill_parse_failed', properties: { reason: 'no_data' } });
       return NextResponse.json(
         { error: 'Could not extract job details from this page. Please fill in manually.' },
         { status: 422 }
       );
     }
 
+    ph.capture({ distinctId: 'server', event: 'autofill_parse_success', properties: { has_company: !!company, has_role: !!role, has_location: !!location } });
     return NextResponse.json({ company, role, location, category: guessCategory(role, url) });
 
   } catch (error: any) {
+    ph.capture({ distinctId: 'server', event: 'autofill_parse_failed', properties: { reason: 'exception' } });
     console.error('Job scraping failed:', error.message);
     return NextResponse.json({ error: 'Failed to extract job details' }, { status: 500 });
   }

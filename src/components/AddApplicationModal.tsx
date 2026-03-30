@@ -5,6 +5,7 @@ import { PipelineStage, Category } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
 import { X } from 'lucide-react';
 import { useExtensionStatus } from '@/lib/extension-status-context';
+import { capture } from '@/lib/analytics';
 
 interface AddApplicationModalProps {
   open: boolean;
@@ -94,6 +95,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
 
   const handleAutofill = async () => {
     if (!isValidUrl(jobLink)) { setError('Please enter a valid URL first.'); return; }
+    capture('autofill_used');
     setIsAutofilling(true); setError('');
     try {
       const res  = await fetch('/api/parse', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: jobLink }) });
@@ -103,8 +105,11 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
       if (data.role)     setRole(data.role);
       if (data.location) setLocation(data.location);
       if (data.category) { setCategory(data.category as Category); userPickedCategory.current = true; }
+      capture('autofill_success', { has_company: !!data.company, has_role: !!data.role, has_location: !!data.location });
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Could not autofill. Fill in manually.');
+      const msg = e instanceof Error ? e.message : 'Could not autofill. Fill in manually.';
+      setError(msg);
+      capture('autofill_error');
     } finally {
       setIsAutofilling(false);
     }

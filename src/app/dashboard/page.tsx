@@ -158,6 +158,7 @@ function DashboardContent() {
 
   // Drag-and-drop status change — shows toast
   const handleStatusChange = (id: string, status: PipelineStage) => {
+    capture('application_status_changed', { status });
     handleUpdate(id, { status });
     showToast(`Moved to ${status}`);
   };
@@ -171,6 +172,7 @@ function DashboardContent() {
     setSelectedApp(null);
 
     // Stage the delete with undo window
+    capture('application_deleted', { company: app.company, status: app.status });
     pendingDeleteRef.current = { id, app };
     if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
 
@@ -349,11 +351,11 @@ function DashboardContent() {
           <div className="flex flex-wrap items-center gap-2">
             <div data-tutorial-id="view-toggle" className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
               <button
-                onClick={() => setView('pipeline')}
+                onClick={() => { setView('pipeline'); capture('view_switched', { view: 'pipeline' }); }}
                 className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
               >Pipeline</button>
               <button
-                onClick={() => setView('table')}
+                onClick={() => { setView('table'); capture('view_switched', { view: 'table' }); }}
                 className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'table' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
               >Table</button>
             </div>
