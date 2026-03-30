@@ -24,6 +24,8 @@ export default function DemoOverlay() {
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!e.shiftKey) return;
+    const tag = (e.target as HTMLElement).tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.key === 'D') { e.preventDefault(); activate(); }
     else if (e.key === 'S') { e.preventDefault(); togglePause(); }
     else if (e.key === 'R') { e.preventDefault(); restart(); }
