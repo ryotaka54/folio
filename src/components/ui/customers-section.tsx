@@ -10,33 +10,43 @@ interface University {
 }
 
 const universities: University[] = [
-  { name: 'UCLA',                      abbr: 'UCLA',  color: '#2774AE' },
-  { name: 'NYU',                        abbr: 'NYU',   color: '#57068C' },
-  { name: 'UC Berkeley',               abbr: 'UCB',   color: '#003262' },
-  { name: 'University of Michigan',    abbr: 'UMich', color: '#00274C' },
-  { name: 'Northeastern',             abbr: 'NEU',   color: '#CC0000' },
-  { name: 'Georgia Tech',             abbr: 'GT',    color: '#003057' },
-  { name: 'Univ. of Washington',      abbr: 'UW',    color: '#4B2E83' },
-  { name: 'Boston University',        abbr: 'BU',    color: '#CC0000' },
-  { name: 'Carnegie Mellon',          abbr: 'CMU',   color: '#C41230' },
-  { name: 'UT Austin',                abbr: 'UT',    color: '#BF5700' },
-  { name: 'USC',                       abbr: 'USC',   color: '#990000' },
-  { name: 'Univ. of Illinois',        abbr: 'UIUC',  color: '#E84A27' },
+  { name: 'UCLA',                   abbr: 'UCLA',  color: '#2774AE' },
+  { name: 'NYU',                    abbr: 'NYU',   color: '#57068C' },
+  { name: 'UC Berkeley',            abbr: 'UCB',   color: '#003262' },
+  { name: 'University of Michigan', abbr: 'UMich', color: '#00274C' },
+  { name: 'Northeastern',           abbr: 'NEU',   color: '#C8102E' },
+  { name: 'Georgia Tech',           abbr: 'GT',    color: '#B3A369' },
+  { name: 'Univ. of Washington',    abbr: 'UW',    color: '#4B2E83' },
+  { name: 'Boston University',      abbr: 'BU',    color: '#CC0000' },
+  { name: 'Carnegie Mellon',        abbr: 'CMU',   color: '#C41230' },
+  { name: 'UT Austin',              abbr: 'UT',    color: '#BF5700' },
+  { name: 'USC',                    abbr: 'USC',   color: '#990000' },
+  { name: 'Univ. of Illinois',      abbr: 'UIUC',  color: '#E84A27' },
 ];
 
 function UniversityLogo({ name, abbr, color }: University) {
   return (
     <div className="flex flex-col items-center gap-2.5">
       <div
-        className="w-12 h-12 rounded-xl flex items-center justify-center"
-        style={{ background: color + '18', border: `1px solid ${color}30` }}
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 14,
+          background: color,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+        }}
       >
         <span
-          className="font-bold leading-none text-center"
           style={{
-            color,
-            fontSize: abbr.length <= 2 ? 15 : abbr.length === 3 ? 12 : 10,
+            color: '#ffffff',
+            fontWeight: 700,
+            fontSize: abbr.length <= 2 ? 18 : abbr.length === 3 ? 15 : 12,
             letterSpacing: '-0.02em',
+            lineHeight: 1,
+            textAlign: 'center',
           }}
         >
           {abbr}
