@@ -81,7 +81,9 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
   if (!testimonials?.length) return null;
 
   return (
-    <section className="testimonials-stack relative pb-10">
+    <section className="testimonials-stack">
+      {/* Cards area — controls must live OUTSIDE this div */}
+      <div className="testimonial-cards-area">
       {testimonials.map((testimonial, index) => {
         const displayOrder = (index - activeIndex + totalCards) % totalCards;
 
@@ -173,9 +175,10 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
           </div>
         );
       })}
+      </div>{/* end .testimonial-cards-area */}
 
-      {/* Prev / Next arrows */}
-      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-3">
+      {/* Prev / Next arrows — sit below cards, never overlapped */}
+      <div className="flex items-center justify-center gap-3 mt-5">
         <button
           onClick={() => navigate(activeIndex - 1)}
           aria-label="Previous testimonial"

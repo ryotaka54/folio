@@ -353,8 +353,11 @@ body {
   width: 100%;
   max-width: 640px;
   margin: 0 auto;
+}
+
+.testimonial-cards-area {
+  position: relative;
   min-height: 320px;
-  padding-bottom: 56px;
 }
 
 .testimonial-card {

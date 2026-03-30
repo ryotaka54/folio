@@ -38,7 +38,7 @@ const FAQS = [
 export default function HelpPage() {
   const router = useRouter();
   const { start: startTutorial } = useTutorial();
-  const { updateProfile } = useAuth();
+  const { updateProfile, user } = useAuth();
   const [query, setQuery] = useState('');
 
   const handleReplayTutorial = () => {
@@ -97,16 +97,18 @@ export default function HelpPage() {
           );
         })()}
 
-        <div className="mt-10 p-6 rounded-lg border border-border-gray" style={{ background: 'var(--card-bg)' }}>
-          <h2 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Take the product tour</h2>
-          <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>Walk through every feature of the dashboard in about 90 seconds.</p>
-          <button
-            onClick={handleReplayTutorial}
-            className="inline-flex items-center h-9 px-4 text-[13px] font-medium text-white rounded-md transition-colors bg-accent-blue hover:bg-accent-blue-hover"
-          >
-            Replay tour →
-          </button>
-        </div>
+        {user && (
+          <div className="mt-10 p-6 rounded-lg border border-border-gray" style={{ background: 'var(--card-bg)' }}>
+            <h2 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Take the product tour</h2>
+            <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>Walk through every feature of the dashboard in about 90 seconds.</p>
+            <button
+              onClick={handleReplayTutorial}
+              className="inline-flex items-center h-9 px-4 text-[13px] font-medium text-white rounded-md transition-colors bg-accent-blue hover:bg-accent-blue-hover"
+            >
+              Replay tour →
+            </button>
+          </div>
+        )}
 
         <div className="mt-4 p-6 rounded-lg border border-border-gray text-center" style={{ background: 'var(--card-bg)' }}>
           <h2 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Still have questions?</h2>
