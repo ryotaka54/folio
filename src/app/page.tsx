@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { TrendingUp, Zap, MessageSquare, Clock, ArrowRight, Menu, X } from 'lucide-react';
+import { TrendingUp, Zap, MessageSquare, Clock, ArrowRight, Menu, X, GraduationCap, Calendar, CheckCircle, Award } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
 import { Logo } from '@/components/Logo';
@@ -13,6 +13,50 @@ import { AnimatedGroup } from '@/components/ui/animated-group';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { TestimonialStack, type Testimonial } from '@/components/ui/glass-testimonial-swiper';
+
+const TESTIMONIALS: Testimonial[] = [
+  {
+    id: 1,
+    initials: 'AK',
+    name: 'Aisha Khan',
+    role: 'CS Junior, University of Michigan',
+    quote: "I had 40+ applications across Greenhouse, Workday, and random portals. Applyd finally gave me one place to see everything. The autofill saved me so much time — paste the link, done.",
+    tags: [{ text: 'Internship Recruiting', type: 'featured' }, { text: 'Engineering', type: 'default' }],
+    stats: [{ icon: CheckCircle, text: '43 apps tracked' }, { icon: Award, text: 'Offer @ Stripe' }],
+    avatarGradient: 'linear-gradient(135deg, #5e6ad2, #8b5cf6)',
+  },
+  {
+    id: 2,
+    initials: 'JL',
+    name: 'James Liu',
+    role: 'Finance Senior, NYU Stern',
+    quote: "Recruiting season is brutal. Having a kanban board for my applications sounds silly until you're managing 30 first-round interviews. The deadline alerts alone saved me from missing a superday.",
+    tags: [{ text: 'Finance Recruiting', type: 'featured' }, { text: 'IB & PE', type: 'default' }],
+    stats: [{ icon: Calendar, text: '31 interviews tracked' }, { icon: TrendingUp, text: '3 offers' }],
+    avatarGradient: 'linear-gradient(135deg, #10b981, #059669)',
+  },
+  {
+    id: 3,
+    initials: 'MR',
+    name: 'Maya Rodriguez',
+    role: 'MBA Candidate, Wharton',
+    quote: "I switched from a Notion template I'd been maintaining for two years. Applyd is just cleaner. The recruiting funnel showed me I had a 40% callback rate — I never would've calculated that manually.",
+    tags: [{ text: 'Full-time Recruiting', type: 'default' }, { text: 'Consulting', type: 'default' }],
+    stats: [{ icon: GraduationCap, text: 'MBA recruiting' }, { icon: Clock, text: 'Saved 3h/week' }],
+    avatarGradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
+  },
+  {
+    id: 4,
+    initials: 'DS',
+    name: 'Dev Shah',
+    role: 'SWE Intern Alum, now at Figma',
+    quote: "Used Applyd during my junior year internship search. The pipeline view made it obvious which companies I was ghosting and which were ghosting me. Got 4 offers, took Figma.",
+    tags: [{ text: 'SWE Intern', type: 'featured' }, { text: 'Design Tools', type: 'default' }],
+    stats: [{ icon: CheckCircle, text: '4 offers received' }, { icon: Award, text: 'Now @ Figma' }],
+    avatarGradient: 'linear-gradient(135deg, #ec4899, #d946ef)',
+  },
+];
 
 const transitionVariants = {
   item: {
@@ -396,6 +440,34 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+        </section>
+
+        {/* ── Testimonials ── */}
+        <section className="max-w-6xl mx-auto px-6 py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
+              What students are saying
+            </h2>
+            <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
+              Trusted by 500+ students across internship and full-time recruiting seasons.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="relative"
+            style={{ minHeight: 320 }}
+          >
+            <TestimonialStack testimonials={TESTIMONIALS} visibleBehind={2} />
+          </motion.div>
         </section>
 
         {/* ── Buy Me a Coffee ── */}
