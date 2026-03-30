@@ -1,65 +1,46 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 
 interface University {
   name: string;
-  domain: string;
+  abbr: string;
+  color: string;
 }
 
 const universities: University[] = [
-  { name: 'UCLA',                      domain: 'ucla.edu' },
-  { name: 'NYU',                       domain: 'nyu.edu' },
-  { name: 'UC Berkeley',               domain: 'berkeley.edu' },
-  { name: 'University of Michigan',    domain: 'umich.edu' },
-  { name: 'Northeastern',             domain: 'northeastern.edu' },
-  { name: 'Georgia Tech',             domain: 'gatech.edu' },
-  { name: 'University of Washington', domain: 'washington.edu' },
-  { name: 'Boston University',        domain: 'bu.edu' },
-  { name: 'Carnegie Mellon',          domain: 'cmu.edu' },
-  { name: 'UT Austin',                domain: 'utexas.edu' },
-  { name: 'USC',                       domain: 'usc.edu' },
-  { name: 'University of Illinois',   domain: 'illinois.edu' },
+  { name: 'UCLA',                      abbr: 'UCLA',  color: '#2774AE' },
+  { name: 'NYU',                        abbr: 'NYU',   color: '#57068C' },
+  { name: 'UC Berkeley',               abbr: 'UCB',   color: '#003262' },
+  { name: 'University of Michigan',    abbr: 'UMich', color: '#00274C' },
+  { name: 'Northeastern',             abbr: 'NEU',   color: '#CC0000' },
+  { name: 'Georgia Tech',             abbr: 'GT',    color: '#003057' },
+  { name: 'Univ. of Washington',      abbr: 'UW',    color: '#4B2E83' },
+  { name: 'Boston University',        abbr: 'BU',    color: '#CC0000' },
+  { name: 'Carnegie Mellon',          abbr: 'CMU',   color: '#C41230' },
+  { name: 'UT Austin',                abbr: 'UT',    color: '#BF5700' },
+  { name: 'USC',                       abbr: 'USC',   color: '#990000' },
+  { name: 'Univ. of Illinois',        abbr: 'UIUC',  color: '#E84A27' },
 ];
 
-// Sources tried in order until one loads
-const LOGO_SOURCES = (domain: string) => [
-  `https://img.logo.dev/${domain}?token=pk_free&size=128&format=png`,
-  `https://logo.clearbit.com/${domain}?size=128`,
-  `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
-];
-
-function UniversityLogo({ name, domain }: University) {
-  const sources = LOGO_SOURCES(domain);
-  const [srcIndex, setSrcIndex] = useState(0);
-  const failed = srcIndex >= sources.length;
-
+function UniversityLogo({ name, abbr, color }: University) {
   return (
     <div className="flex flex-col items-center gap-2.5">
       <div
-        className="w-12 h-12 rounded-xl border flex items-center justify-center overflow-hidden"
-        style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}
+        className="w-12 h-12 rounded-xl flex items-center justify-center"
+        style={{ background: color + '18', border: `1px solid ${color}30` }}
       >
-        {!failed ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={sources[srcIndex]}
-            alt={`${name} logo`}
-            width={32}
-            height={32}
-            className="object-contain w-8 h-8"
-            onError={() => setSrcIndex(i => i + 1)}
-          />
-        ) : (
-          <span
-            className="text-[11px] font-bold text-center px-1 leading-tight"
-            style={{ color: 'var(--muted-text)' }}
-          >
-            {name.split(' ').map(w => w[0]).join('').slice(0, 3)}
-          </span>
-        )}
+        <span
+          className="font-bold leading-none text-center"
+          style={{
+            color,
+            fontSize: abbr.length <= 2 ? 15 : abbr.length === 3 ? 12 : 10,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {abbr}
+        </span>
       </div>
       <span
         className="text-center leading-tight"
