@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { TutorialProvider } from "@/lib/tutorial-context";
 import CommandPalette from "@/components/CommandPalette";
 import TutorialOverlay from "@/components/TutorialOverlay";
+import DemoOverlay from "@/components/DemoOverlay";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -51,6 +52,7 @@ export default function RootLayout({
               {children}
               <CommandPalette />
               <TutorialOverlay />
+              <DemoOverlay />
             </TutorialProvider>
           </AuthProvider>
         </ThemeProvider>

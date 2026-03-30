@@ -13,7 +13,7 @@ interface ApplicationCardProps {
 export default function ApplicationCard({ application, onClick, muted }: ApplicationCardProps) {
   const deadlineInfo = (() => {
     if (!application.deadline) return null;
-    const d = new Date(application.deadline);
+    const d = new Date(application.deadline + 'T00:00:00');
     const now = new Date();
     const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
