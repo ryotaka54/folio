@@ -24,9 +24,17 @@ const universities: University[] = [
   { name: 'University of Illinois',   domain: 'illinois.edu' },
 ];
 
+// Sources tried in order until one loads
+const LOGO_SOURCES = (domain: string) => [
+  `https://img.logo.dev/${domain}?token=pk_free&size=128&format=png`,
+  `https://logo.clearbit.com/${domain}?size=128`,
+  `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
+];
+
 function UniversityLogo({ name, domain }: University) {
-  const [failed, setFailed] = useState(false);
-  const src = `https://logo.clearbit.com/${domain}`;
+  const sources = LOGO_SOURCES(domain);
+  const [srcIndex, setSrcIndex] = useState(0);
+  const failed = srcIndex >= sources.length;
 
   return (
     <div className="flex flex-col items-center gap-2.5">
@@ -37,12 +45,12 @@ function UniversityLogo({ name, domain }: University) {
         {!failed ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={src}
+            src={sources[srcIndex]}
             alt={`${name} logo`}
             width={32}
             height={32}
             className="object-contain w-8 h-8"
-            onError={() => setFailed(true)}
+            onError={() => setSrcIndex(i => i + 1)}
           />
         ) : (
           <span
