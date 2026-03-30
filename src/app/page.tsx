@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { TestimonialStack, type Testimonial } from '@/components/ui/glass-testimonial-swiper';
+import { UniversitiesSection } from '@/components/ui/customers-section';
 
 const TESTIMONIALS: Testimonial[] = [
   {
@@ -367,6 +368,9 @@ export default function Home() {
             </AnimatedGroup>
           </div>
         </section>
+
+        {/* ── Universities ── */}
+        <UniversitiesSection />
 
         {/* ── Product Walkthrough ── */}
         <div id="walkthrough" className="-mx-0">
