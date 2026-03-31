@@ -40,8 +40,7 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
           background: '#F8F8F8',
           border: '1px solid rgba(0,0,0,0.08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 8, boxSizing: 'border-box',
-          overflow: 'hidden',
+          padding: 6, boxSizing: 'border-box',
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
