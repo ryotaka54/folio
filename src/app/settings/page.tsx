@@ -433,7 +433,6 @@ function AppearanceSection() {
   const themes = [
     { id: 'light', label: 'Light', preview: { bg: '#FFFFFF', border: '#E5E7EB', dot: '#2563EB' } },
     { id: 'dark', label: 'Dark', preview: { bg: '#0A0A0A', border: '#2C2C2E', dot: '#3B82F6' } },
-    { id: 'system', label: 'System', preview: { bg: 'linear-gradient(135deg, #FFFFFF 50%, #0A0A0A 50%)', border: '#9CA3AF', dot: '#6B7280' } },
   ];
 
   return (
@@ -441,7 +440,7 @@ function AppearanceSection() {
       <SectionCard title="Theme" description="Choose your preferred color scheme.">
         <div className="flex gap-3">
           {mounted && themes.map(t => {
-            const active = theme === t.id || (!theme && t.id === 'system');
+            const active = theme === t.id;
             return (
               <button
                 key={t.id}
