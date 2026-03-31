@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { TrendingUp, Zap, MessageSquare, Clock, ArrowRight, Menu, X, GraduationCap, Calendar, CheckCircle, Award } from 'lucide-react';
+import { TrendingUp, Zap, MessageSquare, Clock, Menu, X, GraduationCap, Calendar, CheckCircle, Award } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
 import { Logo } from '@/components/Logo';
@@ -233,24 +233,6 @@ export default function Home() {
               }}
               className="flex flex-col items-center"
             >
-              {/* Announcement pill */}
-              <Link
-                href="/help"
-                className="group mb-8 flex w-fit items-center gap-3 rounded-full border border-border-gray px-4 py-1.5 shadow-sm transition-colors hover:bg-surface-gray"
-                style={{ background: 'var(--card-bg)' }}
-              >
-                <span className="text-[12px] font-medium" style={{ color: 'var(--muted-text)' }}>
-                  No credit card needed
-                </span>
-                <span className="h-3.5 w-px" style={{ background: 'var(--border-gray)' }} />
-                <span className="flex size-5 items-center justify-center overflow-hidden rounded-full" style={{ background: 'var(--surface-gray)' }}>
-                  <div className="flex w-10 -translate-x-1/2 transition-transform duration-300 ease-in-out group-hover:translate-x-0">
-                    <ArrowRight className="size-3 flex-shrink-0" style={{ color: 'var(--muted-text)' }} />
-                    <ArrowRight className="size-3 flex-shrink-0" style={{ color: 'var(--muted-text)' }} />
-                  </div>
-                </span>
-              </Link>
-
               {/* Headline */}
               <h1
                 className="max-w-3xl text-balance text-[2.75rem] font-semibold leading-[1.1] md:text-[3.5rem] lg:text-[4.25rem]"
