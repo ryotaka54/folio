@@ -347,7 +347,7 @@ function DashboardContent() {
               </p>
             </div>
             {(() => {
-              const season = getSeasonInfo();
+              const season = getSeasonInfo(user?.recruiting_season);
               const momentum = computeMomentum(applications);
               return (
                 <div className="flex items-center gap-2 flex-shrink-0">

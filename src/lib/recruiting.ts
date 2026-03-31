@@ -325,29 +325,54 @@ export function computeNudges(applications: Application[]): Nudge[] {
 
 // ─── Season ───────────────────────────────────────────────────────────────────
 
-interface Season { name: string; endDate: string }
-
-function getCurrentSeason(): Season {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
-
-  if (month <= 4) return { name: `Summer ${year} internship`, endDate: `${year}-05-01` };
-  if (month <= 7) return { name: `Fall ${year} internship`, endDate: `${year}-08-01` };
-  if (month <= 10) return { name: `Summer ${year + 1} internship`, endDate: `${year + 1}-04-01` };
-  return { name: `Spring ${year + 1} recruiting`, endDate: `${year + 1}-03-01` };
-}
-
 export interface SeasonInfo {
   name: string;
   daysLeft: number;
   urgent: boolean;
 }
 
-export function getSeasonInfo(): SeasonInfo {
-  const season = getCurrentSeason();
-  const daysLeft = daysBetween(todayStr(), season.endDate);
-  return { name: season.name, daysLeft: Math.max(0, daysLeft), urgent: daysLeft <= 30 };
+// Maps a recruiting_season profile value like "Summer 2026" to its offer-deadline end date.
+// Season strings match RECRUITING_SEASONS in constants.ts.
+function seasonEndDate(recruitingSeason: string): string {
+  const [term, yearStr] = recruitingSeason.trim().split(' ');
+  const year = parseInt(yearStr, 10);
+  if (isNaN(year)) return '';
+  switch (term) {
+    case 'Spring':  return `${year}-04-15`; // spring offer deadlines cluster mid-April
+    case 'Summer':  return `${year}-04-01`; // summer internship offer deadlines ~April
+    case 'Fall':    return `${year}-08-15`; // fall recruiting wraps mid-August
+    case 'Winter':  return `${year}-12-15`;
+    default:        return `${year}-06-01`;
+  }
+}
+
+export function getSeasonInfo(recruitingSeason?: string | null): SeasonInfo {
+  const today = todayStr();
+
+  if (recruitingSeason) {
+    const endDate = seasonEndDate(recruitingSeason);
+    if (endDate) {
+      const daysLeft = daysBetween(today, endDate);
+      return {
+        name: recruitingSeason,
+        daysLeft: Math.max(0, daysLeft),
+        urgent: daysLeft <= 30,
+      };
+    }
+  }
+
+  // Fallback: infer from current month
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  let name: string, endDate: string;
+  if (month <= 4)  { name = `Summer ${year}`;       endDate = `${year}-04-01`; }
+  else if (month <= 7) { name = `Fall ${year}`;     endDate = `${year}-08-15`; }
+  else if (month <= 10){ name = `Summer ${year+1}`; endDate = `${year+1}-04-01`; }
+  else             { name = `Spring ${year+1}`;     endDate = `${year+1}-04-15`; }
+
+  const daysLeft = daysBetween(today, endDate);
+  return { name, daysLeft: Math.max(0, daysLeft), urgent: daysLeft <= 30 };
 }
 
 // ─── Seasonal tips ────────────────────────────────────────────────────────────
