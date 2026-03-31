@@ -19,7 +19,7 @@ const universities: University[] = [
   { name: 'University of Michigan', abbr: 'UMich', logo: '/universities/umich.svg',        color: '#00274C' },
   { name: 'Northeastern',           abbr: 'NEU',   logo: '/universities/northeastern.png', color: '#C8102E' },
   { name: 'Georgia Tech',           abbr: 'GT',    logo: '/universities/georgia-tech.svg', color: '#B3A369' },
-  { name: 'Univ. of Washington',    abbr: 'UW',    logo: '/universities/uw.svg',           color: '#4B2E83' },
+  { name: 'UPenn',                  abbr: 'Penn',  logo: '/universities/upenn.svg',        color: '#011F5B' },
   { name: 'Boston University',      abbr: 'BU',    logo: '/universities/bu.svg',           color: '#CC0000' },
   { name: 'Carnegie Mellon',        abbr: 'CMU',   logo: '/universities/cmu.svg',          color: '#C41230' },
   { name: 'UT Austin',              abbr: 'UT',    logo: '/universities/ut-austin.svg',    color: '#BF5700' },
