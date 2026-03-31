@@ -51,7 +51,7 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
           height={48}
           loading="lazy"
           decoding="async"
-          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+          style={{ width: '78%', height: '78%', objectFit: 'contain', display: 'block' }}
           onError={() => setTier('badge')}
         />
       </div>
