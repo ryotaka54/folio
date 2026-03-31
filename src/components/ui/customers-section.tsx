@@ -50,6 +50,8 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
           alt={`${name} logo`}
           width={48}
           height={48}
+          loading="lazy"
+          decoding="async"
           style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
           onError={() => setTier('badge')}
         />
