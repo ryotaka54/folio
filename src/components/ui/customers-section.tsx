@@ -17,7 +17,7 @@ const universities: University[] = [
   { name: 'NYU',                    abbr: 'NYU',   logo: '/universities/nyu.svg',          color: '#57068C' },
   { name: 'UC Berkeley',            abbr: 'UCB',   logo: '/universities/uc-berkeley.svg',  color: '#003262' },
   { name: 'University of Michigan', abbr: 'UMich', logo: '/universities/umich.svg',        color: '#00274C' },
-  { name: 'Northeastern',           abbr: 'NEU',   logo: '/universities/northeastern.svg', color: '#C8102E' },
+  { name: 'Northeastern',           abbr: 'NEU',   logo: '/universities/northeastern.png', color: '#C8102E' },
   { name: 'Georgia Tech',           abbr: 'GT',    logo: '/universities/georgia-tech.svg', color: '#B3A369' },
   { name: 'Univ. of Washington',    abbr: 'UW',    logo: '/universities/uw.svg',           color: '#4B2E83' },
   { name: 'Boston University',      abbr: 'BU',    logo: '/universities/bu.svg',           color: '#CC0000' },
@@ -32,17 +32,45 @@ type Tier = 'img' | 'badge' | 'icon';
 function UniversityLogo({ name, abbr, logo, color }: University) {
   const [tier, setTier] = useState<Tier>('img');
 
+  // CMU is a custom badge SVG — render it directly without the white container
+  const isCustomBadge = logo.endsWith('cmu.svg');
+
   if (tier === 'img') {
+    if (isCustomBadge) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logo}
+          alt={`${name} logo`}
+          width={64}
+          height={64}
+          style={{ width: 64, height: 64, borderRadius: 14, display: 'block', flexShrink: 0 }}
+          onError={() => setTier('badge')}
+        />
+      );
+    }
+
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={logo}
-        alt={`${name} logo`}
-        width={64}
-        height={64}
-        style={{ width: 64, height: 64, borderRadius: 14, display: 'block', flexShrink: 0 }}
-        onError={() => setTier('badge')}
-      />
+      <div
+        style={{
+          width: 64, height: 64, borderRadius: 14, flexShrink: 0,
+          background: '#F8F8F8',
+          border: '1px solid rgba(0,0,0,0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 8, boxSizing: 'border-box',
+          overflow: 'hidden',
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={logo}
+          alt={`${name} logo`}
+          width={48}
+          height={48}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+          onError={() => setTier('badge')}
+        />
+      </div>
     );
   }
 
@@ -63,7 +91,6 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
     );
   }
 
-  // Tier 3 — last resort
   return (
     <div
       style={{ width: 64, height: 64, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}

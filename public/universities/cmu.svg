@@ -1,6 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="14" fill="#C41230"/>
-  <text x="32" y="32" dominant-baseline="central" text-anchor="middle"
+  <text x="32" y="30" dominant-baseline="central" text-anchor="middle"
     fill="white" font-family="system-ui,-apple-system,sans-serif"
     font-weight="700" font-size="15">CMU</text>
+  <text x="32" y="46" dominant-baseline="central" text-anchor="middle"
+    fill="rgba(255,255,255,0.65)" font-family="system-ui,-apple-system,sans-serif"
+    font-weight="500" font-size="8">CARNEGIE MELLON</text>
 </svg>
