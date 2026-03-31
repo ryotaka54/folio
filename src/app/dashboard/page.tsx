@@ -20,9 +20,14 @@ import MobileCardList from '@/components/MobileCardList';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import ExtensionBanner from '@/components/ExtensionBanner';
+import StreakBadge from '@/components/StreakBadge';
+import SmartNudges from '@/components/SmartNudges';
+import WeeklyGoal from '@/components/WeeklyGoal';
+import OfferConfetti from '@/components/OfferConfetti';
 import { useTutorial } from '@/lib/tutorial-context';
 import { ExtensionStatusProvider, useExtensionStatus } from '@/lib/extension-status-context';
 import { capture } from '@/lib/analytics';
+import { computeGreeting, computeMomentum, getSeasonInfo, getSeasonalTip } from '@/lib/recruiting';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
@@ -68,6 +73,10 @@ function DashboardContent() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [toastUndo, setToastUndo] = useState<(() => void) | null>(null);
+  const [offerConfetti, setOfferConfetti] = useState(false);
+  const [greeting, setGreeting] = useState('');
+  const [seasonTip, setSeasonTip] = useState('');
+  const prevStatusesRef = useRef<Record<string, string>>({});
 
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
   const pendingDeleteRef = useRef<{ id: string; app: Application } | null>(null);
@@ -247,6 +256,29 @@ function DashboardContent() {
     };
   }, []);
 
+  // Compute greeting + season tip once applications are loaded
+  useEffect(() => {
+    if (!user || loading) return;
+    setGreeting(computeGreeting({ name: user.name ?? 'there', applications }));
+    setSeasonTip(getSeasonalTip());
+  }, [user, applications, loading]);
+
+  // Detect offer status changes → trigger confetti
+  useEffect(() => {
+    const offerStatuses = ['Offer', 'Offer — Negotiating'];
+    for (const app of applications) {
+      const prev = prevStatusesRef.current[app.id];
+      if (prev && !offerStatuses.includes(prev) && offerStatuses.includes(app.status)) {
+        setOfferConfetti(true);
+        showToast('🎉 Offer received — you earned this.');
+        setTimeout(() => setOfferConfetti(false), 100);
+        break;
+      }
+    }
+    prevStatusesRef.current = Object.fromEntries(applications.map(a => [a.id, a.status]));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applications]);
+
   return (
     <div className="min-h-screen bg-background">
       <ExtensionBanner />
@@ -265,6 +297,9 @@ function DashboardContent() {
         </div>
       )}
 
+      {/* Offer confetti */}
+      <OfferConfetti trigger={offerConfetti} />
+
       {/* Toast */}
       <Toast
         message={toast}
@@ -281,8 +316,9 @@ function DashboardContent() {
           </Link>
           <div className="flex items-center gap-3">
             {user?.name && (
-              <span className="text-sm text-muted-text hidden md:block">Hi, {user.name}</span>
+              <span className="text-sm text-muted-text hidden md:block">Hi, {user.name.split(' ')[0]}</span>
             )}
+            <StreakBadge onMilestone={msg => showToast(msg)} />
             <ThemeToggle />
             <Link
               href="/settings"
@@ -302,36 +338,46 @@ function DashboardContent() {
       </nav>
 
       <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6">
-        {/* Greeting */}
-        <div className="mb-6">
-          <h1 className="text-[18px] font-semibold tracking-tight" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-            {user?.name ? (
-              <>
-                {user.name.split(' ')[0]}{' '}
-                <span className="font-normal" style={{ color: 'var(--muted-text)' }}>
-                  {(() => {
-                    const submitted = applications.filter(a => a.status !== 'Wishlist').length;
-                    const inInterviews = applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length;
-                    if (applications.length === 0) return '— start tracking and see where things land.';
-                    if (inInterviews > 0) return `— ${inInterviews} interview${inInterviews !== 1 ? 's' : ''} in play.`;
-                    if (submitted === 1) return '— 1 application out.';
-                    return `— ${submitted} applications out.`;
-                  })()}
-                </span>
-              </>
-            ) : (
-              <span className="font-normal" style={{ color: 'var(--muted-text)' }}>
-                {(() => {
-                  const submitted = applications.filter(a => a.status !== 'Wishlist').length;
-                  const inInterviews = applications.filter(a => ['OA / Online Assessment','Phone / Recruiter Screen','Final Round Interviews','Recruiter Screen','Technical / Case Interview','Final Round','Offer — Negotiating'].includes(a.status)).length;
-                  if (applications.length === 0) return 'Start tracking and see where things land.';
-                  if (inInterviews > 0) return `${inInterviews} interview${inInterviews !== 1 ? 's' : ''} in play.`;
-                  if (submitted === 1) return '1 application out.';
-                  return `${submitted} applications out.`;
-                })()}
-              </span>
-            )}
-          </h1>
+        {/* Greeting + momentum + season */}
+        <div className="mb-5">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-0">
+              <p className="text-[17px] font-semibold leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
+                {greeting || (user?.name ? `Hey ${user.name.split(' ')[0]}.` : 'Welcome back.')}
+              </p>
+            </div>
+            {(() => {
+              const season = getSeasonInfo();
+              const momentum = computeMomentum(applications);
+              return (
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span
+                    className="text-[11px] font-medium px-2.5 py-1 rounded-full"
+                    style={{ background: momentum.color + '18', color: momentum.color }}
+                    title={`Momentum score: ${momentum.score}/100`}
+                  >
+                    {momentum.label}
+                  </span>
+                  {season.daysLeft > 0 && (
+                    <span
+                      className="text-[11px] font-medium px-2.5 py-1 rounded-full hidden sm:inline-flex items-center gap-1"
+                      style={{
+                        background: season.urgent ? '#FEF3C7' : 'var(--surface-gray)',
+                        color: season.urgent ? '#92400E' : 'var(--muted-text)',
+                      }}
+                    >
+                      {season.urgent && '⚠ '}{season.daysLeft}d left · {season.name}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
+          {seasonTip && (
+            <p className="mt-2 text-[12px] leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
+              {seasonTip}
+            </p>
+          )}
         </div>
 
         {/* Stats */}
@@ -343,6 +389,26 @@ function DashboardContent() {
         <div data-tutorial-id="funnel-chart">
           <FunnelChart applications={displayApplications} />
         </div>
+
+        {/* Weekly goal progress */}
+        {!isActive && (
+          <WeeklyGoal
+            applications={applications}
+            onToast={msg => showToast(msg)}
+          />
+        )}
+
+        {/* Smart nudges */}
+        {!isActive && (
+          <SmartNudges
+            applications={applications}
+            onAddApp={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+            onOpenApp={id => {
+              const app = applications.find(a => a.id === id);
+              if (app) handleCardClick(app);
+            }}
+          />
+        )}
 
         {/* Controls */}
         <div className="mt-6 flex flex-col gap-2">

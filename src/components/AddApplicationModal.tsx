@@ -6,6 +6,7 @@ import { CATEGORIES } from '@/lib/constants';
 import { X, Sparkles } from 'lucide-react';
 import { useExtensionStatus } from '@/lib/extension-status-context';
 import { capture } from '@/lib/analytics';
+import { lookupCompany, type CompanyInfo } from '@/lib/recruiting';
 
 interface AddApplicationModalProps {
   open: boolean;
@@ -59,8 +60,10 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
   const [error,    setError]    = useState('');
   const [isAutofilling, setIsAutofilling] = useState(false);
   const [isSaving,      setIsSaving]      = useState(false);
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const userPickedCategory = useRef(false);
   const backdropRef = useRef<HTMLDivElement>(null);
+  const companyLookupTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -69,12 +72,24 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
       setStatus(defaultStatus);
       setDeadline(''); setNotes(''); setError('');
       setIsAutofilling(false); setIsSaving(false);
+      setCompanyInfo(null);
       setJobLink(initialJobLink || '');
       if (!isInstalled && hintCount < 3) {
         incrementHintCount();
       }
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Company research lookup — debounced 400ms
+  useEffect(() => {
+    if (companyLookupTimer.current) clearTimeout(companyLookupTimer.current);
+    if (!company.trim()) { setCompanyInfo(null); return; }
+    companyLookupTimer.current = setTimeout(async () => {
+      const info = await lookupCompany(company);
+      setCompanyInfo(info);
+    }, 400);
+    return () => { if (companyLookupTimer.current) clearTimeout(companyLookupTimer.current); };
+  }, [company]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -197,6 +212,18 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
               ) : (
                 <input id="modal-company" type="text" value={company} onChange={e => setCompany(e.target.value)}
                   className={inputCls} placeholder="e.g. Google" />
+              )}
+              {companyInfo && (
+                <div className="mt-2 px-3 py-2.5 rounded-md text-[12px] leading-relaxed border"
+                  style={{ background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>{companyInfo.name}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: 'var(--border-gray)', color: 'var(--muted-text)' }}>{companyInfo.industry}</span>
+                    {companyInfo.hasOA && <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: '#FEF3C7', color: '#92400E' }}>Includes OA</span>}
+                  </div>
+                  <p>{companyInfo.tip}</p>
+                  <p className="mt-1 opacity-70">Apps open: {companyInfo.applicationWindow} · Timeline: {companyInfo.timeline}</p>
+                </div>
               )}
             </div>
 

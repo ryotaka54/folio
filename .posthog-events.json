@@ -1,0 +1,57 @@
+[
+  {
+    "event": "autofill_used",
+    "description": "User clicked the autofill button to parse a job URL",
+    "file": "src/components/AddApplicationModal.tsx"
+  },
+  {
+    "event": "autofill_success",
+    "description": "Autofill successfully populated company, role, and/or location from a job URL",
+    "file": "src/components/AddApplicationModal.tsx"
+  },
+  {
+    "event": "autofill_error",
+    "description": "Autofill failed to parse the job URL (client-side error feedback)",
+    "file": "src/components/AddApplicationModal.tsx"
+  },
+  {
+    "event": "application_status_changed",
+    "description": "User moved an application to a different pipeline stage (drag-and-drop or inline update)",
+    "file": "src/app/dashboard/page.tsx"
+  },
+  {
+    "event": "application_deleted",
+    "description": "User deleted an application from the tracker",
+    "file": "src/app/dashboard/page.tsx"
+  },
+  {
+    "event": "view_switched",
+    "description": "User toggled between pipeline (kanban) and table view on the dashboard",
+    "file": "src/app/dashboard/page.tsx"
+  },
+  {
+    "event": "mode_changed",
+    "description": "User changed their tracking mode (internship vs full-time) from the settings flow",
+    "file": "src/app/onboarding/page.tsx"
+  },
+  {
+    "event": "support_click",
+    "description": "User clicked the Buy Me a Coffee / support link (landing page wiring — event already fired elsewhere)",
+    "file": "src/app/page.tsx"
+  },
+  {
+    "event": "autofill_requested",
+    "description": "Server received a request to parse a job URL (server-side)",
+    "file": "src/app/api/parse/route.ts"
+  },
+  {
+    "event": "autofill_parse_success",
+    "description": "Server successfully extracted job data from the URL (server-side)",
+    "file": "src/app/api/parse/route.ts"
+  },
+  {
+    "event": "autofill_parse_failed",
+    "description": "Server failed to extract job data from the URL (server-side)",
+    "file": "src/app/api/parse/route.ts"
+  }
+]
