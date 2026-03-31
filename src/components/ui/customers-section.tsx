@@ -36,22 +36,23 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
     return (
       <div
         style={{
-          width: 64, height: 64, borderRadius: 14, flexShrink: 0,
-          background: '#F8F8F8',
-          border: '1px solid rgba(0,0,0,0.08)',
+          width: 80, height: 80, borderRadius: 16, flexShrink: 0,
+          background: '#FFFFFF',
+          border: '1.5px solid rgba(0,0,0,0.12)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: 6, boxSizing: 'border-box',
+          padding: 8, boxSizing: 'border-box',
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={logo}
           alt={`${name} logo`}
-          width={48}
-          height={48}
+          width={60}
+          height={60}
           loading="lazy"
           decoding="async"
-          style={{ width: '78%', height: '78%', objectFit: 'contain', display: 'block' }}
+          style={{ width: '92%', height: '92%', objectFit: 'contain', display: 'block' }}
           onError={() => setTier('badge')}
         />
       </div>
@@ -62,13 +63,14 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
     return (
       <div
         style={{
-          width: 64, height: 64, borderRadius: 14,
+          width: 80, height: 80, borderRadius: 16,
           background: color,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
+          boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
         }}
       >
-        <span style={{ color: '#fff', fontWeight: 700, fontSize: abbr.length <= 2 ? 18 : abbr.length === 3 ? 15 : 12, letterSpacing: '-0.02em', lineHeight: 1 }}>
+        <span style={{ color: '#fff', fontWeight: 700, fontSize: abbr.length <= 2 ? 20 : abbr.length === 3 ? 17 : 13, letterSpacing: '-0.02em', lineHeight: 1 }}>
           {abbr}
         </span>
       </div>
@@ -77,10 +79,10 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
 
   return (
     <div
-      style={{ width: 64, height: 64, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+      style={{ width: 80, height: 80, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
       className="bg-surface-gray"
     >
-      <GraduationCap size={28} style={{ color: 'var(--text-tertiary)' }} />
+      <GraduationCap size={32} style={{ color: 'var(--text-tertiary)' }} />
     </div>
   );
 }
