@@ -310,10 +310,29 @@ function DashboardContent() {
       {/* Top nav */}
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo size={28} variant="dark" />
-            <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
-          </Link>
+          <div className="flex items-center gap-5">
+            <Link href="/" className="flex items-center gap-2">
+              <Logo size={28} variant="dark" />
+              <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+            </Link>
+            <div className="flex items-center gap-0.5">
+              <Link
+                href="/dashboard"
+                className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors"
+                style={{ color: 'var(--accent-blue)', background: 'rgba(37,99,235,0.08)' }}
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/community"
+                className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+                style={{ color: 'var(--muted-text)' }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Community
+              </Link>
+            </div>
+          </div>
           <div className="flex items-center gap-3">
             {user?.name && (
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name.split(' ')[0]}</span>

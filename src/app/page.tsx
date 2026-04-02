@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { TestimonialStack, type Testimonial } from '@/components/ui/glass-testimonial-swiper';
 import { UniversitiesSection } from '@/components/ui/customers-section';
+import { getChallengeDay } from '@/lib/community';
 
 const TESTIMONIALS: Testimonial[] = [
   {
@@ -187,6 +188,67 @@ function LandingNav() {
   );
 }
 
+// ── Community teaser ──────────────────────────────────────────────────────────
+
+function CommunityTeaser() {
+  const day = getChallengeDay();
+  return (
+    <section className="max-w-6xl mx-auto px-6 py-10">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="rounded-2xl border overflow-hidden flex flex-col md:flex-row items-center gap-0"
+        style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}
+      >
+        {/* Blue left panel */}
+        <div
+          className="w-full md:w-auto md:flex-shrink-0 px-8 py-8 flex flex-col items-center justify-center text-center md:text-left"
+          style={{ background: 'linear-gradient(135deg, #1D4ED8, #3B82F6)', minWidth: 180 }}
+        >
+          <div className="text-[11px] font-semibold uppercase tracking-[0.1em] mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            Day
+          </div>
+          <div className="text-[56px] font-semibold leading-none" style={{ color: '#fff', letterSpacing: '-0.04em' }}>
+            {day}
+          </div>
+          <div className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>of 100</div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 px-7 py-7">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.08em] mb-2" style={{ color: 'var(--accent-blue)' }}>
+            100-day student challenge
+          </p>
+          <h3 className="text-[18px] font-semibold mb-2 leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
+            Students are building this app — one feature a day.
+          </h3>
+          <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'var(--muted-text)' }}>
+            The most-voted idea from the community gets shipped the next day. Every single day for 100 days.
+          </p>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link
+              href="/community"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-medium transition-all"
+              style={{ background: 'var(--accent-blue)', color: '#fff' }}
+            >
+              See what students are building
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
+            </Link>
+            <span
+              className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: 'rgba(22,163,74,0.12)', color: '#16A34A' }}
+            >
+              ✓ Deadline Pill Badges — live today
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
 // ── Home ──────────────────────────────────────────────────────────────────────
 
 export default function Home() {
@@ -353,6 +415,9 @@ export default function Home() {
 
         {/* ── Universities ── */}
         <UniversitiesSection />
+
+        {/* ── Community challenge teaser ── */}
+        <CommunityTeaser />
 
         {/* ── Product Walkthrough ── */}
         <div id="walkthrough" className="-mx-0">
