@@ -26,7 +26,7 @@ create table if not exists public.challenge_config (
 
 -- Insert default config row (update challenge_start_date to match CHALLENGE_START_DATE constant)
 insert into public.challenge_config (id, challenge_start_date)
-values (1, '2026-04-02')
+values (1, '2026-04-03')
 on conflict (id) do nothing;
 
 -- 3. Add is_admin column to users table (for admin panel access)

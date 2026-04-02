@@ -1,7 +1,7 @@
 // ── Community challenge constants & helpers ────────────────────────────────
 
 /** Day 1 of the 100-day challenge. Update this once — everything else is automatic. */
-export const CHALLENGE_START_DATE = new Date('2026-04-02');
+export const CHALLENGE_START_DATE = new Date('2026-04-03');
 
 export type IdeaStatus = 'pending' | 'winning' | 'building' | 'live' | 'rejected';
 
