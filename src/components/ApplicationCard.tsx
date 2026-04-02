@@ -17,11 +17,14 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
     const now = new Date();
     const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffDays < 0)  return { label: 'Overdue',     style: { background: '#FEF2F2', color: '#991B1B', border: '1px solid #FECACA' } };
-    if (diffDays === 0) return { label: 'Due today',  style: { background: '#FEF2F2', color: '#991B1B', border: '1px solid #FECACA' } };
-    if (diffDays <= 3)  return { label: `${diffDays}d left`, style: { background: '#FEF3C7', color: '#92400E', border: '1px solid #FDE68A' } };
-    const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return { label: formatted, style: { background: 'var(--surface-gray)', color: 'var(--text-tertiary)', border: '1px solid var(--border-gray)' } };
+    const red   = { background: 'var(--error-bg)',           color: 'var(--error-text)',   border: '1px solid var(--error-border)' };
+    const amber = { background: 'rgba(217,119,6,0.10)',      color: 'var(--amber-warning)', border: '1px solid rgba(217,119,6,0.25)' };
+
+    if (diffDays < 0)   return { label: 'Overdue',            style: red };
+    if (diffDays === 0) return { label: 'Today',               style: red };
+    if (diffDays <= 3)  return { label: `${diffDays}d left`,   style: red };
+    if (diffDays <= 7)  return { label: `${diffDays}d left`,   style: amber };
+    return null;
   })();
 
   return (
@@ -67,7 +70,7 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
         )}
         {deadlineInfo && (
           <span
-            className="text-[11px] px-1.5 py-0.5 rounded font-medium ml-auto"
+            className="text-[10px] px-1.5 py-0.5 rounded-full font-medium ml-auto whitespace-nowrap"
             style={deadlineInfo.style}
           >
             {deadlineInfo.label}

@@ -21,17 +21,17 @@ const formatDate = (dateStr: string | null) => {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-const deadlineUrgency = (dateStr: string | null): 'overdue' | 'today' | 'soon' | 'normal' | 'none' => {
-  if (!dateStr) return 'none';
+const deadlineUrgency = (dateStr: string | null): { tier: 'overdue' | 'today' | 'red' | 'amber' | 'normal' | 'none'; diffDays: number } => {
+  if (!dateStr) return { tier: 'none', diffDays: 0 };
   const iso = dateStr.length === 10 ? dateStr + 'T00:00:00' : dateStr;
   const d = new Date(iso);
   const now = new Date();
-  const diffMs = d.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  if (diffDays < 0) return 'overdue';
-  if (diffDays === 0) return 'today';
-  if (diffDays <= 3) return 'soon';
-  return 'normal';
+  const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0)   return { tier: 'overdue', diffDays };
+  if (diffDays === 0) return { tier: 'today',   diffDays };
+  if (diffDays <= 3)  return { tier: 'red',     diffDays };
+  if (diffDays <= 7)  return { tier: 'amber',   diffDays };
+  return { tier: 'normal', diffDays };
 };
 
 export default function TableView({ applications, selectedIds, onSelectionChange, onRowClick }: TableViewProps) {
@@ -171,15 +171,21 @@ export default function TableView({ applications, selectedIds, onSelectionChange
                       {app.status}
                     </span>
                   </td>
-                  <td className={`px-3 py-2.5 text-xs hidden md:table-cell ${
-                    (() => {
-                      const u = deadlineUrgency(app.deadline);
-                      if (u === 'overdue' || u === 'today') return 'text-red-500 font-medium';
-                      if (u === 'soon') return 'text-amber-warning font-medium';
-                      return 'text-muted-text';
-                    })()
-                  }`}>
-                    {formatDate(app.deadline)}
+                  <td className="px-3 py-2.5 hidden md:table-cell">
+                    {(() => {
+                      const { tier, diffDays } = deadlineUrgency(app.deadline);
+                      if (tier === 'none') return <span className="text-xs text-muted-text">—</span>;
+                      if (tier === 'normal') return <span className="text-xs text-muted-text">{formatDate(app.deadline)}</span>;
+                      const label = tier === 'overdue' ? 'Overdue' : tier === 'today' ? 'Today' : `${diffDays}d left`;
+                      const style = (tier === 'overdue' || tier === 'today' || tier === 'red')
+                        ? { background: 'var(--error-bg)', color: 'var(--error-text)', border: '1px solid var(--error-border)' }
+                        : { background: 'rgba(217,119,6,0.10)', color: 'var(--amber-warning)', border: '1px solid rgba(217,119,6,0.25)' };
+                      return (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full whitespace-nowrap" style={style}>
+                          {label}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className="px-3 py-2.5 text-xs text-muted-text hidden lg:table-cell">
                     {formatDate(app.created_at)}
