@@ -7,6 +7,7 @@ import { TutorialProvider } from "@/lib/tutorial-context";
 import CommandPalette from "@/components/CommandPalette";
 import TutorialOverlay from "@/components/TutorialOverlay";
 import DemoOverlay from "@/components/DemoOverlay";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -58,11 +59,19 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={geist.variable}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#2563EB" />
+        <meta name="application-name" content="Applyd" />
+        {/* Apple PWA */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Applyd" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        {/* Windows */}
+        <meta name="msapplication-TileColor" content="#2563EB" />
+        <meta name="msapplication-TileImage" content="/icons/icon-144.png" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -89,6 +98,7 @@ export default function RootLayout({
               <CommandPalette />
               <TutorialOverlay />
               <DemoOverlay />
+              <PWAInstallPrompt />
             </TutorialProvider>
           </AuthProvider>
         </ThemeProvider>

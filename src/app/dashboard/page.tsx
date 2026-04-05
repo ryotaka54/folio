@@ -257,11 +257,77 @@ function DashboardContent() {
     };
   }, []);
 
-  // Page title
+  // Dynamic page title + app badge
   useEffect(() => {
-    document.title = 'Dashboard | Applyd';
-    return () => { document.title = 'Applyd — Recruiting Pipeline Tracker for Students'; };
-  }, []);
+    if (loading) return;
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    const todayDeadlines = applications.filter(a => a.deadline === todayStr);
+    const weekDeadlines = applications.filter(a => {
+      if (!a.deadline) return false;
+      const d = new Date(a.deadline + 'T00:00:00');
+      return d >= now && d <= sevenDays;
+    });
+
+    if (todayDeadlines.length > 0) {
+      document.title = `🔴 Deadline Today — Applyd`;
+    } else if (applications.length > 0) {
+      document.title = `Applyd — ${applications.length} application${applications.length !== 1 ? 's' : ''} tracked`;
+    } else {
+      document.title = 'Dashboard | Applyd';
+    }
+
+    // App badge (dock/taskbar badge count = deadlines this week)
+    if ('setAppBadge' in navigator) {
+      if (weekDeadlines.length > 0) {
+        (navigator as Navigator & { setAppBadge: (n: number) => void }).setAppBadge(weekDeadlines.length);
+      } else {
+        (navigator as Navigator & { clearAppBadge: () => void }).clearAppBadge?.();
+      }
+    }
+
+    return () => {
+      document.title = 'Applyd — Recruiting Pipeline Tracker for Students';
+      if ('clearAppBadge' in navigator) {
+        (navigator as Navigator & { clearAppBadge: () => void }).clearAppBadge();
+      }
+    };
+  }, [applications, loading]);
+
+  // Desktop notifications — request after 3+ apps, fire for deadlines within 24h
+  useEffect(() => {
+    if (loading || applications.length < 3) return;
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'denied') return;
+
+    const requestAndNotify = async () => {
+      if (Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
+      if (Notification.permission !== 'granted') return;
+
+      const now = new Date();
+      const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+      const notifiedKey = `applyd_notified_${tomorrowStr}`;
+      if (localStorage.getItem(notifiedKey)) return;
+
+      const dueTomorrow = applications.filter(a => a.deadline === tomorrowStr);
+      for (const app of dueTomorrow.slice(0, 3)) {
+        new Notification(`Applyd — Deadline Tomorrow`, {
+          body: `${app.company} — ${app.role}`,
+          icon: '/icons/icon-192.png',
+          badge: '/icons/icon-96.png',
+          tag: `applyd-deadline-${app.id}`,
+        });
+      }
+      if (dueTomorrow.length > 0) localStorage.setItem(notifiedKey, '1');
+    };
+
+    requestAndNotify();
+  }, [applications, loading]);
 
   // Compute greeting + season tip once applications are loaded
   useEffect(() => {
