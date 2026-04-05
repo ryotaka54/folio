@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import { GraduationCap } from 'lucide-react';
@@ -18,7 +17,7 @@ const universities: University[] = [
   { name: 'NYU',                    abbr: 'NYU',   logo: '/universities/nyu.svg',          color: '#57068C' },
   { name: 'UC Berkeley',            abbr: 'UCB',   logo: '/universities/uc-berkeley.svg',  color: '#003262' },
   { name: 'University of Michigan', abbr: 'UMich', logo: '/universities/umich.svg',        color: '#00274C' },
-  { name: 'Northeastern',           abbr: 'NEU',   logo: '/universities/northeastern.png', color: '#C8102E' },
+  { name: 'Northeastern',           abbr: 'NEU',   logo: '/universities/northeastern.svg', color: '#C8102E' },
   { name: 'Georgia Tech',           abbr: 'GT',    logo: '/universities/georgia-tech.svg', color: '#B3A369' },
   { name: 'UPenn',                  abbr: 'Penn',  logo: '/universities/upenn.svg',        color: '#011F5B' },
   { name: 'Boston University',      abbr: 'BU',    logo: '/universities/bu.svg',           color: '#CC0000' },
@@ -32,8 +31,6 @@ type Tier = 'img' | 'badge' | 'icon';
 
 function UniversityLogo({ name, abbr, logo, color }: University) {
   const [tier, setTier] = useState<Tier>('img');
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
 
   if (tier === 'img') {
     return (
@@ -55,11 +52,7 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
           height={60}
           loading="lazy"
           decoding="async"
-          style={{
-            width: '92%', height: '92%', objectFit: 'contain', display: 'block',
-            filter: isDark ? 'brightness(0) invert(1)' : 'none',
-            opacity: isDark ? 0.85 : 1,
-          }}
+          style={{ width: '92%', height: '92%', objectFit: 'contain', display: 'block' }}
           onError={() => setTier('badge')}
         />
       </div>
