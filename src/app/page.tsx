@@ -97,11 +97,18 @@ function LandingNav() {
         className="fixed z-20 w-full px-2 group"
       >
         <div
-          className={cn(
-            'mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12',
-            scrolled &&
-              'bg-background/70 max-w-4xl rounded-2xl border border-border-gray backdrop-blur-lg lg:px-6',
-          )}
+          className="mx-auto mt-2 max-w-6xl px-6 rounded-2xl transition-all duration-500 lg:px-12"
+          style={{
+            maxWidth: scrolled ? '56rem' : '72rem',
+            background: scrolled ? 'var(--background)' : 'transparent',
+            backdropFilter: scrolled ? 'blur(12px)' : 'none',
+            WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
+            borderWidth: 1,
+            borderStyle: 'solid',
+            borderColor: scrolled ? 'var(--border-gray)' : 'transparent',
+            paddingLeft: scrolled ? '1.5rem' : undefined,
+            paddingRight: scrolled ? '1.5rem' : undefined,
+          }}
         >
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
             {/* Logo */}
