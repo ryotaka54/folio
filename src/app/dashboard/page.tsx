@@ -208,23 +208,6 @@ function DashboardContent() {
     setShowAddModal(true);
   };
 
-  const handleExportCSV = () => {
-    const toExport = filteredApps.length < applications.length ? filteredApps : applications;
-    const headers = ['Company', 'Role', 'Status', 'Location', 'Category', 'Deadline', 'Job Link', 'Notes'];
-    const rows = toExport.map(a => [
-      a.company, a.role, a.status, a.location, a.category ?? '',
-      a.deadline ?? '', a.job_link ?? '', (a.notes ?? '').replace(/\n/g, ' '),
-    ]);
-    const csv = [headers, ...rows]
-      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
-      .join('\n');
-    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'applyd-applications.csv'; a.click();
-    URL.revokeObjectURL(url);
-    capture('csv_exported', { count: toExport.length });
-  };
 
   // Listen for command palette "Add Application"
   useEffect(() => {
@@ -515,17 +498,6 @@ function DashboardContent() {
             >
               {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
             </button>
-            {applications.length > 0 && (
-              <button
-                onClick={handleExportCSV}
-                className="ml-auto h-8 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 flex items-center gap-1.5 transition-colors hover:bg-surface-gray"
-                style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)', background: 'var(--background)' }}
-                title="Export to CSV"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Export CSV
-              </button>
-            )}
           </div>
           {displayApplications.length > 0 && (
             <p className="text-[11px] text-right" style={{ color: 'var(--text-tertiary)' }}>

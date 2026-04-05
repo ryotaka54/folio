@@ -12,7 +12,7 @@ import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS } from '@/lib/constants
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type Section = 'profile' | 'recruiting' | 'appearance' | 'account' | 'support' | 'danger';
+type Section = 'profile' | 'recruiting' | 'appearance' | 'account' | 'data' | 'support' | 'danger';
 
 interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: boolean }
 
@@ -24,6 +24,7 @@ const PaletteIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="
 const ShieldIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
 const CoffeeIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>;
 const TrashIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
+const DownloadIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
 const CheckIcon = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 const GearIcon = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
 
@@ -36,6 +37,7 @@ const SECTIONS: SectionMeta[] = [
   { id: 'recruiting', label: 'Recruiting', icon: <BriefcaseIcon /> },
   { id: 'appearance', label: 'Appearance', icon: <PaletteIcon /> },
   { id: 'account', label: 'Account', icon: <ShieldIcon /> },
+  { id: 'data', label: 'Export Data', icon: <DownloadIcon /> },
   { id: 'support', label: 'Support Applyd', icon: <CoffeeIcon /> },
   { id: 'danger', label: 'Danger Zone', icon: <TrashIcon />, danger: true },
 ];
@@ -816,6 +818,140 @@ function DangerSection({ showToast }: { showToast: (msg: string, type?: 'success
   );
 }
 
+// ─── Section: Export Data ─────────────────────────────────────────────────────
+
+function DataSection({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const { user } = useAuth();
+  const [exporting, setExporting] = useState<string | null>(null);
+
+  const PLATFORMS = [
+    {
+      id: 'sheets',
+      name: 'Google Sheets',
+      hint: 'Sheets → File → Import → Upload',
+      bg: 'rgba(52,168,83,0.08)',
+      border: 'rgba(52,168,83,0.25)',
+      color: '#1E7E34',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <rect x="3" y="2" width="18" height="20" rx="2" fill="#34A853" opacity="0.15"/>
+          <rect x="3" y="2" width="18" height="20" rx="2" stroke="#34A853" strokeWidth="1.5"/>
+          <line x1="7" y1="8" x2="17" y2="8" stroke="#34A853" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="7" y1="12" x2="17" y2="12" stroke="#34A853" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="7" y1="16" x2="13" y2="16" stroke="#34A853" strokeWidth="1.5" strokeLinecap="round"/>
+          <line x1="12" y1="6" x2="12" y2="20" stroke="#34A853" strokeWidth="1" strokeOpacity="0.4"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'excel',
+      name: 'Microsoft Excel',
+      hint: 'Excel opens .csv files natively',
+      bg: 'rgba(33,115,70,0.08)',
+      border: 'rgba(33,115,70,0.25)',
+      color: '#166534',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <rect x="3" y="2" width="18" height="20" rx="2" fill="#217346" opacity="0.15"/>
+          <rect x="3" y="2" width="18" height="20" rx="2" stroke="#217346" strokeWidth="1.5"/>
+          <path d="M7.5 8L12 12M12 12L16.5 8M12 12L7.5 16M12 12L16.5 16" stroke="#217346" strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+      ),
+    },
+    {
+      id: 'numbers',
+      name: 'Apple Numbers',
+      hint: 'Double-click the downloaded file',
+      bg: 'rgba(0,128,0,0.07)',
+      border: 'rgba(0,128,0,0.2)',
+      color: '#15803D',
+      icon: (
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <rect x="3" y="2" width="18" height="20" rx="2" fill="#16A34A" opacity="0.12"/>
+          <rect x="3" y="2" width="18" height="20" rx="2" stroke="#16A34A" strokeWidth="1.5"/>
+          <rect x="6.5" y="6.5" width="4" height="4" rx="0.5" fill="#16A34A" opacity="0.5"/>
+          <rect x="13.5" y="6.5" width="4" height="4" rx="0.5" fill="#16A34A" opacity="0.5"/>
+          <rect x="6.5" y="13.5" width="4" height="4" rx="0.5" fill="#16A34A" opacity="0.5"/>
+          <rect x="13.5" y="13.5" width="4" height="4" rx="0.5" fill="#16A34A" opacity="0.3"/>
+        </svg>
+      ),
+    },
+  ];
+
+  const handleExport = async (platformId: string) => {
+    if (!user || exporting) return;
+    setExporting(platformId);
+    try {
+      const { data, error } = await supabase
+        .from('applications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const headers = ['Company', 'Role', 'Status', 'Location', 'Category', 'Deadline', 'Job Link', 'Notes', 'Recruiter', 'Recruiter Email', 'Date Added'];
+      const rows = (data ?? []).map((a: Record<string, unknown>) => [
+        a.company, a.role, a.status, a.location, a.category ?? '',
+        a.deadline ?? '', a.job_link ?? '',
+        String(a.notes ?? '').replace(/\n/g, ' '),
+        a.recruiter_name ?? '', a.recruiter_email ?? '',
+        a.created_at ? new Date(String(a.created_at)).toLocaleDateString('en-US') : '',
+      ]);
+
+      const csv = [headers, ...rows]
+        .map(row => row.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
+        .join('\n');
+
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `applyd-applications-${new Date().toISOString().split('T')[0]}.csv`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      showToast(`Exported ${data?.length ?? 0} applications`);
+    } catch {
+      showToast('Export failed — check your connection', 'error');
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  return (
+    <div>
+      <SectionCard
+        title="Export your data"
+        description="Download all your applications as a spreadsheet. Choose the platform you use — all exports use CSV format, which every major spreadsheet app opens natively."
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          {PLATFORMS.map(p => (
+            <button
+              key={p.id}
+              onClick={() => handleExport(p.id)}
+              disabled={!!exporting}
+              className="flex flex-col items-center gap-2.5 p-4 rounded-lg border text-center transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              style={{ background: p.bg, borderColor: p.border }}
+            >
+              {exporting === p.id ? (
+                <div className="w-7 h-7 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: p.color, borderTopColor: 'transparent' }} />
+              ) : (
+                p.icon
+              )}
+              <div>
+                <p className="text-[13px] font-semibold" style={{ color: p.color }}>{p.name}</p>
+                <p className="text-[11px] mt-0.5 leading-snug" style={{ color: 'var(--text-tertiary)' }}>{p.hint}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+        <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
+          Exports include: company, role, status, location, category, deadline, job link, notes, recruiter info, and date added.
+        </p>
+      </SectionCard>
+    </div>
+  );
+}
+
 // ─── Section: Support Applyd ──────────────────────────────────────────────────
 
 function SupportSection() {
@@ -890,6 +1026,7 @@ export default function SettingsPage() {
     recruiting: <RecruitingSection showToast={showToast} />,
     appearance: <AppearanceSection />,
     account: <AccountSection showToast={showToast} />,
+    data: <DataSection showToast={showToast} />,
     support: <SupportSection />,
     danger: <DangerSection showToast={showToast} />,
   };
