@@ -49,7 +49,13 @@ export default function StatsBar({ applications }: StatsBarProps) {
     {
       label: 'Response Rate',
       value: responseRate !== null ? `${responseRate}%` : '—',
-      subtext: responseRate === null ? `Track ${5 - applied.length} more to see` : 'of applications replied',
+      subtext: responseRate === null
+        ? `Track ${Math.max(0, 5 - applied.length)} more to see`
+        : responseRate >= 35
+          ? 'Above average — keep going'
+          : responseRate >= 20
+            ? 'Industry avg: 20–30%'
+            : 'Keep applying — it adds up',
       icon: <Zap size={14} />,
       accent: null,
     },

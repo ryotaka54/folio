@@ -208,6 +208,24 @@ function DashboardContent() {
     setShowAddModal(true);
   };
 
+  const handleExportCSV = () => {
+    const toExport = filteredApps.length < applications.length ? filteredApps : applications;
+    const headers = ['Company', 'Role', 'Status', 'Location', 'Category', 'Deadline', 'Job Link', 'Notes'];
+    const rows = toExport.map(a => [
+      a.company, a.role, a.status, a.location, a.category ?? '',
+      a.deadline ?? '', a.job_link ?? '', (a.notes ?? '').replace(/\n/g, ' '),
+    ]);
+    const csv = [headers, ...rows]
+      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'applyd-applications.csv'; a.click();
+    URL.revokeObjectURL(url);
+    capture('csv_exported', { count: toExport.length });
+  };
+
   // Listen for command palette "Add Application"
   useEffect(() => {
     const handler = () => { setAddModalInitialUrl(''); setShowAddModal(true); };
@@ -254,6 +272,12 @@ function DashboardContent() {
       if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
       if (firstAppTimerRef.current) clearTimeout(firstAppTimerRef.current);
     };
+  }, []);
+
+  // Page title
+  useEffect(() => {
+    document.title = 'Dashboard | Applyd';
+    return () => { document.title = 'Applyd — Recruiting Pipeline Tracker for Students'; };
   }, []);
 
   // Compute greeting + season tip once applications are loaded
@@ -389,8 +413,8 @@ function DashboardContent() {
                     <span
                       className="text-[11px] font-medium px-2.5 py-1 rounded-full hidden sm:inline-flex items-center gap-1"
                       style={{
-                        background: season.urgent ? '#FEF3C7' : 'var(--surface-gray)',
-                        color: season.urgent ? '#92400E' : 'var(--muted-text)',
+                        background: season.urgent ? 'rgba(217,119,6,0.12)' : 'var(--surface-gray)',
+                        color: season.urgent ? 'var(--amber-warning)' : 'var(--muted-text)',
                       }}
                     >
                       {season.urgent && '⚠ '}{season.daysLeft}d left · {season.name}
@@ -458,6 +482,7 @@ function DashboardContent() {
             >
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add
+              <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
             </button>
           </div>
           {/* Row 2: View toggle + filters */}
@@ -490,7 +515,25 @@ function DashboardContent() {
             >
               {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
             </button>
+            {applications.length > 0 && (
+              <button
+                onClick={handleExportCSV}
+                className="ml-auto h-8 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 flex items-center gap-1.5 transition-colors hover:bg-surface-gray"
+                style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)', background: 'var(--background)' }}
+                title="Export to CSV"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+              </button>
+            )}
           </div>
+          {displayApplications.length > 0 && (
+            <p className="text-[11px] text-right" style={{ color: 'var(--text-tertiary)' }}>
+              {filteredApps.length === displayApplications.length
+                ? `${displayApplications.length} application${displayApplications.length !== 1 ? 's' : ''}`
+                : `Showing ${filteredApps.length} of ${displayApplications.length}`}
+            </p>
+          )}
         </div>
 
         {/* Content */}
