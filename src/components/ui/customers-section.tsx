@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import { GraduationCap } from 'lucide-react';
@@ -31,6 +32,8 @@ type Tier = 'img' | 'badge' | 'icon';
 
 function UniversityLogo({ name, abbr, logo, color }: University) {
   const [tier, setTier] = useState<Tier>('img');
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   if (tier === 'img') {
     return (
@@ -52,7 +55,11 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
           height={60}
           loading="lazy"
           decoding="async"
-          style={{ width: '92%', height: '92%', objectFit: 'contain', display: 'block' }}
+          style={{
+            width: '92%', height: '92%', objectFit: 'contain', display: 'block',
+            filter: isDark ? 'brightness(0) invert(1)' : 'none',
+            opacity: isDark ? 0.85 : 1,
+          }}
           onError={() => setTier('badge')}
         />
       </div>
