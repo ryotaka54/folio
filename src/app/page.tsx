@@ -458,12 +458,12 @@ export default function Home() {
         <CommunityTeaser />
 
         {/* ── Product Walkthrough ── */}
-        <div id="walkthrough" className="-mx-0">
+        <div id="walkthrough" className="-mx-0" style={{ scrollMarginTop: 72 }}>
           <ProductWalkthrough />
         </div>
 
         {/* ── Benefits ── */}
-        <section id="features" className="max-w-6xl mx-auto px-6 py-20">
+        <section id="features" className="max-w-6xl mx-auto px-6 py-20" style={{ scrollMarginTop: 72 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
