@@ -77,6 +77,7 @@ const transitionVariants = {
 const navLinks = [
   { label: 'Features', href: '#features' },
   { label: 'How it works', href: '#walkthrough' },
+  { label: 'Get the app', href: '/install' },
   { label: 'FAQ', href: '/help' },
 ];
 
