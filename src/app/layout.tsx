@@ -14,19 +14,38 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Applyd — Track Every Application",
-  description: "The simplest way for students to track internship and job applications. Never miss a deadline.",
+  metadataBase: new URL('https://useapplyd.com'),
+  title: {
+    default: 'Applyd — Recruiting Pipeline Tracker for Students',
+    template: '%s | Applyd',
+  },
+  description: 'Track every internship and job application in one place. Recruiting-native stages like OA, Superday, and Recruiter Screen. Automatic deadline alerts. Free for students.',
+  keywords: ['internship tracker', 'job application tracker', 'recruiting pipeline', 'student job tracker', 'OA tracker', 'superday', 'internship recruiting'],
+  authors: [{ name: 'Applyd', url: 'https://useapplyd.com' }],
+  creator: 'Applyd',
+  publisher: 'Applyd',
+  alternates: { canonical: 'https://useapplyd.com' },
   openGraph: {
-    title: "Applyd — Track Every Application",
-    description: "The simplest way for students to track internship and job applications. Never miss a deadline.",
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    title: 'Applyd — Recruiting Pipeline Tracker for Students',
+    description: 'Track every internship and job application in one place. Recruiting-native stages, automatic deadline alerts, and response rate analytics. Free for students.',
+    url: 'https://useapplyd.com',
+    siteName: 'Applyd',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Applyd — Recruiting Pipeline Tracker' }],
     type: 'website',
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Applyd — Track Every Application",
-    description: "The simplest way for students to track internship and job applications. Never miss a deadline.",
+    site: '@useapplyd',
+    creator: '@useapplyd',
+    title: 'Applyd — Recruiting Pipeline Tracker for Students',
+    description: 'Track every internship and job application in one place. OA, Superday, Recruiter Screen — stages built for how recruiting actually works.',
     images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
 };
 
@@ -44,6 +63,23 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebApplication',
+              name: 'Applyd',
+              url: 'https://useapplyd.com',
+              description: 'Recruiting pipeline tracker for students. Track internship and job applications with recruiting-native stages, automatic deadline alerts, and response rate analytics.',
+              applicationCategory: 'ProductivityApplication',
+              operatingSystem: 'Web',
+              offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+              author: { '@type': 'Organization', name: 'Applyd', url: 'https://useapplyd.com' },
+              audience: { '@type': 'Audience', audienceType: 'Students' },
+            }),
+          }}
+        />
       </head>
       <body className="antialiased">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true}>

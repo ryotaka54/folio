@@ -306,7 +306,7 @@ export default function Home() {
 
               {/* Sub */}
               <p className="mt-6 max-w-xl text-balance text-[17px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
-                The simplest way for students to manage internship and job applications — all in one place, zero setup required.
+                A recruiting pipeline built for students — with stages like OA, Superday, and Recruiter Screen, deadline alerts that escalate automatically, and a response rate that tells you exactly where you stand.
               </p>
 
               {/* CTAs */}
@@ -383,23 +383,61 @@ export default function Home() {
                     {/* Pipeline */}
                     <div className="flex gap-2.5 overflow-x-hidden">
                       {[
-                        { name: 'Wishlist', count: 6, color: '#8B5CF6', cards: [{ co: 'Google', role: 'SWE Intern' }, { co: 'Meta', role: 'PM Intern' }] },
-                        { name: 'Applied', count: 10, color: '#2563EB', cards: [{ co: 'Stripe', role: 'SWE Intern' }, { co: 'Airbnb', role: 'Design Intern' }] },
-                        { name: 'OA', count: 4, color: '#06B6D4', cards: [{ co: 'Amazon', role: 'SDE Intern' }] },
-                        { name: 'Interviews', count: 3, color: '#F59E0B', cards: [{ co: 'Microsoft', role: 'SWE Intern' }] },
-                        { name: 'Offer', count: 1, color: '#1D9E75', cards: [{ co: 'Figma', role: 'Design Intern' }] },
+                        {
+                          name: 'Applied', count: 12, color: '#2563EB',
+                          cards: [
+                            { co: 'Stripe', role: 'SWE Intern', badge: null },
+                            { co: 'Airbnb', role: 'Design Intern', badge: { label: '2d left', type: 'red' } },
+                          ],
+                        },
+                        {
+                          name: 'OA / Online Assessment', count: 4, color: '#06B6D4',
+                          cards: [
+                            { co: 'Amazon', role: 'SDE Intern', badge: { label: 'Today', type: 'red' } },
+                            { co: 'Bloomberg', role: 'SWE Intern', badge: { label: '5d left', type: 'amber' } },
+                          ],
+                        },
+                        {
+                          name: 'Phone / Recruiter Screen', count: 3, color: '#F59E0B',
+                          cards: [
+                            { co: 'Microsoft', role: 'SWE Intern', badge: null },
+                          ],
+                        },
+                        {
+                          name: 'Final Round', count: 2, color: '#8B5CF6',
+                          cards: [
+                            { co: 'Google', role: 'SWE Intern', badge: { label: '3d left', type: 'red' } },
+                          ],
+                        },
+                        {
+                          name: 'Offer', count: 1, color: '#1D9E75',
+                          cards: [
+                            { co: 'Figma', role: 'Design Intern', badge: null },
+                          ],
+                        },
                       ].map(col => (
                         <div key={col.name} className="min-w-[160px] w-[160px] flex-shrink-0">
                           <div className="flex items-center gap-1.5 mb-1.5 px-0.5">
-                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: col.color }} />
+                            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: col.color }} />
                             <span className="text-[10px] font-semibold uppercase tracking-[0.07em] truncate" style={{ color: 'var(--muted-text)' }}>{col.name}</span>
-                            <span className="ml-auto text-[9px] font-medium px-1 py-0.5 rounded border" style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }}>{col.count}</span>
+                            <span className="ml-auto text-[9px] font-medium px-1 py-0.5 rounded border flex-shrink-0" style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)', borderColor: 'var(--border-gray)' }}>{col.count}</span>
                           </div>
-                          <div className="space-y-1.5 rounded-lg p-1.5 border" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)', minHeight: 72 }}>
+                          <div className="space-y-1.5 rounded-lg p-1.5 border" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)', minHeight: 80 }}>
                             {col.cards.map(card => (
-                              <div key={card.co} className="bg-background border rounded-lg p-2" style={{ borderColor: 'var(--border-gray)' }}>
+                              <div key={card.co} className="bg-background border rounded-lg p-2 relative" style={{ borderColor: 'var(--border-gray)' }}>
                                 <div className="text-[11px] font-semibold truncate" style={{ color: 'var(--brand-navy)' }}>{card.co}</div>
                                 <div className="text-[10px] truncate mt-0.5" style={{ color: 'var(--muted-text)' }}>{card.role}</div>
+                                {card.badge && (
+                                  <span
+                                    className="absolute bottom-1.5 right-1.5 text-[9px] font-semibold px-1.5 py-0.5 rounded-full"
+                                    style={card.badge.type === 'red'
+                                      ? { background: 'rgba(220,38,38,0.12)', color: '#DC2626' }
+                                      : { background: 'rgba(217,119,6,0.12)', color: '#D97706' }
+                                    }
+                                  >
+                                    {card.badge.label}
+                                  </span>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -446,20 +484,22 @@ export default function Home() {
               {
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="16" /><line x1="8" y1="12" x2="16" y2="12" />
+                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
                   </svg>
                 ),
-                title: 'Add applications fast',
-                desc: 'Paste a job URL and Applyd autofills the company, role, and location. Or add manually in seconds.',
+                title: 'Stages that match recruiting',
+                desc: 'OA / Online Assessment, Phone / Recruiter Screen, Final Round Interviews, Superday — not generic "Applied / Interviewed." Applyd speaks the same language as your recruiting season.',
+                detail: null,
               },
               {
                 icon: (
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
                   </svg>
                 ),
-                title: 'Visualize your pipeline',
-                desc: "See every application's status at a glance with a clean kanban board. Drag to move stages.",
+                title: 'Response rate analytics',
+                desc: "See exactly what percentage of companies replied to you. Applyd calculates your callback rate automatically — a number most students never know, but every recruiter does.",
+                detail: '38% response rate',
               },
               {
                 icon: (
@@ -467,8 +507,9 @@ export default function Home() {
                     <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                   </svg>
                 ),
-                title: 'Never miss a deadline',
-                desc: 'Upcoming deadlines are highlighted in amber and red so nothing slips through the cracks.',
+                title: 'Deadline intelligence',
+                desc: 'Deadlines turn amber at 7 days, red at 3 days, and show "Today" on the day itself. The Act Now card surfaces everything urgent so you never open 12 browser tabs to remember where you stand.',
+                detail: null,
               },
             ].map((benefit, i) => (
               <motion.div
@@ -477,7 +518,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="rounded-xl border p-6"
+                className="rounded-xl border p-6 flex flex-col"
                 style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}
               >
                 <div
@@ -487,10 +528,95 @@ export default function Home() {
                   {benefit.icon}
                 </div>
                 <h3 className="text-[14px] font-semibold mb-2" style={{ color: 'var(--brand-navy)' }}>{benefit.title}</h3>
-                <p className="text-[13px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{benefit.desc}</p>
+                <p className="text-[13px] leading-relaxed flex-1" style={{ color: 'var(--muted-text)' }}>{benefit.desc}</p>
+                {benefit.detail && (
+                  <div className="mt-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold w-fit"
+                    style={{ background: 'rgba(37,99,235,0.1)', color: 'var(--accent-blue)' }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {benefit.detail}
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
+        </section>
+
+        {/* ── Comparison ── */}
+        <section className="max-w-6xl mx-auto px-6 py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
+              Why not just use a spreadsheet?
+            </h2>
+            <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
+              You could. Most students do. Here&apos;s what they&apos;re missing.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="overflow-hidden rounded-xl border"
+            style={{ borderColor: 'var(--border-gray)' }}
+          >
+            {/* Header row */}
+            <div className="grid grid-cols-4 border-b" style={{ borderColor: 'var(--border-gray)', background: 'var(--surface-gray)' }}>
+              <div className="p-4 text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--muted-text)' }}>Feature</div>
+              {['Spreadsheet', 'Notion template', 'Applyd'].map((col, i) => (
+                <div key={col} className="p-4 text-center border-l" style={{ borderColor: 'var(--border-gray)' }}>
+                  <span
+                    className="text-[12px] font-semibold"
+                    style={{ color: i === 2 ? 'var(--accent-blue)' : 'var(--muted-text)' }}
+                  >
+                    {col}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Data rows */}
+            {[
+              { feature: 'Recruiting-native stages (OA, Superday, Recruiter Screen)', vals: [false, false, true] },
+              { feature: 'Automatic deadline alerts', vals: [false, false, true] },
+              { feature: 'Response rate analytics', vals: [false, false, true] },
+              { feature: 'Real-time pipeline view', vals: [false, 'Manual', true] },
+              { feature: 'Works on mobile', vals: ['Broken', 'Barely', true] },
+              { feature: 'Zero setup', vals: [false, false, true] },
+              { feature: 'Free', vals: [true, true, true] },
+            ].map((row, ri) => (
+              <div
+                key={row.feature}
+                className="grid grid-cols-4 border-b last:border-b-0 transition-colors"
+                style={{ borderColor: 'var(--border-gray)', background: ri % 2 === 0 ? 'var(--card-bg)' : 'transparent' }}
+              >
+                <div className="p-4 text-[13px]" style={{ color: 'var(--brand-navy)' }}>{row.feature}</div>
+                {row.vals.map((val, vi) => (
+                  <div key={vi} className="p-4 flex items-center justify-center border-l" style={{ borderColor: 'var(--border-gray)' }}>
+                    {val === true ? (
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: vi === 2 ? 'rgba(22,163,74,0.12)' : 'rgba(22,163,74,0.08)' }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={vi === 2 ? '#16A34A' : '#16A34A'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    ) : val === false ? (
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: 'rgba(220,38,38,0.08)' }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-medium" style={{ color: 'var(--muted-text)' }}>{val}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </motion.div>
         </section>
 
         {/* ── Testimonials ── */}
