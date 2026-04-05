@@ -11,7 +11,9 @@ import { Logo } from '@/components/Logo';
 import { capture } from '@/lib/analytics';
 import { AnimatedGroup } from '@/components/ui/animated-group';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import {
+  cn
+} from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { TestimonialStack, type Testimonial } from '@/components/ui/glass-testimonial-swiper';
 import { UniversitiesSection } from '@/components/ui/customers-section';
@@ -77,7 +79,7 @@ const transitionVariants = {
 const navLinks = [
   { label: 'Features', href: '#features' },
   { label: 'How it works', href: '#walkthrough' },
-  { label: 'Get the app', href: '/install' },
+
   { label: 'FAQ', href: '/help' },
 ];
 
@@ -242,7 +244,7 @@ function CommunityTeaser() {
               style={{ background: 'var(--accent-blue)', color: '#fff' }}
             >
               See what students are building
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden><polyline points="9 18 15 12 9 6" /></svg>
             </Link>
             <span
               className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
@@ -540,7 +542,7 @@ export default function Home() {
                 {benefit.detail && (
                   <div className="mt-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold w-fit"
                     style={{ background: 'rgba(37,99,235,0.1)', color: 'var(--accent-blue)' }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                     {benefit.detail}
                   </div>
                 )}
@@ -610,12 +612,12 @@ export default function Home() {
                     {val === true ? (
                       <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                         style={{ background: vi === 2 ? 'rgba(22,163,74,0.12)' : 'rgba(22,163,74,0.08)' }}>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={vi === 2 ? '#16A34A' : '#16A34A'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={vi === 2 ? '#16A34A' : '#16A34A'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                       </span>
                     ) : val === false ? (
                       <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
                         style={{ background: 'rgba(220,38,38,0.08)' }}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                       </span>
                     ) : (
                       <span className="text-[11px] font-medium" style={{ color: 'var(--muted-text)' }}>{val}</span>
