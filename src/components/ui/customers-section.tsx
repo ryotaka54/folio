@@ -37,9 +37,9 @@ function UniversityLogo({ name, abbr, logo, color }: University) {
       <div
         style={{
           width: 80, height: 80, borderRadius: 16, flexShrink: 0,
-          background: '#FFFFFF',
-          border: '1.5px solid rgba(0,0,0,0.12)',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
+          background: 'var(--card-bg)',
+          border: '1.5px solid var(--border-gray)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 8, boxSizing: 'border-box',
         }}
