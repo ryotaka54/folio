@@ -139,15 +139,32 @@ function LandingNav() {
 
             {/* Desktop centre links */}
             <div className="absolute inset-0 m-auto hidden size-fit lg:block">
-              <ul className="flex gap-8 text-sm">
+              <ul className="flex gap-1 text-sm">
                 {navLinks.map(item => (
                   <li key={item.label}>
                     <Link
                       href={item.href}
-                      className="text-[13px] font-medium transition-colors"
-                      style={{ color: 'var(--muted-text)' }}
-                      onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = 'var(--brand-navy)')}
-                      onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'var(--muted-text)')}
+                      className="relative text-[13px] font-medium px-3 py-1.5 rounded-lg inline-block"
+                      style={{
+                        color: 'var(--muted-text)',
+                        transition: 'color 250ms ease, background 250ms ease',
+                      }}
+                      onMouseEnter={e => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.color = 'var(--brand-navy)';
+                        el.style.background = 'var(--surface-gray)';
+                      }}
+                      onMouseLeave={e => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.color = 'var(--muted-text)';
+                        el.style.background = 'transparent';
+                      }}
+                      onMouseDown={e => {
+                        (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)';
+                      }}
+                      onMouseUp={e => {
+                        (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+                      }}
                     >
                       {item.label}
                     </Link>
@@ -165,14 +182,27 @@ function LandingNav() {
             >
               {/* Mobile nav links */}
               <div className="lg:hidden w-full">
-                <ul className="space-y-5 text-base">
+                <ul className="space-y-1 text-base">
                   {navLinks.map(item => (
                     <li key={item.label}>
                       <Link
                         href={item.href}
                         onClick={() => setMenuOpen(false)}
-                        className="text-[14px] font-medium"
-                        style={{ color: 'var(--muted-text)' }}
+                        className="block text-[14px] font-medium px-3 py-2.5 rounded-xl active:scale-[0.98]"
+                        style={{
+                          color: 'var(--muted-text)',
+                          transition: 'background 220ms ease, color 220ms ease, transform 120ms ease',
+                        }}
+                        onMouseEnter={e => {
+                          const el = e.currentTarget as HTMLElement;
+                          el.style.background = 'var(--surface-gray)';
+                          el.style.color = 'var(--brand-navy)';
+                        }}
+                        onMouseLeave={e => {
+                          const el = e.currentTarget as HTMLElement;
+                          el.style.background = 'transparent';
+                          el.style.color = 'var(--muted-text)';
+                        }}
                       >
                         {item.label}
                       </Link>
