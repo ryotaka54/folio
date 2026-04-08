@@ -2,14 +2,25 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
+}
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+}
 
-async function getUserIdFromCustomer(customerId: string): Promise<string | null> {
+/** Derive renewal date from the first subscription item's current_period_end */
+function getExpiresAt(sub: Stripe.Subscription): string {
+  const item = sub.items?.data?.[0];
+  const ts: number | undefined = (item as Stripe.SubscriptionItem & { current_period_end?: number }).current_period_end;
+  return ts ? new Date(ts * 1000).toISOString() : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+}
+
+async function getUserIdFromCustomer(supabaseAdmin: ReturnType<typeof getSupabase>, customerId: string): Promise<string | null> {
   const { data } = await supabaseAdmin
     .from('users')
     .select('id')
@@ -18,15 +29,13 @@ async function getUserIdFromCustomer(customerId: string): Promise<string | null>
   return data?.id ?? null;
 }
 
-/** Derive renewal date from the first subscription item's current_period_end */
-function getExpiresAt(sub: Stripe.Subscription): string {
-  const item = sub.items?.data?.[0];
-  // In API version 2025-06-30.basil, current_period_end is on SubscriptionItem
-  const ts: number | undefined = (item as Stripe.SubscriptionItem & { current_period_end?: number }).current_period_end;
-  return ts ? new Date(ts * 1000).toISOString() : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-}
-
-async function setProStatus(userId: string, active: boolean, subscriptionId?: string, expiresAt?: string | null) {
+async function setProStatus(
+  supabaseAdmin: ReturnType<typeof getSupabase>,
+  userId: string,
+  active: boolean,
+  subscriptionId?: string,
+  expiresAt?: string | null,
+) {
   await supabaseAdmin
     .from('users')
     .update({
@@ -43,6 +52,9 @@ export async function POST(request: Request) {
 
   if (!sig) return NextResponse.json({ error: 'Missing signature' }, { status: 400 });
 
+  const stripe = getStripe();
+  const supabaseAdmin = getSupabase();
+
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
@@ -58,28 +70,23 @@ export async function POST(request: Request) {
         if (session.mode !== 'subscription') break;
         const customerId = session.customer as string;
         const subscriptionId = session.subscription as string;
-
         const sub = await stripe.subscriptions.retrieve(subscriptionId);
         const expiresAt = getExpiresAt(sub);
-
-        const userId = await getUserIdFromCustomer(customerId);
-        if (userId) await setProStatus(userId, true, subscriptionId, expiresAt);
+        const userId = await getUserIdFromCustomer(supabaseAdmin, customerId);
+        if (userId) await setProStatus(supabaseAdmin, userId, true, subscriptionId, expiresAt);
         break;
       }
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
-        // In v22 (2025-06-30.basil), subscription is nested under invoice.parent.subscription_details.subscription
         const subRef = invoice.parent?.subscription_details?.subscription;
         const subscriptionId = typeof subRef === 'string' ? subRef : subRef?.id;
         if (!subscriptionId) break;
-
         const sub = await stripe.subscriptions.retrieve(subscriptionId);
         const expiresAt = getExpiresAt(sub);
-
-        const userId = await getUserIdFromCustomer(customerId);
-        if (userId) await setProStatus(userId, true, subscriptionId, expiresAt);
+        const userId = await getUserIdFromCustomer(supabaseAdmin, customerId);
+        if (userId) await setProStatus(supabaseAdmin, userId, true, subscriptionId, expiresAt);
         break;
       }
 
@@ -87,8 +94,8 @@ export async function POST(request: Request) {
       case 'customer.subscription.paused': {
         const sub = event.data.object as Stripe.Subscription;
         const customerId = sub.customer as string;
-        const userId = await getUserIdFromCustomer(customerId);
-        if (userId) await setProStatus(userId, false, sub.id, null);
+        const userId = await getUserIdFromCustomer(supabaseAdmin, customerId);
+        if (userId) await setProStatus(supabaseAdmin, userId, false, sub.id, null);
         break;
       }
 
@@ -97,8 +104,8 @@ export async function POST(request: Request) {
         const customerId = sub.customer as string;
         const active = sub.status === 'active' || sub.status === 'trialing';
         const expiresAt = active ? getExpiresAt(sub) : null;
-        const userId = await getUserIdFromCustomer(customerId);
-        if (userId) await setProStatus(userId, active, sub.id, expiresAt);
+        const userId = await getUserIdFromCustomer(supabaseAdmin, customerId);
+        if (userId) await setProStatus(supabaseAdmin, userId, active, sub.id, expiresAt);
         break;
       }
     }
