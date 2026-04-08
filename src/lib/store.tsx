@@ -3,6 +3,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { Application } from './types';
 import { supabase } from './supabase';
+import { FREE_TIER_LIMIT } from './pro';
+
+/** Thrown when a free-tier user tries to exceed the application cap. */
+export class CapExceededError extends Error {
+  constructor() { super('cap_exceeded'); this.name = 'CapExceededError'; }
+}
 
 interface StoreContextType {
   applications: Application[];
@@ -17,7 +23,7 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-export function StoreProvider({ children, userId }: { children: ReactNode; userId: string }) {
+export function StoreProvider({ children, userId, isPro = false }: { children: ReactNode; userId: string; isPro?: boolean }) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [storeError, setStoreError] = useState<string | null>(null);
@@ -72,6 +78,14 @@ export function StoreProvider({ children, userId }: { children: ReactNode; userI
   const addApplication = useCallback(async (
     appData: Omit<Application, 'id' | 'user_id' | 'created_at' | 'updated_at'>
   ): Promise<Application> => {
+    if (!isPro) {
+      const { count } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId);
+      if ((count ?? 0) >= FREE_TIER_LIMIT) throw new CapExceededError();
+    }
+
     const now = new Date().toISOString();
     const { data, error } = await supabase
       .from('applications')

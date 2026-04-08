@@ -10,6 +10,7 @@ import { INTERNSHIP_STAGES, JOB_STAGES } from '@/lib/constants';
 import { Application, PipelineStage, Category } from '@/lib/types';
 import StatsBar from '@/components/StatsBar';
 import { Logo } from '@/components/Logo';
+import { ProLogo } from '@/components/ProLogo';
 import PipelineView from '@/components/PipelineView';
 import TableView from '@/components/TableView';
 import FunnelChart from '@/components/FunnelChart';
@@ -28,6 +29,9 @@ import { useTutorial } from '@/lib/tutorial-context';
 import { ExtensionStatusProvider, useExtensionStatus } from '@/lib/extension-status-context';
 import { capture } from '@/lib/analytics';
 import { computeGreeting, computeMomentum, getSeasonInfo, getSeasonalTip } from '@/lib/recruiting';
+import { isPro as checkIsPro, FREE_TIER_LIMIT } from '@/lib/pro';
+import { CapExceededError } from '@/lib/store';
+import UpgradeModal from '@/components/UpgradeModal';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
@@ -76,6 +80,9 @@ function DashboardContent() {
   const [offerConfetti, setOfferConfetti] = useState(false);
   const [greeting, setGreeting] = useState('');
   const [seasonTip, setSeasonTip] = useState('');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradedSuccess, setUpgradedSuccess] = useState(false);
+  const userIsPro = checkIsPro(user);
   const prevStatusesRef = useRef<Record<string, string>>({});
 
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -153,7 +160,16 @@ function DashboardContent() {
     notes: string;
   }) => {
     const isFirstApp = applications.length === 0;
-    await addApplication({ ...data, recruiter_name: '', recruiter_email: '' });
+    try {
+      await addApplication({ ...data, recruiter_name: '', recruiter_email: '' });
+    } catch (err) {
+      if (err instanceof CapExceededError) {
+        setShowAddModal(false);
+        setShowUpgradeModal(true);
+        return;
+      }
+      throw err;
+    }
     capture('application_added', { status: data.status, has_job_link: !!data.job_link });
     showToast(`${data.company} added`);
     if (isFirstApp && !localStorage.getItem('first_app_celebration_shown')) {
@@ -208,6 +224,16 @@ function DashboardContent() {
     setShowAddModal(true);
   };
 
+
+  // Detect ?upgraded=true in URL → show success banner
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('upgraded') === 'true') {
+      setUpgradedSuccess(true);
+      window.history.replaceState({}, '', '/dashboard');
+    }
+  }, []);
 
   // Listen for command palette "Add Application"
   useEffect(() => {
@@ -356,6 +382,37 @@ function DashboardContent() {
     <div className="min-h-screen bg-background">
       <ExtensionBanner />
 
+      {/* Pro upgrade success banner */}
+      {upgradedSuccess && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl shadow-lg fade-in"
+          style={{ background: 'linear-gradient(135deg,#0a0a14,#1e1e3a)', border: '1px solid rgba(201,168,76,0.3)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
+          <ProLogo size={24} />
+          Welcome to Pro! Unlimited applications unlocked.
+          <button onClick={() => setUpgradedSuccess(false)} className="ml-1 opacity-60 hover:opacity-100 transition-opacity">✕</button>
+        </div>
+      )}
+
+      {/* Free-tier soft nudge — appears at 12 apps */}
+      {!userIsPro && !loading && applications.length >= FREE_TIER_LIMIT - 3 && applications.length < FREE_TIER_LIMIT && (
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-3">
+          <div
+            className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg"
+            style={{ background: 'rgba(37,99,235,0.07)', border: '1px solid rgba(37,99,235,0.2)' }}
+          >
+            <p className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>
+              <span className="font-semibold">Almost at the limit</span> — {FREE_TIER_LIMIT - applications.length} free slot{FREE_TIER_LIMIT - applications.length !== 1 ? 's' : ''} remaining.
+            </p>
+            <button
+              onClick={() => setShowUpgradeModal(true)}
+              className="text-[12px] font-semibold px-3 py-1 rounded-md text-white flex-shrink-0"
+              style={{ background: 'var(--accent-blue)' }}
+            >
+              Upgrade ⚡
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Store error banner */}
       {storeError && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-red-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
@@ -385,7 +442,7 @@ function DashboardContent() {
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
           <div className="flex items-center gap-5">
             <Link href="/" className="flex items-center gap-2">
-              <Logo size={28} variant="dark" />
+              {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
               <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
             <div className="flex items-center gap-0.5">
@@ -417,6 +474,22 @@ function DashboardContent() {
           <div className="flex items-center gap-3">
             {user?.name && (
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name.split(' ')[0]}</span>
+            )}
+            {userIsPro ? (
+              <span
+                className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff', letterSpacing: '0.02em' }}
+              >
+                ⚡ Pro
+              </span>
+            ) : (
+              <button
+                onClick={() => setShowUpgradeModal(true)}
+                className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border transition-colors hover:border-accent-blue hover:text-accent-blue"
+                style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+              >
+                Upgrade
+              </button>
             )}
             <StreakBadge onMilestone={msg => showToast(msg)} />
             <ThemeToggle />
@@ -658,6 +731,7 @@ function DashboardContent() {
             <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help Center</Link>
             <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Support</Link>
             <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Terms of Service</Link>
           </div>
           <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
             Made with care by a student —{' '}
@@ -693,6 +767,13 @@ function DashboardContent() {
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         stages={stages as PipelineStage[]}
+      />
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        reason={applications.length >= FREE_TIER_LIMIT ? 'cap' : 'billing'}
       />
 
       {/* First-app celebration tooltip — appears once, fades after 5s */}
@@ -794,7 +875,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <StoreProvider userId={user.id}>
+    <StoreProvider userId={user.id} isPro={checkIsPro(user)}>
       <ExtensionStatusProvider>
         <DashboardContent />
       </ExtensionStatusProvider>

@@ -77,6 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           onboarding_complete: data.onboarding_complete || localOnboarding === 'true',
           // localStorage wins — we don't write tutorial_completed to DB, so DB default (false) must not override it
           tutorial_completed: localTutorial === 'true' || data.tutorial_completed === true,
+          pro: data.pro ?? false,
+          stripe_customer_id: data.stripe_customer_id ?? undefined,
+          stripe_subscription_id: data.stripe_subscription_id ?? undefined,
+          pro_expires_at: data.pro_expires_at ?? null,
         });
       } else {
         // No profile row exists — auto-create one so future writes succeed

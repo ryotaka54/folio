@@ -126,7 +126,14 @@ export default function SignUpPage() {
             </button>
           </form>
 
-          <p className="text-center text-[13px] mt-4" style={{ color: 'var(--muted-text)' }}>
+          <p className="text-center text-[12px] mt-3 leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
+            By creating an account you agree to our{' '}
+            <Link href="/terms" className="underline underline-offset-2 hover:opacity-80 transition-opacity" style={{ color: 'var(--muted-text)' }}>Terms of Service</Link>
+            {' '}and{' '}
+            <Link href="/privacy" className="underline underline-offset-2 hover:opacity-80 transition-opacity" style={{ color: 'var(--muted-text)' }}>Privacy Policy</Link>.
+          </p>
+
+          <p className="text-center text-[13px] mt-3" style={{ color: 'var(--muted-text)' }}>
             Already have an account?{' '}
             <Link href="/login" className="hover:underline" style={{ color: 'var(--accent-blue)' }}>Log in</Link>
           </p>

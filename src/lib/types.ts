@@ -67,4 +67,8 @@ export interface UserProfile {
   created_at: string;
   onboarding_complete: boolean;
   tutorial_completed?: boolean;
+  pro?: boolean;
+  stripe_customer_id?: string;
+  stripe_subscription_id?: string;
+  pro_expires_at?: string | null;
 }

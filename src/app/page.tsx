@@ -728,6 +728,7 @@ export default function Home() {
               <Link href="/help" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Help & FAQ</Link>
               <Link href="/contact" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Contact</Link>
               <Link href="/privacy" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Privacy</Link>
+              <Link href="/terms" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Terms</Link>
               <span className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>© {new Date().getFullYear()} Applyd</span>
             </div>
           </div>

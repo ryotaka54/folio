@@ -5,10 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { Logo } from '@/components/Logo';
+import { ProLogo } from '@/components/ProLogo';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
 import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS } from '@/lib/constants';
+import { isPro, FREE_TIER_LIMIT } from '@/lib/pro';
+import UpgradeModal from '@/components/UpgradeModal';
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
@@ -498,6 +501,83 @@ function AppearanceSection() {
   );
 }
 
+// ─── Plan card (used inside AccountSection) ───────────────────────────────────
+
+function PlanCard() {
+  const { user } = useAuth();
+  const userIsPro = isPro(user);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [loadingPortal, setLoadingPortal] = useState(false);
+
+  const handleManage = async () => {
+    if (!user) return;
+    setLoadingPortal(true);
+    try {
+      const res = await fetch('/api/create-portal-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } finally {
+      setLoadingPortal(false);
+    }
+  };
+
+  return (
+    <>
+      <SectionCard title="Plan">
+        {userIsPro ? (
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <ProLogo size={40} />
+              <div>
+                <p className="text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Applyd Pro</p>
+                <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>
+                  Unlimited applications · All features unlocked
+                  {user?.pro_expires_at && (
+                    <span> · Renews {new Date(user.pro_expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>⚡ Pro</span>
+              <button
+                onClick={handleManage}
+                disabled={loadingPortal}
+                className="text-[12px] font-medium px-3 py-1 rounded-md border transition-colors hover:bg-surface-gray disabled:opacity-50"
+                style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+              >
+                {loadingPortal ? 'Loading…' : 'Manage subscription'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <p className="text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Free plan</p>
+              <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>{FREE_TIER_LIMIT} applications included · Upgrade for unlimited</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)' }}>Free</span>
+              <button
+                onClick={() => setShowUpgrade(true)}
+                className="text-[12px] font-semibold px-3 py-1 rounded-md text-white transition-colors"
+                style={{ background: 'var(--accent-blue)' }}
+              >
+                Upgrade ⚡
+              </button>
+            </div>
+          </div>
+        )}
+      </SectionCard>
+      <UpgradeModal open={showUpgrade} onClose={() => setShowUpgrade(false)} reason="billing" />
+    </>
+  );
+}
+
 // ─── Section: Account ─────────────────────────────────────────────────────────
 
 function AccountSection({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
@@ -591,15 +671,7 @@ function AccountSection({ showToast }: { showToast: (msg: string, type?: 'succes
       </SectionCard>
 
       {/* Billing */}
-      <SectionCard title="Plan">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Free plan</p>
-            <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Unlimited applications, full pipeline, all features — always free.</p>
-          </div>
-          <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)' }}>Free</span>
-        </div>
-      </SectionCard>
+      <PlanCard />
 
       {/* Extension status */}
       <SectionCard title="Browser extension">
