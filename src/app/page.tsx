@@ -339,7 +339,7 @@ export default function Home() {
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-2"
                 style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                AI-powered recruiting, built for students
+                The quiet edge in every competitive recruiting season
               </div>
 
               {/* Headline */}
@@ -347,13 +347,13 @@ export default function Home() {
                 className="max-w-3xl text-balance text-[2.75rem] font-semibold leading-[1.1] md:text-[3.5rem] lg:text-[4.25rem]"
                 style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}
               >
-                Your AI recruiting companion.{' '}
-                <span style={{ color: 'var(--accent-blue)' }}>Built for students.</span>
+                The internship search rewards the prepared.{' '}
+                <span style={{ color: 'var(--accent-blue)' }}>Now you are.</span>
               </h1>
 
               {/* Sub */}
               <p className="mt-6 max-w-xl text-balance text-[17px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
-                Track every application. Get AI-powered interview prep, follow-up emails, and offer negotiation — automatically, the moment you need them. Free for students.
+                Most students walk into interviews cold, send generic follow-ups, and leave money on the table. Applyd gives you the intel, the email, and the negotiation script — automatically, before you even think to ask.
               </p>
 
               {/* CTAs */}
@@ -369,7 +369,7 @@ export default function Home() {
               </div>
 
               <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-                No credit card · 2-minute setup · Trusted by 500+ students
+                Free to start · 2 minutes to set up · 500+ students already tracking
               </p>
             </AnimatedGroup>
 
@@ -513,10 +513,10 @@ export default function Home() {
         <section id="features" className="max-w-6xl mx-auto px-6 py-20" style={{ scrollMarginTop: 72 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
             <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
-              Everything you need to land the offer
+              The free tier beats a spreadsheet. The Pro tier beats everyone else.
             </h2>
             <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
-              Free tools for every student. AI that works for you when you go Pro.
+              Start free — no credit card, no catch. When you&apos;re ready to stop leaving things to chance, there&apos;s Pro.
             </p>
           </motion.div>
 
@@ -559,7 +559,7 @@ export default function Home() {
                 { icon: '📊', title: 'Strength Signal', desc: 'Know how competitive your application is before you invest more time. Appears automatically when you add a new application.' },
                 { icon: '💰', title: 'Offer Negotiation Guide', desc: 'Compensation benchmarks and a word-for-word negotiation script, waiting for you the moment an offer arrives.' },
                 { icon: '📅', title: 'Weekly AI Coach', desc: 'A personalized Monday morning briefing built from your actual pipeline data. Specific actions for the week ahead, every week.' },
-                { icon: '∞', title: 'Unlimited applications', desc: 'No cap, no limits. Track every opportunity across every recruiting cycle without restriction.' },
+                { icon: '∞', title: 'Unlimited applications', desc: 'Apply broadly. Track everything. The more your pipeline grows, the smarter the AI gets about your patterns.' },
               ].map((f, i) => (
                 <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
                   className="rounded-xl border p-5 flex flex-col gap-2 relative"
@@ -579,10 +579,10 @@ export default function Home() {
         <section className="max-w-6xl mx-auto px-6 py-16">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-12">
             <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
-              How the AI works
+              The AI that shows up before you realize you need it.
             </h2>
             <p className="text-[15px] max-w-md mx-auto" style={{ color: 'var(--muted-text)' }}>
-              You don&apos;t go looking for help. Applyd brings it to you.
+              You don&apos;t go searching for help. Applyd reads where you are and surfaces the right tool at the right moment — without you asking.
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -602,7 +602,7 @@ export default function Home() {
               {
                 step: '3',
                 title: 'The right AI feature activates at the right moment',
-                desc: 'No setup. No searching. The AI shows up exactly when you need it.',
+                desc: 'No prompting. No searching. Before you think to ask, it&apos;s already there.',
                 examples: [
                   { trigger: 'Move to interviews →', result: 'Interview Intel appears' },
                   { trigger: 'Receive an offer →', result: 'Negotiation Guide activates' },
@@ -723,10 +723,10 @@ export default function Home() {
             className="text-center mb-14"
           >
             <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
-              What students are saying
+              What changes when students stop guessing.
             </h2>
             <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
-              Trusted by 500+ students across internship and full-time recruiting seasons.
+              500+ students. Real pipelines. Real offers.
             </p>
           </motion.div>
           <motion.div
@@ -748,10 +748,10 @@ export default function Home() {
               <Logo size={36} variant="dark" />
             </div>
             <h2 className="text-[20px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-              Applyd is free to use.
+              Built in the same recruiting chaos you&apos;re in.
             </h2>
             <p className="text-[14px] leading-relaxed mb-6" style={{ color: 'var(--muted-text)' }}>
-              Building and maintaining Applyd takes time and care. If it&apos;s helped your recruiting season even a little, buying me a coffee means the world.
+              This started as a tool I needed and couldn&apos;t find. If it&apos;s shaved even one hour off your recruiting season, a coffee is the kindest thing you could do.
             </p>
             <a
               href="https://buymeacoffee.com/applyd"
