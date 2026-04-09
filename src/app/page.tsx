@@ -324,7 +324,7 @@ export default function Home() {
             style={{ background: 'radial-gradient(125% 125% at 50% 100%, transparent 0%, var(--background) 70%)' }}
           />
 
-          <div className="mx-auto max-w-6xl px-6 text-center">
+          <div className="mx-auto max-w-6xl px-6">
             <AnimatedGroup
               variants={{
                 container: {
@@ -333,42 +333,68 @@ export default function Home() {
                 },
                 ...transitionVariants,
               }}
-              className="flex flex-col items-center"
+              className="flex flex-col items-center md:items-start"
             >
               {/* Eyebrow */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-2"
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-6"
                 style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                The quiet edge in every competitive recruiting season
+                AI-powered recruiting, built for students
               </div>
 
               {/* Headline */}
               <h1
-                className="max-w-3xl text-balance text-[2.75rem] font-semibold leading-[1.1] md:text-[3.5rem] lg:text-[4.25rem]"
-                style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}
+                className="max-w-[640px] text-[28px] sm:text-[36px] lg:text-[56px] text-center md:text-left"
+                style={{
+                  color: 'var(--brand-navy)',
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1.15,
+                  fontWeight: 700,
+                }}
               >
-                The only recruiting tool that{' '}
-                <span style={{ color: 'var(--accent-blue)' }}>prepares you, not just tracks you.</span>
+                Every application.{' '}
+                Every stage.{' '}
+                <span
+                  style={{
+                    textDecoration: 'underline',
+                    textDecorationColor: 'var(--accent-blue)',
+                    textDecorationThickness: '4px',
+                    textUnderlineOffset: '6px',
+                    textDecorationSkipInk: 'none',
+                  }}
+                >
+                  One place.
+                </span>
               </h1>
 
               {/* Sub */}
-              <p className="mt-6 max-w-xl text-balance text-[17px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
-                Track every application, get AI interview prep the moment you advance, send the perfect follow-up in one click, and negotiate your offer with confidence — all from one place, free to start.
+              <p
+                className="mt-5 max-w-[480px] text-[16px] md:text-[18px] text-center md:text-left"
+                style={{ color: 'var(--muted-text)', lineHeight: 1.6 }}
+              >
+                Track every application. Get AI-powered interview prep, follow-up emails, and offer negotiation — automatically, the moment you need them. Free for students.
               </p>
 
               {/* CTAs */}
-              <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-                <div className="rounded-[14px] border border-border-gray p-0.5" style={{ background: 'var(--surface-gray)' }}>
-                  <Button asChild size="lg" className="rounded-xl px-6">
-                    <Link href="/signup">Get started free</Link>
-                  </Button>
-                </div>
-                <Button asChild size="lg" variant="ghost" className="rounded-xl px-6">
+              <div className="mt-8 flex flex-col items-center md:items-start gap-3 sm:flex-row">
+                <Button
+                  asChild
+                  size="lg"
+                  style={{ borderRadius: 8, height: 44, padding: '0 20px', fontWeight: 600 }}
+                >
+                  <Link href="/signup">Get started free</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="ghost"
+                  style={{ borderRadius: 8, height: 44, padding: '0 20px', fontWeight: 600, color: 'var(--accent-blue)' }}
+                >
                   <Link href="#walkthrough">See how it works</Link>
                 </Button>
               </div>
 
-              <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
+              <p className="mt-4 text-[12px] text-center md:text-left" style={{ color: 'var(--text-tertiary)' }}>
                 Free to start · 2 minutes to set up · 500+ students already tracking
               </p>
             </AnimatedGroup>
