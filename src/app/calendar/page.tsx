@@ -17,6 +17,8 @@ import ApplicationDrawer from '@/components/ApplicationDrawer';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import { Logo } from '@/components/Logo';
+import { ProLogo } from '@/components/ProLogo';
+import { isPro } from '@/lib/pro';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -674,6 +676,7 @@ function MobileWeekView({
 
 function CalendarContent() {
   const { user, signOut } = useAuth();
+  const userIsPro = isPro(user);
   const { applications, loading, updateApplication, deleteApplication } = useStore();
   const router = useRouter();
 
@@ -820,11 +823,11 @@ function CalendarContent() {
 
       {/* ── Nav ─────────────────────────────────────────────────────────── */}
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
           <div className="flex items-center gap-5">
             <Link href="/" className="flex items-center gap-2">
-              <Logo size={26} variant="dark" />
-              <span className="text-[15px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+              {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
+              <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
             <div className="flex items-center gap-0.5">
               <Link href="/dashboard" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors" style={{ color: 'var(--muted-text)' }}>
@@ -849,7 +852,7 @@ function CalendarContent() {
         </div>
       </nav>
 
-      <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 flex-1 flex flex-col gap-5 w-full">
+      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 flex-1 flex flex-col gap-5 w-full">
 
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-start gap-4">

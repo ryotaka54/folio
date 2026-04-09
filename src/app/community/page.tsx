@@ -7,6 +7,8 @@ import { ThumbsUp, Check, Trophy, Lightbulb, ArrowRight, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import { Logo } from '@/components/Logo';
+import { ProLogo } from '@/components/ProLogo';
+import { isPro } from '@/lib/pro';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import {
@@ -405,6 +407,7 @@ function HallOfFameModal({ entry, onClose }: { entry: CommunityIdea; onClose: ()
 // ── Main page ────────────────────────────────────────────────────────────────
 export default function CommunityPage() {
   const { user, signOut } = useAuth();
+  const userIsPro = isPro(user);
 
   // ── Data state
   const [ideas, setIdeas] = useState<CommunityIdea[]>([]);
@@ -568,10 +571,10 @@ export default function CommunityPage() {
       {/* ── Nav ─────────────────────────────────────────────────────────── */}
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <Link href="/" className="flex items-center gap-2">
-              <Logo size={26} variant="dark" />
-              <span className="text-[15px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+              {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
+              <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
             <div className="flex items-center gap-1">
               <Link
