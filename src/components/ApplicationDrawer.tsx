@@ -7,6 +7,7 @@ import { ExternalLink, X, Mail } from 'lucide-react';
 import InterviewPrepPanel from '@/components/ai/InterviewPrepPanel';
 import OfferIntelligencePanel from '@/components/ai/OfferIntelligencePanel';
 import FollowUpEmailModal from '@/components/ai/FollowUpEmailModal';
+import InterviewTimeline from '@/components/InterviewTimeline';
 
 const inputCls = [
   'w-full px-3 bg-background border border-border-gray rounded-md text-sm',
@@ -258,6 +259,12 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 placeholder="Interview prep notes, salary info, etc."
               />
             </div>
+
+            {/* Interview Timeline */}
+            <InterviewTimeline
+              steps={application.interview_steps || []}
+              onUpdate={(steps) => immediateUpdate('interview_steps', steps as unknown as string)}
+            />
 
             {/* AI Panels */}
             {userId && (() => {

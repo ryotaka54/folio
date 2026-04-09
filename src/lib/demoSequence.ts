@@ -118,6 +118,7 @@ const DEMO_APPS: Array<Omit<Application, 'id' | 'user_id' | 'created_at' | 'upda
     notes: '',
     recruiter_name: '',
     recruiter_email: DEMO_TAG,
+    interview_steps: [],
   },
   {
     company: 'Meta',
@@ -130,6 +131,7 @@ const DEMO_APPS: Array<Omit<Application, 'id' | 'user_id' | 'created_at' | 'upda
     notes: '',
     recruiter_name: '',
     recruiter_email: DEMO_TAG,
+    interview_steps: [],
   },
   {
     company: 'Stripe',
@@ -142,6 +144,7 @@ const DEMO_APPS: Array<Omit<Application, 'id' | 'user_id' | 'created_at' | 'upda
     notes: '',
     recruiter_name: '',
     recruiter_email: DEMO_TAG,
+    interview_steps: [],
   },
   {
     company: 'Airbnb',
@@ -154,6 +157,7 @@ const DEMO_APPS: Array<Omit<Application, 'id' | 'user_id' | 'created_at' | 'upda
     notes: '',
     recruiter_name: '',
     recruiter_email: DEMO_TAG,
+    interview_steps: [],
   },
   {
     company: 'Anthropic',
@@ -166,6 +170,7 @@ const DEMO_APPS: Array<Omit<Application, 'id' | 'user_id' | 'created_at' | 'upda
     notes: '',
     recruiter_name: '',
     recruiter_email: DEMO_TAG,
+    interview_steps: [],
   },
   {
     company: 'Jane Street',
@@ -178,6 +183,7 @@ const DEMO_APPS: Array<Omit<Application, 'id' | 'user_id' | 'created_at' | 'upda
     notes: '',
     recruiter_name: '',
     recruiter_email: DEMO_TAG,
+    interview_steps: [],
   },
 ];
 

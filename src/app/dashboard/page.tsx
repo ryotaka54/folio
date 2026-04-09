@@ -35,19 +35,19 @@ import UpgradeModal from '@/components/UpgradeModal';
 import WeeklyCoach from '@/components/ai/WeeklyCoach';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
-  { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-2', user_id: 'demo', company: 'Google', role: 'PM Intern', location: 'Mountain View, CA', category: 'Product Management', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-3', user_id: 'demo', company: 'Microsoft', role: 'Software Engineer Intern', location: 'Redmond, WA', category: 'Engineering', status: 'OA / Online Assessment', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-4', user_id: 'demo', company: 'Amazon', role: 'SDE Intern', location: 'Seattle, WA', category: 'Engineering', status: 'Phone / Recruiter Screen', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-5', user_id: 'demo', company: 'Meta', role: 'Software Engineer Intern', location: 'Menlo Park, CA', category: 'Engineering', status: 'Final Round Interviews', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-2', user_id: 'demo', company: 'Google', role: 'PM Intern', location: 'Mountain View, CA', category: 'Product Management', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-3', user_id: 'demo', company: 'Microsoft', role: 'Software Engineer Intern', location: 'Redmond, WA', category: 'Engineering', status: 'OA / Online Assessment', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-4', user_id: 'demo', company: 'Amazon', role: 'SDE Intern', location: 'Seattle, WA', category: 'Engineering', status: 'Phone / Recruiter Screen', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-5', user_id: 'demo', company: 'Meta', role: 'Software Engineer Intern', location: 'Menlo Park, CA', category: 'Engineering', status: 'Final Round Interviews', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
 ];
 
 const DEMO_APPS_JOB: Application[] = [
-  { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-2', user_id: 'demo', company: 'Google', role: 'Product Manager', location: 'Mountain View, CA', category: 'Product Management', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-3', user_id: 'demo', company: 'Microsoft', role: 'Software Engineer', location: 'Redmond, WA', category: 'Engineering', status: 'Recruiter Screen', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-4', user_id: 'demo', company: 'Amazon', role: 'SDE', location: 'Seattle, WA', category: 'Engineering', status: 'Technical / Case Interview', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
-  { id: 'demo-5', user_id: 'demo', company: 'Meta', role: 'Software Engineer', location: 'Menlo Park, CA', category: 'Engineering', status: 'Final Round', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
+  { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-2', user_id: 'demo', company: 'Google', role: 'Product Manager', location: 'Mountain View, CA', category: 'Product Management', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-3', user_id: 'demo', company: 'Microsoft', role: 'Software Engineer', location: 'Redmond, WA', category: 'Engineering', status: 'Recruiter Screen', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-4', user_id: 'demo', company: 'Amazon', role: 'SDE', location: 'Seattle, WA', category: 'Engineering', status: 'Technical / Case Interview', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
+  { id: 'demo-5', user_id: 'demo', company: 'Meta', role: 'Software Engineer', location: 'Menlo Park, CA', category: 'Engineering', status: 'Final Round', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
 ];
 
 function DashboardContent() {
@@ -162,7 +162,7 @@ function DashboardContent() {
   }) => {
     const isFirstApp = applications.length === 0;
     try {
-      await addApplication({ ...data, recruiter_name: '', recruiter_email: '' });
+      await addApplication({ ...data, recruiter_name: '', recruiter_email: '', interview_steps: [] });
     } catch (err) {
       if (err instanceof CapExceededError) {
         setShowAddModal(false);

@@ -21,6 +21,14 @@ export type JobStage =
 
 export type PipelineStage = InternshipStage | JobStage;
 
+export interface InterviewStep {
+  id: string;
+  name: string;
+  date: string | null;
+  completed: boolean;
+  notes: string;
+}
+
 export type Category =
   | 'Engineering'
   | 'Product Management'
@@ -53,6 +61,7 @@ export interface Application {
   notes: string;
   recruiter_name: string;
   recruiter_email: string;
+  interview_steps: InterviewStep[];
   created_at: string;
   updated_at: string;
   ai_interview_prep?: unknown;

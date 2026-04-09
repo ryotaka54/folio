@@ -28,6 +28,7 @@ function makeApp(overrides: Partial<Application> & { id: string; company: string
   return {
     user_id: 'demo', location: '', category: 'Engineering' as Category,
     deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '',
+    interview_steps: [],
     created_at: NOW, updated_at: NOW,
     ...overrides,
   };

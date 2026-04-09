@@ -27,6 +27,12 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
     return null;
   })();
 
+  // Interview progress dots
+  const steps = application.interview_steps || [];
+  const hasSteps = steps.length > 0;
+  const completedCount = steps.filter(s => s.completed).length;
+  const nextStep = steps.find(s => !s.completed);
+
   return (
     <button
       onClick={onClick}
@@ -56,6 +62,41 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
         {application.role}
       </div>
 
+      {/* Interview Progress Dots */}
+      {hasSteps && !muted && (
+        <div className="mt-2">
+          <div className="flex items-center gap-1">
+            {steps.map((step) => (
+              <div
+                key={step.id}
+                className="rounded-full flex-shrink-0"
+                style={{
+                  width: 7,
+                  height: 7,
+                  backgroundColor: step.completed ? 'var(--accent-blue)' : 'transparent',
+                  border: step.completed ? 'none' : '1.5px solid var(--border-gray)',
+                }}
+                title={step.name}
+              />
+            ))}
+            <span
+              className="text-[10px] font-medium ml-1.5"
+              style={{ color: 'var(--muted-text)' }}
+            >
+              {completedCount}/{steps.length}
+            </span>
+          </div>
+          {nextStep && (
+            <div
+              className="text-[10px] mt-1 truncate"
+              style={{ color: 'var(--muted-text)' }}
+            >
+              Next: {nextStep.name}{nextStep.date ? `, ${new Date(nextStep.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
         {application.category && !muted && (
           <span
@@ -80,3 +121,4 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
     </button>
   );
 }
+
