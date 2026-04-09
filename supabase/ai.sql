@@ -39,3 +39,7 @@ create policy "Users manage own ai_events"
   on ai_events for all
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- Interview steps column
+alter table applications
+  add column if not exists interview_steps jsonb default '[]'::jsonb;

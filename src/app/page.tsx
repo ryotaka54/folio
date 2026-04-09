@@ -335,29 +335,36 @@ export default function Home() {
               }}
               className="flex flex-col items-center"
             >
+              {/* Eyebrow */}
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-2"
+                style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                AI-powered recruiting, built for students
+              </div>
+
               {/* Headline */}
               <h1
                 className="max-w-3xl text-balance text-[2.75rem] font-semibold leading-[1.1] md:text-[3.5rem] lg:text-[4.25rem]"
                 style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}
               >
-                Track every application.{' '}
-                <span style={{ color: 'var(--accent-blue)' }}>Never miss a deadline.</span>
+                Your AI recruiting companion.{' '}
+                <span style={{ color: 'var(--accent-blue)' }}>Built for students.</span>
               </h1>
 
               {/* Sub */}
               <p className="mt-6 max-w-xl text-balance text-[17px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
-                A recruiting pipeline built for students — with stages like OA, Superday, and Recruiter Screen, deadline alerts that escalate automatically, and a response rate that tells you exactly where you stand.
+                Track every application. Get AI-powered interview prep, follow-up emails, and offer negotiation — automatically, the moment you need them. Free for students.
               </p>
 
               {/* CTAs */}
               <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
                 <div className="rounded-[14px] border border-border-gray p-0.5" style={{ background: 'var(--surface-gray)' }}>
                   <Button asChild size="lg" className="rounded-xl px-6">
-                    <Link href="/signup">Start tracking</Link>
+                    <Link href="/signup">Get started free</Link>
                   </Button>
                 </div>
                 <Button asChild size="lg" variant="ghost" className="rounded-xl px-6">
-                  <Link href="/login">Log in</Link>
+                  <Link href="#walkthrough">See how it works</Link>
                 </Button>
               </div>
 
@@ -502,78 +509,121 @@ export default function Home() {
           <ProductWalkthrough />
         </div>
 
-        {/* ── Benefits ── */}
+        {/* ── Features ── */}
         <section id="features" className="max-w-6xl mx-auto px-6 py-20" style={{ scrollMarginTop: 72 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-14"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
             <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
-              Everything you need. Nothing you don&apos;t.
+              Everything you need to land the offer
             </h2>
             <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
-              Built specifically for students navigating internship and job recruiting season.
+              Free tools for every student. AI that works for you when you go Pro.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Free tier */}
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] px-3 py-1 rounded-full" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)' }}>Free for every student</span>
+              <div className="flex-1 h-px" style={{ background: 'var(--border-gray)' }} />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {[
+                { icon: '🗂', title: 'Kanban pipeline view', desc: 'See every application at a glance across recruiting-native stages: OA, Recruiter Screen, Final Round, and more.' },
+                { icon: '⏰', title: 'Deadline tracking', desc: 'Deadlines turn amber at 7 days, red at 3, and surface automatically in your Act Now card.' },
+                { icon: '📈', title: 'Response rate analytics', desc: 'See your callback rate automatically — a number most students never know but every recruiter does.' },
+                { icon: '💡', title: 'Smart nudges', desc: 'Applyd tells you when applications have gone quiet and prompts action before opportunities slip away.' },
+                { icon: '📅', title: 'Calendar view', desc: 'Every deadline and interview in one calendar. Sync to Google Calendar in one click.' },
+                { icon: '⚡', title: 'Browser extension', desc: 'Log any job from LinkedIn, Handshake, or any job board in one click. No copy-pasting.' },
+              ].map((f, i) => (
+                <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
+                  className="rounded-xl border p-5 flex flex-col gap-2"
+                  style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}>
+                  <span className="text-2xl">{f.icon}</span>
+                  <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{f.title}</h3>
+                  <p className="text-[12px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{f.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pro tier */}
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>Pro — AI that works for you</span>
+              <div className="flex-1 h-px" style={{ background: 'var(--border-gray)' }} />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {[
+                { icon: '🧠', title: 'Interview Intel', desc: 'Walk into every interview knowing what this company actually asks. Activates automatically when you enter any interview stage.' },
+                { icon: '✉️', title: 'Follow Up Writer', desc: 'One click generates a perfect professional email — thank you, status check, negotiation, withdrawal — calibrated to your exact situation.' },
+                { icon: '📊', title: 'Strength Signal', desc: 'Know how competitive your application is before you invest more time. Appears automatically when you add a new application.' },
+                { icon: '💰', title: 'Offer Negotiation Guide', desc: 'Compensation benchmarks and a word-for-word negotiation script, waiting for you the moment an offer arrives.' },
+                { icon: '📅', title: 'Weekly AI Coach', desc: 'A personalized Monday morning briefing built from your actual pipeline data. Specific actions for the week ahead, every week.' },
+                { icon: '∞', title: 'Unlimited applications', desc: 'No cap, no limits. Track every opportunity across every recruiting cycle without restriction.' },
+              ].map((f, i) => (
+                <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
+                  className="rounded-xl border p-5 flex flex-col gap-2 relative"
+                  style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.04) 0%, var(--card-bg) 100%)', borderColor: 'rgba(37,99,235,0.2)', boxShadow: '0 2px 12px rgba(37,99,235,0.06)' }}>
+                  <span className="absolute top-3 right-3 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                    style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>Pro</span>
+                  <span className="text-2xl">{f.icon}</span>
+                  <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{f.title}</h3>
+                  <p className="text-[12px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{f.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── How the AI works ── */}
+        <section className="max-w-6xl mx-auto px-6 py-16">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-12">
+            <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
+              How the AI works
+            </h2>
+            <p className="text-[15px] max-w-md mx-auto" style={{ color: 'var(--muted-text)' }}>
+              You don&apos;t go looking for help. Applyd brings it to you.
+            </p>
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-                  </svg>
-                ),
-                title: 'Stages that match recruiting',
-                desc: 'OA / Online Assessment, Phone / Recruiter Screen, Final Round Interviews, Superday — not generic "Applied / Interviewed." Applyd speaks the same language as your recruiting season.',
-                detail: null,
+                step: '1',
+                title: 'You track your applications as normal',
+                desc: 'Add applications with the kanban board or the browser extension. Takes seconds.',
+                examples: [],
               },
               {
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                  </svg>
-                ),
-                title: 'Response rate analytics',
-                desc: "See exactly what percentage of companies replied to you. Applyd calculates your callback rate automatically — a number most students never know, but every recruiter does.",
-                detail: '38% response rate',
+                step: '2',
+                title: 'Applyd detects where you are in the process',
+                desc: 'The pipeline watches every status change, deadline, and stage transition automatically.',
+                examples: [],
               },
               {
-                icon: (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-                  </svg>
-                ),
-                title: 'Deadline intelligence',
-                desc: 'Deadlines turn amber at 7 days, red at 3 days, and show "Today" on the day itself. The Act Now card surfaces everything urgent so you never open 12 browser tabs to remember where you stand.',
-                detail: null,
+                step: '3',
+                title: 'The right AI feature activates at the right moment',
+                desc: 'No setup. No searching. The AI shows up exactly when you need it.',
+                examples: [
+                  { trigger: 'Move to interviews →', result: 'Interview Intel appears' },
+                  { trigger: 'Receive an offer →', result: 'Negotiation Guide activates' },
+                  { trigger: 'Monday morning →', result: 'Weekly Coach arrives' },
+                ],
               },
-            ].map((benefit, i) => (
-              <motion.div
-                key={benefit.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="rounded-xl border p-6 flex flex-col"
-                style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}
-              >
-                <div
-                  className="w-10 h-10 rounded-lg border flex items-center justify-center mb-4"
-                  style={{ background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--accent-blue)' }}
-                >
-                  {benefit.icon}
-                </div>
-                <h3 className="text-[14px] font-semibold mb-2" style={{ color: 'var(--brand-navy)' }}>{benefit.title}</h3>
-                <p className="text-[13px] leading-relaxed flex-1" style={{ color: 'var(--muted-text)' }}>{benefit.desc}</p>
-                {benefit.detail && (
-                  <div className="mt-4 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold w-fit"
-                    style={{ background: 'rgba(37,99,235,0.1)', color: 'var(--accent-blue)' }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                    {benefit.detail}
+            ].map((s, i) => (
+              <motion.div key={s.step} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.12 }}
+                className="rounded-xl border p-6 flex flex-col gap-3"
+                style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-bold" style={{ background: 'var(--accent-blue)', color: '#fff' }}>{s.step}</div>
+                <h3 className="text-[14px] font-semibold leading-snug" style={{ color: 'var(--brand-navy)' }}>{s.title}</h3>
+                <p className="text-[13px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{s.desc}</p>
+                {s.examples.length > 0 && (
+                  <div className="space-y-1.5 mt-1">
+                    {s.examples.map(ex => (
+                      <div key={ex.trigger} className="flex items-center gap-2 text-[11px]">
+                        <span style={{ color: 'var(--muted-text)' }}>{ex.trigger}</span>
+                        <span className="font-semibold" style={{ color: 'var(--accent-blue)' }}>{ex.result}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </motion.div>
@@ -628,8 +678,12 @@ export default function Home() {
               { feature: 'Response rate analytics', vals: [false, false, true] },
               { feature: 'Real-time pipeline view', vals: [false, 'Manual', true] },
               { feature: 'Works on mobile', vals: ['Broken', 'Barely', true] },
+              { feature: 'AI interview prep — auto-activated', vals: [false, false, true] },
+              { feature: 'AI follow-up email generator', vals: [false, false, true] },
+              { feature: 'AI offer negotiation guide', vals: [false, false, true] },
+              { feature: 'Weekly AI recruiting coach', vals: [false, false, true] },
               { feature: 'Zero setup', vals: [false, false, true] },
-              { feature: 'Free', vals: [true, true, true] },
+              { feature: 'Free to start', vals: [true, true, true] },
             ].map((row, ri) => (
               <div
                 key={row.feature}

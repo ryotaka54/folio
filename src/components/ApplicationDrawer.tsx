@@ -263,7 +263,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
             {/* Interview Timeline */}
             <InterviewTimeline
               steps={application.interview_steps || []}
-              onUpdate={(steps) => immediateUpdate('interview_steps', steps as unknown as string)}
+              onUpdate={(steps) => onUpdate(application.id, { interview_steps: steps })}
             />
 
             {/* AI Panels */}

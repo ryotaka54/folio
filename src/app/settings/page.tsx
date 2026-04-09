@@ -15,7 +15,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type Section = 'profile' | 'recruiting' | 'appearance' | 'account' | 'data' | 'support' | 'danger';
+type Section = 'profile' | 'recruiting' | 'ai' | 'appearance' | 'account' | 'data' | 'support' | 'danger';
 
 interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: boolean }
 
@@ -38,6 +38,7 @@ export { GearIcon };
 const SECTIONS: SectionMeta[] = [
   { id: 'profile', label: 'Profile', icon: <UserIcon /> },
   { id: 'recruiting', label: 'Recruiting', icon: <BriefcaseIcon /> },
+  { id: 'ai', label: 'AI Features', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> },
   { id: 'appearance', label: 'Appearance', icon: <PaletteIcon /> },
   { id: 'account', label: 'Account', icon: <ShieldIcon /> },
   { id: 'data', label: 'Export Data', icon: <DownloadIcon /> },
@@ -415,6 +416,65 @@ function TargetField({ storageKey, placeholder }: { storageKey: string; placehol
 // ─── Section: Notifications ───────────────────────────────────────────────────
 // TODO: Add email_notifications, deadline_reminders, weekly_digest columns to users table in Supabase.
 // Currently saved to localStorage as fallback.
+
+// ─── Section: AI Features ─────────────────────────────────────────────────────
+
+function AISection() {
+  const { user } = useAuth();
+  const userIsPro = isPro(user);
+
+  const AI_FEATURES = [
+    { key: 'interview-prep', label: 'Interview Intel' },
+    { key: 'follow-up-email', label: 'Follow Up Writer' },
+    { key: 'strength-signal', label: 'Strength Signal' },
+    { key: 'offer-intelligence', label: 'Offer Guide' },
+    { key: 'weekly-coach', label: 'Weekly Coach' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div>
+        <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--brand-navy)', marginBottom: 4, letterSpacing: '-0.01em' }}>AI Features</h2>
+        <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.5 }}>
+          {userIsPro
+            ? 'Your AI suite is active. Features activate automatically as your applications move through stages.'
+            : `You're on the free plan — ${3} AI uses per feature per day. Upgrade to Pro for 20 uses per day.`}
+        </p>
+      </div>
+
+      {/* Feature list */}
+      <div style={{ borderRadius: 10, border: '1px solid var(--border-gray)', overflow: 'hidden' }}>
+        {AI_FEATURES.map((f, i) => (
+          <div
+            key={f.key}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '12px 16px',
+              borderTop: i > 0 ? '1px solid var(--border-gray)' : undefined,
+              background: 'var(--card-bg)',
+            }}
+          >
+            <span style={{ fontSize: 13, color: 'var(--brand-navy)', fontWeight: 500 }}>{f.label}</span>
+            <span style={{
+              fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 99,
+              background: userIsPro ? 'rgba(22,163,74,0.1)' : 'var(--surface-gray)',
+              color: userIsPro ? '#16A34A' : 'var(--muted-text)',
+            }}>
+              {userIsPro ? '20 uses/day' : '3 uses/day'}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Privacy note */}
+      <div style={{ padding: '12px 14px', borderRadius: 8, border: '1px solid var(--border-gray)', background: 'var(--surface-gray)' }}>
+        <p style={{ fontSize: 12, color: 'var(--muted-text)', lineHeight: 1.6 }}>
+          All AI features are powered by Anthropic&apos;s Claude. Responses are generated in real time. Your application data is never used to train AI models.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // ─── Section: Appearance ──────────────────────────────────────────────────────
 
@@ -1096,6 +1156,7 @@ export default function SettingsPage() {
   const sectionContent: Record<Section, ReactNode> = {
     profile: <ProfileSection showToast={showToast} />,
     recruiting: <RecruitingSection showToast={showToast} />,
+    ai: <AISection />,
     appearance: <AppearanceSection />,
     account: <AccountSection showToast={showToast} />,
     data: <DataSection showToast={showToast} />,

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { STAGE_COLORS } from '@/lib/constants';
 import { useExtensionStatus } from '@/lib/extension-status-context';
+import { Sparkles } from 'lucide-react';
 
 const GHOST_STAGES = ['Wishlist', 'Applied', 'OA / Online Assessment', 'Phone / Recruiter Screen', 'Offer'];
 
@@ -45,11 +46,19 @@ export default function EmptyState({ onAdd, onAutofillUrl, hideExtensionHint }: 
       </div>
 
       <h3 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>
-        Your pipeline is empty
+        Add your first application to get started
       </h3>
-      <p className="text-[13px] text-center max-w-xs mb-6" style={{ color: 'var(--muted-text)' }}>
-        Paste a job link below to autofill the details, or add an application manually.
+      <p className="text-[13px] text-center max-w-sm mb-2" style={{ color: 'var(--muted-text)' }}>
+        Applyd starts working for you the moment you track. After your first interview stage, your AI prep guide activates automatically.
       </p>
+
+      {/* AI features teaser */}
+      <div className="flex items-center gap-1.5 mb-6">
+        <Sparkles size={11} style={{ color: 'var(--accent-blue)' }} />
+        <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+          Pro users get AI interview prep, follow-up emails &amp; offer negotiation — automatically.
+        </p>
+      </div>
 
       {/* URL autofill input */}
       <div className="w-full max-w-sm mb-3">
@@ -80,7 +89,6 @@ export default function EmptyState({ onAdd, onAutofillUrl, hideExtensionHint }: 
         or add manually
       </button>
 
-      {/* Extension hint — only if banner isn't already showing and extension not installed */}
       {!hideExtensionHint && !isInstalled && (
         <p className="mt-5 text-[11px] text-center max-w-xs" style={{ color: 'var(--text-tertiary)' }}>
           Already found jobs to apply to? The{' '}
