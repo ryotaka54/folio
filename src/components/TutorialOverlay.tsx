@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { useTutorial } from '@/lib/tutorial-context';
 import { useAuth } from '@/lib/auth-context';
 import { capture } from '@/lib/analytics';
+import { isPro } from '@/lib/pro';
 
 // TODO: Replace with real Chrome Web Store URL when extension is published
 const EXTENSION_URL = 'https://chromewebstore.google.com/detail/applyd';
@@ -18,6 +19,7 @@ interface TutorialStep {
   title: string;
   description: string;
   includeOnMobile: boolean;
+  proOnly?: boolean;
 }
 
 const STEPS: TutorialStep[] = [
@@ -78,6 +80,24 @@ const STEPS: TutorialStep[] = [
     title: 'Find anything instantly',
     description: 'Filter by company or role in real time. Handy before interviews or when following up.',
     includeOnMobile: true,
+  },
+  {
+    id: 'ai-features',
+    type: 'spotlight',
+    fallbackId: 'pipeline-board',
+    title: 'Your AI features live here',
+    description: 'Open any application to access Interview Intel, Follow-Up Writer, and Offer Negotiation Guide — activated automatically based on your interview stage.',
+    includeOnMobile: true,
+    proOnly: true,
+  },
+  {
+    id: 'weekly-coach',
+    type: 'spotlight',
+    fallbackId: 'stats-bar',
+    title: 'Every Monday your AI Coach checks in',
+    description: 'A personalized briefing built from your real pipeline — priorities, trends, and one key insight to act on this week.',
+    includeOnMobile: true,
+    proOnly: true,
   },
   {
     id: 'extension',
@@ -469,6 +489,7 @@ function TooltipCard({
   onSkip,
   isFirst,
   isLast,
+  isProUser,
 }: {
   step: TutorialStep;
   stepIndex: number;
@@ -479,6 +500,7 @@ function TooltipCard({
   onSkip: () => void;
   isFirst: boolean;
   isLast: boolean;
+  isProUser: boolean;
 }) {
   const [vpW, setVpW] = useState(0);
   const [vpH, setVpH] = useState(0);
@@ -518,21 +540,37 @@ function TooltipCard({
       <p style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-tertiary)', marginBottom: 7 }}>
         Step {stepIndex + 1} of {totalSteps}
       </p>
-      <p
-        style={{
-          fontSize: 14,
-          fontWeight: 700,
-          color: 'var(--brand-navy)',
-          letterSpacing: '-0.015em',
-          marginBottom: 7,
-          lineHeight: 1.3,
-        }}
-      >
-        {step.title}
-      </p>
-      <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.55, marginBottom: 16 }}>
-        {step.description}
-      </p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 7 }}>
+        <p
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: 'var(--brand-navy)',
+            letterSpacing: '-0.015em',
+            lineHeight: 1.3,
+            margin: 0,
+          }}
+        >
+          {step.title}
+        </p>
+        {step.proOnly && (
+          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', color: '#C9A84C', background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 4, padding: '1px 5px', flexShrink: 0 }}>PRO</span>
+        )}
+      </div>
+      {step.proOnly && !isProUser ? (
+        <div style={{ position: 'relative', marginBottom: 16, borderRadius: 8, overflow: 'hidden' }}>
+          <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.55, filter: 'blur(3px)', userSelect: 'none' }}>
+            {step.description}
+          </p>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(var(--card-bg-rgb, 255,255,255), 0.6)', backdropFilter: 'blur(1px)' }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#C9A84C' }}>✦ Upgrade to Pro to unlock</span>
+          </div>
+        </div>
+      ) : (
+        <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.55, marginBottom: 16 }}>
+          {step.description}
+        </p>
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {!isFirst && (
@@ -611,6 +649,7 @@ function MobileSheet({
   isFirst,
   isLast,
   onInstall,
+  isProUser,
 }: {
   step: TutorialStep;
   stepIndex: number;
@@ -621,6 +660,7 @@ function MobileSheet({
   isFirst: boolean;
   isLast: boolean;
   onInstall: () => void;
+  isProUser: boolean;
 }) {
   const isExtension = step.id === 'extension';
   const isWelcome = step.id === 'welcome';
@@ -691,25 +731,41 @@ function MobileSheet({
           </div>
         )}
 
-        <h2
-          style={{
-            fontSize: 17,
-            fontWeight: 700,
-            color: 'var(--brand-navy)',
-            letterSpacing: '-0.02em',
-            marginBottom: 8,
-          }}
-        >
-          {step.title}
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <h2
+            style={{
+              fontSize: 17,
+              fontWeight: 700,
+              color: 'var(--brand-navy)',
+              letterSpacing: '-0.02em',
+              margin: 0,
+            }}
+          >
+            {step.title}
+          </h2>
+          {step.proOnly && (
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', color: '#C9A84C', background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 4, padding: '2px 6px', flexShrink: 0 }}>PRO</span>
+          )}
+        </div>
 
-        <p style={{ fontSize: 14, color: 'var(--muted-text)', lineHeight: 1.6, marginBottom: 16 }}>
-          {isWelcome
-            ? "Your command center for recruiting. We'll walk through every feature — takes about 60 seconds."
-            : isExtension
-            ? "Click once on any job posting and it's instantly saved to Applyd — no copy-pasting. Works on LinkedIn, Handshake, Greenhouse, and more."
-            : step.description}
-        </p>
+        {step.proOnly && !isProUser ? (
+          <div style={{ position: 'relative', marginBottom: 16, borderRadius: 8, overflow: 'hidden' }}>
+            <p style={{ fontSize: 14, color: 'var(--muted-text)', lineHeight: 1.6, filter: 'blur(3px)', userSelect: 'none' }}>
+              {step.description}
+            </p>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(1px)' }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#C9A84C' }}>✦ Upgrade to Pro to unlock</span>
+            </div>
+          </div>
+        ) : (
+          <p style={{ fontSize: 14, color: 'var(--muted-text)', lineHeight: 1.6, marginBottom: 16 }}>
+            {isWelcome
+              ? "Your command center for recruiting. We'll walk through every feature — takes about 60 seconds."
+              : isExtension
+              ? "Click once on any job posting and it's instantly saved to Applyd — no copy-pasting. Works on LinkedIn, Handshake, Greenhouse, and more."
+              : step.description}
+          </p>
+        )}
 
 
         {/* Buttons */}
@@ -781,7 +837,8 @@ function MobileSheet({
 
 export default function TutorialOverlay() {
   const { isActive, currentStep, next, prev, skip } = useTutorial();
-  const { updateProfile } = useAuth();
+  const { updateProfile, user } = useAuth();
+  const isProUser = isPro(user);
 
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -935,6 +992,7 @@ export default function TutorialOverlay() {
         isFirst={isFirst}
         isLast={isLast}
         onInstall={handleInstall}
+        isProUser={isProUser}
       />,
       document.body
     );
@@ -996,6 +1054,7 @@ export default function TutorialOverlay() {
           onSkip={handleSkip}
           isFirst={isFirst}
           isLast={isLast}
+          isProUser={isProUser}
         />
       )}
     </>,

@@ -137,17 +137,19 @@ export default function WeeklyCoach({ userId, isPro, onUpgrade }: WeeklyCoachPro
 
   if (!isPro) {
     return (
-      <ProGate isPro={false} onUpgrade={onUpgrade} label="Weekly AI Recruiting Coach — Pro">
-        <div className="rounded-xl border p-4 space-y-2" style={{ borderColor: 'var(--border-gray)' }}>
-          <div className="flex items-center gap-2">
-            <Sparkles size={13} style={{ color: 'var(--accent-blue)' }} />
-            <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Weekly Recruiting Coach</span>
+      <div data-tutorial-id="weekly-coach">
+        <ProGate isPro={false} onUpgrade={onUpgrade} label="Weekly AI Recruiting Coach — Pro">
+          <div className="rounded-xl border p-4 space-y-2" style={{ borderColor: 'var(--border-gray)' }}>
+            <div className="flex items-center gap-2">
+              <Sparkles size={13} style={{ color: 'var(--accent-blue)' }} />
+              <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Weekly Recruiting Coach</span>
+            </div>
+            <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Get personalized recruiting advice every Monday based on your pipeline.</p>
           </div>
-          <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>Get personalized recruiting advice every Monday based on your pipeline.</p>
-        </div>
-      </ProGate>
+        </ProGate>
+      </div>
     );
   }
 
-  return content;
+  return <div data-tutorial-id="weekly-coach">{content}</div>;
 }
