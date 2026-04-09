@@ -55,6 +55,9 @@ export interface Application {
   recruiter_email: string;
   created_at: string;
   updated_at: string;
+  ai_interview_prep?: unknown;
+  ai_strength_signal?: unknown;
+  ai_offer_intelligence?: unknown;
 }
 
 export interface UserProfile {

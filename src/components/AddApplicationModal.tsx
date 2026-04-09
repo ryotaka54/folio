@@ -7,6 +7,7 @@ import { X, Sparkles } from 'lucide-react';
 import { useExtensionStatus } from '@/lib/extension-status-context';
 import { capture } from '@/lib/analytics';
 import { lookupCompany, type CompanyInfo } from '@/lib/recruiting';
+import StrengthSignal from '@/components/ai/StrengthSignal';
 
 interface AddApplicationModalProps {
   open: boolean;
@@ -23,6 +24,9 @@ interface AddApplicationModalProps {
   }) => Promise<void>;
   stages: PipelineStage[];
   initialJobLink?: string;
+  userId?: string;
+  isPro?: boolean;
+  onUpgrade?: () => void;
 }
 
 const inputCls = [
@@ -45,7 +49,7 @@ function guessCategory(role: string): Category | '' {
   return '';
 }
 
-export default function AddApplicationModal({ open, onClose, onSave, stages, initialJobLink }: AddApplicationModalProps) {
+export default function AddApplicationModal({ open, onClose, onSave, stages, initialJobLink, userId, isPro = false, onUpgrade = () => {} }: AddApplicationModalProps) {
   const defaultStatus = (stages.includes('Wishlist' as PipelineStage) ? 'Wishlist' : stages[0]) as PipelineStage;
   const { isInstalled, hintCount, incrementHintCount } = useExtensionStatus();
 
@@ -226,6 +230,18 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
                 </div>
               )}
             </div>
+
+            {userId && company.trim() && role.trim() && (
+              <StrengthSignal
+                userId={userId}
+                company={company}
+                role={role}
+                category={category || undefined}
+                location={location || undefined}
+                isPro={isPro}
+                onUpgrade={onUpgrade}
+              />
+            )}
 
             <div>
               <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>

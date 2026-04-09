@@ -32,6 +32,7 @@ import { computeGreeting, computeMomentum, getSeasonInfo, getSeasonalTip } from 
 import { isPro as checkIsPro, FREE_TIER_LIMIT } from '@/lib/pro';
 import { CapExceededError } from '@/lib/store';
 import UpgradeModal from '@/components/UpgradeModal';
+import WeeklyCoach from '@/components/ai/WeeklyCoach';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', created_at: '', updated_at: '' },
@@ -553,6 +554,17 @@ function DashboardContent() {
           )}
         </div>
 
+        {/* Weekly AI Coach */}
+        {!isActive && user?.id && (
+          <div className="mb-5">
+            <WeeklyCoach
+              userId={user.id}
+              isPro={userIsPro}
+              onUpgrade={() => setShowUpgradeModal(true)}
+            />
+          </div>
+        )}
+
         {/* Stats */}
         <div data-tutorial-id="stats-bar">
           <StatsBar applications={displayApplications} />
@@ -756,6 +768,9 @@ function DashboardContent() {
         onSave={handleAddSave}
         stages={stages as PipelineStage[]}
         initialJobLink={addModalInitialUrl}
+        userId={user?.id}
+        isPro={userIsPro}
+        onUpgrade={() => setShowUpgradeModal(true)}
       />
 
       {/* Detail Drawer */}
@@ -767,6 +782,9 @@ function DashboardContent() {
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         stages={stages as PipelineStage[]}
+        userId={user?.id}
+        isPro={userIsPro}
+        onUpgrade={() => setShowUpgradeModal(true)}
       />
 
       {/* Upgrade Modal */}

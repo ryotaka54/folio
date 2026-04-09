@@ -3,7 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Application, PipelineStage } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
-import { ExternalLink, X } from 'lucide-react';
+import { ExternalLink, X, Mail } from 'lucide-react';
+import InterviewPrepPanel from '@/components/ai/InterviewPrepPanel';
+import OfferIntelligencePanel from '@/components/ai/OfferIntelligencePanel';
+import FollowUpEmailModal from '@/components/ai/FollowUpEmailModal';
 
 const inputCls = [
   'w-full px-3 bg-background border border-border-gray rounded-md text-sm',
@@ -19,11 +22,15 @@ interface ApplicationDrawerProps {
   onUpdate: (id: string, updates: Partial<Application>) => void;
   onDelete: (id: string) => Promise<void>;
   stages: PipelineStage[];
+  userId?: string;
+  isPro?: boolean;
+  onUpgrade?: () => void;
 }
 
 type SaveStatus = 'idle' | 'saving' | 'saved';
 
-export default function ApplicationDrawer({ application, open, onClose, onUpdate, onDelete, stages }: ApplicationDrawerProps) {
+export default function ApplicationDrawer({ application, open, onClose, onUpdate, onDelete, stages, userId, isPro = false, onUpgrade = () => {} }: ApplicationDrawerProps) {
+  const [showFollowUpEmail, setShowFollowUpEmail] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [visible, setVisible] = useState(false);
@@ -112,6 +119,17 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
               Application Details
             </h2>
             <div className="flex items-center gap-3">
+              {userId && (
+                <button
+                  onClick={() => setShowFollowUpEmail(true)}
+                  className="flex items-center gap-1 text-[12px] font-medium px-2 py-1 rounded-md border border-border-gray hover:bg-surface-gray transition-colors"
+                  style={{ color: 'var(--brand-navy)' }}
+                  title="AI Follow-Up Email"
+                >
+                  <Mail size={12} />
+                  Email
+                </button>
+              )}
               {saveStatus === 'saving' && (
                 <span className="text-[12px] flex items-center gap-1" style={{ color: 'var(--muted-text)' }}>
                   <svg className="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -240,6 +258,58 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 placeholder="Interview prep notes, salary info, etc."
               />
             </div>
+
+            {/* AI Panels */}
+            {userId && (() => {
+              const isOfferStage = application.status === 'Offer' || application.status === 'Offer — Negotiating';
+              const isInterviewStage = /interview|recruiter screen|phone|final round|oa \//i.test(application.status);
+              return (
+                <div className="space-y-2">
+                  {isOfferStage && (
+                    <OfferIntelligencePanel
+                      userId={userId}
+                      applicationId={application.id}
+                      company={application.company}
+                      role={application.role}
+                      category={application.category || undefined}
+                      location={application.location || undefined}
+                      isPro={isPro}
+                      cached={(application.ai_offer_intelligence as Parameters<typeof OfferIntelligencePanel>[0]['cached']) ?? null}
+                      onUpgrade={onUpgrade}
+                    />
+                  )}
+                  {(isInterviewStage || isOfferStage) && (
+                    <InterviewPrepPanel
+                      userId={userId}
+                      applicationId={application.id}
+                      company={application.company}
+                      role={application.role}
+                      stage={application.status}
+                      notes={application.notes || undefined}
+                      isPro={isPro}
+                      cached={(application.ai_interview_prep as Parameters<typeof InterviewPrepPanel>[0]['cached']) ?? null}
+                      onUpgrade={onUpgrade}
+                    />
+                  )}
+                </div>
+              );
+            })()}
+
+            {/* Follow-Up Email Modal */}
+            {showFollowUpEmail && userId && (
+              <FollowUpEmailModal
+                userId={userId}
+                company={application.company}
+                role={application.role}
+                stage={application.status}
+                recruiterName={application.recruiter_name || undefined}
+                recruiterEmail={application.recruiter_email || undefined}
+                notes={application.notes || undefined}
+                isPro={isPro}
+                onUpgrade={onUpgrade}
+                onClose={() => setShowFollowUpEmail(false)}
+              />
+            )}
 
             {/* Recruiter Contact */}
             <div className="border-t border-border-gray pt-4 mt-4">
