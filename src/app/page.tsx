@@ -347,13 +347,13 @@ export default function Home() {
                 className="max-w-3xl text-balance text-[2.75rem] font-semibold leading-[1.1] md:text-[3.5rem] lg:text-[4.25rem]"
                 style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}
               >
-                The internship search rewards the prepared.{' '}
-                <span style={{ color: 'var(--accent-blue)' }}>Now you are.</span>
+                The only recruiting tool that{' '}
+                <span style={{ color: 'var(--accent-blue)' }}>prepares you, not just tracks you.</span>
               </h1>
 
               {/* Sub */}
               <p className="mt-6 max-w-xl text-balance text-[17px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
-                Most students walk into interviews cold, send generic follow-ups, and leave money on the table. Applyd gives you the intel, the email, and the negotiation script — automatically, before you even think to ask.
+                Track every application, get AI interview prep the moment you advance, send the perfect follow-up in one click, and negotiate your offer with confidence — all from one place, free to start.
               </p>
 
               {/* CTAs */}
