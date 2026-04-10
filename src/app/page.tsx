@@ -339,40 +339,40 @@ export default function Home() {
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-6"
                 style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                AI-powered recruiting, built for students
+                AI that activates at the right moment — free to start
               </div>
 
               {/* Headline */}
               <h1
-                className="max-w-[640px] text-[28px] sm:text-[36px] lg:text-[56px] text-center md:text-left"
+                className="max-w-[640px] text-[28px] sm:text-[38px] lg:text-[58px] text-center md:text-left"
                 style={{
                   color: 'var(--brand-navy)',
                   letterSpacing: '-0.03em',
-                  lineHeight: 1.15,
+                  lineHeight: 1.1,
                   fontWeight: 700,
                 }}
               >
-                Every application.{' '}
-                Every stage.{' '}
+                Track every application.{' '}
                 <span
                   style={{
                     textDecoration: 'underline',
                     textDecorationColor: 'var(--accent-blue)',
                     textDecorationThickness: '4px',
-                    textUnderlineOffset: '6px',
+                    textUnderlineOffset: '8px',
                     textDecorationSkipInk: 'none',
+                    color: 'var(--brand-navy)',
                   }}
                 >
-                  One place.
+                  Ace every interview.
                 </span>
               </h1>
 
               {/* Sub */}
               <p
-                className="mt-5 max-w-[480px] text-[16px] md:text-[18px] text-center md:text-left"
-                style={{ color: 'var(--muted-text)', lineHeight: 1.6 }}
+                className="mt-5 max-w-[480px] text-[17px] text-center md:text-left"
+                style={{ color: 'var(--muted-text)', lineHeight: 1.65 }}
               >
-                Track every application. Get AI-powered interview prep, follow-up emails, and offer negotiation — automatically, the moment you need them. Free for students.
+                Applyd tracks your pipeline and deploys AI exactly when you need it — interview prep when you advance, a negotiation guide when an offer lands, a weekly coach every Monday.
               </p>
 
               {/* CTAs */}
@@ -380,22 +380,22 @@ export default function Home() {
                 <Button
                   asChild
                   size="lg"
-                  style={{ borderRadius: 8, height: 44, padding: '0 20px', fontWeight: 600 }}
+                  style={{ borderRadius: 8, height: 46, padding: '0 24px', fontWeight: 700, fontSize: 14 }}
                 >
-                  <Link href="/signup">Get started free</Link>
+                  <Link href="/signup">Start free — no card needed</Link>
                 </Button>
                 <Button
                   asChild
                   size="lg"
-                  variant="ghost"
-                  style={{ borderRadius: 8, height: 44, padding: '0 20px', fontWeight: 600, color: 'var(--accent-blue)' }}
+                  variant="outline"
+                  style={{ borderRadius: 8, height: 46, padding: '0 20px', fontWeight: 600, fontSize: 14, borderColor: 'var(--border-gray)', color: 'var(--brand-navy)', background: 'var(--surface-gray)' }}
                 >
                   <Link href="#walkthrough">See how it works</Link>
                 </Button>
               </div>
 
               <p className="mt-4 text-[12px] text-center md:text-left" style={{ color: 'var(--text-tertiary)' }}>
-                Free to start · 2 minutes to set up · 500+ students already tracking
+                Free forever · 2 min setup · 500+ students already tracking
               </p>
             </AnimatedGroup>
 
@@ -535,6 +535,34 @@ export default function Home() {
           <ProductWalkthrough />
         </div>
 
+        {/* ── Testimonials ── */}
+        <section className="max-w-6xl mx-auto px-6 py-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-14"
+          >
+            <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
+              What changes when students stop guessing.
+            </h2>
+            <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
+              500+ students. Real pipelines. Real offers.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="relative"
+            style={{ minHeight: 320 }}
+          >
+            <TestimonialStack testimonials={TESTIMONIALS} visibleBehind={2} />
+          </motion.div>
+        </section>
+
         {/* ── Features ── */}
         <section id="features" className="max-w-6xl mx-auto px-6 py-20" style={{ scrollMarginTop: 72 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
@@ -554,12 +582,12 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {[
-                { icon: '🗂', title: 'Kanban pipeline view', desc: 'See every application at a glance across recruiting-native stages: OA, Recruiter Screen, Final Round, and more.' },
-                { icon: '⏰', title: 'Deadline tracking', desc: 'Deadlines turn amber at 7 days, red at 3, and surface automatically in your Act Now card.' },
-                { icon: '📈', title: 'Response rate analytics', desc: 'See your callback rate automatically — a number most students never know but every recruiter does.' },
-                { icon: '💡', title: 'Smart nudges', desc: 'Applyd tells you when applications have gone quiet and prompts action before opportunities slip away.' },
-                { icon: '📅', title: 'Calendar view', desc: 'Every deadline and interview in one calendar. Sync to Google Calendar in one click.' },
-                { icon: '⚡', title: 'Browser extension', desc: 'Log any job from LinkedIn, Handshake, or any job board in one click. No copy-pasting.' },
+                { icon: '🗂', title: 'Kanban pipeline', desc: 'The stages are built for recruiting — OA, Recruiter Screen, Superday. Not a generic task board repurposed for your job search.' },
+                { icon: '⏰', title: 'Deadline tracking', desc: 'Amber at 7 days, red at 3. The Act Now card surfaces the things you\'re about to miss — before you miss them.' },
+                { icon: '📈', title: 'Response rate', desc: 'Most students have no idea if their applications are working. This tells you your exact callback rate so you know when to change your approach.' },
+                { icon: '💡', title: 'Smart nudges', desc: 'Left an OA sitting? Forgot to follow up after an interview? Applyd notices and reminds you before the window closes.' },
+                { icon: '📅', title: 'Calendar view', desc: 'Every deadline and interview in one place. Sync to Google Calendar so your recruiting schedule lives where your classes already are.' },
+                { icon: '⚡', title: 'Browser extension', desc: 'Log a job from LinkedIn or Handshake in one click. The autofill handles company, role, and location — you just hit save.' },
               ].map((f, i) => (
                 <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
                   className="rounded-xl border p-5 flex flex-col gap-2"
@@ -580,12 +608,12 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {[
-                { icon: '🧠', title: 'Interview Intel', desc: 'Walk into every interview knowing what this company actually asks. Activates automatically when you enter any interview stage.' },
-                { icon: '✉️', title: 'Follow Up Writer', desc: 'One click generates a perfect professional email — thank you, status check, negotiation, withdrawal — calibrated to your exact situation.' },
-                { icon: '📊', title: 'Strength Signal', desc: 'Know how competitive your application is before you invest more time. Appears automatically when you add a new application.' },
-                { icon: '💰', title: 'Offer Negotiation Guide', desc: 'Compensation benchmarks and a word-for-word negotiation script, waiting for you the moment an offer arrives.' },
-                { icon: '📅', title: 'Weekly AI Coach', desc: 'A personalized Monday morning briefing built from your actual pipeline data. Specific actions for the week ahead, every week.' },
-                { icon: '∞', title: 'Unlimited applications', desc: 'Apply broadly. Track everything. The more your pipeline grows, the smarter the AI gets about your patterns.' },
+                { icon: '🧠', title: 'Interview Intel', desc: 'The moment you move to an interview stage, AI generates the questions this company actually asks — behavioral, technical, and role-specific. You walk in prepared, not guessing.' },
+                { icon: '✉️', title: 'Follow Up Writer', desc: 'Thank you, status check, negotiation, withdrawal — one click writes the email. Calibrated to your company, your role, and where you are in the process.' },
+                { icon: '📊', title: 'Strength Signal', desc: 'Before you invest 3 hours on a cover letter, know how competitive you are. The signal appears the moment you add a new application.' },
+                { icon: '💰', title: 'Offer Negotiation Guide', desc: 'An offer lands. Now what? Market salary ranges, a word-for-word counter offer script, and the tactics that get results — waiting for you automatically.' },
+                { icon: '📅', title: 'Weekly AI Coach', desc: 'Every Monday morning, a briefing built from your real pipeline: what\'s stalled, what to prioritize, and one thing you should do this week.' },
+                { icon: '∞', title: 'Unlimited applications', desc: 'No cap, no throttle. Apply to 100 companies if that\'s what it takes. Everything tracked, nothing missed.' },
               ].map((f, i) => (
                 <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
                   className="rounded-xl border p-5 flex flex-col gap-2 relative"
@@ -615,20 +643,20 @@ export default function Home() {
             {[
               {
                 step: '1',
-                title: 'You track your applications as normal',
-                desc: 'Add applications with the kanban board or the browser extension. Takes seconds.',
+                title: 'Log your applications in seconds',
+                desc: 'Paste a job URL and the autofill handles company, role, and location. Or use the browser extension directly from LinkedIn or Handshake.',
                 examples: [],
               },
               {
                 step: '2',
-                title: 'Applyd detects where you are in the process',
-                desc: 'The pipeline watches every status change, deadline, and stage transition automatically.',
+                title: 'Move cards as your status changes',
+                desc: 'Drag to OA when you get the email. Drag to Final Round when the call is scheduled. The pipeline tracks where you stand across every company at once.',
                 examples: [],
               },
               {
                 step: '3',
-                title: 'The right AI feature activates at the right moment',
-                desc: 'No prompting. No searching. Before you think to ask, it&apos;s already there.',
+                title: 'AI shows up before you think to ask',
+                desc: 'No prompting, no searching. Applyd reads your pipeline and activates the right tool at the exact right moment.',
                 examples: [
                   { trigger: 'Move to interviews →', result: 'Interview Intel appears' },
                   { trigger: 'Receive an offer →', result: 'Negotiation Guide activates' },
@@ -736,34 +764,6 @@ export default function Home() {
                 ))}
               </div>
             ))}
-          </motion.div>
-        </section>
-
-        {/* ── Testimonials ── */}
-        <section className="max-w-6xl mx-auto px-6 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-14"
-          >
-            <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
-              What changes when students stop guessing.
-            </h2>
-            <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
-              500+ students. Real pipelines. Real offers.
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="relative"
-            style={{ minHeight: 320 }}
-          >
-            <TestimonialStack testimonials={TESTIMONIALS} visibleBehind={2} />
           </motion.div>
         </section>
 

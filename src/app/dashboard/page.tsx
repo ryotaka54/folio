@@ -498,7 +498,7 @@ function DashboardContent() {
                 Upgrade
               </button>
             )}
-            <StreakBadge onMilestone={msg => showToast(msg)} />
+            {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
             <ThemeToggle />
             <Link
               href="/settings"
@@ -561,7 +561,7 @@ function DashboardContent() {
         </div>
 
         {/* Weekly AI Coach */}
-        {!isActive && user?.id && (
+        {!isActive && user?.id && applications.length > 0 && (
           <div className="mb-5">
             <WeeklyCoach
               userId={user.id}
@@ -582,7 +582,7 @@ function DashboardContent() {
         </div>
 
         {/* Weekly goal progress */}
-        {!isActive && (
+        {!isActive && applications.length > 0 && (
           <WeeklyGoal
             applications={applications}
             onToast={msg => showToast(msg)}
@@ -590,7 +590,7 @@ function DashboardContent() {
         )}
 
         {/* Smart nudges */}
-        {!isActive && (
+        {!isActive && applications.length > 0 && (
           <SmartNudges
             applications={applications}
             onAddApp={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
@@ -814,11 +814,11 @@ function DashboardContent() {
       {/* First-app celebration tooltip — appears once, fades after 5s */}
       {showFirstAppTip && (
         <div
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 px-4 py-3 rounded-xl shadow-xl fade-in"
-          style={{ background: '#111827', color: '#fff', fontSize: 12, textAlign: 'center', lineHeight: 1.5, maxWidth: 320, width: 'calc(100% - 2rem)' }}
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 px-5 py-3.5 rounded-xl shadow-2xl fade-in"
+          style={{ background: '#111827', color: '#fff', fontSize: 13, textAlign: 'center', lineHeight: 1.5, maxWidth: 340, width: 'calc(100% - 2rem)', border: '1px solid rgba(74,222,128,0.2)' }}
         >
-          <span style={{ color: '#4ADE80', marginRight: 6 }}>✓</span>
-          First application logged! Pro tip: the extension does this automatically from any job board.
+          <div style={{ color: '#4ADE80', fontWeight: 700, marginBottom: 2 }}>✓ Your pipeline is live.</div>
+          <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Keep adding applications — the more you track, the smarter Applyd gets.</div>
         </div>
       )}
     </div>
