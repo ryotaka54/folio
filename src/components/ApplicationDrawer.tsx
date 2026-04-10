@@ -40,6 +40,8 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartXRef = useRef<number>(0);
+  const touchStartYRef = useRef<number>(0);
 
   useEffect(() => {
     if (open) {
@@ -112,7 +114,27 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
       className="fixed inset-0 z-50 flex justify-end"
     >
       <div className="absolute inset-0 bg-brand-navy/20 backdrop z-0" onClick={onClose} />
-      <div className={`relative z-10 w-full sm:max-w-md bg-card-bg shadow-2xl h-full overflow-y-auto ${closing ? 'slide-out' : 'slide-in'}`} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`relative z-10 w-full sm:max-w-md bg-card-bg h-full overflow-y-auto ${closing ? 'slide-out' : 'slide-in'}`}
+        style={{ boxShadow: '-12px 0 48px rgba(0,0,0,0.14)' }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => {
+          touchStartXRef.current = e.touches[0].clientX;
+          touchStartYRef.current = e.touches[0].clientY;
+        }}
+        onTouchEnd={(e) => {
+          const dx = e.changedTouches[0].clientX - touchStartXRef.current;
+          const dy = e.changedTouches[0].clientY - touchStartYRef.current;
+          // Swipe right (on full-width mobile drawer) or down both close
+          const isRightSwipe = dx > 80 && Math.abs(dy) < Math.abs(dx);
+          const isDownSwipe = dy > 80 && Math.abs(dx) < Math.abs(dy);
+          if (isRightSwipe || isDownSwipe) onClose();
+        }}
+      >
+        {/* Mobile drag handle */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden" aria-hidden>
+          <div style={{ width: 32, height: 4, borderRadius: 99, background: 'var(--border-gray)' }} />
+        </div>
         <div className="p-4 sm:p-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           {/* Header */}
           <div className="flex items-center justify-between mb-5">

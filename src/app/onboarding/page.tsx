@@ -68,8 +68,8 @@ function OnboardingContent() {
       <div className="min-h-screen bg-surface-gray flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-lg">
           <div className="bg-card-bg rounded-lg p-6 md:p-8 border border-border-gray modal-enter">
-            <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Change your track</h1>
-            <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>This updates your pipeline stages.</p>
+            <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>What are you applying to?</h1>
+            <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Switch anytime — your pipeline stages update automatically.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
               <button
                 onClick={() => setMode('internship')}
@@ -81,8 +81,8 @@ function OnboardingContent() {
                 <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
                   <GraduationCap size={17} />
                 </div>
-                <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Internship applications</div>
-                <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track internship recruiting cycles</div>
+                <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>I&apos;m applying for internships</div>
+                <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>This summer, next semester, or co-op</div>
               </button>
               <button
                 onClick={() => setMode('job')}
@@ -94,8 +94,8 @@ function OnboardingContent() {
                 <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
                   <Briefcase size={17} />
                 </div>
-                <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Full-time job applications</div>
-                <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track post-graduation job searches</div>
+                <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>I&apos;m looking for a full-time role</div>
+                <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Full-time after graduation or a career change</div>
               </button>
             </div>
             <div className="flex gap-3">
@@ -152,8 +152,8 @@ function OnboardingContent() {
           {/* Step 1: Mode Selection */}
           {step === 1 && (
             <div>
-              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>What are you tracking?</h1>
-              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>This determines your pipeline stages. You can change it later.</p>
+              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>What are you applying to?</h1>
+              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Pick one to start — you can switch anytime.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <button
                   onClick={() => setMode('internship')}
@@ -165,8 +165,8 @@ function OnboardingContent() {
                   <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
                     <GraduationCap size={17} />
                   </div>
-                  <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Internship applications</div>
-                  <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track internship recruiting cycles</div>
+                  <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>I&apos;m applying for internships</div>
+                  <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>This summer, next semester, or co-op</div>
                   <div className="flex flex-wrap gap-1 mt-3">
                     {['Summer 2026', 'OA / Screen', 'Return offer'].map(tag => (
                       <span key={tag} className="text-[10px] px-1.5 py-0.5 border border-border-gray rounded" style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)' }}>{tag}</span>
@@ -183,8 +183,8 @@ function OnboardingContent() {
                   <div className="mb-3 w-9 h-9 rounded-md border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--accent-blue)' }}>
                     <Briefcase size={17} />
                   </div>
-                  <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>Full-time job applications</div>
-                  <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Track post-graduation job searches</div>
+                  <div className="font-medium text-[13px]" style={{ color: 'var(--brand-navy)' }}>I&apos;m looking for a full-time role</div>
+                  <div className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Full-time after graduation or a career change</div>
                   <div className="flex flex-wrap gap-1 mt-3">
                     {['New Grad', 'Negotiation', 'Offer compare'].map(tag => (
                       <span key={tag} className="text-[10px] px-1.5 py-0.5 border border-border-gray rounded" style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)' }}>{tag}</span>
@@ -204,8 +204,8 @@ function OnboardingContent() {
           {/* Step 2: Personal Context */}
           {step === 2 && (
             <div>
-              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Tell us about yourself</h1>
-              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Just the basics — takes 30 seconds.</p>
+              <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>A little about you</h1>
+              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Applyd uses this to personalize your coaching and reminders.</p>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Your name</label>
@@ -301,7 +301,7 @@ function OnboardingContent() {
               <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>
                 You&apos;re all set{name ? `, ${name}` : ''}!
               </h1>
-              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Your pipeline is ready to go.</p>
+              <p className="text-[13px] mb-5" style={{ color: 'var(--muted-text)' }}>Here&apos;s your pipeline. Add your first application and the AI starts working.</p>
 
               {/* Mini pipeline preview — scrollable with scroll indicator */}
               <div className="relative mb-4">
@@ -329,13 +329,13 @@ function OnboardingContent() {
               <div className="space-y-2 mb-5">
                 <div className="p-3 rounded-lg border border-border-gray text-[12px]"
                   style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
-                  <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Tip:</span>{' '}
-                  Paste any job URL when adding an application — Applyd will autofill the company, role, and location for you.
+                  <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Paste a job URL</span>{' '}
+                  and Applyd fills in the company, role, and location automatically. No typing needed.
                 </div>
                 <div className="p-3 rounded-lg border border-border-gray text-[12px]"
                   style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
-                  <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Tip:</span>{' '}
-                  Drag cards between columns to move them through your pipeline as you progress.
+                  <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>Drag to advance.</span>{' '}
+                  When you hear back, drag the card to the next stage. Your AI tools activate automatically as you move forward.
                 </div>
               </div>
 
