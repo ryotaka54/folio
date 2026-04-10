@@ -303,7 +303,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
                 <p className="text-[11px]" style={{ color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
                   ⚡ Tip — use the{' '}
                   <a
-                    href="https://chromewebstore.google.com/detail/applyd"
+                    href="https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao"
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ color: 'var(--muted-text)', textDecoration: 'underline', textUnderlineOffset: 2 }}

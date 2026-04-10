@@ -4,7 +4,7 @@ import { useExtensionStatus } from '@/lib/extension-status-context';
 import { useAuth } from '@/lib/auth-context';
 import { useTutorial } from '@/lib/tutorial-context';
 
-const EXTENSION_URL = 'https://chromewebstore.google.com/detail/applyd';
+const EXTENSION_URL = 'https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao';
 
 export default function ExtensionBanner() {
   const { isInstalled, isDismissed, mounted, markDismissed, isBannerEligible } = useExtensionStatus();

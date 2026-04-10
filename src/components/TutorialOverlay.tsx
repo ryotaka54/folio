@@ -7,8 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { capture } from '@/lib/analytics';
 import { isPro } from '@/lib/pro';
 
-// TODO: Replace with real Chrome Web Store URL when extension is published
-const EXTENSION_URL = 'https://chromewebstore.google.com/detail/applyd';
+const EXTENSION_URL = 'https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao';
 
 // ─── Step definitions ────────────────────────────────────────────────────────
 

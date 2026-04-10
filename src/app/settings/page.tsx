@@ -748,7 +748,7 @@ function AccountSection({ showToast }: { showToast: (msg: string, type?: 'succes
             </span>
           ) : (
             <a
-              href="https://chromewebstore.google.com/detail/applyd"
+              href="https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold transition-colors"

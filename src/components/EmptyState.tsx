@@ -93,7 +93,7 @@ export default function EmptyState({ onAdd, onAutofillUrl, hideExtensionHint }: 
         <p className="mt-5 text-[11px] text-center max-w-xs" style={{ color: 'var(--text-tertiary)' }}>
           Already found jobs to apply to? The{' '}
           <a
-            href="https://chromewebstore.google.com/detail/applyd"
+            href="https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao"
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: 'var(--muted-text)', textDecoration: 'underline', textUnderlineOffset: 2 }}
