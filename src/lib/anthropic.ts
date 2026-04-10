@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
+import { AI_FREE_DAILY_LIMIT, AI_PRO_DAILY_LIMIT } from './constants';
 
 export const AI_MODEL = 'claude-sonnet-4-5';
 export const AI_MAX_TOKENS = 2048;
@@ -10,8 +11,8 @@ export function isProServer(user: { pro?: boolean; pro_expires_at?: string | nul
   return new Date(user.pro_expires_at) > new Date();
 }
 
-const PRO_DAILY_LIMIT = 20;
-const FREE_DAILY_LIMIT = 3;
+const PRO_DAILY_LIMIT = AI_PRO_DAILY_LIMIT;
+const FREE_DAILY_LIMIT = AI_FREE_DAILY_LIMIT;
 
 function getClient() {
   return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });

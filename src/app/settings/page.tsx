@@ -9,7 +9,7 @@ import { ProLogo } from '@/components/ProLogo';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
-import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS } from '@/lib/constants';
+import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS, AI_FREE_DAILY_LIMIT, AI_PRO_DAILY_LIMIT } from '@/lib/constants';
 import { isPro, FREE_TIER_LIMIT } from '@/lib/pro';
 import UpgradeModal from '@/components/UpgradeModal';
 
@@ -438,7 +438,7 @@ function AISection() {
         <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.5 }}>
           {userIsPro
             ? 'Your AI suite is active. Features activate automatically as your applications move through stages.'
-            : `You're on the free plan — ${3} AI uses per feature per day. Upgrade to Pro for 20 uses per day.`}
+            : `You're on the free plan — ${AI_FREE_DAILY_LIMIT} AI uses per feature per day. Upgrade to Pro for ${AI_PRO_DAILY_LIMIT} uses per day.`}
         </p>
       </div>
 

@@ -1011,12 +1011,57 @@ function CalendarContent() {
             {/* Mobile view */}
             <div className="flex-1 lg:hidden">
               {mobileView === 'week' ? (
-                <MobileWeekView
-                  weekStart={weekStart}
-                  eventsByDate={eventsByDate}
-                  onEventClick={handleCardClick}
-                  onMoreClick={(date, evs) => setPopover({ date, events: evs })}
-                />
+                <>
+                  <MobileWeekView
+                    weekStart={weekStart}
+                    eventsByDate={eventsByDate}
+                    onEventClick={handleCardClick}
+                    onMoreClick={(date, evs) => setPopover({ date, events: evs })}
+                  />
+                  {/* Upcoming — next events beyond the visible week */}
+                  {(() => {
+                    const weekEndDate = new Date(weekStart);
+                    weekEndDate.setDate(weekEndDate.getDate() + 7);
+                    const weekEnd = toYMD(weekEndDate);
+                    const upcoming = events
+                      .filter(e => e.date >= weekEnd)
+                      .sort((a, b) => a.date.localeCompare(b.date))
+                      .slice(0, 6);
+                    if (upcoming.length === 0) return null;
+                    return (
+                      <div className="mt-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.07em] mb-2 px-1" style={{ color: 'var(--text-tertiary)' }}>Coming up</p>
+                        <div className="space-y-1.5">
+                          {upcoming.map(ev => {
+                            const s = EVENT_STYLE[ev.type];
+                            const d = new Date(ev.date + 'T00:00:00');
+                            const diff = Math.round((d.getTime() - new Date(today + 'T00:00:00').getTime()) / 86400000);
+                            const dateLabel = diff === 0 ? 'Today' : diff === 1 ? 'Tomorrow'
+                              : diff < 7 ? d.toLocaleDateString('en-US', { weekday: 'short' })
+                              : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            return (
+                              <button
+                                key={ev.id}
+                                onClick={() => handleCardClick(ev.application)}
+                                className="w-full text-left flex items-center gap-3 p-3 rounded-xl border transition-colors"
+                                style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}
+                              >
+                                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: s.color }} />
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-[13px] font-medium truncate" style={{ color: 'var(--brand-navy)' }}>{ev.company}</div>
+                                  <div className="text-[11px] truncate" style={{ color: 'var(--muted-text)' }}>
+                                    {{ overdue: 'Overdue', interview: 'Interview', oa: 'Online Assessment', offer: 'Offer', deadline: 'Deadline' }[ev.type]}
+                                  </div>
+                                </div>
+                                <div className="text-[10px] font-semibold flex-shrink-0" style={{ color: s.color }}>{dateLabel}</div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </>
               ) : (
                 <div className="space-y-1.5">
                   {events
