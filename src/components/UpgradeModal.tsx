@@ -32,11 +32,17 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Reset loading state when modal closes or when user returns to tab
   useEffect(() => {
-    if (!open) return;
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', h);
-    return () => window.removeEventListener('keydown', h);
+    if (!open) { setLoading(false); setError(null); return; }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onVisible = () => { if (!document.hidden) setLoading(false); };
+    window.addEventListener('keydown', onKey);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [open, onClose]);
 
   if (!open) return null;
