@@ -38,7 +38,7 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
   const { setNodeRef, isOver } = useDroppable({ id: stage, data: { stage } });
 
   return (
-    <div id={`pipeline-col-${stage}`} className="flex-1 min-w-[150px] flex flex-col snap-center">
+    <div id={`pipeline-col-${stage}`} className={`flex flex-col flex-shrink-0 ${isRejected ? 'w-[160px]' : 'flex-1 min-w-[120px]'}`}>
       {/* Column header — Linear style */}
       <div className="flex items-center gap-2 mb-2 px-1">
         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
