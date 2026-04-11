@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { startCheckout, MONTHLY_PRICE_ID, ANNUAL_PRICE_ID, FREE_TIER_LIMIT } from '@/lib/pro';
 import { ProLogo } from '@/components/ProLogo';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface Props {
   open: boolean;
@@ -31,6 +32,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
   const [plan, setPlan] = useState<'monthly' | 'annual'>('annual');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const reduce = useReducedMotion();
 
   // Reset loading state when modal closes or when user returns to tab
   useEffect(() => {
@@ -44,8 +46,6 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, [open, onClose]);
-
-  if (!open) return null;
 
   const handleUpgrade = async () => {
     if (!user) return;
@@ -67,19 +67,25 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
   const savings = Math.round(100 - (48 / (6 * 12)) * 100);
 
   return (
+    <AnimatePresence>
+      {open && (
     <div
       role="dialog"
       aria-modal
       aria-label="Upgrade to Applyd Pro"
       style={{ position: 'fixed', inset: 0, zIndex: 9100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}
     >
-      <div
-        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
+      <motion.div
+        style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.18 }}
         onClick={onClose}
         aria-hidden
       />
 
-      <div
+      <motion.div
         style={{
           position: 'relative',
           width: '100%',
@@ -89,11 +95,14 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
           borderRadius: 16,
           overflow: 'hidden',
           boxShadow: '0 24px 80px rgba(0,0,0,0.3)',
-          animation: 'upgrade-modal-in 220ms cubic-bezier(0.34,1.2,0.64,1) both',
           margin: 'auto',
         }}
+        initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 16 }}
+        animate={reduce ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+        exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 8 }}
+        transition={reduce ? { duration: 0.01 } : { type: 'spring', stiffness: 360, damping: 26 }}
       >
-        <style>{`@keyframes upgrade-modal-in{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
 
         {/* Header */}
         <div style={{ background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', padding: '20px 24px 18px', position: 'relative' }}>
@@ -212,7 +221,9 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
             Less than a Chipotle bowl · Cancel anytime · Secure via Stripe
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
+      )}
+    </AnimatePresence>
   );
 }

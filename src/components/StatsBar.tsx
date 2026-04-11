@@ -2,6 +2,7 @@
 
 import { Application } from '@/lib/types';
 import { TrendingUp, Zap, MessageSquare, Clock } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface StatsBarProps {
   applications: Application[];
@@ -75,10 +76,12 @@ export default function StatsBar({ applications }: StatsBarProps) {
     },
   ];
 
+  const reduce = useReducedMotion();
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {stats.map((stat) => (
-        <div
+      {stats.map((stat, i) => (
+        <motion.div
           key={stat.label}
           className="rounded-lg p-4 bg-card-bg border border-border-gray relative overflow-hidden"
           style={stat.accent === 'green'
@@ -86,6 +89,9 @@ export default function StatsBar({ applications }: StatsBarProps) {
             : stat.accent === 'amber'
             ? { borderLeft: '3px solid #D97706' }
             : undefined}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+          animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={reduce ? { duration: 0.01 } : { duration: 0.28, delay: i * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <div className="flex items-center gap-1.5 mb-2">
             <span className="text-text-tertiary">{stat.icon}</span>
@@ -112,7 +118,7 @@ export default function StatsBar({ applications }: StatsBarProps) {
           {stat.subtext && (
             <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>{stat.subtext}</p>
           )}
-        </div>
+        </motion.div>
       ))}
     </div>
   );

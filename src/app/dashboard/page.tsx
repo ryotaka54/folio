@@ -34,6 +34,7 @@ import { CapExceededError } from '@/lib/store';
 import UpgradeModal from '@/components/UpgradeModal';
 import WeeklyCoach from '@/components/ai/WeeklyCoach';
 import ProTour from '@/components/ProTour';
+import { motion } from 'framer-motion';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
@@ -453,29 +454,28 @@ function DashboardContent() {
               <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
             <div className="flex items-center gap-0.5">
-              <Link
-                href="/dashboard"
-                className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors"
-                style={{ color: 'var(--accent-blue)', background: 'rgba(37,99,235,0.08)' }}
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/calendar"
-                className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
-                style={{ color: 'var(--muted-text)' }}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                Calendar
-              </Link>
-              <Link
-                href="/community"
-                className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
-                style={{ color: 'var(--muted-text)' }}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Community
-              </Link>
+              {[
+                { href: '/dashboard', label: 'Dashboard', active: true },
+                { href: '/calendar',  label: 'Calendar',  active: false },
+                { href: '/community', label: 'Community', active: false },
+              ].map(({ href, label, active }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg"
+                  style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)' }}
+                >
+                  {active && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-0 rounded-lg"
+                      style={{ background: 'rgba(37,99,235,0.08)' }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
+                    />
+                  )}
+                  <span className="relative">{label}</span>
+                </Link>
+              ))}
             </div>
           </div>
           <div className="flex items-center gap-3">

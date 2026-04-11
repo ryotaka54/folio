@@ -8,6 +8,7 @@ import InterviewPrepPanel from '@/components/ai/InterviewPrepPanel';
 import OfferIntelligencePanel from '@/components/ai/OfferIntelligencePanel';
 import FollowUpEmailModal from '@/components/ai/FollowUpEmailModal';
 import InterviewTimeline from '@/components/InterviewTimeline';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const inputCls = [
   'w-full px-3 bg-background border border-border-gray rounded-md text-sm',
@@ -34,28 +35,12 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
   const [showFollowUpEmail, setShowFollowUpEmail] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
-  const [visible, setVisible] = useState(false);
-  const [closing, setClosing] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartXRef = useRef<number>(0);
   const touchStartYRef = useRef<number>(0);
-
-  useEffect(() => {
-    if (open) {
-      setClosing(false);
-      setVisible(true);
-    } else if (visible) {
-      setClosing(true);
-      closeTimerRef.current = setTimeout(() => {
-        setVisible(false);
-        setClosing(false);
-      }, 200);
-    }
-    return () => { if (closeTimerRef.current) clearTimeout(closeTimerRef.current); };
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     setShowDeleteConfirm(false);
@@ -96,8 +81,6 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
     }, 400);
   }, [application, onUpdate]);
 
-  if (!visible || !application) return null;
-
   const isValidUrl = (url: string) => {
     try { new URL(url); return true; } catch { return false; }
   };
@@ -108,15 +91,32 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
     });
   };
 
+  const drawerSpring = reduce
+    ? { duration: 0.01 }
+    : { type: 'spring' as const, stiffness: 300, damping: 32, mass: 0.9 };
+
   return (
+    <AnimatePresence>
+      {open && application && (
     <div
       ref={backdropRef}
       className="fixed inset-0 z-50 flex justify-end"
     >
-      <div className="absolute inset-0 bg-brand-navy/20 backdrop z-0" onClick={onClose} />
-      <div
-        className={`relative z-10 w-full sm:max-w-md bg-card-bg h-full overflow-y-auto ${closing ? 'slide-out' : 'slide-in'}`}
+      <motion.div
+        className="absolute inset-0 bg-brand-navy/20 backdrop z-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.18 }}
+        onClick={onClose}
+      />
+      <motion.div
+        className="relative z-10 w-full sm:max-w-md bg-card-bg h-full overflow-y-auto"
         style={{ boxShadow: '-12px 0 48px rgba(0,0,0,0.14)' }}
+        initial={reduce ? { opacity: 0 } : { x: '100%', opacity: 0 }}
+        animate={reduce ? { opacity: 1 } : { x: 0, opacity: 1 }}
+        exit={reduce ? { opacity: 0 } : { x: '100%', opacity: 0 }}
+        transition={drawerSpring}
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => {
           touchStartXRef.current = e.touches[0].clientX;
@@ -125,7 +125,6 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
         onTouchEnd={(e) => {
           const dx = e.changedTouches[0].clientX - touchStartXRef.current;
           const dy = e.changedTouches[0].clientY - touchStartYRef.current;
-          // Swipe right (on full-width mobile drawer) or down both close
           const isRightSwipe = dx > 80 && Math.abs(dy) < Math.abs(dx);
           const isDownSwipe = dy > 80 && Math.abs(dx) < Math.abs(dy);
           if (isRightSwipe || isDownSwipe) onClose();
@@ -410,7 +409,9 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
+      )}
+    </AnimatePresence>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
 import { Application } from '@/lib/types';
-
 import { GripVertical } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 interface ApplicationCardProps {
   application: Application;
@@ -11,6 +11,7 @@ interface ApplicationCardProps {
 }
 
 export default function ApplicationCard({ application, onClick, muted }: ApplicationCardProps) {
+  const reduce = useReducedMotion();
   const deadlineInfo = (() => {
     if (!application.deadline) return null;
     const d = new Date(application.deadline + 'T00:00:00');
@@ -34,9 +35,13 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
   const nextStep = steps.find(s => !s.completed);
 
   return (
-    <button
+    <motion.button
       onClick={onClick}
       className="w-full text-left bg-background border border-border-gray rounded-lg p-3 group relative hover:[border-color:var(--border-emphasis)] transition-colors"
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.98 }}
+      animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+      whileHover={reduce ? undefined : { y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.10)' }}
+      transition={reduce ? { duration: 0.01 } : { type: 'spring', stiffness: 400, damping: 28 }}
     >
       {/* Drag handle — visible on hover */}
       <div
@@ -118,7 +123,7 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
           </span>
         )}
       </div>
-    </button>
+    </motion.button>
   );
 }
 

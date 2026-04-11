@@ -8,6 +8,7 @@ import CommandPalette from "@/components/CommandPalette";
 import TutorialOverlay from "@/components/TutorialOverlay";
 import DemoOverlay from "@/components/DemoOverlay";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import { PageTransition } from "@/components/PageTransition";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -94,7 +95,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true}>
           <AuthProvider>
             <TutorialProvider>
-              {children}
+              <PageTransition>{children}</PageTransition>
               <CommandPalette />
               <TutorialOverlay />
               <DemoOverlay />
