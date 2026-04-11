@@ -2,14 +2,16 @@
 
 import { motion, useReducedMotion } from 'framer-motion';
 
+// IMPORTANT: Only animate opacity — never transform or filter here.
+// Any CSS transform or filter on a parent creates a new containing block,
+// which breaks position:fixed on dnd-kit DragOverlay and modals.
 export default function Template({ children }: { children: React.ReactNode }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6, filter: 'blur(3px)' }}
-      animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={reduce ? { duration: 0.01 } : { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-      style={{ width: '100%' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={reduce ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
     >
       {children}
     </motion.div>
