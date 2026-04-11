@@ -1,7 +1,7 @@
 'use client';
 
 import { Application } from '@/lib/types';
-import { GripVertical } from 'lucide-react';
+import { STAGE_COLORS } from '@/lib/constants';
 
 interface ApplicationCardProps {
   application: Application;
@@ -10,19 +10,18 @@ interface ApplicationCardProps {
 }
 
 export default function ApplicationCard({ application, onClick, muted }: ApplicationCardProps) {
+  const stageColor = STAGE_COLORS[application.status] || '#6B7280';
+
   const deadlineInfo = (() => {
     if (!application.deadline) return null;
     const d = new Date(application.deadline + 'T00:00:00');
     const now = new Date();
     const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
-    const red   = { background: 'var(--error-bg)',           color: 'var(--error-text)',   border: '1px solid var(--error-border)' };
-    const amber = { background: 'rgba(217,119,6,0.10)',      color: 'var(--amber-warning)', border: '1px solid rgba(217,119,6,0.25)' };
-
-    if (diffDays < 0)   return { label: 'Overdue',            style: red };
-    if (diffDays === 0) return { label: 'Today',               style: red };
-    if (diffDays <= 3)  return { label: `${diffDays}d left`,   style: red };
-    if (diffDays <= 7)  return { label: `${diffDays}d left`,   style: amber };
+    if (diffDays < 0)   return { label: 'Overdue',          urgent: true };
+    if (diffDays === 0) return { label: 'Due today',         urgent: true };
+    if (diffDays <= 3)  return { label: `${diffDays}d left`, urgent: true };
+    if (diffDays <= 7)  return { label: `${diffDays}d left`, urgent: false };
     return null;
   })();
 
@@ -34,71 +33,105 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-background border border-border-gray rounded-lg p-3 group relative hover:[border-color:var(--border-emphasis)] transition-all hover:-translate-y-px hover:shadow-md"
+      className="w-full text-left group relative rounded-xl overflow-hidden select-none"
+      style={{
+        background: 'var(--card-bg)',
+        border: '1px solid var(--border-gray)',
+        transition: 'border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLButtonElement).style.borderColor = `${stageColor}55`;
+        (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 4px 16px rgba(0,0,0,0.08), 0 0 0 1px ${stageColor}22`;
+        (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-gray)';
+        (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
+        (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+      }}
     >
+      {/* Left accent bar */}
       <div
-        className="absolute top-2.5 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ color: 'var(--text-tertiary)' }}
-      >
-        <GripVertical size={13} />
-      </div>
+        className="absolute inset-y-0 left-0 w-[3px]"
+        style={{
+          background: muted ? 'var(--border-gray)' : stageColor,
+          opacity: muted ? 0.4 : 1,
+        }}
+      />
 
-      <div
-        className="text-[14px] font-semibold truncate leading-tight pr-5"
-        style={{ color: 'var(--brand-navy)', opacity: muted ? 0.5 : 1 }}
-      >
-        {application.company}
-      </div>
-      <div
-        className="text-[13px] truncate mt-0.5"
-        style={{ color: 'var(--muted-text)', opacity: muted ? 0.5 : 1 }}
-      >
-        {application.role}
-      </div>
-
-      {hasSteps && !muted && (
-        <div className="mt-2">
-          <div className="flex items-center gap-1">
-            {steps.map((step) => (
-              <div
-                key={step.id}
-                className="rounded-full flex-shrink-0"
-                style={{
-                  width: 7, height: 7,
-                  backgroundColor: step.completed ? 'var(--accent-blue)' : 'transparent',
-                  border: step.completed ? 'none' : '1.5px solid var(--border-gray)',
-                }}
-                title={step.name}
-              />
-            ))}
-            <span className="text-[10px] font-medium ml-1.5" style={{ color: 'var(--muted-text)' }}>
-              {completedCount}/{steps.length}
-            </span>
+      {/* Card body */}
+      <div className="pl-4 pr-3 py-3">
+        {/* Company + deadline row */}
+        <div className="flex items-start justify-between gap-2">
+          <div
+            className="text-[13px] font-semibold leading-snug truncate"
+            style={{ color: muted ? 'var(--text-tertiary)' : 'var(--brand-navy)' }}
+          >
+            {application.company}
           </div>
-          {nextStep && (
-            <div className="text-[10px] mt-1 truncate" style={{ color: 'var(--muted-text)' }}>
-              Next: {nextStep.name}{nextStep.date ? `, ${new Date(nextStep.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
-            </div>
+          {deadlineInfo && (
+            <span
+              className="flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none"
+              style={deadlineInfo.urgent
+                ? { background: 'var(--error-bg)', color: 'var(--error-text)', border: '1px solid var(--error-border)' }
+                : { background: 'rgba(245,158,11,0.12)', color: 'var(--amber-warning)', border: '1px solid rgba(245,158,11,0.25)' }
+              }
+            >
+              {deadlineInfo.label}
+            </span>
           )}
         </div>
-      )}
 
-      <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
-        {application.category && !muted && (
-          <span
-            className="text-[11px] px-1.5 py-0.5 rounded font-medium"
-            style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)' }}
-          >
-            {application.category}
-          </span>
+        {/* Role */}
+        <div
+          className="text-[11.5px] mt-0.5 truncate"
+          style={{ color: 'var(--muted-text)' }}
+        >
+          {application.role}
+        </div>
+
+        {/* Interview progress */}
+        {hasSteps && !muted && (
+          <div className="mt-2.5">
+            <div className="flex items-center gap-[4px]">
+              {steps.map((step) => (
+                <div
+                  key={step.id}
+                  className="rounded-full flex-shrink-0 transition-colors"
+                  style={{
+                    width: 6, height: 6,
+                    backgroundColor: step.completed ? stageColor : 'transparent',
+                    border: step.completed ? 'none' : `1.5px solid var(--border-emphasis)`,
+                  }}
+                  title={step.name}
+                />
+              ))}
+              <span className="text-[10px] ml-1.5" style={{ color: 'var(--text-tertiary)' }}>
+                {completedCount}/{steps.length}
+              </span>
+            </div>
+            {nextStep && (
+              <div className="text-[10px] mt-1 truncate" style={{ color: 'var(--text-tertiary)' }}>
+                ↳ {nextStep.name}{nextStep.date ? ` · ${new Date(nextStep.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
+              </div>
+            )}
+          </div>
         )}
-        {deadlineInfo && (
-          <span
-            className="text-[10px] px-1.5 py-0.5 rounded-full font-medium ml-auto whitespace-nowrap"
-            style={deadlineInfo.style}
-          >
-            {deadlineInfo.label}
-          </span>
+
+        {/* Category pill */}
+        {application.category && !muted && (
+          <div className="mt-2">
+            <span
+              className="inline-flex items-center text-[10px] font-medium px-1.5 py-[2px] rounded-md"
+              style={{
+                background: `${stageColor}12`,
+                color: stageColor,
+                border: `1px solid ${stageColor}28`,
+              }}
+            >
+              {application.category}
+            </span>
+          </div>
         )}
       </div>
     </button>
