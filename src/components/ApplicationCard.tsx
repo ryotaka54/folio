@@ -2,7 +2,6 @@
 
 import { Application } from '@/lib/types';
 import { GripVertical } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
 
 interface ApplicationCardProps {
   application: Application;
@@ -11,7 +10,6 @@ interface ApplicationCardProps {
 }
 
 export default function ApplicationCard({ application, onClick, muted }: ApplicationCardProps) {
-  const reduce = useReducedMotion();
   const deadlineInfo = (() => {
     if (!application.deadline) return null;
     const d = new Date(application.deadline + 'T00:00:00');
@@ -28,22 +26,16 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
     return null;
   })();
 
-  // Interview progress dots
   const steps = application.interview_steps || [];
   const hasSteps = steps.length > 0;
   const completedCount = steps.filter(s => s.completed).length;
   const nextStep = steps.find(s => !s.completed);
 
   return (
-    <motion.button
+    <button
       onClick={onClick}
-      className="w-full text-left bg-background border border-border-gray rounded-lg p-3 group relative hover:[border-color:var(--border-emphasis)] transition-colors"
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.98 }}
-      animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-      whileHover={reduce ? undefined : { y: -2, boxShadow: '0 8px 24px rgba(0,0,0,0.10)' }}
-      transition={reduce ? { duration: 0.01 } : { type: 'spring', stiffness: 400, damping: 28 }}
+      className="w-full text-left bg-background border border-border-gray rounded-lg p-3 group relative hover:[border-color:var(--border-emphasis)] transition-all hover:-translate-y-px hover:shadow-md"
     >
-      {/* Drag handle — visible on hover */}
       <div
         className="absolute top-2.5 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
         style={{ color: 'var(--text-tertiary)' }}
@@ -53,10 +45,7 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
 
       <div
         className="text-[14px] font-semibold truncate leading-tight pr-5"
-        style={{
-          color: 'var(--brand-navy)',
-          opacity: muted ? 0.5 : 1,
-        }}
+        style={{ color: 'var(--brand-navy)', opacity: muted ? 0.5 : 1 }}
       >
         {application.company}
       </div>
@@ -67,7 +56,6 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
         {application.role}
       </div>
 
-      {/* Interview Progress Dots */}
       {hasSteps && !muted && (
         <div className="mt-2">
           <div className="flex items-center gap-1">
@@ -76,26 +64,19 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
                 key={step.id}
                 className="rounded-full flex-shrink-0"
                 style={{
-                  width: 7,
-                  height: 7,
+                  width: 7, height: 7,
                   backgroundColor: step.completed ? 'var(--accent-blue)' : 'transparent',
                   border: step.completed ? 'none' : '1.5px solid var(--border-gray)',
                 }}
                 title={step.name}
               />
             ))}
-            <span
-              className="text-[10px] font-medium ml-1.5"
-              style={{ color: 'var(--muted-text)' }}
-            >
+            <span className="text-[10px] font-medium ml-1.5" style={{ color: 'var(--muted-text)' }}>
               {completedCount}/{steps.length}
             </span>
           </div>
           {nextStep && (
-            <div
-              className="text-[10px] mt-1 truncate"
-              style={{ color: 'var(--muted-text)' }}
-            >
+            <div className="text-[10px] mt-1 truncate" style={{ color: 'var(--muted-text)' }}>
               Next: {nextStep.name}{nextStep.date ? `, ${new Date(nextStep.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}` : ''}
             </div>
           )}
@@ -106,10 +87,7 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
         {application.category && !muted && (
           <span
             className="text-[11px] px-1.5 py-0.5 rounded font-medium"
-            style={{
-              background: 'var(--surface-gray)',
-              color: 'var(--text-tertiary)',
-            }}
+            style={{ background: 'var(--surface-gray)', color: 'var(--text-tertiary)' }}
           >
             {application.category}
           </span>
@@ -123,7 +101,6 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
           </span>
         )}
       </div>
-    </motion.button>
+    </button>
   );
 }
-
