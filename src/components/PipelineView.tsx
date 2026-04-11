@@ -117,7 +117,8 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
           );
         })}
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-4" style={{ minHeight: 400 }}>
+      <div className="overflow-x-auto pb-4" style={{ minHeight: 400 }}>
+      <div className="flex gap-2 min-w-full" style={{ minHeight: 400 }}>
         {stages.map((stage) => {
           const stageApps = applications.filter(a => a.status === stage);
           const color = STAGE_COLORS[stage] || '#6B7280';
@@ -152,6 +153,7 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
             </DroppableColumn>
           );
         })}
+      </div>
       </div>
 
       <DragOverlay dropAnimation={null} className="draggable-active select-none">
