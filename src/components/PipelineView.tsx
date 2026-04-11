@@ -118,42 +118,55 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
         })}
       </div>
       <div className="overflow-x-auto pb-4" style={{ minHeight: 400 }}>
-      <div className="flex gap-2 min-w-full" style={{ minHeight: 400 }}>
-        {stages.map((stage) => {
-          const stageApps = applications.filter(a => a.status === stage);
-          const color = STAGE_COLORS[stage] || '#6B7280';
-          const isRejected = stage === 'Rejected' || stage === 'Declined';
+        <div className="flex gap-2" style={{ minHeight: 400 }}>
+          {/* Active stages — fill the visible viewport width exactly */}
+          <div className="flex gap-2 flex-shrink-0" style={{ width: '100%', minHeight: 400 }}>
+            {stages.filter(s => s !== 'Rejected' && s !== 'Declined').map((stage) => {
+              const stageApps = applications.filter(a => a.status === stage);
+              const color = STAGE_COLORS[stage] || '#6B7280';
+              return (
+                <DroppableColumn key={stage} stage={stage} count={stageApps.length} color={color} isRejected={false}>
+                  {stageApps.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
+                      <div className="w-4 h-4 rounded border-2 border-dashed" style={{ borderColor: 'var(--border-gray)' }} />
+                      <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>Drop here</span>
+                    </div>
+                  )}
+                  {stageApps.map(app => {
+                    const isFirst = !firstCardTagged;
+                    if (isFirst) firstCardTagged = true;
+                    return (
+                      <div key={app.id} {...(isFirst ? { 'data-tutorial-id': 'first-card' } : {})}>
+                        <DraggableCard application={app} onClick={() => onCardClick(app)} muted={false} />
+                      </div>
+                    );
+                  })}
+                </DroppableColumn>
+              );
+            })}
+          </div>
 
-          return (
-            <DroppableColumn key={stage} stage={stage} count={stageApps.length} color={color} isRejected={isRejected}>
-              {stageApps.length === 0 && (
-                <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
-                  <div
-                    className="w-4 h-4 rounded border-2 border-dashed"
-                    style={{ borderColor: 'var(--border-gray)' }}
-                  />
-                  <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
-                    Drop here
-                  </span>
-                </div>
-              )}
-              {stageApps.map(app => {
-                const isFirst = !firstCardTagged;
-                if (isFirst) firstCardTagged = true;
-                return (
-                  <div key={app.id} {...(isFirst ? { 'data-tutorial-id': 'first-card' } : {})}>
-                    <DraggableCard
-                      application={app}
-                      onClick={() => onCardClick(app)}
-                      muted={isRejected}
-                    />
+          {/* Rejected / Declined — off-screen by default, scroll right to reach */}
+          {stages.filter(s => s === 'Rejected' || s === 'Declined').map((stage) => {
+            const stageApps = applications.filter(a => a.status === stage);
+            const color = STAGE_COLORS[stage] || '#6B7280';
+            return (
+              <DroppableColumn key={stage} stage={stage} count={stageApps.length} color={color} isRejected={true}>
+                {stageApps.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
+                    <div className="w-4 h-4 rounded border-2 border-dashed" style={{ borderColor: 'var(--border-gray)' }} />
+                    <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>Drop here</span>
                   </div>
-                );
-              })}
-            </DroppableColumn>
-          );
-        })}
-      </div>
+                )}
+                {stageApps.map(app => (
+                  <div key={app.id}>
+                    <DraggableCard application={app} onClick={() => onCardClick(app)} muted={true} />
+                  </div>
+                ))}
+              </DroppableColumn>
+            );
+          })}
+        </div>
       </div>
 
       <DragOverlay dropAnimation={null} className="draggable-active select-none">
