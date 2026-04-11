@@ -104,11 +104,11 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
           </div>
           {reason === 'cap' ? (
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 1.5 }}>
-              You&apos;ve hit the <strong style={{ color: '#fff' }}>{FREE_TIER_LIMIT}-application free limit</strong>. Upgrade to unlock unlimited applications and your full AI suite.
+              You&apos;ve tracked <strong style={{ color: '#fff' }}>{FREE_TIER_LIMIT} applications</strong> — more than most students ever log. Remove the cap and unlock the AI suite that turns applications into offers.
             </p>
           ) : (
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 1.5 }}>
-              Unlock your AI recruiting companion — interview prep, email drafts, offer negotiation, and a personal weekly coach.
+              Unlock your AI recruiting companion — interview prep, follow-up emails, offer negotiation, and a personal weekly coach. Less than a coffee a month.
             </p>
           )}
         </div>

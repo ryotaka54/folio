@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { computeNudges, dismissNudge, type Nudge } from '@/lib/recruiting';
 import type { Application } from '@/lib/types';
+import { Lightbulb } from 'lucide-react';
 
 interface Props {
   applications: Application[];
@@ -32,7 +33,7 @@ export default function SmartNudges({ applications, onAddApp, onOpenApp }: Props
           className="flex items-start gap-3 px-4 py-3 rounded-lg border"
           style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}
         >
-          <span style={{ fontSize: 15, lineHeight: 1, marginTop: 1 }}>💡</span>
+          <Lightbulb size={14} style={{ color: 'var(--accent-blue)', flexShrink: 0, marginTop: 1 }} />
           <p className="flex-1 text-[12px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
             {nudge.message}
           </p>

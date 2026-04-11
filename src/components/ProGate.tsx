@@ -19,7 +19,7 @@ export default function ProGate({ children, isPro, onUpgrade, label = 'Pro featu
       </div>
       <div
         className="absolute inset-0 flex flex-col items-center justify-center rounded-lg gap-2"
-        style={{ background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(2px)' }}
+        style={{ background: 'var(--progate-overlay)', backdropFilter: 'blur(2px)' }}
       >
         <Lock size={16} style={{ color: 'var(--brand-navy)' }} />
         <p className="text-[12px] font-medium" style={{ color: 'var(--brand-navy)' }}>{label}</p>

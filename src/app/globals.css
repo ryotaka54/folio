@@ -38,6 +38,7 @@
 
   --foreground: #111827;
   --bmac-bg: #FFFDF7;
+  --progate-overlay: rgba(255, 255, 255, 0.78);
 }
 
 .dark {
@@ -71,6 +72,7 @@
 
   --foreground: #F9FAFB;
   --bmac-bg: #1A1914;
+  --progate-overlay: rgba(10, 10, 10, 0.82);
 }
 
 @theme inline {

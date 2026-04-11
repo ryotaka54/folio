@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const defaultProfile = (userId: string): UserProfile => ({
     id: userId,
     name: '',
+    school: '',
     mode: 'internship',
     school_year: '',
     career_level: '',
@@ -69,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser({
           id: data.id,
           name: data.name || '',
+          school: data.school || '',
           mode: data.mode || 'internship',
           school_year: data.school_year || '',
           career_level: data.career_level || '',
@@ -87,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const newProfile = {
           id: userId,
           name: '',
+          school: '',
           mode: 'internship',
           school_year: '',
           career_level: '',
@@ -210,6 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser({
         id: data.user.id,
         name: '',
+        school: '',
         mode: 'internship',
         school_year: '',
         career_level: '',

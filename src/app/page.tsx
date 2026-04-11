@@ -567,65 +567,99 @@ export default function Home() {
         <section id="features" className="max-w-6xl mx-auto px-6 py-20" style={{ scrollMarginTop: 72 }}>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
             <h2 className="text-[28px] md:text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
-              The free tier beats a spreadsheet. The Pro tier beats everyone else.
+              The free tier beats a spreadsheet.<br className="hidden sm:block" /> The Pro tier beats everyone else.
             </h2>
             <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
               Start free — no credit card, no catch. When you&apos;re ready to stop leaving things to chance, there&apos;s Pro.
             </p>
           </motion.div>
 
-          {/* Free tier */}
-          <div className="mb-10">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] px-3 py-1 rounded-full" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)' }}>Free for every student</span>
-              <div className="flex-1 h-px" style={{ background: 'var(--border-gray)' }} />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {[
-                { icon: '🗂', title: 'Kanban pipeline', desc: 'The stages are built for recruiting — OA, Recruiter Screen, Superday. Not a generic task board repurposed for your job search.' },
-                { icon: '⏰', title: 'Deadline tracking', desc: 'Amber at 7 days, red at 3. The Act Now card surfaces the things you\'re about to miss — before you miss them.' },
-                { icon: '📈', title: 'Response rate', desc: 'Most students have no idea if their applications are working. This tells you your exact callback rate so you know when to change your approach.' },
-                { icon: '💡', title: 'Smart nudges', desc: 'Left an OA sitting? Forgot to follow up after an interview? Applyd notices and reminds you before the window closes.' },
-                { icon: '📅', title: 'Calendar view', desc: 'Every deadline and interview in one place. Sync to Google Calendar so your recruiting schedule lives where your classes already are.' },
-                { icon: '⚡', title: 'Browser extension', desc: 'Log a job from LinkedIn or Handshake in one click. The autofill handles company, role, and location — you just hit save.' },
-              ].map((f, i) => (
-                <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
-                  className="rounded-xl border p-5 flex flex-col gap-2"
-                  style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}>
-                  <span className="text-2xl">{f.icon}</span>
-                  <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{f.title}</h3>
-                  <p className="text-[12px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-8 items-start">
 
-          {/* Pro tier */}
-          <div>
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-[12px] font-semibold uppercase tracking-[0.08em] px-3 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>Pro — AI that works for you</span>
-              <div className="flex-1 h-px" style={{ background: 'var(--border-gray)' }} />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {[
-                { icon: '🧠', title: 'Interview Intel', desc: 'The moment you move to an interview stage, AI generates the questions this company actually asks — behavioral, technical, and role-specific. You walk in prepared, not guessing.' },
-                { icon: '✉️', title: 'Follow Up Writer', desc: 'Thank you, status check, negotiation, withdrawal — one click writes the email. Calibrated to your company, your role, and where you are in the process.' },
-                { icon: '📊', title: 'Strength Signal', desc: 'Before you invest 3 hours on a cover letter, know how competitive you are. The signal appears the moment you add a new application.' },
-                { icon: '💰', title: 'Offer Negotiation Guide', desc: 'An offer lands. Now what? Market salary ranges, a word-for-word counter offer script, and the tactics that get results — waiting for you automatically.' },
-                { icon: '📅', title: 'Weekly AI Coach', desc: 'Every Monday morning, a briefing built from your real pipeline: what\'s stalled, what to prioritize, and one thing you should do this week.' },
-                { icon: '∞', title: 'Unlimited applications', desc: 'No cap, no throttle. Apply to 100 companies if that\'s what it takes. Everything tracked, nothing missed.' },
-              ].map((f, i) => (
-                <motion.div key={f.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.06 }}
-                  className="rounded-xl border p-5 flex flex-col gap-2 relative"
-                  style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.04) 0%, var(--card-bg) 100%)', borderColor: 'rgba(37,99,235,0.2)', boxShadow: '0 2px 12px rgba(37,99,235,0.06)' }}>
-                  <span className="absolute top-3 right-3 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                    style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>Pro</span>
-                  <span className="text-2xl">{f.icon}</span>
-                  <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{f.title}</h3>
-                  <p className="text-[12px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>{f.desc}</p>
-                </motion.div>
-              ))}
-            </div>
+            {/* Free tier — compact checklist */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+              <div className="flex items-center gap-3 mb-5">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.08em] px-3 py-1 rounded-full" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)' }}>Free for every student</span>
+                <div className="flex-1 h-px" style={{ background: 'var(--border-gray)' }} />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+                {[
+                  { title: 'Kanban pipeline',   desc: 'OA, recruiter screen, final round — built for recruiting, not generic task management.' },
+                  { title: 'Deadline tracking', desc: 'Amber at 7 days, red at 3. Act Now surfaces urgent items before you miss them.' },
+                  { title: 'Response rate',     desc: 'Your exact callback rate so you know when to change your approach.' },
+                  { title: 'Smart nudges',      desc: 'Stalled OA? Missed follow-up? Applyd notices and reminds you.' },
+                  { title: 'Calendar view',     desc: 'Every deadline and interview in one place, with Google Calendar sync.' },
+                  { title: 'Browser extension', desc: 'Log from LinkedIn or Handshake in one click — autofill handles the rest.' },
+                ].map((f, i) => (
+                  <motion.div key={f.title}
+                    initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                    transition={{ duration: 0.35, delay: i * 0.05 }}
+                    className="flex items-start gap-3 py-2.5 border-b"
+                    style={{ borderColor: 'var(--border-gray)' }}
+                  >
+                    <svg className="mt-0.5 flex-shrink-0" width="15" height="15" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill="var(--surface-gray)"/>
+                      <path d="M6 10l3 3 5-5" stroke="var(--muted-text)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <div>
+                      <span className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{f.title}</span>
+                      <span className="text-[12px]" style={{ color: 'var(--muted-text)' }}> — {f.desc}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+              <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
+                No credit card required. Free forever, up to 15 applications.
+              </p>
+            </motion.div>
+
+            {/* Pro tier — pricing card */}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
+              className="rounded-2xl border p-6 lg:sticky lg:top-24"
+              style={{ background: 'linear-gradient(160deg, rgba(37,99,235,0.06) 0%, var(--card-bg) 60%)', borderColor: 'rgba(37,99,235,0.22)', boxShadow: '0 4px 24px rgba(37,99,235,0.08)' }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em] px-2.5 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>Pro</span>
+                <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>AI that works for you</span>
+              </div>
+
+              <div className="mb-1">
+                <span className="text-[36px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}>$4</span>
+                <span className="text-[16px]" style={{ color: 'var(--muted-text)' }}>/mo</span>
+              </div>
+              <p className="text-[12px] mb-5" style={{ color: 'var(--text-tertiary)' }}>$48/yr · cancel anytime</p>
+
+              <div className="space-y-3 mb-6">
+                {[
+                  { title: 'Interview Intel',         desc: 'AI generates the exact questions this company asks the moment you hit interview stage.' },
+                  { title: 'Follow Up Writer',        desc: 'Thank you, status check, negotiation, withdrawal — one click, calibrated to your stage.' },
+                  { title: 'Strength Signal',         desc: 'Know how competitive you are before you invest hours on an application.' },
+                  { title: 'Offer Negotiation Guide', desc: 'Market salary ranges and a word-for-word counter script, automatically.' },
+                  { title: 'Weekly AI Coach',         desc: 'Monday briefing: what\'s stalled, what to prioritize, one thing to do this week.' },
+                  { title: 'Unlimited applications', desc: 'No 15-app cap. Track everything, miss nothing.' },
+                ].map(f => (
+                  <div key={f.title} className="flex items-start gap-2.5">
+                    <svg className="mt-0.5 flex-shrink-0" width="15" height="15" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill="rgba(37,99,235,0.12)"/>
+                      <path d="M6 10l3 3 5-5" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <div>
+                      <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{f.title}</span>
+                      <span className="text-[12px]" style={{ color: 'var(--muted-text)' }}> — {f.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                href={user ? '/dashboard' : '/signup'}
+                onClick={() => capture('landing_pro_cta_click')}
+                className="block w-full h-10 rounded-xl text-[14px] font-semibold text-white text-center leading-10 transition-opacity hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)' }}
+              >
+                {user ? 'Upgrade in dashboard →' : 'Start free, upgrade anytime →'}
+              </Link>
+            </motion.div>
           </div>
         </section>
 

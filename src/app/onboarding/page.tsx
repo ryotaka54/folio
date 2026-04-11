@@ -18,6 +18,7 @@ function OnboardingContent() {
   const [step, setStep] = useState(1);
   const [mode, setMode] = useState<Mode>('internship');
   const [name, setName] = useState('');
+  const [school, setSchool] = useState('');
   const [schoolYear, setSchoolYear] = useState('');
   const [recruitingSeason, setRecruitingSeason] = useState('');
   const [careerLevel, setCareerLevel] = useState('');
@@ -120,9 +121,10 @@ function OnboardingContent() {
   }
 
   const handleComplete = () => {
-    capture('onboarding_complete', { mode });
+    capture('onboarding_complete', { mode, school });
     updateProfile({
       name,
+      school,
       mode,
       school_year: schoolYear,
       career_level: careerLevel,
@@ -217,6 +219,17 @@ function OnboardingContent() {
                     onChange={(e) => setName(e.target.value)}
                     className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                     placeholder="First name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="school" className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>School</label>
+                  <input
+                    id="school"
+                    type="text"
+                    value={school}
+                    onChange={(e) => setSchool(e.target.value)}
+                    className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+                    placeholder="e.g. UC Berkeley, MIT, Georgia Tech"
                   />
                 </div>
                 {mode === 'internship' ? (

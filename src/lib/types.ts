@@ -72,6 +72,7 @@ export interface Application {
 export interface UserProfile {
   id: string;
   name: string;
+  school: string;
   mode: Mode;
   school_year: string;
   career_level: string;
