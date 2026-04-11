@@ -38,7 +38,7 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
   const { setNodeRef, isOver } = useDroppable({ id: stage, data: { stage } });
 
   return (
-    <div id={`pipeline-col-${stage}`} className="min-w-[192px] w-[192px] flex-shrink-0 flex flex-col snap-center">
+    <div id={`pipeline-col-${stage}`} className="flex-1 min-w-[150px] flex flex-col snap-center">
       {/* Column header — Linear style */}
       <div className="flex items-center gap-2 mb-2 px-1">
         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
@@ -117,7 +117,7 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
           );
         })}
       </div>
-      <div className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory" style={{ minHeight: 400 }}>
+      <div className="flex gap-2 overflow-x-auto pb-4" style={{ minHeight: 400 }}>
         {stages.map((stage) => {
           const stageApps = applications.filter(a => a.status === stage);
           const color = STAGE_COLORS[stage] || '#6B7280';
