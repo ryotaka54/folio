@@ -16,12 +16,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
         exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4, filter: 'blur(2px)' }}
         transition={reduce
           ? { duration: 0.01 }
-          : {
-              enter: { duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] },
-              exit:  { duration: 0.16, ease: [0.55, 0, 1, 0.45] },
-              duration: 0.22,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            }
+          : { duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }
         }
         style={{ width: '100%', minHeight: '100%' }}
       >
