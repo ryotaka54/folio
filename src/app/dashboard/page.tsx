@@ -243,11 +243,22 @@ function DashboardContent() {
     }
   }, []);
 
-  // Listen for command palette "Add Application"
+  // Listen for command palette "Add Application" and mobile bottom nav
   useEffect(() => {
     const handler = () => { setAddModalInitialUrl(''); setShowAddModal(true); };
     document.addEventListener('applyd:add', handler);
     return () => document.removeEventListener('applyd:add', handler);
+  }, []);
+
+  // Handle ?add=1 from mobile nav when navigating from another page
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('add') === '1') {
+      window.history.replaceState({}, '', '/dashboard');
+      setAddModalInitialUrl('');
+      setShowAddModal(true);
+    }
   }, []);
 
   // Keyboard shortcut: N opens add modal (when no input is focused)
@@ -445,8 +456,23 @@ function DashboardContent() {
         onUndo={toastUndo ?? undefined}
       />
 
-      {/* Top nav */}
-      <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+      {/* Mobile top bar — logo + theme toggle (replaces full desktop nav on small screens) */}
+      <div className="lg:hidden flex items-center justify-between px-4 h-14 border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+        <div className="flex items-center gap-2">
+          {userIsPro ? <ProLogo size={26} /> : <Logo size={26} variant="dark" />}
+          <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+          {userIsPro && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>⚡ Pro</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
+          <ThemeToggle />
+        </div>
+      </div>
+
+      {/* Top nav — hidden on mobile (replaced by bottom tab bar) */}
+      <nav className="hidden lg:block border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
           <div className="flex items-center gap-5">
             <Link href="/" className="flex items-center gap-2">
@@ -517,7 +543,7 @@ function DashboardContent() {
         </div>
       </nav>
 
-      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6">
+      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-6">
         {/* Greeting + momentum + season */}
         <div className="mb-5">
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -603,8 +629,22 @@ function DashboardContent() {
 
         {/* Controls */}
         <div className="mt-6 flex flex-col gap-2">
-          {/* Row 1: Search + Add */}
-          <div className="flex gap-2">
+          {/* Mobile: compact search only (Add is in bottom tab bar) */}
+          {isMobile && (
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search…"
+                className="w-full h-11 pl-10 pr-3 bg-background border border-border-gray rounded-xl text-[16px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+              />
+            </div>
+          )}
+
+          {/* Desktop: Row 1: Search + Add */}
+          <div className="hidden lg:flex gap-2">
             <div data-tutorial-id="search-input" className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input
@@ -625,8 +665,8 @@ function DashboardContent() {
               <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
             </button>
           </div>
-          {/* Row 2: View toggle + filters */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Row 2: View toggle + filters — desktop only */}
+          <div className="hidden lg:flex flex-wrap items-center gap-2">
             <div data-tutorial-id="view-toggle" className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
               <button
                 onClick={() => { setView('pipeline'); capture('view_switched', { view: 'pipeline' }); }}
@@ -693,7 +733,7 @@ function DashboardContent() {
               </button>
             </div>
           ) : isMobile ? (
-            <MobileCardList applications={filteredApps} onCardClick={handleCardClick} />
+            <MobileCardList applications={filteredApps} stages={stages as PipelineStage[]} onCardClick={handleCardClick} />
           ) : view === 'pipeline' ? (
             <div data-tutorial-id="pipeline-board">
               <PipelineView

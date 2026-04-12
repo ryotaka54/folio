@@ -30,10 +30,11 @@ interface AddApplicationModalProps {
 }
 
 const inputCls = [
-  'w-full px-3 bg-background border border-border-gray rounded-md text-sm',
+  'w-full px-3 bg-background border border-border-gray rounded-md',
+  'text-[16px] sm:text-sm',   // 16px prevents iOS auto-zoom on focus
   'focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20',
   'placeholder:text-text-tertiary transition-colors',
-  'h-9',
+  'h-11 sm:h-9',              // taller on mobile for easier tapping
 ].join(' ');
 
 function guessCategory(role: string): Category | '' {
@@ -266,24 +267,68 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Category</label>
-                <select
-                  value={category}
-                  onChange={e => { userPickedCategory.current = true; setCategory(e.target.value as Category | ''); }}
-                  className={inputCls}
-                >
-                  <option value="">Select…</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+            {/* Category — pill row on mobile, select on desktop */}
+            <div>
+              <label className="block text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)' }}>Category</label>
+              {/* Mobile: horizontal scrollable pills */}
+              <div className="flex gap-2 overflow-x-auto pb-1 sm:hidden" style={{ scrollbarWidth: 'none' }}>
+                {(['Engineering', 'Finance', 'Consulting', 'Design', 'Product Management', 'Data Science', 'Marketing', 'Other'] as Category[]).map(c => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => { userPickedCategory.current = true; setCategory(c); }}
+                    className="flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium border transition-colors tap-compact min-h-0"
+                    style={{
+                      minHeight: 36,
+                      background: category === c ? 'var(--accent-blue)' : 'var(--surface-gray)',
+                      borderColor: category === c ? 'var(--accent-blue)' : 'var(--border-gray)',
+                      color: category === c ? '#fff' : 'var(--muted-text)',
+                    }}
+                  >
+                    {c === 'Product Management' ? 'Product' : c}
+                  </button>
+                ))}
               </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>Status</label>
-                <select value={status} onChange={e => setStatus(e.target.value as PipelineStage)} className={inputCls}>
-                  {stages.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
+              {/* Desktop: select dropdown */}
+              <select
+                className={`hidden sm:block ${inputCls}`}
+                value={category}
+                onChange={e => { userPickedCategory.current = true; setCategory(e.target.value as Category | ''); }}
+              >
+                <option value="">Select…</option>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            {/* Status — pill row on mobile, select on desktop */}
+            <div>
+              <label className="block text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)' }}>Status</label>
+              <div className="flex gap-2 overflow-x-auto pb-1 sm:hidden" style={{ scrollbarWidth: 'none' }}>
+                {stages.map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setStatus(s)}
+                    className="flex-shrink-0 px-3 py-1.5 rounded-full text-[12px] font-medium border transition-colors tap-compact min-h-0"
+                    style={{
+                      minHeight: 36,
+                      background: status === s ? 'var(--accent-blue)' : 'var(--surface-gray)',
+                      borderColor: status === s ? 'var(--accent-blue)' : 'var(--border-gray)',
+                      color: status === s ? '#fff' : 'var(--muted-text)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
+              <select
+                className={`hidden sm:block ${inputCls}`}
+                value={status}
+                onChange={e => setStatus(e.target.value as PipelineStage)}
+              >
+                {stages.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
             </div>
 
             <div>
@@ -318,8 +363,8 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
             <button
               type="submit"
               disabled={isSaving}
-              className="w-full h-9 text-[14px] font-medium text-white rounded-md transition-colors disabled:opacity-50 mt-1 hover:[background:var(--accent-blue-hover)]"
-              style={{ background: 'var(--accent-blue)' }}
+              className="w-full h-13 sm:h-9 text-[15px] sm:text-[14px] font-semibold text-white rounded-xl sm:rounded-md transition-colors disabled:opacity-50 mt-2 active:opacity-80"
+              style={{ background: 'var(--accent-blue)', minHeight: 52 }}
             >
               {isSaving ? 'Saving…' : 'Save Application'}
             </button>

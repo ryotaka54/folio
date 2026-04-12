@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { STAGE_COLORS } from '@/lib/constants';
-import { useExtensionStatus } from '@/lib/extension-status-context';
 import { Sparkles } from 'lucide-react';
 
 const GHOST_STAGES = ['Wishlist', 'Applied', 'OA / Online Assessment', 'Phone / Recruiter Screen', 'Offer'];
@@ -13,22 +11,12 @@ interface EmptyStateProps {
   hideExtensionHint?: boolean;
 }
 
-export default function EmptyState({ onAdd, onAutofillUrl, hideExtensionHint }: EmptyStateProps) {
-  const { isInstalled } = useExtensionStatus();
-  const [url, setUrl] = useState('');
-
-  const isValidUrl = (u: string) => { try { new URL(u); return true; } catch { return false; } };
-
-  const handleAutofill = () => {
-    if (isValidUrl(url) && onAutofillUrl) {
-      onAutofillUrl(url);
-    }
-  };
-
+export default function EmptyState({ onAdd, hideExtensionHint }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 mt-4 rounded-lg border border-dashed border-border-gray fade-in">
-      {/* Ghost pipeline preview */}
-      <div className="flex gap-2 mb-8 w-full max-w-sm opacity-40 pointer-events-none" aria-hidden>
+    <div className="flex flex-col items-center justify-center px-6 py-16 mt-4">
+
+      {/* Ghost pipeline preview — desktop only */}
+      <div className="hidden sm:flex gap-2 mb-8 w-full max-w-sm opacity-40 pointer-events-none" aria-hidden>
         {GHOST_STAGES.map((stage, i) => {
           const color = STAGE_COLORS[stage] || '#6B7280';
           return (
@@ -45,62 +33,59 @@ export default function EmptyState({ onAdd, onAutofillUrl, hideExtensionHint }: 
         })}
       </div>
 
-      <h3 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>
-        Add your first application to get started
+      {/* Mobile illustration */}
+      <div className="sm:hidden mb-8 flex items-end gap-3 opacity-40 pointer-events-none" aria-hidden>
+        {['#8B5CF6', '#2563EB', '#06B6D4', '#F59E0B', '#1D9E75'].map((color, i) => (
+          <div
+            key={i}
+            className="w-8 rounded-lg"
+            style={{ height: [48, 72, 56, 88, 40][i], backgroundColor: color, opacity: 0.6 }}
+          />
+        ))}
+      </div>
+
+      {/* Headline */}
+      <h3 className="text-[20px] sm:text-[16px] font-bold mb-2 text-center" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
+        Ready to start recruiting?
       </h3>
-      <p className="text-[13px] text-center max-w-sm mb-2" style={{ color: 'var(--muted-text)' }}>
-        Applyd starts working for you the moment you track. After your first interview stage, your AI prep guide activates automatically.
+      <p className="text-[14px] sm:text-[13px] text-center max-w-xs mb-1" style={{ color: 'var(--muted-text)' }}>
+        Add your first application and Applyd starts working for you.
       </p>
 
       {/* AI features teaser */}
-      <div className="flex items-center gap-1.5 mb-6">
+      <div className="flex items-center gap-1.5 mb-7 mt-1">
         <Sparkles size={11} style={{ color: 'var(--accent-blue)' }} />
         <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
-          Pro users get AI interview prep, follow-up emails &amp; offer negotiation — automatically.
+          AI interview prep, follow-up emails &amp; coaching — automatically.
         </p>
       </div>
 
-      {/* URL autofill input */}
-      <div className="w-full max-w-sm mb-3">
-        <div className="flex gap-2">
-          <input
-            type="url"
-            value={url}
-            onChange={e => setUrl(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') handleAutofill(); }}
-            placeholder="Paste a job URL to autofill →"
-            className="flex-1 h-9 px-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
-          />
-          <button
-            onClick={handleAutofill}
-            disabled={!isValidUrl(url)}
-            className="h-9 px-3 text-[13px] font-medium text-white rounded-md transition-colors disabled:opacity-40 disabled:cursor-not-allowed bg-accent-blue hover:bg-accent-blue-hover"
-          >
-            Autofill
-          </button>
-        </div>
-      </div>
-
+      {/* Primary CTA — full width on mobile */}
       <button
         onClick={onAdd}
-        className="h-8 px-3 text-[12px] font-medium rounded-md border border-border-gray transition-colors"
-        style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}
+        className="w-full sm:w-auto sm:px-6 rounded-xl sm:rounded-md font-semibold text-white transition-colors active:opacity-80"
+        style={{ background: 'var(--accent-blue)', minHeight: 56, fontSize: 16 }}
       >
-        or add manually
+        Add Application
       </button>
 
-      {!hideExtensionHint && !isInstalled && (
-        <p className="mt-5 text-[11px] text-center max-w-xs" style={{ color: 'var(--text-tertiary)' }}>
-          Already found jobs to apply to? The{' '}
+      <p className="mt-3 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
+        Takes 30 seconds. No spreadsheet needed.
+      </p>
+
+      {!hideExtensionHint && (
+        <p className="mt-6 text-[11px] text-center max-w-xs hidden sm:block" style={{ color: 'var(--text-tertiary)' }}>
+          Already found jobs? The{' '}
           <a
             href="https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao"
             target="_blank"
             rel="noopener noreferrer"
+            className="tap-compact"
             style={{ color: 'var(--muted-text)', textDecoration: 'underline', textUnderlineOffset: 2 }}
           >
             Applyd extension
           </a>
-          {' '}lets you log them directly from LinkedIn or Handshake in one click.
+          {' '}logs them directly from LinkedIn or Handshake in one click.
         </p>
       )}
     </div>

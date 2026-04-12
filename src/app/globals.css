@@ -196,6 +196,35 @@ body {
 .pipeline-column::-webkit-scrollbar-track { background: transparent; }
 .pipeline-column::-webkit-scrollbar-thumb { background: var(--border-gray); border-radius: 2px; }
 
+/* ── Mobile global fixes ─────────────────────────────────────────────────── */
+
+/* Prevent unexpected horizontal overflow on every page except the kanban board */
+@media (max-width: 1023px) {
+  body { overflow-x: hidden; }
+}
+
+/* Ensure every interactive element meets Apple 44px tap-target minimum */
+@media (max-width: 1023px) {
+  /* Buttons and links that are smaller than 44px get a transparent hit-area via padding */
+  button, a[href], [role="button"] {
+    min-height: 44px;
+  }
+  /* Override for very specific cases where min-height breaks layout (inline text links) */
+  button.tap-compact, a.tap-compact { min-height: unset; }
+}
+
+/* Bottom nav spacing — pages add pb-mobile-nav to their main container */
+.pb-mobile-nav {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}
+
+/* Active press feedback on all tappable elements */
+@media (max-width: 1023px) {
+  button:active, a:active, [role="button"]:active {
+    opacity: 0.75;
+  }
+}
+
 /* Modal/drawer backdrop */
 .backdrop {
   transition: opacity 0.15s ease;

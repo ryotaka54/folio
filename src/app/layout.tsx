@@ -8,6 +8,7 @@ import CommandPalette from "@/components/CommandPalette";
 import TutorialOverlay from "@/components/TutorialOverlay";
 import DemoOverlay from "@/components/DemoOverlay";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import MobileBottomNav from "@/components/MobileBottomNav";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -99,6 +100,7 @@ export default function RootLayout({
               <TutorialOverlay />
               <DemoOverlay />
               <PWAInstallPrompt />
+              <MobileBottomNav />
             </TutorialProvider>
           </AuthProvider>
         </ThemeProvider>
