@@ -154,7 +154,8 @@ function OnboardingContent() {
       }
     }
 
-    router.push('/dashboard');
+    // Show referral welcome on first sign-up (not on mode-change flows)
+    router.push('/dashboard?ref_welcome=1');
   };
 
   const stages = mode === 'internship' ? INTERNSHIP_STAGES : JOB_STAGES;

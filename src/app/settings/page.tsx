@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, ReactNode } from 'react';
+import { useState, useEffect, useRef, useCallback, ReactNode, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { Logo } from '@/components/Logo';
 import { ProLogo } from '@/components/ProLogo';
@@ -1125,10 +1125,14 @@ function SupportSection() {
 
 // ─── Main settings page ───────────────────────────────────────────────────────
 
-export default function SettingsPage() {
+function SettingsPageInner() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [section, setSection] = useState<Section>('profile');
+  const searchParams = useSearchParams();
+  const [section, setSection] = useState<Section>(() => {
+    const s = searchParams.get('section');
+    return (SECTIONS.find(x => x.id === s)?.id ?? 'profile') as Section;
+  });
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -1260,5 +1264,13 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense>
+      <SettingsPageInner />
+    </Suspense>
   );
 }

@@ -34,6 +34,7 @@ import { CapExceededError } from '@/lib/store';
 import UpgradeModal from '@/components/UpgradeModal';
 import WeeklyCoach from '@/components/ai/WeeklyCoach';
 import ProTour from '@/components/ProTour';
+import ReferralWelcomeModal from '@/components/ReferralWelcomeModal';
 import { motion } from 'framer-motion';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
@@ -86,6 +87,7 @@ function DashboardContent() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradedSuccess, setUpgradedSuccess] = useState(false);
   const [showProWelcome, setShowProWelcome] = useState(false);
+  const [showReferralWelcome, setShowReferralWelcome] = useState(false);
   const userIsPro = checkIsPro(user);
   const prevStatusesRef = useRef<Record<string, string>>({});
 
@@ -239,6 +241,13 @@ function DashboardContent() {
         setShowProWelcome(true);
       } else {
         setUpgradedSuccess(true);
+      }
+    }
+    // Detect ?ref_welcome=1 → show referral welcome modal once per user
+    if (params.get('ref_welcome') === '1') {
+      window.history.replaceState({}, '', '/dashboard');
+      if (!localStorage.getItem('ref_welcome_shown')) {
+        setShowReferralWelcome(true);
       }
     }
   }, []);
@@ -852,6 +861,15 @@ function DashboardContent() {
             localStorage.setItem('pro_welcome_shown', '1');
             setShowProWelcome(false);
             setUpgradedSuccess(true);
+          }}
+        />
+      )}
+
+      {showReferralWelcome && (
+        <ReferralWelcomeModal
+          onDone={() => {
+            localStorage.setItem('ref_welcome_shown', '1');
+            setShowReferralWelcome(false);
           }}
         />
       )}
