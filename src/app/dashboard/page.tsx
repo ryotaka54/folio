@@ -806,17 +806,7 @@ function DashboardContent() {
             <Link href="/terms" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Terms of Service</Link>
           </div>
           <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
-            Made with care by a student —{' '}
-            <a
-              href="https://buymeacoffee.com/applyd"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => capture('support_click', { location: 'dashboard_footer' })}
-              className="underline underline-offset-2 hover:opacity-80 transition-opacity"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
-              support Applyd with a coffee
-            </a>
+            © {new Date().getFullYear()} Applyd. All rights reserved.
           </p>
         </footer>
       </main>

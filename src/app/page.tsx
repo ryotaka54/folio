@@ -801,35 +801,6 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── Buy Me a Coffee ── */}
-        <section style={{ background: 'var(--bmac-bg)', borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)' }}>
-          <div className="max-w-[480px] mx-auto px-6 py-16 text-center">
-            <div className="flex justify-center mb-5">
-              <Logo size={36} variant="dark" />
-            </div>
-            <h2 className="text-[20px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-              Built in the same recruiting chaos you&apos;re in.
-            </h2>
-            <p className="text-[14px] leading-relaxed mb-6" style={{ color: 'var(--muted-text)' }}>
-              This started as a tool I needed and couldn&apos;t find. If it&apos;s shaved even one hour off your recruiting season, a coffee is the kindest thing you could do.
-            </p>
-            <a
-              href="https://buymeacoffee.com/applyd"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => capture('support_click', { location: 'landing_page' })}
-              className="inline-flex items-center gap-2 font-semibold transition-colors"
-              style={{ background: '#FFDD00', color: '#000', borderRadius: 8, padding: '10px 22px', fontSize: 14 }}
-              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = '#F0D000')}
-              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = '#FFDD00')}
-            >
-              ☕ Buy me a coffee
-            </a>
-            <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-              No pressure. No paywall.
-            </p>
-          </div>
-        </section>
 
         {/* ── Footer ── */}
         <footer className="border-t border-border-gray py-8">

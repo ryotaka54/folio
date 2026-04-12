@@ -314,6 +314,7 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                       role={application.role}
                       stage={application.status}
                       notes={application.notes || undefined}
+                      jobLink={application.job_link || undefined}
                       isPro={isPro}
                       cached={(application.ai_interview_prep as Parameters<typeof InterviewPrepPanel>[0]['cached']) ?? null}
                       onUpgrade={onUpgrade}

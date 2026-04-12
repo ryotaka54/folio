@@ -16,7 +16,7 @@ import ReferralCard from '@/components/ReferralCard';
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type Section = 'profile' | 'recruiting' | 'ai' | 'appearance' | 'account' | 'referrals' | 'data' | 'support' | 'danger';
+type Section = 'profile' | 'recruiting' | 'ai' | 'appearance' | 'account' | 'referrals' | 'data' | 'danger';
 
 interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: boolean }
 
@@ -26,7 +26,7 @@ const UserIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="non
 const BriefcaseIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
 const PaletteIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>;
 const ShieldIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
-const CoffeeIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>;
+
 const TrashIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>;
 const DownloadIcon = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
 const CheckIcon = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
@@ -44,7 +44,7 @@ const SECTIONS: SectionMeta[] = [
   { id: 'account', label: 'Account', icon: <ShieldIcon /> },
   { id: 'referrals', label: 'Referrals', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg> },
   { id: 'data', label: 'Export Data', icon: <DownloadIcon /> },
-  { id: 'support', label: 'Support Applyd', icon: <CoffeeIcon /> },
+
   { id: 'danger', label: 'Danger Zone', icon: <TrashIcon />, danger: true },
 ];
 
@@ -1086,42 +1086,7 @@ function DataSection({ showToast }: { showToast: (msg: string, type?: 'success' 
   );
 }
 
-// ─── Section: Support Applyd ──────────────────────────────────────────────────
 
-function SupportSection() {
-  return (
-    <div>
-      <SectionCard>
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'var(--accent-blue)' }}>
-            <svg width="20" height="20" viewBox="0 0 56 56" fill="none">
-              <path d="M14 36 L22 26 L30 32 L38 20 L44 26" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="44" cy="26" r="4" fill="#FFDD00"/>
-            </svg>
-          </div>
-          <div className="flex-1">
-            <p className="text-[14px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Enjoying Applyd?</p>
-            <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'var(--muted-text)' }}>
-              It takes a lot of work to keep it free, fast, and improving. If it&apos;s helped your recruiting season, a coffee goes a long way.
-            </p>
-            <a
-              href="https://buymeacoffee.com/applyd"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => { try { console.log('[analytics] support_click', { location: 'settings_page' }); } catch { /* silent */ } }}
-              className="inline-flex items-center gap-2 text-[13px] font-semibold transition-colors"
-              style={{ background: '#FFDD00', color: '#000', borderRadius: 8, padding: '9px 18px' }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#F0D000')}
-              onMouseLeave={e => (e.currentTarget.style.background = '#FFDD00')}
-            >
-              ☕ Buy me a coffee
-            </a>
-          </div>
-        </div>
-      </SectionCard>
-    </div>
-  );
-}
 
 // ─── Main settings page ───────────────────────────────────────────────────────
 
@@ -1175,7 +1140,7 @@ function SettingsPageInner() {
       </div>
     ),
     data: <DataSection showToast={showToast} />,
-    support: <SupportSection />,
+
     danger: <DangerSection showToast={showToast} />,
   };
 
