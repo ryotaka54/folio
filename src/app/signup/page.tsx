@@ -1,15 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 
-export default function SignUpPage() {
+function SignUpForm() {
   const { signUp } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const refCode = searchParams.get('ref');
+
+  // Persist referral code so onboarding can pick it up after account creation
+  useEffect(() => {
+    if (refCode) localStorage.setItem('applyd_ref', refCode.toLowerCase().trim());
+  }, [refCode]);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,25 +29,17 @@ export default function SignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
+    if (password !== confirmPassword) { setError('Passwords do not match'); return; }
+    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
     setLoading(true);
     try {
-      const timeoutPromise = new Promise((_, reject) =>
+      const timeout = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Request timed out. Please check your connection and try again.')), 8000)
       );
-      await Promise.race([signUp(email, password), timeoutPromise]);
+      await Promise.race([signUp(email, password), timeout]);
       router.push('/onboarding');
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
       setLoading(false);
     }
   };
@@ -58,6 +59,17 @@ export default function SignUpPage() {
           </Link>
         </div>
 
+        {/* Referral banner */}
+        {refCode && (
+          <div
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg mb-4 text-[13px]"
+            style={{ background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+            <span>You were invited — sign up to confirm your friend&apos;s referral.</span>
+          </div>
+        )}
+
         <div className="bg-card-bg rounded-lg p-6 border border-border-gray">
           <h1 className="text-[15px] font-semibold mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Create your account</h1>
           <p className="text-[13px] mb-6" style={{ color: 'var(--muted-text)' }}>Free to use. No credit card needed.</p>
@@ -76,7 +88,7 @@ export default function SignUpPage() {
                 required
                 autoFocus
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                 placeholder="you@email.com"
               />
@@ -89,7 +101,7 @@ export default function SignUpPage() {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   className="w-full h-9 px-3 pr-10 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                   placeholder="At least 6 characters"
                 />
@@ -111,7 +123,7 @@ export default function SignUpPage() {
                 type={showPassword ? 'text' : 'password'}
                 required
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={e => setConfirmPassword(e.target.value)}
                 className="w-full h-9 px-3 bg-background border border-border-gray rounded-md text-sm focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
                 placeholder="Confirm your password"
               />
@@ -140,5 +152,13 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense>
+      <SignUpForm />
+    </Suspense>
   );
 }

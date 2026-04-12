@@ -12,10 +12,11 @@ import { supabase } from '@/lib/supabase';
 import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS, AI_FREE_DAILY_LIMIT, AI_PRO_DAILY_LIMIT } from '@/lib/constants';
 import { isPro, FREE_TIER_LIMIT } from '@/lib/pro';
 import UpgradeModal from '@/components/UpgradeModal';
+import ReferralCard from '@/components/ReferralCard';
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type Section = 'profile' | 'recruiting' | 'ai' | 'appearance' | 'account' | 'data' | 'support' | 'danger';
+type Section = 'profile' | 'recruiting' | 'ai' | 'appearance' | 'account' | 'referrals' | 'data' | 'support' | 'danger';
 
 interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: boolean }
 
@@ -41,6 +42,7 @@ const SECTIONS: SectionMeta[] = [
   { id: 'ai', label: 'AI Features', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> },
   { id: 'appearance', label: 'Appearance', icon: <PaletteIcon /> },
   { id: 'account', label: 'Account', icon: <ShieldIcon /> },
+  { id: 'referrals', label: 'Referrals', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg> },
   { id: 'data', label: 'Export Data', icon: <DownloadIcon /> },
   { id: 'support', label: 'Support Applyd', icon: <CoffeeIcon /> },
   { id: 'danger', label: 'Danger Zone', icon: <TrashIcon />, danger: true },
@@ -1159,6 +1161,15 @@ export default function SettingsPage() {
     ai: <AISection />,
     appearance: <AppearanceSection />,
     account: <AccountSection showToast={showToast} />,
+    referrals: (
+      <div>
+        <div className="mb-4">
+          <h2 className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Referrals</h2>
+          <p className="text-[13px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Invite friends to Applyd. Every 3 who join earns you 1 month of Pro free.</p>
+        </div>
+        <ReferralCard />
+      </div>
+    ),
     data: <DataSection showToast={showToast} />,
     support: <SupportSection />,
     danger: <DangerSection showToast={showToast} />,

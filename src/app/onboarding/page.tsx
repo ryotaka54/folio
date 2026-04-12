@@ -120,7 +120,7 @@ function OnboardingContent() {
     );
   }
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     capture('onboarding_complete', { mode, school });
     updateProfile({
       name,
@@ -131,6 +131,29 @@ function OnboardingContent() {
       recruiting_season: recruitingSeason,
       onboarding_complete: true,
     });
+
+    // Fire referral confirmation if this user signed up via a referral link
+    const refCode = typeof window !== 'undefined' ? localStorage.getItem('applyd_ref') : null;
+    if (refCode) {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await fetch('/api/referral/confirm', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({ referrer_code: refCode }),
+          });
+        }
+        localStorage.removeItem('applyd_ref');
+      } catch {
+        // Non-critical — don't block the user
+      }
+    }
+
     router.push('/dashboard');
   };
 
