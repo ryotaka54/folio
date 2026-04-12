@@ -733,7 +733,12 @@ function DashboardContent() {
               </button>
             </div>
           ) : isMobile ? (
-            <MobileCardList applications={filteredApps} stages={stages as PipelineStage[]} onCardClick={handleCardClick} />
+            <MobileCardList
+              applications={filteredApps}
+              stages={stages as PipelineStage[]}
+              onCardClick={handleCardClick}
+              onStatusChange={(id, status) => handleStatusChange(id, status)}
+            />
           ) : view === 'pipeline' ? (
             <div data-tutorial-id="pipeline-board">
               <PipelineView
