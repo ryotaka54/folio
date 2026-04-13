@@ -19,7 +19,19 @@ export type JobStage =
   | 'Accepted'
   | 'Declined';
 
-export type PipelineStage = InternshipStage | JobStage;
+export type ShuukatsuStage =
+  | 'エントリー'
+  | '説明会'
+  | 'ES提出'
+  | 'SPI'
+  | '一次面接'
+  | '二次面接'
+  | '最終面接'
+  | '内々定'
+  | '内定'
+  | '承諾';
+
+export type PipelineStage = InternshipStage | JobStage | ShuukatsuStage;
 
 export interface InterviewStep {
   id: string;
@@ -84,4 +96,6 @@ export interface UserProfile {
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
   pro_expires_at?: string | null;
+  pipeline_type?: 'english' | 'shuukatsu';
+  language_preference?: 'en' | 'ja';
 }

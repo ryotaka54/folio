@@ -1,4 +1,4 @@
-import { InternshipStage, JobStage, Category } from './types';
+import { InternshipStage, JobStage, ShuukatsuStage, Category } from './types';
 
 export const INTERNSHIP_STAGES: InternshipStage[] = [
   'Wishlist',
@@ -63,3 +63,37 @@ export const CAREER_LEVELS = ['New grad', 'Early career', 'Mid-career', 'Senior+
 
 export const AI_FREE_DAILY_LIMIT = 3;
 export const AI_PRO_DAILY_LIMIT = 20;
+
+// ── Shuukatsu (Japanese Recruiting) Stages ──────────────────────────────────
+export interface ShuukatsuStageConfig {
+  id: ShuukatsuStage;
+  label: string;
+  color: string;
+  order: number;
+}
+
+export const SHUUKATSU_STAGES: ShuukatsuStageConfig[] = [
+  { id: 'エントリー',       label: 'エントリー',       color: '#64748B', order: 1 },
+  { id: '説明会',           label: '説明会',           color: '#0EA5E9', order: 2 },
+  { id: 'ES提出',           label: 'ES提出',           color: '#8B5CF6', order: 3 },
+  { id: 'SPI',              label: 'SPI / 適性検査',   color: '#F59E0B', order: 4 },
+  { id: '一次面接',         label: '一次面接',         color: '#3B82F6', order: 5 },
+  { id: '二次面接',         label: '二次面接',         color: '#6366F1', order: 6 },
+  { id: '最終面接',         label: '最終面接',         color: '#EC4899', order: 7 },
+  { id: '内々定',           label: '内々定',           color: '#10B981', order: 8 },
+  { id: '内定',             label: '内定',             color: '#22C55E', order: 9 },
+  { id: '承諾',             label: '承諾 / 辞退',      color: '#94A3B8', order: 10 },
+];
+
+export const SHUUKATSU_STAGE_COLORS: Record<string, string> = {
+  'エントリー': '#64748B',
+  '説明会':     '#0EA5E9',
+  'ES提出':     '#8B5CF6',
+  'SPI':        '#F59E0B',
+  '一次面接':   '#3B82F6',
+  '二次面接':   '#6366F1',
+  '最終面接':   '#EC4899',
+  '内々定':     '#10B981',
+  '内定':       '#22C55E',
+  '承諾':       '#94A3B8',
+};

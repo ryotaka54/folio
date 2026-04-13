@@ -1,0 +1,70 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Log out",
+    "signIn": "Sign in",
+    "signUp": "Sign up"
+  },
+  "dashboard": {
+    "greeting_morning": "Good morning",
+    "greeting_afternoon": "Good afternoon",
+    "greeting_evening": "Good evening",
+    "addApplication": "Add Application",
+    "searchPlaceholder": "Search by company or role...",
+    "pipelineView": "Pipeline",
+    "tableView": "Table",
+    "noApplications": "No applications yet",
+    "noApplicationsDetail": "Add your first application to start tracking your recruiting pipeline.",
+    "addFirstApplication": "Add your first application"
+  },
+  "stats": {
+    "total": "Total",
+    "responseRate": "Response Rate",
+    "interviews": "Interviews",
+    "actNow": "Act Now",
+    "avgStudentRate": "Avg. student rate is 12–18%"
+  },
+  "pipeline": {
+    "stages": {
+      "Wishlist": "Wishlist",
+      "Applied": "Applied",
+      "OA / Online Assessment": "OA / Online Assessment",
+      "Phone / Recruiter Screen": "Phone / Recruiter Screen",
+      "Final Round Interviews": "Final Round Interviews",
+      "Offer": "Offer",
+      "Rejected": "Rejected",
+      "Recruiter Screen": "Recruiter Screen",
+      "Technical / Case Interview": "Technical / Case Interview",
+      "Final Round": "Final Round",
+      "Offer — Negotiating": "Offer — Negotiating",
+      "Accepted": "Accepted",
+      "Declined": "Declined"
+    }
+  },
+  "onboarding": {
+    "step1Title": "What are you recruiting for?",
+    "internship": "Internships",
+    "fullTime": "Full-time jobs",
+    "step2Title": "What year are you in?",
+    "year3": "Junior",
+    "year4": "Senior",
+    "graduate": "Graduate",
+    "other": "Other",
+    "step3Title": "Target industry"
+  },
+  "upgrade": {
+    "headline": "Level up your job search.",
+    "subtext": "Upgrade from free when you hit 15 applications",
+    "monthlyPrice": "$9/mo",
+    "annualPrice": "$59/yr",
+    "annualEquivalent": "$4.92/mo",
+    "annualSavings": "Save $49/yr",
+    "annualDefault": "Most students choose annual",
+    "upgradeButton": "Upgrade to Pro",
+    "capMessage": "You're managing 15 applications",
+    "capSub": "Serious job seekers apply to 50–100+ companies. Remove the limit with Pro."
+  }
+}

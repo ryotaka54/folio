@@ -10,7 +10,7 @@ function getSupabase() {
   );
 }
 
-const SYSTEM = `You are an expert hiring consultant who evaluates job application competitiveness.
+const SYSTEM_EN = `You are an expert hiring consultant who evaluates job application competitiveness.
 Respond ONLY with a valid JSON object — no markdown, no backticks, no commentary.
 The JSON must match this shape exactly:
 {
@@ -23,6 +23,18 @@ The JSON must match this shape exactly:
 }
 score must be a number 0-100. label must be one of: "Strong", "Competitive", "Fair", "Challenging".`;
 
+const SYSTEM_JA = `あなたは日本の就職活動市場に精通したアナリストです。企業と職種の組み合わせの選考難易度を正確に評価してください。
+マークダウン、バッククォートなし。JSONのみで回答してください:
+{
+  "score": 75,
+  "label": "標準",
+  "summary": "この応募の競争力を1文で表現してください。",
+  "strengths": ["強み1", "強み2"],
+  "gaps": ["課題1", "課題2"],
+  "tip": "改善のためのアドバイス（1つ）"
+}
+scoreは0〜100の数値。labelは "非常に難関" | "難関" | "標準" | "比較的通りやすい" のいずれか。`;
+
 export async function POST(request: Request) {
   try {
     const { userId, applicationId, company, role, category, location } = await request.json();
@@ -33,11 +45,13 @@ export async function POST(request: Request) {
     const supabase = getSupabase();
     const { data: profile } = await supabase
       .from('users')
-      .select('pro, pro_expires_at, school_year, mode')
+      .select('pro, pro_expires_at, school_year, mode, language_preference')
       .eq('id', userId)
       .single();
 
     const userIsPro = isProServer(profile);
+    const isJa = profile?.language_preference === 'ja';
+    const SYSTEM = isJa ? SYSTEM_JA : SYSTEM_EN;
 
     // Check cache (only if applicationId provided)
     if (applicationId) {
@@ -57,7 +71,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Rate limit exceeded', used, limit }, { status: 429 });
     }
 
-    const prompt = `Evaluate the strength of this job application:
+    const prompt = isJa
+      ? `以下の就活の選考難易度を評価してください:
+企業: ${company}
+職種: ${role}
+${category ? `カテゴリ: ${category}` : ''}
+${location ? `勤務地: ${location}` : ''}
+${profile?.school_year ? `学年・卒業年度: ${profile.school_year}` : ''}
+
+この応募の競争力を評価してください。`
+      : `Evaluate the strength of this job application:
 Company: ${company}
 Role: ${role}
 ${category ? `Category: ${category}` : ''}

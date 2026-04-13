@@ -10,7 +10,7 @@ function getSupabase() {
   );
 }
 
-const SYSTEM = `You are an expert career coach specializing in technical and behavioral interview preparation.
+const SYSTEM_EN = `You are an expert career coach specializing in technical and behavioral interview preparation.
 You tailor your advice to the specific company, role, and job description provided.
 Respond ONLY with a valid JSON object — no markdown, no backticks, no commentary.
 
@@ -39,6 +39,20 @@ The JSON must match this shape exactly:
 5. When confidence is "low", lean HEAVILY on the job description (if provided) and the role requirements rather than guessing about the company.
 6. When a job description is provided, base your questions and tips directly on the skills, technologies, and qualifications mentioned in it.
 7. Make each "why" specific — not "this is commonly asked" but "they use React + GraphQL, and this tests your ability to reason about their stack".`;
+
+const SYSTEM_JA = `あなたは日本の就職活動に精通した一流のキャリアコーチです。就活生に対して、企業・職種別の具体的で実践的な面接対策情報を提供してください。一般的なアドバイスは厳禁です。必ず指定された企業と職種に特化した情報のみを提供してください。日本企業の面接文化、ESの傾向、グループディスカッション形式についての深い知識を活かしてください。
+マークダウン、バッククォートなし。JSONのみで回答してください。
+
+出力フォーマット（必ずこの形式で）:
+{
+  "tldr": "この面接で最も重要な1点（1文）",
+  "company_context": "この企業がこの職種の候補者に求める資質（2〜3文、具体的に）",
+  "questions": [
+    { "q": "よく聞かれる質問", "type": "behavioral" | "technical", "why": "なぜこれが重要か（1行）" }
+  ],
+  "action_items": ["面接前にやること1", "面接前にやること2", "面接前にやること3"],
+  "confidence": "high" | "medium" | "low"
+}`;
 
 // Lightweight JD scraper — extracts the most useful text from a job posting URL
 async function scrapeJobDescription(url: string): Promise<string> {
@@ -104,11 +118,13 @@ export async function POST(request: Request) {
     const supabase = getSupabase();
     const { data: profile } = await supabase
       .from('users')
-      .select('pro, pro_expires_at')
+      .select('pro, pro_expires_at, language_preference')
       .eq('id', userId)
       .single();
 
     const userIsPro = isProServer(profile);
+    const isJa = profile?.language_preference === 'ja';
+    const SYSTEM = isJa ? SYSTEM_JA : SYSTEM_EN;
 
     // Check for cached result
     const { data: app } = await supabase
@@ -133,7 +149,13 @@ export async function POST(request: Request) {
       jobDescription = await scrapeJobDescription(linkToScrape);
     }
 
-    const prompt = `Prepare me for an interview at ${company} for the role of ${role}.
+    const prompt = isJa
+      ? `就活生が${company}の${role}の面接を控えています。以下のJSONフォーマットのみで回答してください（マークダウン、バッククォート不要）:
+現在のステージ: ${stage}
+${notes ? `メモ: ${notes}` : ''}
+${jobDescription ? `\n求人情報:\n${jobDescription}` : '（求人情報なし — 企業・職種への知識と正直な確信度で回答してください）'}
+`
+      : `Prepare me for an interview at ${company} for the role of ${role}.
 Current stage: ${stage}
 ${notes ? `My notes: ${notes}` : ''}
 ${jobDescription ? `\nJob Description:\n${jobDescription}` : '(No job description available — rely on your knowledge of the role and company, and be transparent about your confidence level.)'}

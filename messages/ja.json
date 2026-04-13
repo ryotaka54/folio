@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "calendar": "カレンダー",
+    "settings": "設定",
+    "profile": "プロフィール",
+    "logout": "ログアウト",
+    "signIn": "ログイン",
+    "signUp": "新規登録"
+  },
+  "dashboard": {
+    "greeting_morning": "おはようございます",
+    "greeting_afternoon": "こんにちは",
+    "greeting_evening": "こんばんは",
+    "addApplication": "選考を追加",
+    "searchPlaceholder": "企業名・職種で検索",
+    "pipelineView": "パイプライン",
+    "tableView": "リスト表示",
+    "noApplications": "まだ選考を追加していません",
+    "noApplicationsDetail": "最初の選考を追加して、就活管理を始めましょう",
+    "addFirstApplication": "最初の選考を追加する"
+  },
+  "stats": {
+    "total": "合計",
+    "responseRate": "返答率",
+    "interviews": "面接中",
+    "actNow": "要対応",
+    "avgStudentRate": "学生平均は12〜18%"
+  },
+  "pipeline": {
+    "stages": {
+      "エントリー": "エントリー",
+      "説明会": "説明会",
+      "ES提出": "ES提出",
+      "SPI": "SPI / 適性検査",
+      "一次面接": "一次面接",
+      "二次面接": "二次面接",
+      "最終面接": "最終面接",
+      "内々定": "内々定",
+      "内定": "内定",
+      "承諾": "承諾 / 辞退"
+    }
+  },
+  "onboarding": {
+    "step1Title": "就活の種別を選択してください",
+    "internship": "インターンシップ",
+    "fullTime": "本選考",
+    "step2Title": "卒業予定年度を選んでください",
+    "year25": "25卒",
+    "year26": "26卒",
+    "year27": "27卒",
+    "year28": "28卒",
+    "uniTypeTitle": "大学の種別は？",
+    "uniNational": "国立大学",
+    "uniPrivate": "私立大学",
+    "uniGraduate": "大学院",
+    "uniOverseas": "海外大学",
+    "industryTitle": "志望業界を教えてください。",
+    "industryMultiNote": "複数選択できます",
+    "industryTech": "IT・テクノロジー",
+    "industryFinance": "金融",
+    "industryConsulting": "コンサルティング",
+    "industryManufacturing": "メーカー",
+    "industryTrading": "商社",
+    "industryMedia": "メディア・広告",
+    "industryOther": "その他",
+    "completeTitle": "準備完了です",
+    "completeSub": "ダッシュボードへ進んでください",
+    "completeCTA": "ダッシュボードへ",
+    "welcomeHeadline": "就活を、もっとシンプルに。",
+    "welcomeCTA": "始める"
+  },
+  "upgrade": {
+    "headline": "本気の就活は、Proで。",
+    "subtext": "15社を超えた就活生のための無料プランからアップグレード",
+    "monthlyPrice": "¥1,000/月",
+    "annualPrice": "¥7,000/年",
+    "annualEquivalent": "月あたり¥583",
+    "annualSavings": "年間¥5,000お得",
+    "annualDefault": "ほとんどの就活生が年間プランを選んでいます",
+    "upgradeButton": "Proにアップグレード",
+    "capMessage": "15社の選考を管理中です",
+    "capSub": "本格的な就活生は平均50〜100社に応募します。Proで制限を外しましょう。"
+  },
+  "application": {
+    "company": "企業名",
+    "role": "職種",
+    "stage": "選考ステージ",
+    "deadline": "締め切り",
+    "notes": "メモ",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "add": "追加",
+    "edit": "編集",
+    "daysLeft": "あと{n}日",
+    "overdue": "期限切れ",
+    "dueToday": "今日締め切り"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行",
+    "close": "閉じる",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "saving": "保存中",
+    "saved": "保存済み",
+    "language": "言語"
+  }
+}

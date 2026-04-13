@@ -8,6 +8,9 @@ import InterviewPrepPanel from '@/components/ai/InterviewPrepPanel';
 import OfferIntelligencePanel from '@/components/ai/OfferIntelligencePanel';
 import FollowUpEmailModal from '@/components/ai/FollowUpEmailModal';
 import InterviewTimeline from '@/components/InterviewTimeline';
+import ESManager from '@/components/ja/ESManager';
+import SPITracker from '@/components/ja/SPITracker';
+import NaiteiManager from '@/components/ja/NaiteiManager';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const inputCls = [
@@ -27,11 +30,12 @@ interface ApplicationDrawerProps {
   userId?: string;
   isPro?: boolean;
   onUpgrade?: () => void;
+  isShuukatsu?: boolean;
 }
 
 type SaveStatus = 'idle' | 'saving' | 'saved';
 
-export default function ApplicationDrawer({ application, open, onClose, onUpdate, onDelete, stages, userId, isPro = false, onUpgrade = () => {} }: ApplicationDrawerProps) {
+export default function ApplicationDrawer({ application, open, onClose, onUpdate, onDelete, stages, userId, isPro = false, onUpgrade = () => {}, isShuukatsu = false }: ApplicationDrawerProps) {
   const [showFollowUpEmail, setShowFollowUpEmail] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
@@ -286,6 +290,28 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
               steps={application.interview_steps || []}
               onUpdate={(steps) => onUpdate(application.id, { interview_steps: steps })}
             />
+
+            {/* Shuukatsu Pro panels — ES管理 / SPI / 内定管理 */}
+            {isShuukatsu && application && (
+              <>
+                <ESManager
+                  applicationId={application.id}
+                  initialContent={(application as Application & { es_content?: { motivation: string; selfPR: string; gakuchika: string; other: string } }).es_content ?? null}
+                  isPro={isPro}
+                />
+                <SPITracker
+                  applicationId={application.id}
+                  initialData={(application as Application & { spi_result?: unknown }).spi_result as Parameters<typeof SPITracker>[0]['initialData']}
+                  isPro={isPro}
+                />
+                <NaiteiManager
+                  applicationId={application.id}
+                  stage={application.status}
+                  initialData={(application as Application & { naitei_details?: { offerDate: string; acceptanceDeadline: string; conditions: string; department: string; compensation: string; comparisonNotes: string } }).naitei_details ?? null}
+                  isPro={isPro}
+                />
+              </>
+            )}
 
             {/* AI Panels */}
             {userId && (() => {
