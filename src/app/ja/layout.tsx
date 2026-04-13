@@ -1,12 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist } from 'next/font/google';
-import '../globals.css';
 import './ja.css';
-
-const geist = Geist({
-  subsets: ['latin'],
-  variable: '--font-geist',
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://useapplyd.com'),
@@ -14,14 +7,8 @@ export const metadata: Metadata = {
   description:
     '就活生のための無料アプリ。エントリーから内定まで全ステージを管理、AIが面接対策をサポート。5,000人以上の就活生が使用中。',
   keywords: [
-    '就活管理',
-    '就活アプリ',
-    '就活ツール',
-    'エントリーシート管理',
-    '面接対策',
-    '内定管理',
-    '就活',
-    'シューカツ',
+    '就活管理', '就活アプリ', '就活ツール', 'エントリーシート管理',
+    '面接対策', '内定管理', '就活', 'シューカツ',
   ],
   alternates: {
     canonical: 'https://useapplyd.com/ja',
@@ -50,23 +37,20 @@ export const metadata: Metadata = {
 
 export default function JaLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className={geist.variable}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
-          rel="stylesheet"
-        />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-        <link rel="alternate" hrefLang="en" href="https://useapplyd.com" />
-        <link rel="alternate" hrefLang="ja" href="https://useapplyd.com/ja" />
-        <link rel="alternate" hrefLang="x-default" href="https://useapplyd.com" />
-      </head>
-      <body className="antialiased ja-body">
+    <>
+      {/* Next.js hoists these <link> tags to <head> automatically from Server Components */}
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap"
+        rel="stylesheet"
+      />
+      <div className="ja-body">
         {children}
-      </body>
-    </html>
+      </div>
+    </>
   );
 }
