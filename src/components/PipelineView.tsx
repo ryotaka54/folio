@@ -6,11 +6,36 @@ import ApplicationCard from './ApplicationCard';
 import { DndContext, DragEndEvent, DragStartEvent, useDraggable, useDroppable, PointerSensor, TouchSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { useState } from 'react';
 
+const COLUMN_CAP = 6; // Max visible cards before "Show more"
+
 interface PipelineViewProps {
   applications: Application[];
   stages: PipelineStage[];
   onCardClick: (app: Application) => void;
   onStatusChange: (appId: string, newStatus: PipelineStage) => void;
+}
+
+// ── Priority sort: urgent deadlines first, then soonest deadline, then newest ─
+function sortByPriority(apps: Application[]): Application[] {
+  const now = Date.now();
+  return [...apps].sort((a, b) => {
+    const scoreA = priorityScore(a, now);
+    const scoreB = priorityScore(b, now);
+    return scoreA - scoreB; // lower score = higher priority (top of column)
+  });
+}
+
+function priorityScore(app: Application, now: number): number {
+  if (app.deadline) {
+    const dMs = new Date(app.deadline + 'T00:00:00').getTime();
+    const daysLeft = Math.ceil((dMs - now) / (1000 * 60 * 60 * 24));
+    if (daysLeft <= 0) return -2000 + daysLeft;   // overdue: highest priority
+    if (daysLeft <= 7) return -1000 + daysLeft;   // this week: second priority
+    return daysLeft;                               // future deadline
+  }
+  // No deadline: sort by newest first (negative ts = earlier in list)
+  const ts = app.created_at ? new Date(app.created_at).getTime() : 0;
+  return 10000 - ts / 1e10;
 }
 
 function DraggableCard({ application, onClick, muted }: { application: Application; onClick: () => void; muted?: boolean }) {
@@ -39,21 +64,15 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
 
   return (
     <div id={`pipeline-col-${stage}`} className={`flex flex-col flex-shrink-0 ${isRejected ? 'w-[160px]' : 'flex-1 min-w-[120px]'}`}>
-      {/* Column header — Linear style */}
+      {/* Column header */}
       <div className="flex items-center gap-2 mb-2 px-1">
         <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-        <span
-          className="text-[12px] font-semibold truncate"
-          style={{ color: 'var(--brand-navy)' }}
-        >
+        <span className="text-[12px] font-semibold truncate" style={{ color: 'var(--brand-navy)' }}>
           {stage}
         </span>
         <span
           className="ml-auto text-[11px] font-medium px-1.5 py-0.5 rounded-full"
-          style={{
-            background: 'var(--surface-gray)',
-            color: 'var(--muted-text)',
-          }}
+          style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}
         >
           {count}
         </span>
@@ -74,10 +93,66 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
   );
 }
 
+// ── Column content with priority sort + card cap ───────────────────────────
+function ColumnContent({
+  stage, apps, isRejected, onCardClick, firstCardTaggedRef,
+}: {
+  stage: string;
+  apps: Application[];
+  isRejected: boolean;
+  onCardClick: (app: Application) => void;
+  firstCardTaggedRef: { current: boolean };
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const sorted = sortByPriority(apps);
+  const hidden = sorted.length - COLUMN_CAP;
+  const visible = expanded ? sorted : sorted.slice(0, COLUMN_CAP);
+
+  if (apps.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
+        <div className="w-4 h-4 rounded border-2 border-dashed" style={{ borderColor: 'var(--border-gray)' }} />
+        <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>Drop here</span>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {visible.map(app => {
+        const isFirst = !firstCardTaggedRef.current;
+        if (isFirst) firstCardTaggedRef.current = true;
+        return (
+          <div key={app.id} {...(isFirst ? { 'data-tutorial-id': 'first-card' } : {})}>
+            <DraggableCard application={app} onClick={() => onCardClick(app)} muted={isRejected} />
+          </div>
+        );
+      })}
+
+      {/* Show more / Show less toggle */}
+      {sorted.length > COLUMN_CAP && (
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="w-full mt-0.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors"
+          style={{
+            background: 'var(--surface-gray)',
+            color: 'var(--muted-text)',
+            border: '1px dashed var(--border-gray)',
+          }}
+        >
+          {expanded
+            ? `↑ Show less`
+            : `↓ Show ${hidden} more`}
+        </button>
+      )}
+    </>
+  );
+}
+
 export default function PipelineView({ applications, stages, onCardClick, onStatusChange }: PipelineViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  // Track which card gets the tutorial anchor — the first one rendered
-  let firstCardTagged = false;
+  const firstCardTaggedRef = { current: false };
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -98,7 +173,7 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
 
   return (
     <DndContext id="applyd-dnd-context" sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      {/* Mobile stage summary — tap to scroll column into view */}
+      {/* Mobile stage summary */}
       <div className="lg:hidden flex gap-2 overflow-x-auto pb-2 mb-3" style={{ scrollbarWidth: 'none' }}>
         {stages.map((stage) => {
           const count = applications.filter(a => a.status === stage).length;
@@ -117,52 +192,41 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
           );
         })}
       </div>
+
       <div className="overflow-x-auto pb-4" style={{ minHeight: 400 }}>
         <div className="flex gap-2" style={{ minHeight: 400 }}>
-          {/* Active stages — fill the visible viewport width exactly */}
+          {/* Active stages */}
           <div className="flex gap-2 flex-shrink-0" style={{ width: '100%', minHeight: 400 }}>
             {stages.filter(s => s !== 'Rejected' && s !== 'Declined').map((stage) => {
               const stageApps = applications.filter(a => a.status === stage);
               const color = STAGE_COLORS[stage] || '#6B7280';
               return (
                 <DroppableColumn key={stage} stage={stage} count={stageApps.length} color={color} isRejected={false}>
-                  {stageApps.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
-                      <div className="w-4 h-4 rounded border-2 border-dashed" style={{ borderColor: 'var(--border-gray)' }} />
-                      <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>Drop here</span>
-                    </div>
-                  )}
-                  {stageApps.map(app => {
-                    const isFirst = !firstCardTagged;
-                    if (isFirst) firstCardTagged = true;
-                    return (
-                      <div key={app.id} {...(isFirst ? { 'data-tutorial-id': 'first-card' } : {})}>
-                        <DraggableCard application={app} onClick={() => onCardClick(app)} muted={false} />
-                      </div>
-                    );
-                  })}
+                  <ColumnContent
+                    stage={stage}
+                    apps={stageApps}
+                    isRejected={false}
+                    onCardClick={onCardClick}
+                    firstCardTaggedRef={firstCardTaggedRef}
+                  />
                 </DroppableColumn>
               );
             })}
           </div>
 
-          {/* Rejected / Declined — off-screen by default, scroll right to reach */}
+          {/* Rejected / Declined */}
           {stages.filter(s => s === 'Rejected' || s === 'Declined').map((stage) => {
             const stageApps = applications.filter(a => a.status === stage);
             const color = STAGE_COLORS[stage] || '#6B7280';
             return (
               <DroppableColumn key={stage} stage={stage} count={stageApps.length} color={color} isRejected={true}>
-                {stageApps.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
-                    <div className="w-4 h-4 rounded border-2 border-dashed" style={{ borderColor: 'var(--border-gray)' }} />
-                    <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>Drop here</span>
-                  </div>
-                )}
-                {stageApps.map(app => (
-                  <div key={app.id}>
-                    <DraggableCard application={app} onClick={() => onCardClick(app)} muted={true} />
-                  </div>
-                ))}
+                <ColumnContent
+                  stage={stage}
+                  apps={stageApps}
+                  isRejected={true}
+                  onCardClick={onCardClick}
+                  firstCardTaggedRef={firstCardTaggedRef}
+                />
               </DroppableColumn>
             );
           })}
