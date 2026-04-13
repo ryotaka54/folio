@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes';
 import { Logo } from '@/components/Logo';
 import { ProLogo } from '@/components/ProLogo';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageToggle from '@/components/LanguageToggle';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
 import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS, AI_FREE_DAILY_LIMIT, AI_PRO_DAILY_LIMIT } from '@/lib/constants';
@@ -544,20 +545,8 @@ function AppearanceSection() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Language" description="Interface language preference.">
-        <div className="flex items-center gap-3">
-          {/* TODO: Implement full i18n. Currently stores preference only. */}
-          <select
-            defaultValue="en"
-            className={input('flex-1')}
-            onChange={e => localStorage.setItem('applyd_language', e.target.value)}
-            style={{ color: 'var(--body-text)' }}
-          >
-            <option value="en">English</option>
-            <option value="ja">日本語</option>
-          </select>
-          <span className="text-[12px] flex-shrink-0" style={{ color: 'var(--text-tertiary)' }}>More languages coming soon</span>
-        </div>
+      <SectionCard title="Language" description="Switch between English and Japanese (就活モード).">
+        <LanguageToggle />
       </SectionCard>
     </div>
   );

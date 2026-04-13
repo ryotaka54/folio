@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { TrendingUp, Zap, MessageSquare, Clock, Menu, X, GraduationCap, Calendar, CheckCircle, Award } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageToggle from '@/components/LanguageToggle';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
 import { Logo } from '@/components/Logo';
 import { capture } from '@/lib/analytics';
@@ -212,6 +213,7 @@ function LandingNav() {
               </div>
 
               <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-2 md:w-fit">
+                <LanguageToggle />
                 <ThemeToggle />
                 <Button asChild variant="outline" size="sm">
                   <Link href="/login">Log in</Link>
