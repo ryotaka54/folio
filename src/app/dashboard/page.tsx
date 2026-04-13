@@ -35,6 +35,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 import WeeklyCoach from '@/components/ai/WeeklyCoach';
 import ProTour from '@/components/ProTour';
 import ReferralWelcomeModal from '@/components/ReferralWelcomeModal';
+import FeedbackPrompt from '@/components/FeedbackPrompt';
 import { motion } from 'framer-motion';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
@@ -873,6 +874,14 @@ function DashboardContent() {
           <div style={{ color: '#4ADE80', fontWeight: 700, marginBottom: 2 }}>✓ Your pipeline is live.</div>
           <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Keep adding applications — the more you track, the smarter Applyd gets.</div>
         </div>
+      )}
+
+      {/* In-app feedback prompt — fires after 5th application, once per user */}
+      {user?.id && !isActive && (
+        <FeedbackPrompt
+          userId={user.id}
+          applicationCount={applications.length}
+        />
       )}
     </div>
   );
