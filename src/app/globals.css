@@ -1,14 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* ── Language transition: page fade-in on load ───────────────────────────── */
-@keyframes langPageFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-body {
-  animation: langPageFadeIn 280ms ease both;
-}
 
 :root {
   /* Blue palette */
@@ -48,6 +40,9 @@ body {
   --foreground: #111827;
   --bmac-bg: #FFFDF7;
   --progate-overlay: rgba(255, 255, 255, 0.78);
+
+  /* shadcn raw vars (used by focus-visible ring utilities) */
+  --ring: var(--accent-blue);
 }
 
 .dark {
@@ -82,6 +77,8 @@ body {
   --foreground: #F9FAFB;
   --bmac-bg: #1A1914;
   --progate-overlay: rgba(10, 10, 10, 0.82);
+
+  --ring: var(--accent-blue);
 }
 
 @theme inline {
@@ -108,6 +105,12 @@ body {
   --color-success-bg: var(--success-bg);
   --color-success-text: var(--success-text);
   --color-success-border: var(--success-border);
+
+  /* shadcn component aliases — required by Switch, Label, etc. */
+  --color-primary: var(--accent-blue);
+  --color-primary-foreground: #ffffff;
+  --color-input: var(--border-gray);
+  --color-ring: var(--accent-blue);
 }
 
 * {
