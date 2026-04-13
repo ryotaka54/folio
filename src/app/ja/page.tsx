@@ -1,4 +1,8 @@
+'use client';
+
 import Link from 'next/link';
+import LanguageToggle from '@/components/LanguageToggle';
+import ThemeToggle from '@/components/ThemeToggle';
 
 // ────────────────────────────────────────────────────────────────────────────
 // Data
@@ -222,7 +226,10 @@ export default function JaLandingPage() {
               padding: '7px 20px', textDecoration: 'none', fontFamily: F,
               marginLeft: 4,
             }}>無料で始める</Link>
-            <Link href="/" style={{ fontSize: 11, color: '#94A3B8', letterSpacing: '0.06em', padding: '6px 10px', textDecoration: 'none', fontFamily: G, marginLeft: 4 }}>EN</Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </nav>
