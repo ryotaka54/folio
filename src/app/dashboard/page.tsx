@@ -37,6 +37,8 @@ import ProTour from '@/components/ProTour';
 import ReferralWelcomeModal from '@/components/ReferralWelcomeModal';
 import FeedbackPrompt from '@/components/FeedbackPrompt';
 import LanguageToggle from '@/components/LanguageToggle';
+import PipelineInsights from '@/components/PipelineInsights';
+import ImportCSVModal from '@/components/ImportCSVModal';
 import { motion } from 'framer-motion';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
@@ -78,6 +80,7 @@ function DashboardContent() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<PipelineStage | ''>('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [addModalInitialUrl, setAddModalInitialUrl] = useState('');
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
@@ -640,6 +643,18 @@ function DashboardContent() {
           />
         )}
 
+        {/* Proactive pipeline insights — stale apps + deadline alerts */}
+        {!isActive && applications.length > 0 && (
+          <PipelineInsights
+            applications={applications}
+            onOpenApp={id => {
+              const app = applications.find(a => a.id === id);
+              if (app) handleCardClick(app);
+            }}
+            onFollowUp={app => handleCardClick(app)}
+          />
+        )}
+
         {/* Controls */}
         <div className="mt-6 flex flex-col gap-2">
           {/* Mobile: compact search only (Add is in bottom tab bar) */}
@@ -676,6 +691,15 @@ function DashboardContent() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Add
               <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
+            </button>
+            <button
+              onClick={() => setShowImportModal(true)}
+              className="h-9 px-3 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 border transition-colors hover:border-accent-blue hover:text-accent-blue"
+              style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+              title="Import from CSV"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Import
             </button>
           </div>
           {/* Row 2: View toggle + filters — desktop only */}
@@ -825,6 +849,20 @@ function DashboardContent() {
         userId={user?.id}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
+      />
+
+      {/* CSV Import Modal */}
+      <ImportCSVModal
+        open={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        stages={stages as PipelineStage[]}
+        onImport={async rows => {
+          for (const row of rows) {
+            try {
+              await addApplication({ ...row, recruiter_name: '', recruiter_email: '', interview_steps: [] });
+            } catch { /* skip rows that fail */ }
+          }
+        }}
       />
 
       {/* Detail Drawer */}

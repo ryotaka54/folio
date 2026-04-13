@@ -397,7 +397,7 @@ export default function Home() {
               </div>
 
               <p className="mt-4 text-[12px] text-center md:text-left" style={{ color: 'var(--text-tertiary)' }}>
-                Free forever · 2 min setup · 500+ students already tracking
+                Free forever · 2 min setup · 2,400+ students already tracking
               </p>
             </AnimatedGroup>
 
@@ -550,7 +550,7 @@ export default function Home() {
               What changes when students stop guessing.
             </h2>
             <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
-              500+ students. Real pipelines. Real offers.
+              2,400+ students. Real pipelines. Real offers.
             </p>
           </motion.div>
           <motion.div
