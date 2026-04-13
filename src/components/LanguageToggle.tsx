@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export default function LanguageToggle() {
@@ -11,10 +11,11 @@ export default function LanguageToggle() {
   const [hovered, setHovered] = useState(false);
 
   const switchTo = async (lang: 'en' | 'ja') => {
+    if (lang === 'ja' && isJa) return;
+    if (lang === 'en' && !isJa) return;
+
     // Set cookie so middleware uses this preference on every future request
     document.cookie = `preferred_language=${lang}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-
-    // Also save to localStorage as fallback
     localStorage.setItem('preferred_language', lang);
 
     // Persist to Supabase if signed in (non-blocking)
@@ -24,21 +25,41 @@ export default function LanguageToggle() {
       }
     }).catch(() => {});
 
-    // Navigate — preserve the current sub-path where sensible
+    // Determine destination
+    let dest: string;
     if (lang === 'ja') {
-      if (!pathname?.startsWith('/ja')) {
-        // Map known paths; fall back to /ja root for anything unknown
-        const mapped = pathname === '/dashboard' ? '/ja/dashboard'
-          : pathname === '/settings'  ? '/settings'
-          : '/ja';
-        router.push(mapped);
-      }
+      dest = pathname === '/dashboard' ? '/ja/dashboard'
+           : pathname === '/settings'  ? '/settings'
+           : '/ja';
     } else {
-      if (pathname?.startsWith('/ja')) {
-        const stripped = pathname.replace(/^\/ja/, '') || '/';
-        router.push(stripped);
-      }
+      dest = pathname?.startsWith('/ja')
+        ? (pathname.replace(/^\/ja/, '') || '/')
+        : '/';
     }
+
+    // Fade-out overlay — covers the black flash between root layouts
+    const overlay = document.createElement('div');
+    overlay.style.cssText = [
+      'position:fixed',
+      'inset:0',
+      'z-index:99999',
+      'background:var(--background,#fff)',
+      'opacity:0',
+      'transition:opacity 180ms ease',
+      'pointer-events:none',
+    ].join(';');
+    document.body.appendChild(overlay);
+
+    // Trigger fade-in of overlay (covers old page)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+    });
+
+    // Navigate after overlay is opaque, then remove it
+    await new Promise<void>(resolve => setTimeout(resolve, 220));
+    router.push(dest);
+    // Clean up overlay after navigation settles
+    setTimeout(() => overlay.remove(), 600);
   };
 
   return (

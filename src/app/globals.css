@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ── Language transition: page fade-in on load ───────────────────────────── */
+@keyframes langPageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+body {
+  animation: langPageFadeIn 280ms ease both;
+}
+
 :root {
   /* Blue palette */
   --accent-blue: #2563EB;

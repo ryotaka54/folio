@@ -2,6 +2,15 @@
 
 /* Noto Sans JP is loaded via layout.tsx <link> */
 
+/* Page fade-in (mirrors globals.css — ja layout has its own root) */
+@keyframes langPageFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+body {
+  animation: langPageFadeIn 280ms ease both;
+}
+
 .ja-body {
   font-family: 'Noto Sans JP', var(--font-geist), sans-serif;
 }
