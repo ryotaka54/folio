@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
@@ -77,17 +75,16 @@ const UNIVERSITIES = [
 ];
 
 const F = "'Noto Sans JP', sans-serif";
-const G = "var(--font-geist), sans-serif";
-const BLUE = '#2563EB';
+const G = "var(--font-geist), -apple-system, BlinkMacSystemFont, sans-serif";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Logo mark SVG
+// Logo mark
 // ─────────────────────────────────────────────────────────────────────────────
 
 function LogoMark({ size = 28 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="7" fill={BLUE} />
+      <rect width="32" height="32" rx="7" fill="var(--accent-blue)" />
       <rect x="7"  y="20" width="4" height="7" rx="1" fill="white" fillOpacity="0.35" />
       <rect x="14" y="13" width="4" height="14" rx="1" fill="white" fillOpacity="0.65" />
       <rect x="21" y="7"  width="4" height="20" rx="1" fill="white" />
@@ -96,17 +93,10 @@ function LogoMark({ size = 28 }: { size?: number }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// App mockup — responds to dark mode via props
+// App mockup — uses CSS variables, dark-mode-aware automatically
 // ─────────────────────────────────────────────────────────────────────────────
 
-function AppMockup({ isDark }: { isDark: boolean }) {
-  const mockBg   = isDark ? '#111218' : '#F8FAFC';
-  const mockCard = isDark ? '#1A1B25' : '#ffffff';
-  const mockBorder = isDark ? '#2A2A2C' : '#E8ECF2';
-  const mockNav  = isDark ? '#0D0F1A' : '#ffffff';
-  const navy     = isDark ? '#F1F5F9' : '#0A0A14';
-  const muted    = isDark ? '#94A3B8' : '#64748B';
-
+function AppMockup() {
   const cards = [
     { company: 'Mercari',    role: 'バックエンドエンジニア', stage: 'ES提出',  color: '#8B5CF6', deadline: 'あと2日' },
     { company: 'Recruit',    role: 'プロダクトマネージャー', stage: '一次面接', color: '#3B82F6', deadline: 'あと5日' },
@@ -116,20 +106,18 @@ function AppMockup({ isDark }: { isDark: boolean }) {
 
   return (
     <div style={{
-      background: mockBg,
+      background: 'var(--surface-gray)',
       borderRadius: 20,
-      border: `1px solid ${mockBorder}`,
+      border: '1px solid var(--border-gray)',
       overflow: 'hidden',
-      boxShadow: isDark
-        ? '0 24px 64px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3)'
-        : '0 24px 64px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.04)',
+      boxShadow: '0 24px 64px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
       maxWidth: '100%',
       width: '100%',
     }}>
       {/* Mock toolbar */}
       <div style={{
-        background: mockNav,
-        borderBottom: `1px solid ${mockBorder}`,
+        background: 'var(--card-bg)',
+        borderBottom: '1px solid var(--border-gray)',
         padding: '12px 18px',
         display: 'flex',
         alignItems: 'center',
@@ -137,7 +125,7 @@ function AppMockup({ isDark }: { isDark: boolean }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <LogoMark size={20} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: navy, fontFamily: G, letterSpacing: '-0.02em' }}>Applyd</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.02em' }}>Applyd</span>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
           {['#FF5F57','#FEBC2E','#28C840'].map(c => (
@@ -155,13 +143,13 @@ function AppMockup({ isDark }: { isDark: boolean }) {
         ].map(s => (
           <div key={s.label} style={{
             flex: 1,
-            background: mockCard,
+            background: 'var(--card-bg)',
             borderRadius: 10,
-            border: `1px solid ${mockBorder}`,
+            border: '1px solid var(--border-gray)',
             padding: '10px 12px',
           }}>
-            <p style={{ fontSize: 18, fontWeight: 700, color: navy, margin: 0, fontFamily: G, letterSpacing: '-0.03em' }}>{s.value}</p>
-            <p style={{ fontSize: 10, color: muted, margin: '2px 0 0', fontFamily: F, letterSpacing: '0.05em' }}>{s.label}</p>
+            <p style={{ fontSize: 18, fontWeight: 700, color: 'var(--brand-navy)', margin: 0, fontFamily: G, letterSpacing: '-0.03em' }}>{s.value}</p>
+            <p style={{ fontSize: 10, color: 'var(--muted-text)', margin: '2px 0 0', fontFamily: F, letterSpacing: '0.05em' }}>{s.label}</p>
           </div>
         ))}
       </div>
@@ -170,9 +158,9 @@ function AppMockup({ isDark }: { isDark: boolean }) {
       <div style={{ padding: '12px 18px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {cards.map(card => (
           <div key={card.company} style={{
-            background: mockCard,
+            background: 'var(--card-bg)',
             borderRadius: 11,
-            border: `1px solid ${mockBorder}`,
+            border: '1px solid var(--border-gray)',
             borderLeft: `3px solid ${card.color}`,
             padding: '11px 14px',
             display: 'flex',
@@ -180,8 +168,8 @@ function AppMockup({ isDark }: { isDark: boolean }) {
             gap: 12,
           }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: navy, margin: 0, fontFamily: F, letterSpacing: '0.02em' }}>{card.company}</p>
-              <p style={{ fontSize: 11, color: muted, margin: '1px 0 0', fontFamily: F, letterSpacing: '0.04em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.role}</p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)', margin: 0, fontFamily: F, letterSpacing: '0.02em' }}>{card.company}</p>
+              <p style={{ fontSize: 11, color: 'var(--muted-text)', margin: '1px 0 0', fontFamily: F, letterSpacing: '0.04em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{card.role}</p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3, flexShrink: 0 }}>
               <span style={{
@@ -201,36 +189,33 @@ function AppMockup({ isDark }: { isDark: boolean }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Check icon
+// ─────────────────────────────────────────────────────────────────────────────
+
+function CheckIcon({ blue }: { blue?: boolean }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="7" cy="7" r="7" fill={blue ? 'rgba(37,99,235,0.15)' : 'rgba(34,197,94,0.15)'} />
+      <path d="M4.5 7.5l1.75 1.75L9.5 5" stroke={blue ? 'var(--accent-blue)' : '#22C55E'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Page
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function JaLandingPage() {
-  const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  const isDark = mounted && theme === 'dark';
-
-  // Color tokens — light / dark
-  const BG      = isDark ? '#0A0A0A'                  : '#ffffff';
-  const NAVY    = isDark ? '#F1F5F9'                  : '#0A0A14';
-  const MUTED   = isDark ? '#94A3B8'                  : '#64748B';
-  const BORDER  = isDark ? '#2A2A2C'                  : '#E8ECF2';
-  const CARD    = isDark ? '#161618'                  : '#ffffff';
-  const SURFACE = isDark ? '#111218'                  : '#F8FAFC';
-  const NAV_BG  = isDark ? 'rgba(10,10,10,0.94)'      : 'rgba(255,255,255,0.94)';
-  const FOOTER_BG = isDark ? '#060810'                : '#060810'; // always dark
-  const SUBTLE  = isDark ? '#475569'                  : '#94A3B8';
-
   return (
-    <div style={{ fontFamily: F, background: BG, color: NAVY, overflowX: 'hidden' }}>
+    <div style={{ fontFamily: F, background: 'var(--background)', color: 'var(--brand-navy)', overflowX: 'hidden' }}>
 
       {/* ─── Navigation ──────────────────────────────────────────────────── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 50,
-        background: NAV_BG,
+        background: 'var(--background)',
         backdropFilter: 'blur(16px)',
-        borderBottom: `1px solid ${BORDER}`,
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid var(--border-gray)',
       }}>
         <div style={{
           maxWidth: 1160, margin: '0 auto', padding: '0 28px',
@@ -238,20 +223,41 @@ export default function JaLandingPage() {
         }}>
           <Link href="/ja" style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none' }}>
             <LogoMark size={26} />
-            <span style={{ fontSize: 17, fontWeight: 700, color: NAVY, letterSpacing: '-0.03em', fontFamily: G }}>Applyd</span>
+            <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--brand-navy)', letterSpacing: '-0.03em', fontFamily: G }}>Applyd</span>
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Link href="#features" style={{ fontSize: 13, color: MUTED, letterSpacing: '0.04em', padding: '6px 12px', textDecoration: 'none', fontFamily: F }}>機能</Link>
-            <Link href="#pricing" style={{ fontSize: 13, color: MUTED, letterSpacing: '0.04em', padding: '6px 12px', textDecoration: 'none', fontFamily: F }}>料金</Link>
-            <div style={{ width: 1, height: 16, background: BORDER, margin: '0 4px' }} />
-            <Link href="/login" style={{ fontSize: 13, color: MUTED, letterSpacing: '0.04em', padding: '6px 12px', textDecoration: 'none', fontFamily: F }}>ログイン</Link>
-            <Link href="/ja/onboarding" style={{
-              fontSize: 13, fontWeight: 500, letterSpacing: '0.04em',
-              color: '#fff', background: BLUE, borderRadius: 9999,
-              padding: '7px 20px', textDecoration: 'none', fontFamily: F,
-              marginLeft: 4,
-            }}>無料で始める</Link>
+            <Link
+              href="#features"
+              style={{ fontSize: 13, color: 'var(--muted-text)', letterSpacing: '0.04em', padding: '6px 12px', textDecoration: 'none', fontFamily: F, borderRadius: 8, transition: 'color 150ms ease, background 150ms ease' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--brand-navy)'; el.style.background = 'var(--surface-gray)'; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--muted-text)'; el.style.background = 'transparent'; }}
+            >機能</Link>
+            <Link
+              href="#pricing"
+              style={{ fontSize: 13, color: 'var(--muted-text)', letterSpacing: '0.04em', padding: '6px 12px', textDecoration: 'none', fontFamily: F, borderRadius: 8, transition: 'color 150ms ease, background 150ms ease' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--brand-navy)'; el.style.background = 'var(--surface-gray)'; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--muted-text)'; el.style.background = 'transparent'; }}
+            >料金</Link>
+            <div style={{ width: 1, height: 16, background: 'var(--border-gray)', margin: '0 4px' }} />
+            <Link
+              href="/ja/login"
+              style={{ fontSize: 13, color: 'var(--muted-text)', letterSpacing: '0.04em', padding: '6px 12px', textDecoration: 'none', fontFamily: F, borderRadius: 8, transition: 'color 150ms ease, background 150ms ease' }}
+              onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--brand-navy)'; el.style.background = 'var(--surface-gray)'; }}
+              onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.color = 'var(--muted-text)'; el.style.background = 'transparent'; }}
+            >ログイン</Link>
+            <Link
+              href="/ja/signup"
+              style={{
+                fontSize: 13, fontWeight: 600, letterSpacing: '0.04em',
+                color: '#fff', background: 'var(--accent-blue)', borderRadius: 9999,
+                padding: '8px 20px', textDecoration: 'none', fontFamily: F,
+                marginLeft: 4, transition: 'opacity 150ms ease, transform 100ms ease-out',
+              }}
+              onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+              onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+            >無料で始める</Link>
             <div style={{ marginLeft: 8 }}>
               <ThemeToggle />
             </div>
@@ -265,69 +271,88 @@ export default function JaLandingPage() {
 
           {/* Left — text */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
-              <div style={{ width: 28, height: 1, background: BLUE }} />
-              <span style={{
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.18em',
-                color: BLUE, fontFamily: F, textTransform: 'uppercase',
-              }}>就活生のための無料ツール</span>
+            {/* Eyebrow */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 14px', borderRadius: 9999, border: '1px solid rgba(37,99,235,0.25)', background: 'rgba(37,99,235,0.06)', marginBottom: 28 }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--accent-blue)', fontFamily: F }}>就活生のための無料ツール</span>
             </div>
 
             <h1 style={{
-              fontSize: 'clamp(36px, 5vw, 58px)',
+              fontSize: 'clamp(34px, 5vw, 56px)',
               fontWeight: 700,
               letterSpacing: '-0.025em',
               lineHeight: 1.15,
-              color: NAVY,
+              color: 'var(--brand-navy)',
               margin: '0 0 24px',
               fontFamily: F,
             }}>
               就活を、<br />
-              もっと<span style={{ color: BLUE }}>シンプル</span>に。
+              もっと<span style={{
+                color: 'var(--accent-blue)',
+                textDecoration: 'underline',
+                textDecorationColor: 'var(--accent-blue)',
+                textDecorationThickness: '3px',
+                textUnderlineOffset: '6px',
+              }}>シンプル</span>に。
             </h1>
 
             <p style={{
               fontSize: 16, fontWeight: 400, letterSpacing: '0.05em',
-              lineHeight: 1.95, color: MUTED, maxWidth: 440,
-              margin: '0 0 32px', fontFamily: F,
+              lineHeight: 1.95, color: 'var(--muted-text)', maxWidth: 440,
+              margin: '0 0 36px', fontFamily: F,
             }}>
               エントリーから内定まですべての選考を一元管理。
               AIが面接対策と選考対策を自動でサポートします。
             </p>
 
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 20 }}>
-              <Link href="/ja/onboarding" style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                height: 50, padding: '0 36px', borderRadius: 9999,
-                background: BLUE, color: '#fff',
-                fontSize: 15, fontWeight: 500, letterSpacing: '0.05em',
-                textDecoration: 'none', fontFamily: F,
-                boxShadow: '0 4px 14px rgba(37,99,235,0.3)',
-              }}>無料で始める</Link>
-              <a href="#features" style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                height: 50, padding: '0 28px', borderRadius: 9999,
-                background: 'transparent', color: NAVY,
-                border: `1.5px solid ${BORDER}`,
-                fontSize: 15, fontWeight: 400, letterSpacing: '0.05em',
-                textDecoration: 'none', fontFamily: F,
-              }}>機能を見る</a>
+              <Link
+                href="/ja/signup"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  height: 50, padding: '0 36px', borderRadius: 9999,
+                  background: 'var(--accent-blue)', color: '#fff',
+                  fontSize: 15, fontWeight: 600, letterSpacing: '0.05em',
+                  textDecoration: 'none', fontFamily: F,
+                  boxShadow: '0 4px 14px rgba(37,99,235,0.3)',
+                  transition: 'opacity 150ms ease, transform 100ms ease-out',
+                }}
+                onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+                onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+              >無料で始める</Link>
+              <a
+                href="#features"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  height: 50, padding: '0 28px', borderRadius: 9999,
+                  background: 'transparent', color: 'var(--brand-navy)',
+                  border: '1.5px solid var(--border-gray)',
+                  fontSize: 15, fontWeight: 400, letterSpacing: '0.05em',
+                  textDecoration: 'none', fontFamily: F,
+                  transition: 'border-color 150ms ease, background 150ms ease, transform 100ms ease-out',
+                }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border-emphasis)'; el.style.background = 'var(--surface-gray)'; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border-gray)'; el.style.background = 'transparent'; (el as HTMLElement).style.transform = 'scale(1)'; }}
+                onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+                onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+              >機能を見る</a>
             </div>
 
-            <p style={{ fontSize: 12, color: SUBTLE, letterSpacing: '0.06em', fontFamily: F }}>
+            <p style={{ fontSize: 12, color: 'var(--text-tertiary)', letterSpacing: '0.06em', fontFamily: F }}>
               クレジットカード不要・完全無料でスタート
             </p>
 
             {/* Trust stats */}
-            <div style={{ display: 'flex', gap: 24, marginTop: 32, paddingTop: 24, borderTop: `1px solid ${BORDER}`, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 24, marginTop: 36, paddingTop: 28, borderTop: '1px solid var(--border-gray)', flexWrap: 'wrap' }}>
               {[
                 { num: '5,000+', label: '就活生が利用中' },
                 { num: '50社',   label: '平均管理社数' },
                 { num: '97%',    label: '継続利用率' },
               ].map(s => (
                 <div key={s.label}>
-                  <p style={{ fontSize: 22, fontWeight: 700, color: NAVY, margin: 0, fontFamily: G, letterSpacing: '-0.03em' }}>{s.num}</p>
-                  <p style={{ fontSize: 11, color: MUTED, margin: '2px 0 0', fontFamily: F, letterSpacing: '0.05em' }}>{s.label}</p>
+                  <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--brand-navy)', margin: 0, fontFamily: G, letterSpacing: '-0.03em' }}>{s.num}</p>
+                  <p style={{ fontSize: 11, color: 'var(--muted-text)', margin: '2px 0 0', fontFamily: F, letterSpacing: '0.05em' }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -335,23 +360,23 @@ export default function JaLandingPage() {
 
           {/* Right — app mockup */}
           <div style={{ maxWidth: '100%', overflow: 'hidden' }}>
-            <AppMockup isDark={isDark} />
+            <AppMockup />
           </div>
         </div>
       </section>
 
       {/* ─── University strip ─────────────────────────────────────────────── */}
-      <div style={{ borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}`, padding: '18px 28px', overflow: 'hidden', background: SURFACE }}>
+      <div style={{ borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)', padding: '18px 28px', overflow: 'hidden', background: 'var(--card-bg)' }}>
         <div style={{ maxWidth: 1160, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 11, color: SUBTLE, letterSpacing: '0.12em', fontFamily: F, marginRight: 8, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.12em', fontFamily: F, marginRight: 8, whiteSpace: 'nowrap' }}>
             利用している大学
           </span>
           {UNIVERSITIES.map((u, i) => (
             <span key={u} style={{
-              fontSize: 12, color: MUTED, letterSpacing: '0.08em',
+              fontSize: 12, color: 'var(--muted-text)', letterSpacing: '0.08em',
               fontFamily: F, whiteSpace: 'nowrap',
               paddingRight: i < UNIVERSITIES.length - 1 ? 12 : 0,
-              borderRight: i < UNIVERSITIES.length - 1 ? `1px solid ${BORDER}` : 'none',
+              borderRight: i < UNIVERSITIES.length - 1 ? '1px solid var(--border-gray)' : 'none',
             }}>{u}</span>
           ))}
         </div>
@@ -360,8 +385,8 @@ export default function JaLandingPage() {
       {/* ─── Features ────────────────────────────────────────────────────── */}
       <section id="features" style={{ maxWidth: 1160, margin: '0 auto', padding: '96px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 56 }}>
-          <div style={{ width: 28, height: 1, background: BLUE }} />
-          <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: BLUE, fontFamily: F, textTransform: 'uppercase' }}>主な機能</span>
+          <div style={{ width: 28, height: 1, background: 'var(--accent-blue)' }} />
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.18em', color: 'var(--accent-blue)', fontFamily: F, textTransform: 'uppercase' }}>主な機能</span>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -372,31 +397,31 @@ export default function JaLandingPage() {
               gap: 64,
               alignItems: 'center',
               padding: '48px 0',
-              borderTop: `1px solid ${BORDER}`,
+              borderTop: '1px solid var(--border-gray)',
             }}>
               <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
                 <div style={{ marginBottom: 16 }}>
                   <span style={{
-                    fontSize: 11, fontWeight: 500, letterSpacing: '0.14em',
-                    color: SUBTLE, fontFamily: F, textTransform: 'uppercase',
+                    fontSize: 11, fontWeight: 600, letterSpacing: '0.14em',
+                    color: 'var(--text-tertiary)', fontFamily: F, textTransform: 'uppercase',
                   }}>{f.tag}</span>
                 </div>
                 <p style={{
                   fontSize: 'clamp(22px, 2.8vw, 30px)', fontWeight: 700,
                   letterSpacing: '-0.015em', lineHeight: 1.3,
-                  color: NAVY, margin: '0 0 16px', fontFamily: F,
+                  color: 'var(--brand-navy)', margin: '0 0 16px', fontFamily: F,
                 }}>{f.title}</p>
                 <p style={{
                   fontSize: 15, fontWeight: 400, letterSpacing: '0.05em',
-                  lineHeight: 1.95, color: MUTED, margin: 0, fontFamily: F,
+                  lineHeight: 1.95, color: 'var(--muted-text)', margin: 0, fontFamily: F,
                 }}>{f.body}</p>
               </div>
 
-              {/* Visual */}
+              {/* Visual placeholder */}
               <div style={{ order: i % 2 === 0 ? 1 : 0, maxWidth: '100%', overflow: 'hidden' }}>
                 <div style={{
-                  background: SURFACE,
-                  border: `1px solid ${BORDER}`,
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--border-gray)',
                   borderRadius: 16,
                   minHeight: 180,
                   display: 'flex',
@@ -423,13 +448,13 @@ export default function JaLandingPage() {
                   )}
                   {i === 1 && (
                     <div style={{ width: '100%', maxWidth: 280 }}>
-                      <div style={{ height: 10, borderRadius: 4, background: BLUE + '20', marginBottom: 10, width: '60%' }} />
+                      <div style={{ height: 10, borderRadius: 4, background: 'rgba(37,99,235,0.2)', marginBottom: 10, width: '60%' }} />
                       {['よくある質問①：入社後のキャリアパスは？','よくある質問②：チームの雰囲気は？','よくある質問③：残業について教えてください'].map((q, j) => (
                         <div key={j} style={{
                           padding: '9px 12px', borderRadius: 8,
-                          background: CARD, border: `1px solid ${BORDER}`,
+                          background: 'var(--surface-gray)', border: '1px solid var(--border-gray)',
                           marginBottom: 6,
-                          fontSize: 10, color: MUTED, fontFamily: F, letterSpacing: '0.04em',
+                          fontSize: 10, color: 'var(--muted-text)', fontFamily: F, letterSpacing: '0.04em',
                         }}>{q}</div>
                       ))}
                     </div>
@@ -438,13 +463,13 @@ export default function JaLandingPage() {
                     <div style={{ width: '100%', maxWidth: 280 }}>
                       {['志望動機','自己PR','ガクチカ'].map((label, j) => (
                         <div key={j} style={{ marginBottom: 10 }}>
-                          <div style={{ fontSize: 10, color: MUTED, fontFamily: F, letterSpacing: '0.05em', marginBottom: 4 }}>{label}</div>
+                          <div style={{ fontSize: 10, color: 'var(--muted-text)', fontFamily: F, letterSpacing: '0.05em', marginBottom: 4 }}>{label}</div>
                           <div style={{
                             height: j === 0 ? 44 : 32, borderRadius: 6,
-                            background: CARD, border: `1px solid ${BORDER}`,
+                            background: 'var(--surface-gray)', border: '1px solid var(--border-gray)',
                             position: 'relative',
                           }}>
-                            <div style={{ position: 'absolute', bottom: 4, right: 8, fontSize: 9, color: SUBTLE, fontFamily: G }}>
+                            <div style={{ position: 'absolute', bottom: 4, right: 8, fontSize: 9, color: 'var(--text-tertiary)', fontFamily: G }}>
                               {[148, 97, 203][j]} / {[400, 400, 400][j]}文字
                             </div>
                           </div>
@@ -457,14 +482,14 @@ export default function JaLandingPage() {
                       {[
                         { label: 'Mercari ES締め切り', days: 2, color: '#EF4444' },
                         { label: 'Recruit 説明会',     days: 5, color: '#F59E0B' },
-                        { label: 'DeNA 一次面接',      days: 9, color: '#94A3B8' },
+                        { label: 'DeNA 一次面接',      days: 9, color: 'var(--muted-text)' },
                       ].map(d => (
                         <div key={d.label} style={{
                           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                           padding: '9px 12px', borderRadius: 8,
-                          background: CARD, border: `1px solid ${BORDER}`, marginBottom: 6,
+                          background: 'var(--surface-gray)', border: '1px solid var(--border-gray)', marginBottom: 6,
                         }}>
-                          <span style={{ fontSize: 11, color: NAVY, fontFamily: F, letterSpacing: '0.04em' }}>{d.label}</span>
+                          <span style={{ fontSize: 11, color: 'var(--brand-navy)', fontFamily: F, letterSpacing: '0.04em' }}>{d.label}</span>
                           <span style={{ fontSize: 11, fontWeight: 600, color: d.color, fontFamily: G }}>あと{d.days}日</span>
                         </div>
                       ))}
@@ -477,32 +502,117 @@ export default function JaLandingPage() {
         </div>
       </section>
 
+      {/* ─── Mock Interview callout ───────────────────────────────────────── */}
+      <section style={{ background: 'var(--card-bg)', borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)', padding: '72px 28px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 56, alignItems: 'center' }} className="ja-mock-grid">
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '4px 12px', borderRadius: 9999, background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)', marginBottom: 20 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-blue)', fontFamily: F, textTransform: 'uppercase' }}>Pro</span>
+              <span style={{ fontSize: 10, color: 'var(--accent-blue)', fontFamily: F, letterSpacing: '0.06em' }}>面接前日に使える</span>
+            </div>
+            <h2 style={{ fontSize: 'clamp(24px, 3vw, 32px)', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.3, color: 'var(--brand-navy)', margin: '0 0 16px', fontFamily: F }}>
+              本番同様のAI模擬面接。<br />企業別・職種別で対策。
+            </h2>
+            <p style={{ fontSize: 14, letterSpacing: '0.05em', lineHeight: 1.95, color: 'var(--muted-text)', margin: '0 0 28px', fontFamily: F }}>
+              JDを貼り付けると、その企業に特化した質問をAIが生成。回答するとSTAR法でフィードバックを返します。テキストでも音声でも使えます。
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
+              {['企業別・職種別の質問自動生成', 'STAR法スコア（1〜5点）とフィードバック', '音声入力対応・セッション保存', 'トランスクリプトをダウンロード'].map(item => (
+                <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <CheckIcon blue />
+                  <span style={{ fontSize: 13, color: 'var(--brand-navy)', fontFamily: F, letterSpacing: '0.04em' }}>{item}</span>
+                </div>
+              ))}
+            </div>
+            <Link
+              href="/ja/signup"
+              style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                height: 46, padding: '0 28px', borderRadius: 10,
+                background: 'var(--accent-blue)', color: '#fff',
+                fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
+                textDecoration: 'none', fontFamily: F,
+                transition: 'opacity 150ms ease, transform 100ms ease-out',
+              }}
+              onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+              onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+            >Proで始める</Link>
+          </div>
+
+          {/* Mock interview preview */}
+          <div style={{ background: 'var(--surface-gray)', borderRadius: 16, border: '1px solid var(--border-gray)', padding: 24, overflow: 'hidden' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', fontFamily: F, textTransform: 'uppercase', marginBottom: 16 }}>
+              AI 模擬面接
+            </div>
+
+            {/* Question */}
+            <div style={{ background: 'var(--card-bg)', borderRadius: 10, border: '1px solid var(--border-gray)', padding: '14px 16px', marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#3B82F6', fontFamily: F, letterSpacing: '0.06em' }}>質問 2 / 5</span>
+                <span style={{ fontSize: 10, color: 'var(--text-tertiary)', fontFamily: G }}>行動面接</span>
+              </div>
+              <p style={{ fontSize: 13, color: 'var(--brand-navy)', margin: 0, fontFamily: F, letterSpacing: '0.04em', lineHeight: 1.7 }}>
+                困難なプロジェクトでチームをまとめた経験を教えてください。具体的にどう行動しましたか？
+              </p>
+            </div>
+
+            {/* STAR feedback */}
+            {[
+              { label: 'Situation', rating: 'strong', note: '状況説明が明確で具体的' },
+              { label: 'Task',      rating: 'okay',   note: '役割をもう少し明確に' },
+              { label: 'Action',    rating: 'strong', note: '行動の詳細が非常に良い' },
+              { label: 'Result',    rating: 'missing', note: '成果の数値化が必要' },
+            ].map(s => (
+              <div key={s.label} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+                <span style={{
+                  fontSize: 10, fontWeight: 700,
+                  color: s.rating === 'strong' ? '#16A34A' : s.rating === 'okay' ? '#D97706' : '#DC2626',
+                  background: s.rating === 'strong' ? 'rgba(22,163,74,0.12)' : s.rating === 'okay' ? 'rgba(217,119,6,0.12)' : 'rgba(220,38,38,0.12)',
+                  borderRadius: 4, padding: '2px 7px', fontFamily: G, flexShrink: 0,
+                }}>{s.label}</span>
+                <span style={{ fontSize: 11, color: 'var(--muted-text)', fontFamily: F, letterSpacing: '0.04em', lineHeight: 1.5 }}>{s.note}</span>
+              </div>
+            ))}
+
+            <div style={{ marginTop: 16, borderTop: '1px solid var(--border-gray)', paddingTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 11, color: 'var(--muted-text)', fontFamily: F }}>総合スコア</span>
+              <div style={{ display: 'flex', gap: 4 }}>
+                {[1,2,3,4,5].map(n => (
+                  <div key={n} style={{ width: 10, height: 10, borderRadius: '50%', background: n <= 3 ? 'var(--accent-blue)' : 'var(--border-gray)' }} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ─── Pipeline journey ─────────────────────────────────────────────── */}
-      <section style={{ background: SURFACE, padding: '80px 28px', borderTop: `1px solid ${BORDER}`, borderBottom: `1px solid ${BORDER}` }}>
+      <section style={{ background: 'var(--surface-gray)', padding: '80px 28px', borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)' }}>
         <div style={{ maxWidth: 1160, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 1, background: BLUE }} />
-            <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: BLUE, fontFamily: F, textTransform: 'uppercase' }}>就活の全ステージ</span>
+            <div style={{ width: 28, height: 1, background: 'var(--accent-blue)' }} />
+            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.18em', color: 'var(--accent-blue)', fontFamily: F, textTransform: 'uppercase' }}>就活の全ステージ</span>
           </div>
-          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 700, letterSpacing: '-0.02em', color: NAVY, margin: '0 0 48px', fontFamily: F, lineHeight: 1.25 }}>
+          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--brand-navy)', margin: '0 0 48px', fontFamily: F, lineHeight: 1.25 }}>
             就活のすべてのステージに<br />Applydが寄り添います。
           </h2>
 
           <div className="ja-pipeline-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10 }}>
             {PIPELINE_STAGES.map((stage) => (
               <div key={stage.label} style={{
-                background: CARD,
-                border: `1px solid ${BORDER}`,
+                background: 'var(--card-bg)',
+                border: '1px solid var(--border-gray)',
                 borderTop: `3px solid ${stage.color}`,
                 borderRadius: '0 0 12px 12px',
                 padding: '16px 14px',
               }}>
                 <p style={{
-                  fontSize: 10, fontWeight: 500, color: SUBTLE,
+                  fontSize: 10, fontWeight: 500, color: 'var(--text-tertiary)',
                   margin: '0 0 6px', fontFamily: G, letterSpacing: '0.1em',
                 }}>{stage.num}</p>
                 <p style={{
-                  fontSize: 12, fontWeight: 600, color: NAVY,
+                  fontSize: 12, fontWeight: 600, color: 'var(--brand-navy)',
                   margin: 0, fontFamily: F, letterSpacing: '0.04em', lineHeight: 1.4,
                 }}>{stage.label}</p>
                 <div style={{
@@ -513,7 +623,7 @@ export default function JaLandingPage() {
             ))}
           </div>
 
-          <p style={{ fontSize: 13, color: SUBTLE, marginTop: 20, letterSpacing: '0.06em', fontFamily: F }}>
+          <p style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 20, letterSpacing: '0.06em', fontFamily: F }}>
             エントリーから承諾まで — 就活のあらゆる場面でApplydが現在地を教えてくれます。
           </p>
         </div>
@@ -522,8 +632,8 @@ export default function JaLandingPage() {
       {/* ─── Testimonials ─────────────────────────────────────────────────── */}
       <section style={{ maxWidth: 1160, margin: '0 auto', padding: '96px 28px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 56 }}>
-          <div style={{ width: 28, height: 1, background: BLUE }} />
-          <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: BLUE, fontFamily: F, textTransform: 'uppercase' }}>利用者の声</span>
+          <div style={{ width: 28, height: 1, background: 'var(--accent-blue)' }} />
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.18em', color: 'var(--accent-blue)', fontFamily: F, textTransform: 'uppercase' }}>利用者の声</span>
         </div>
 
         <div className="ja-testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
@@ -531,8 +641,8 @@ export default function JaLandingPage() {
             <div key={i} style={{
               padding: '28px 24px',
               borderRadius: 16,
-              border: `1px solid ${BORDER}`,
-              background: CARD,
+              border: '1px solid var(--border-gray)',
+              background: 'var(--card-bg)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -540,25 +650,25 @@ export default function JaLandingPage() {
             }}>
               <div>
                 <p style={{
-                  fontSize: 32, fontWeight: 700, color: BLUE + '30',
-                  margin: '0 0 14px', fontFamily: G, lineHeight: 1,
+                  fontSize: 32, fontWeight: 700, color: 'var(--accent-blue)',
+                  margin: '0 0 14px', fontFamily: G, lineHeight: 1, opacity: 0.3,
                 }}>&ldquo;</p>
                 <p style={{
                   fontSize: 14, fontWeight: 400, lineHeight: 1.95,
-                  letterSpacing: '0.06em', color: NAVY,
+                  letterSpacing: '0.06em', color: 'var(--brand-navy)',
                   margin: 0, fontFamily: F,
                 }}>{t.quote}</p>
               </div>
 
-              <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 18 }}>
+              <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 18 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: NAVY, margin: 0, fontFamily: F, letterSpacing: '0.04em' }}>{t.name}</p>
-                    <p style={{ fontSize: 11, color: MUTED, margin: '3px 0 0', fontFamily: F, letterSpacing: '0.05em' }}>{t.detail}</p>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)', margin: 0, fontFamily: F, letterSpacing: '0.04em' }}>{t.name}</p>
+                    <p style={{ fontSize: 11, color: 'var(--muted-text)', margin: '3px 0 0', fontFamily: F, letterSpacing: '0.05em' }}>{t.detail}</p>
                   </div>
                   <span style={{
-                    fontSize: 11, fontWeight: 600, color: '#16A34A',
-                    background: isDark ? 'rgba(22,163,74,0.15)' : '#DCFCE7',
+                    fontSize: 11, fontWeight: 600, color: 'var(--green-success)',
+                    background: 'rgba(22,163,74,0.12)',
                     borderRadius: 9999, padding: '3px 10px',
                     fontFamily: F, letterSpacing: '0.04em', whiteSpace: 'nowrap',
                   }}>{t.result}</span>
@@ -570,13 +680,13 @@ export default function JaLandingPage() {
       </section>
 
       {/* ─── Pricing ──────────────────────────────────────────────────────── */}
-      <section id="pricing" style={{ background: SURFACE, borderTop: `1px solid ${BORDER}`, padding: '96px 28px' }}>
+      <section id="pricing" style={{ background: 'var(--card-bg)', borderTop: '1px solid var(--border-gray)', padding: '96px 28px' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 1, background: BLUE }} />
-            <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.18em', color: BLUE, fontFamily: F, textTransform: 'uppercase' }}>料金</span>
+            <div style={{ width: 28, height: 1, background: 'var(--accent-blue)' }} />
+            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.18em', color: 'var(--accent-blue)', fontFamily: F, textTransform: 'uppercase' }}>料金</span>
           </div>
-          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 700, letterSpacing: '-0.02em', color: NAVY, margin: '0 0 48px', fontFamily: F }}>
+          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--brand-navy)', margin: '0 0 48px', fontFamily: F }}>
             シンプルな料金体系。
           </h2>
 
@@ -585,99 +695,115 @@ export default function JaLandingPage() {
             <div style={{
               padding: '32px 28px',
               borderRadius: 20,
-              border: `1px solid ${BORDER}`,
-              background: CARD,
+              border: '1px solid var(--border-gray)',
+              background: 'var(--background)',
             }}>
-              <p style={{ fontSize: 13, fontWeight: 500, color: MUTED, letterSpacing: '0.08em', margin: '0 0 18px', fontFamily: F }}>無料プラン</p>
+              <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--muted-text)', letterSpacing: '0.08em', margin: '0 0 18px', fontFamily: F }}>無料プラン</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 42, fontWeight: 700, color: NAVY, fontFamily: G, letterSpacing: '-0.04em' }}>¥0</span>
+                <span style={{ fontSize: 42, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.04em' }}>¥0</span>
               </div>
-              <p style={{ fontSize: 12, color: MUTED, margin: '0 0 24px', fontFamily: F, letterSpacing: '0.05em' }}>最大15社まで永久無料</p>
-              <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
+              <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '0 0 24px', fontFamily: F, letterSpacing: '0.05em' }}>最大15社まで永久無料</p>
+              <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
                 {['選考パイプライン管理', '締め切り管理', '基本統計ダッシュボード', 'カレンダー連携'].map(item => (
                   <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill={isDark ? 'rgba(34,197,94,0.2)' : '#E8F5E9'} /><path d="M4.5 7.5l1.75 1.75L9.5 5" stroke="#22C55E" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    <span style={{ fontSize: 13, color: NAVY, fontFamily: F, letterSpacing: '0.04em' }}>{item}</span>
+                    <CheckIcon />
+                    <span style={{ fontSize: 13, color: 'var(--brand-navy)', fontFamily: F, letterSpacing: '0.04em' }}>{item}</span>
                   </div>
                 ))}
               </div>
-              <Link href="/ja/onboarding" style={{
-                display: 'block', textAlign: 'center', marginTop: 28,
-                padding: '12px 0', borderRadius: 9999,
-                border: `1.5px solid ${BORDER}`, color: NAVY,
-                fontSize: 14, fontWeight: 500, letterSpacing: '0.05em',
-                textDecoration: 'none', fontFamily: F,
-              }}>無料で始める</Link>
+              <Link
+                href="/ja/signup"
+                style={{
+                  display: 'block', textAlign: 'center', marginTop: 28,
+                  padding: '12px 0', borderRadius: 9999,
+                  border: '1.5px solid var(--border-gray)', color: 'var(--brand-navy)',
+                  fontSize: 14, fontWeight: 500, letterSpacing: '0.05em',
+                  textDecoration: 'none', fontFamily: F,
+                  transition: 'border-color 150ms ease, background 150ms ease, transform 100ms ease-out',
+                }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'var(--surface-gray)'; el.style.borderColor = 'var(--border-emphasis)'; }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.background = 'transparent'; el.style.borderColor = 'var(--border-gray)'; el.style.transform = 'scale(1)'; }}
+                onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+                onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+              >無料で始める</Link>
             </div>
 
             {/* Pro */}
             <div style={{
               padding: '32px 28px',
               borderRadius: 20,
-              border: `2px solid ${BLUE}`,
-              background: CARD,
+              border: '2px solid var(--accent-blue)',
+              background: 'var(--background)',
               position: 'relative',
               overflow: 'hidden',
             }}>
               <div style={{
                 position: 'absolute', top: 0, left: 0, right: 0,
-                background: BLUE, color: '#fff',
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                background: 'var(--accent-blue)', color: '#fff',
+                fontSize: 11, fontWeight: 600, letterSpacing: '0.1em',
                 textAlign: 'center', padding: '4px 0', fontFamily: F,
               }}>おすすめ</div>
 
               <div style={{ paddingTop: 14 }}>
-                <p style={{ fontSize: 13, fontWeight: 500, color: BLUE, letterSpacing: '0.08em', margin: '0 0 18px', fontFamily: F }}>Proプラン</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--accent-blue)', letterSpacing: '0.08em', margin: '0 0 18px', fontFamily: F }}>Proプラン</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                  <span style={{ fontSize: 42, fontWeight: 700, color: NAVY, fontFamily: G, letterSpacing: '-0.04em' }}>¥7,000</span>
-                  <span style={{ fontSize: 14, color: MUTED, fontFamily: G }}>/年</span>
+                  <span style={{ fontSize: 42, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.04em' }}>¥7,000</span>
+                  <span style={{ fontSize: 14, color: 'var(--muted-text)', fontFamily: G }}>/年</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-                  <p style={{ fontSize: 12, color: MUTED, margin: 0, fontFamily: F, letterSpacing: '0.05em' }}>月あたり¥583（月払いは¥1,000）</p>
+                  <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: 0, fontFamily: F, letterSpacing: '0.05em' }}>月あたり¥583（月払いは¥1,000）</p>
                   <span style={{
-                    fontSize: 10, fontWeight: 600, color: '#16A34A',
-                    background: isDark ? 'rgba(22,163,74,0.15)' : '#DCFCE7',
+                    fontSize: 10, fontWeight: 600, color: 'var(--green-success)',
+                    background: 'rgba(22,163,74,0.12)',
                     borderRadius: 9999, padding: '2px 8px',
                     fontFamily: F, letterSpacing: '0.04em', whiteSpace: 'nowrap',
                   }}>年間¥5,000お得</span>
                 </div>
-                <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
+                <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
                   {[
                     '無制限の選考管理',
                     'AI面接対策（企業別・職種別）',
+                    'AI模擬面接（STAR法フィードバック）',
                     'ES管理・志望動機・ガクチカ保存',
                     'AIフォローアップメール生成',
                     'オファー交渉ガイド',
                     '週次AIコーチング',
                   ].map(item => (
                     <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill={isDark ? 'rgba(37,99,235,0.2)' : '#DBEAFE'} /><path d="M4.5 7.5l1.75 1.75L9.5 5" stroke={BLUE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                      <span style={{ fontSize: 13, color: NAVY, fontFamily: F, letterSpacing: '0.04em' }}>{item}</span>
+                      <CheckIcon blue />
+                      <span style={{ fontSize: 13, color: 'var(--brand-navy)', fontFamily: F, letterSpacing: '0.04em' }}>{item}</span>
                     </div>
                   ))}
                 </div>
-                <Link href="/ja/onboarding" style={{
-                  display: 'block', textAlign: 'center', marginTop: 28,
-                  padding: '12px 0', borderRadius: 9999,
-                  background: BLUE, color: '#fff',
-                  fontSize: 14, fontWeight: 500, letterSpacing: '0.05em',
-                  textDecoration: 'none', fontFamily: F,
-                  boxShadow: '0 4px 14px rgba(37,99,235,0.28)',
-                }}>Proを始める</Link>
+                <Link
+                  href="/ja/signup"
+                  style={{
+                    display: 'block', textAlign: 'center', marginTop: 28,
+                    padding: '12px 0', borderRadius: 9999,
+                    background: 'var(--accent-blue)', color: '#fff',
+                    fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
+                    textDecoration: 'none', fontFamily: F,
+                    boxShadow: '0 4px 14px rgba(37,99,235,0.28)',
+                    transition: 'opacity 150ms ease, transform 100ms ease-out',
+                  }}
+                  onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+                  onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+                >Proを始める</Link>
               </div>
             </div>
           </div>
 
-          <p style={{ textAlign: 'center', fontSize: 12, color: SUBTLE, marginTop: 20, letterSpacing: '0.05em', fontFamily: F }}>
+          <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-tertiary)', marginTop: 20, letterSpacing: '0.05em', fontFamily: F }}>
             クレジットカードで安全に決済 · いつでもキャンセル可能 · 返金保証あり
           </p>
         </div>
       </section>
 
       {/* ─── Final CTA ────────────────────────────────────────────────────── */}
-      <section style={{ background: '#0A0A14', padding: '96px 28px' }}>
+      <section style={{ background: '#060810', padding: '96px 28px' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ width: 48, height: 2, background: BLUE, margin: '0 auto 28px' }} />
+          <div style={{ width: 48, height: 2, background: 'var(--accent-blue)', margin: '0 auto 28px' }} />
           <h2 style={{
             fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700,
             letterSpacing: '-0.025em', lineHeight: 1.18,
@@ -687,13 +813,20 @@ export default function JaLandingPage() {
             fontSize: 15, color: 'rgba(255,255,255,0.5)',
             letterSpacing: '0.06em', margin: '0 0 36px', fontFamily: F, lineHeight: 1.8,
           }}>5,000人以上の就活生がすでに使い始めています。</p>
-          <Link href="/ja/onboarding" style={{
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            height: 52, padding: '0 48px', borderRadius: 9999,
-            background: '#fff', color: '#0A0A14',
-            fontSize: 16, fontWeight: 600, letterSpacing: '0.05em',
-            textDecoration: 'none', fontFamily: F,
-          }}>無料で始める</Link>
+          <Link
+            href="/ja/signup"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              height: 52, padding: '0 48px', borderRadius: 9999,
+              background: '#fff', color: '#060810',
+              fontSize: 16, fontWeight: 700, letterSpacing: '0.05em',
+              textDecoration: 'none', fontFamily: F,
+              transition: 'opacity 150ms ease, transform 100ms ease-out',
+            }}
+            onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+            onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+          >無料で始める</Link>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', marginTop: 14, letterSpacing: '0.06em', fontFamily: F }}>
             クレジットカード不要
           </p>
@@ -701,7 +834,7 @@ export default function JaLandingPage() {
       </section>
 
       {/* ─── Footer ───────────────────────────────────────────────────────── */}
-      <footer style={{ background: FOOTER_BG, padding: '48px 28px 40px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <footer style={{ background: '#060810', padding: '48px 28px 40px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 1160, margin: '0 auto' }}>
           <div className="ja-footer-top" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 32, marginBottom: 36 }}>
             {/* Brand */}
@@ -724,7 +857,10 @@ export default function JaLandingPage() {
                   { label: '料金プラン',   href: '#pricing' },
                   { label: 'ダッシュボード', href: '/ja/dashboard' },
                 ].map(l => (
-                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: '#64748B', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F }}>{l.label}</Link>
+                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: '#64748B', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F, transition: 'color 150ms ease' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748B'; }}
+                  >{l.label}</Link>
                 ))}
               </div>
               <div>
@@ -735,14 +871,17 @@ export default function JaLandingPage() {
                   { label: '利用規約',             href: '/ja/terms' },
                   { label: 'お問い合わせ',         href: '/ja/support' },
                 ].map(l => (
-                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: '#64748B', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F }}>{l.label}</Link>
+                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: '#64748B', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F, transition: 'color 150ms ease' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748B'; }}
+                  >{l.label}</Link>
                 ))}
               </div>
             </div>
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-            <p style={{ fontSize: 11, color: '#334155', letterSpacing: '0.06em', margin: 0, fontFamily: F }}>© 2026 Applyd. All rights reserved.</p>
+            <p style={{ fontSize: 11, color: '#334155', letterSpacing: '0.06em', margin: 0, fontFamily: F }}>© {new Date().getFullYear()} Applyd. All rights reserved.</p>
             <LocaleSwitcher />
           </div>
         </div>
@@ -750,52 +889,26 @@ export default function JaLandingPage() {
 
       {/* ─── Responsive CSS ───────────────────────────────────────────────── */}
       <style>{`
-        .ja-hero-grid {
-          grid-template-columns: 1fr 1fr;
-          gap: 64px;
-        }
-        .ja-feature-row {
-          grid-template-columns: 1fr 1fr;
-          gap: 64px;
-        }
-        .ja-pipeline-grid {
-          grid-template-columns: repeat(5, 1fr);
-        }
-        .ja-testimonials-grid {
-          grid-template-columns: repeat(3, 1fr);
-        }
-        .ja-pricing-grid {
-          grid-template-columns: 1fr 1fr;
-        }
-        .ja-footer-top {
-          flex-direction: row;
-        }
+        .ja-hero-grid { grid-template-columns: 1fr 1fr; gap: 64px; }
+        .ja-mock-grid { grid-template-columns: 1fr 1fr; gap: 56px; }
+        .ja-feature-row { grid-template-columns: 1fr 1fr; gap: 64px; }
+        .ja-pipeline-grid { grid-template-columns: repeat(5, 1fr); }
+        .ja-testimonials-grid { grid-template-columns: repeat(3, 1fr); }
+        .ja-pricing-grid { grid-template-columns: 1fr 1fr; }
+        .ja-footer-top { flex-direction: row; }
+
         @media (max-width: 900px) {
-          .ja-hero-grid {
+          .ja-hero-grid, .ja-mock-grid, .ja-feature-row {
             grid-template-columns: 1fr !important;
             gap: 40px !important;
           }
-          .ja-feature-row {
-            grid-template-columns: 1fr !important;
-            gap: 28px !important;
-          }
-          .ja-pipeline-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          .ja-testimonials-grid {
-            grid-template-columns: 1fr !important;
-          }
-          .ja-pricing-grid {
-            grid-template-columns: 1fr !important;
-          }
-          nav a[href="#features"], nav a[href="#pricing"] {
-            display: none !important;
-          }
+          .ja-pipeline-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .ja-testimonials-grid { grid-template-columns: 1fr !important; }
+          .ja-pricing-grid { grid-template-columns: 1fr !important; }
+          nav a[href="#features"], nav a[href="#pricing"] { display: none !important; }
         }
         @media (max-width: 600px) {
-          .ja-footer-top {
-            flex-direction: column !important;
-          }
+          .ja-footer-top { flex-direction: column !important; }
           section { padding-left: 16px !important; padding-right: 16px !important; }
           nav > div { padding-left: 16px !important; padding-right: 16px !important; }
         }

@@ -340,12 +340,12 @@ export default function Home() {
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-6"
                 style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                AI that activates at the right moment — free to start
+                Free for students · AI that knows where you are in the process
               </div>
 
               {/* Headline */}
               <h1
-                className="max-w-[640px] text-[28px] sm:text-[38px] lg:text-[58px] text-center md:text-left"
+                className="max-w-[640px] text-[28px] sm:text-[38px] lg:text-[56px] text-center md:text-left"
                 style={{
                   color: 'var(--brand-navy)',
                   letterSpacing: '-0.03em',
@@ -353,7 +353,7 @@ export default function Home() {
                   fontWeight: 700,
                 }}
               >
-                Track every application.{' '}
+                Stop managing your job search{' '}
                 <span
                   style={{
                     textDecoration: 'underline',
@@ -364,7 +364,7 @@ export default function Home() {
                     color: 'var(--brand-navy)',
                   }}
                 >
-                  Ace every interview.
+                  on a spreadsheet.
                 </span>
               </h1>
 
@@ -373,7 +373,7 @@ export default function Home() {
                 className="mt-5 max-w-[480px] text-[17px] text-center md:text-left"
                 style={{ color: 'var(--muted-text)', lineHeight: 1.65 }}
               >
-                Applyd tracks your pipeline and deploys AI exactly when you need it — interview prep when you advance, a negotiation guide when an offer lands, a weekly coach every Monday.
+                Applyd is a kanban board built for recruiting — deadline alerts, AI interview prep, follow-up emails, offer negotiation — all in one place. Free to start.
               </p>
 
               {/* CTAs */}
@@ -535,6 +535,100 @@ export default function Home() {
         <div id="walkthrough" className="-mx-0" style={{ scrollMarginTop: 72 }}>
           <ProductWalkthrough />
         </div>
+
+        {/* ── Mock Interview callout ── */}
+        <section className="max-w-6xl mx-auto px-6 py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="rounded-2xl border overflow-hidden"
+            style={{ borderColor: 'rgba(37,99,235,0.22)', background: 'linear-gradient(135deg, rgba(37,99,235,0.04) 0%, var(--card-bg) 60%)' }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+              {/* Left */}
+              <div className="p-8 md:p-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] font-semibold mb-5"
+                  style={{ background: 'rgba(37,99,235,0.08)', borderColor: 'rgba(37,99,235,0.22)', color: 'var(--accent-blue)', letterSpacing: '0.08em' }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  PRO FEATURE — MOCK INTERVIEW
+                </div>
+                <h2 className="text-[24px] md:text-[30px] font-semibold mb-3 leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
+                  Practice with AI the night before your interview.
+                </h2>
+                <p className="text-[14px] leading-relaxed mb-6" style={{ color: 'var(--muted-text)' }}>
+                  Paste a job description. Get tailored questions. Answer by typing or voice. AI scores your answer with a STAR rubric and tells you exactly what to fix — in seconds.
+                </p>
+                <div className="space-y-2.5 mb-7">
+                  {[
+                    'Questions pulled from the actual job description',
+                    'STAR rubric scoring (1–5) with line-by-line feedback',
+                    'Voice input supported — practice like the real thing',
+                    'Download a full transcript when you\'re done',
+                  ].map(item => (
+                    <div key={item} className="flex items-start gap-2.5">
+                      <svg className="mt-0.5 flex-shrink-0" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <circle cx="7" cy="7" r="7" fill="rgba(37,99,235,0.12)"/>
+                        <path d="M4.5 7.5l1.75 1.75L9.5 5" stroke="var(--accent-blue)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <Link
+                  href={user ? '/dashboard' : '/signup'}
+                  className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-semibold text-white transition-all"
+                  style={{ background: 'var(--accent-blue)' }}
+                  onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
+                  onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
+                >
+                  {user ? 'Open dashboard →' : 'Try it free →'}
+                </Link>
+              </div>
+
+              {/* Right — preview */}
+              <div className="border-t md:border-t-0 md:border-l p-8" style={{ borderColor: 'rgba(37,99,235,0.15)', background: 'rgba(37,99,235,0.03)' }}>
+                <div className="text-[10px] font-bold uppercase tracking-[0.1em] mb-4" style={{ color: 'var(--text-tertiary)' }}>Live session preview</div>
+
+                <div className="rounded-xl border p-4 mb-3" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] font-semibold" style={{ color: 'var(--accent-blue)' }}>Question 2 of 5 · Behavioral</span>
+                    <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Stripe · SWE Intern</span>
+                  </div>
+                  <p className="text-[13px] leading-relaxed" style={{ color: 'var(--brand-navy)' }}>
+                    Tell me about a time you had to meet a tight deadline while maintaining quality. What did you do?
+                  </p>
+                </div>
+
+                {[
+                  { label: 'Situation', rating: 'strong',  note: 'Clear context, specific timeline' },
+                  { label: 'Task',      rating: 'okay',    note: 'Your role could be clearer' },
+                  { label: 'Action',    rating: 'strong',  note: 'Excellent — very specific steps' },
+                  { label: 'Result',    rating: 'missing', note: 'Add a number or outcome' },
+                ].map(s => (
+                  <div key={s.label} className="flex items-start gap-2.5 mb-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded flex-shrink-0" style={{
+                      color: s.rating === 'strong' ? '#16A34A' : s.rating === 'okay' ? '#D97706' : '#DC2626',
+                      background: s.rating === 'strong' ? 'rgba(22,163,74,0.12)' : s.rating === 'okay' ? 'rgba(217,119,6,0.12)' : 'rgba(220,38,38,0.12)',
+                    }}>{s.label}</span>
+                    <span className="text-[12px]" style={{ color: 'var(--muted-text)' }}>{s.note}</span>
+                  </div>
+                ))}
+
+                <div className="mt-4 pt-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--border-gray)' }}>
+                  <span className="text-[11px]" style={{ color: 'var(--muted-text)' }}>Overall score</span>
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map(n => (
+                      <div key={n} className="w-2.5 h-2.5 rounded-full" style={{ background: n <= 3 ? 'var(--accent-blue)' : 'var(--border-gray)' }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
 
         {/* ── Testimonials ── */}
         <section className="max-w-6xl mx-auto px-6 py-20">
