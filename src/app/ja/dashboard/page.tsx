@@ -13,6 +13,7 @@ import { CapExceededError } from '@/lib/store';
 import { getGreetingJa, formatDeadlineJa } from '@/lib/ja-utils';
 import { Logo } from '@/components/Logo';
 import { ProLogo } from '@/components/ProLogo';
+import { ExtensionStatusProvider } from '@/lib/extension-status-context';
 import AddApplicationModal from '@/components/AddApplicationModal';
 import ApplicationDrawer from '@/components/ApplicationDrawer';
 import UpgradeModal from '@/components/UpgradeModal';
@@ -833,8 +834,10 @@ export default function JaDashboardPage() {
   if (loading || !user) return null;
 
   return (
-    <StoreProvider userId={user.id}>
-      <JaDashboardContent />
-    </StoreProvider>
+    <ExtensionStatusProvider>
+      <StoreProvider userId={user.id}>
+        <JaDashboardContent />
+      </StoreProvider>
+    </ExtensionStatusProvider>
   );
 }
