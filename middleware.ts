@@ -16,6 +16,15 @@ const BYPASS = [
   '/forgot-password',
   '/reset-password',
   '/settings',
+  '/calendar',
+  '/community',
+  '/help',
+  '/contact',
+  '/privacy',
+  '/terms',
+  '/demo',
+  '/install',
+  '/admin',
 ];
 
 export async function middleware(request: NextRequest) {
