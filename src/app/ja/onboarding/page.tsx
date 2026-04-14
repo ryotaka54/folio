@@ -119,6 +119,8 @@ export default function JaOnboarding() {
         pipeline_type: 'shuukatsu',
         language_preference: 'ja',
         school_year: gradYear ?? '26卒',
+        university_type: uniType ?? null,
+        target_industries: industries.length > 0 ? industries : null,
         onboarding_complete: true,
       }).eq('id', session.user.id);
 

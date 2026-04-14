@@ -36,6 +36,7 @@ interface InterviewPrepPanelProps {
   isPro: boolean;
   cached?: InterviewPrepData | null;
   onUpgrade: () => void;
+  isShuukatsu?: boolean;
 }
 
 function Skeleton() {
@@ -50,25 +51,25 @@ function Skeleton() {
 
 // ── Confidence badge ─────────────────────────────────────────────────────────
 const CONFIDENCE_COLORS = {
-  high: { bg: 'rgba(22,163,74,0.1)', border: 'rgba(22,163,74,0.25)', text: 'var(--green-success)', label: 'High confidence' },
-  medium: { bg: 'rgba(202,138,4,0.1)', border: 'rgba(202,138,4,0.25)', text: 'var(--amber-warning)', label: 'Medium confidence' },
-  low: { bg: 'rgba(220,38,38,0.08)', border: 'rgba(220,38,38,0.2)', text: '#DC2626', label: 'Limited company data' },
+  high: { bg: 'rgba(22,163,74,0.1)', border: 'rgba(22,163,74,0.25)', text: 'var(--green-success)', label: 'High confidence', labelJa: '精度：高' },
+  medium: { bg: 'rgba(202,138,4,0.1)', border: 'rgba(202,138,4,0.25)', text: 'var(--amber-warning)', label: 'Medium confidence', labelJa: '精度：中' },
+  low: { bg: 'rgba(220,38,38,0.08)', border: 'rgba(220,38,38,0.2)', text: '#DC2626', label: 'Limited company data', labelJa: '情報限定' },
 };
 
-function ConfidenceBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
+function ConfidenceBadge({ level, isShuukatsu }: { level: 'high' | 'medium' | 'low'; isShuukatsu?: boolean }) {
   const c = CONFIDENCE_COLORS[level];
   return (
     <span
       className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
       style={{ background: c.bg, border: `1px solid ${c.border}`, color: c.text }}
     >
-      {c.label}
+      {isShuukatsu ? c.labelJa : c.label}
     </span>
   );
 }
 
 // ── Question type pill ───────────────────────────────────────────────────────
-function TypePill({ type }: { type: string }) {
+function TypePill({ type, isShuukatsu }: { type: string; isShuukatsu?: boolean }) {
   const isTech = type === 'technical';
   return (
     <span
@@ -79,7 +80,7 @@ function TypePill({ type }: { type: string }) {
         border: `1px solid ${isTech ? 'rgba(37,99,235,0.2)' : 'rgba(139,92,246,0.2)'}`,
       }}
     >
-      {isTech ? 'Tech' : 'Behav'}
+      {isShuukatsu ? (isTech ? '技術' : '行動') : (isTech ? 'Tech' : 'Behav')}
     </span>
   );
 }
@@ -132,11 +133,12 @@ function LegacyContent({ data }: { data: InterviewPrepData }) {
 }
 
 // ── v2 compact render ────────────────────────────────────────────────────────
-function CompactContent({ data }: { data: InterviewPrepData }) {
+function CompactContent({ data, isShuukatsu }: { data: InterviewPrepData; isShuukatsu?: boolean }) {
   const [showWhy, setShowWhy] = useState<number | null>(null);
+  const ja = isShuukatsu;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" style={{ fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}>
       {/* TL;DR — the one thing to focus on */}
       <div
         className="rounded-lg px-3 py-2.5"
@@ -144,9 +146,9 @@ function CompactContent({ data }: { data: InterviewPrepData }) {
       >
         <div className="flex items-center gap-1.5 mb-1">
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--accent-blue)' }}>
-            🎯 Focus
+            🎯 {ja ? 'ポイント' : 'Focus'}
           </span>
-          {data.confidence && <ConfidenceBadge level={data.confidence} />}
+          {data.confidence && <ConfidenceBadge level={data.confidence} isShuukatsu={ja} />}
         </div>
         <p className="text-[12px] font-medium leading-snug" style={{ color: 'var(--brand-navy)' }}>
           {data.tldr}
@@ -163,7 +165,7 @@ function CompactContent({ data }: { data: InterviewPrepData }) {
       {/* Top 3 questions */}
       <div>
         <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--muted-text)' }}>
-          Top questions to prep
+          {ja ? '対策すべき質問' : 'Top questions to prep'}
         </p>
         <div className="space-y-2">
           {data.questions.map((q, i) => (
@@ -183,7 +185,7 @@ function CompactContent({ data }: { data: InterviewPrepData }) {
                     <p className="text-[12px] font-medium leading-snug flex-1" style={{ color: 'var(--brand-navy)' }}>
                       {q.q}
                     </p>
-                    <TypePill type={q.type} />
+                    <TypePill type={q.type} isShuukatsu={ja} />
                   </div>
                   {showWhy === i && q.why && (
                     <p className="text-[11px] mt-1 leading-snug" style={{ color: 'var(--text-tertiary)' }}>
@@ -201,7 +203,7 @@ function CompactContent({ data }: { data: InterviewPrepData }) {
       {data.action_items && data.action_items.length > 0 && (
         <div>
           <p className="text-[10px] font-bold uppercase tracking-wider mb-1.5" style={{ color: 'var(--muted-text)' }}>
-            Before your interview
+            {ja ? '面接前にやること' : 'Before your interview'}
           </p>
           <ul className="space-y-1">
             {data.action_items.map((item, i) => (
@@ -220,8 +222,11 @@ function CompactContent({ data }: { data: InterviewPrepData }) {
           className="rounded-lg px-3 py-2 text-[11px] leading-snug"
           style={{ background: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.12)', color: 'var(--muted-text)' }}
         >
-          ⚠️ Limited public info on this company — prep is based on the role description and industry norms.
-          Adding a <strong>job posting link</strong> significantly improves accuracy.
+          {ja
+            ? '⚠️ この企業に関する公開情報が少ないため、職種と業界の一般情報をもとに作成しています。求人URLを追加すると精度が上がります。'
+            : '⚠️ Limited public info on this company — prep is based on the role description and industry norms. Adding a '}
+          {!ja && <strong>job posting link</strong>}
+          {!ja && ' significantly improves accuracy.'}
         </div>
       )}
     </div>
@@ -234,12 +239,13 @@ function isV2Data(data: InterviewPrepData): boolean {
 }
 
 export default function InterviewPrepPanel({
-  userId, applicationId, company, role, stage, notes, jobLink, isPro, cached, onUpgrade,
+  userId, applicationId, company, role, stage, notes, jobLink, isPro, cached, onUpgrade, isShuukatsu = false,
 }: InterviewPrepPanelProps) {
   const [expanded, setExpanded] = useState(false);
   const [data, setData] = useState<InterviewPrepData | null>(cached ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const ja = isShuukatsu;
 
   const generate = async () => {
     if (data) { setExpanded(v => !v); return; }
@@ -256,7 +262,7 @@ export default function InterviewPrepPanel({
       if (!res.ok) throw new Error(json.error ?? 'Failed');
       setData(json.result);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Something went wrong');
+      setError(e instanceof Error ? e.message : ja ? 'エラーが発生しました' : 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -267,13 +273,13 @@ export default function InterviewPrepPanel({
       <button
         onClick={generate}
         className="w-full flex items-center justify-between px-3 py-2.5 transition-colors hover:bg-surface-gray/50"
-        style={{ background: 'var(--surface-gray)' }}
+        style={{ background: 'var(--surface-gray)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}
         disabled={loading}
       >
         <div className="flex items-center gap-2">
           <Sparkles size={13} style={{ color: 'var(--accent-blue)' }} />
-          <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>AI Interview Prep</span>
-          {data && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-blue)', color: '#fff' }}>Ready</span>}
+          <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{ja ? 'AI面接対策' : 'AI Interview Prep'}</span>
+          {data && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-blue)', color: '#fff' }}>{ja ? '生成済み' : 'Ready'}</span>}
         </div>
         {loading ? (
           <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--muted-text)' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -288,14 +294,14 @@ export default function InterviewPrepPanel({
         <div className="px-3 py-3 border-t border-border-gray" style={{ background: 'var(--card-bg)' }}>
           {loading && <Skeleton />}
           {error && <p className="text-[12px] text-error-text">{error}</p>}
-          {data && (isV2Data(data) ? <CompactContent data={data} /> : <LegacyContent data={data} />)}
+          {data && (isV2Data(data) ? <CompactContent data={data} isShuukatsu={ja} /> : <LegacyContent data={data} />)}
         </div>
       )}
     </div>
   );
 
   return (
-    <ProGate isPro={isPro} onUpgrade={onUpgrade} label="AI Interview Prep — Pro">
+    <ProGate isPro={isPro} onUpgrade={onUpgrade} label={ja ? 'AI面接対策 — Pro' : 'AI Interview Prep — Pro'}>
       {content}
     </ProGate>
   );

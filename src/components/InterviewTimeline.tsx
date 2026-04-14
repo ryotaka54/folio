@@ -7,13 +7,15 @@ import { Plus, Trash2, Check, ChevronDown, ChevronUp } from 'lucide-react';
 interface InterviewTimelineProps {
   steps: InterviewStep[];
   onUpdate: (steps: InterviewStep[]) => void;
+  isShuukatsu?: boolean;
 }
 
 function generateId() {
   return Math.random().toString(36).substring(2, 10);
 }
 
-export default function InterviewTimeline({ steps, onUpdate }: InterviewTimelineProps) {
+export default function InterviewTimeline({ steps, onUpdate, isShuukatsu = false }: InterviewTimelineProps) {
+  const ja = isShuukatsu;
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newStepName, setNewStepName] = useState('');
 
@@ -22,7 +24,7 @@ export default function InterviewTimeline({ steps, onUpdate }: InterviewTimeline
   };
 
   const addStep = () => {
-    const name = newStepName.trim() || 'New Round';
+    const name = newStepName.trim() || (ja ? '新しいステップ' : 'New Round');
     const step: InterviewStep = {
       id: generateId(),
       name,
@@ -60,8 +62,8 @@ export default function InterviewTimeline({ steps, onUpdate }: InterviewTimeline
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-text)' }}>
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
-          <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>
-            Interview Progress
+          <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}>
+            {ja ? '選考プロセス' : 'Interview Progress'}
           </h3>
           {steps.length > 0 && (
             <span className="text-[11px] font-medium px-1.5 py-0.5 rounded-full" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}>
@@ -107,7 +109,7 @@ export default function InterviewTimeline({ steps, onUpdate }: InterviewTimeline
                   </span>
                   {step.date && (
                     <span className="text-[10px] flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
-                      {new Date(step.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {new Date(step.date + 'T00:00:00').toLocaleDateString(ja ? 'ja-JP' : 'en-US', ja ? { month: 'numeric', day: 'numeric' } : { month: 'short', day: 'numeric' })}
                     </span>
                   )}
                   <div className="flex items-center gap-0.5 flex-shrink-0">
@@ -129,9 +131,9 @@ export default function InterviewTimeline({ steps, onUpdate }: InterviewTimeline
 
                 {/* Expanded detail */}
                 {expandedId === step.id && (
-                  <div className="mt-2.5 space-y-2 pt-2 border-t border-border-gray" onClick={(e) => e.stopPropagation()}>
+                  <div className="mt-2.5 space-y-2 pt-2 border-t border-border-gray" style={{ fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }} onClick={(e) => e.stopPropagation()}>
                     <div>
-                      <label className="block text-[11px] font-medium mb-0.5" style={{ color: 'var(--muted-text)' }}>Name</label>
+                      <label className="block text-[11px] font-medium mb-0.5" style={{ color: 'var(--muted-text)' }}>{ja ? 'ステップ名' : 'Name'}</label>
                       <input
                         type="text"
                         value={step.name}
@@ -140,7 +142,7 @@ export default function InterviewTimeline({ steps, onUpdate }: InterviewTimeline
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium mb-0.5" style={{ color: 'var(--muted-text)' }}>Date</label>
+                      <label className="block text-[11px] font-medium mb-0.5" style={{ color: 'var(--muted-text)' }}>{ja ? '日付' : 'Date'}</label>
                       <input
                         type="date"
                         value={step.date || ''}
@@ -149,12 +151,12 @@ export default function InterviewTimeline({ steps, onUpdate }: InterviewTimeline
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-medium mb-0.5" style={{ color: 'var(--muted-text)' }}>Notes</label>
+                      <label className="block text-[11px] font-medium mb-0.5" style={{ color: 'var(--muted-text)' }}>{ja ? 'メモ' : 'Notes'}</label>
                       <input
                         type="text"
                         value={step.notes}
                         onChange={(e) => updateStep(step.id, { notes: e.target.value })}
-                        placeholder="e.g. Behavioral + coding, 45 min"
+                        placeholder={ja ? '例：集団面接、45分' : 'e.g. Behavioral + coding, 45 min'}
                         className="w-full px-2 py-1.5 bg-background border border-border-gray rounded text-[13px] focus:outline-none focus:border-accent-blue transition-colors placeholder:text-text-tertiary"
                       />
                     </div>
@@ -173,16 +175,17 @@ export default function InterviewTimeline({ steps, onUpdate }: InterviewTimeline
           value={newStepName}
           onChange={(e) => setNewStepName(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addStep(); } }}
-          placeholder="e.g. Phone Screen, On-site..."
+          placeholder={ja ? '例：一次面接、グループ面接...' : 'e.g. Phone Screen, On-site...'}
           className="flex-1 px-2.5 py-1.5 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue transition-colors placeholder:text-text-tertiary"
+          style={{ fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}
         />
         <button
           onClick={addStep}
           className="flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-medium rounded-md border border-accent-blue/30 hover:bg-accent-blue/10 transition-colors"
-          style={{ color: 'var(--accent-blue)' }}
+          style={{ color: 'var(--accent-blue)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}
         >
           <Plus size={13} />
-          Add
+          {ja ? '追加' : 'Add'}
         </button>
       </div>
     </div>

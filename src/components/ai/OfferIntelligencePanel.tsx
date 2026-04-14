@@ -23,6 +23,7 @@ interface OfferIntelligencePanelProps {
   isPro: boolean;
   cached?: OfferData | null;
   onUpgrade: () => void;
+  isShuukatsu?: boolean;
 }
 
 function Skeleton() {
@@ -53,12 +54,13 @@ function Section({ title, items }: { title: string; items: string[] }) {
 }
 
 export default function OfferIntelligencePanel({
-  userId, applicationId, company, role, category, location, isPro, cached, onUpgrade,
+  userId, applicationId, company, role, category, location, isPro, cached, onUpgrade, isShuukatsu = false,
 }: OfferIntelligencePanelProps) {
   const [expanded, setExpanded] = useState(false);
   const [data, setData] = useState<OfferData | null>(cached ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const ja = isShuukatsu;
 
   const generate = async () => {
     if (data) { setExpanded(v => !v); return; }
@@ -75,7 +77,7 @@ export default function OfferIntelligencePanel({
       if (!res.ok) throw new Error(json.error ?? 'Failed');
       setData(json.result);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Something went wrong');
+      setError(e instanceof Error ? e.message : ja ? 'エラーが発生しました' : 'Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -86,13 +88,13 @@ export default function OfferIntelligencePanel({
       <button
         onClick={generate}
         className="w-full flex items-center justify-between px-3 py-2.5 transition-colors hover:bg-surface-gray/50"
-        style={{ background: 'var(--surface-gray)' }}
+        style={{ background: 'var(--surface-gray)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}
         disabled={loading}
       >
         <div className="flex items-center gap-2">
           <DollarSign size={13} style={{ color: '#10B981' }} />
-          <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>AI Offer Intelligence</span>
-          {data && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#10B981', color: '#fff' }}>Ready</span>}
+          <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{ja ? 'AI内定分析' : 'AI Offer Intelligence'}</span>
+          {data && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#10B981', color: '#fff' }}>{ja ? '生成済み' : 'Ready'}</span>}
         </div>
         {loading ? (
           <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--muted-text)' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -104,7 +106,7 @@ export default function OfferIntelligencePanel({
       </button>
 
       {expanded && (
-        <div className="px-3 py-3 space-y-3 border-t border-border-gray" style={{ background: 'var(--card-bg)' }}>
+        <div className="px-3 py-3 space-y-3 border-t border-border-gray" style={{ background: 'var(--card-bg)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}>
           {loading && <Skeleton />}
           {error && <p className="text-[12px] text-error-text">{error}</p>}
           {data && (
@@ -114,16 +116,16 @@ export default function OfferIntelligencePanel({
                 <span className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{data.salaryRange}</span>
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--muted-text)' }}>Opening Script</p>
+                <p className="text-[11px] font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--muted-text)' }}>{ja ? '交渉の切り出し方' : 'Opening Script'}</p>
                 <p className="text-[12px] leading-relaxed italic px-3 py-2 rounded-md border-l-2" style={{ color: 'var(--brand-navy)', borderColor: 'var(--accent-blue)', background: 'var(--surface-gray)' }}>
                   &ldquo;{data.negotiationScript}&rdquo;
                 </p>
               </div>
-              <Section title="Tactics" items={data.tactics} />
-              {data.redFlags.length > 0 && <Section title="Watch Out For" items={data.redFlags} />}
-              <Section title="Questions to Ask" items={data.questions} />
+              <Section title={ja ? '交渉戦術' : 'Tactics'} items={data.tactics} />
+              {data.redFlags.length > 0 && <Section title={ja ? '注意点' : 'Watch Out For'} items={data.redFlags} />}
+              <Section title={ja ? '確認すべき質問' : 'Questions to Ask'} items={data.questions} />
               <p className="text-[11px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
-                <span className="font-semibold">Verdict:</span> {data.verdict}
+                <span className="font-semibold">{ja ? '総評：' : 'Verdict:'}</span> {data.verdict}
               </p>
             </>
           )}
@@ -133,7 +135,7 @@ export default function OfferIntelligencePanel({
   );
 
   return (
-    <ProGate isPro={isPro} onUpgrade={onUpgrade} label="AI Offer Intelligence — Pro">
+    <ProGate isPro={isPro} onUpgrade={onUpgrade} label={ja ? 'AI内定分析 — Pro' : 'AI Offer Intelligence — Pro'}>
       {content}
     </ProGate>
   );

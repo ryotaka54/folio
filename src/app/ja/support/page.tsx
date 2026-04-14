@@ -190,7 +190,7 @@ export default function JaSupportPage() {
                 height: 48,
                 borderRadius: 10,
                 border: 'none',
-                background: '#0A0A14',
+                background: 'var(--accent-blue)',
                 color: '#ffffff',
                 fontSize: 14,
                 fontWeight: 600,
