@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const COOKIE = 'locale_preference';
 
-// Paths that should never be redirected
+// Paths that should never be redirected (no Japanese equivalents exist)
 const BYPASS = [
   '/api/',
   '/_next/',
@@ -13,12 +13,9 @@ const BYPASS = [
   '/robots',
   '/sitemap',
   '/ingest/',
-  // Auth pages — no Japanese equivalents exist, never redirect these
-  '/login',
-  '/signup',
   '/forgot-password',
   '/reset-password',
-  '/onboarding',
+  '/settings',
 ];
 
 export async function middleware(request: NextRequest) {
