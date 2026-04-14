@@ -7,7 +7,7 @@ import { useTheme } from 'next-themes';
 import { Logo } from '@/components/Logo';
 import { ProLogo } from '@/components/ProLogo';
 import ThemeToggle from '@/components/ThemeToggle';
-import LanguageToggle from '@/components/LanguageToggle';
+import LocaleSwitcher from '@/components/LocaleSwitcher';
 import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
 import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS, AI_FREE_DAILY_LIMIT, AI_PRO_DAILY_LIMIT } from '@/lib/constants';
@@ -546,7 +546,7 @@ function AppearanceSection() {
       </SectionCard>
 
       <SectionCard title="Language" description="Switch between English and Japanese (就活モード).">
-        <LanguageToggle />
+        <LocaleSwitcher />
       </SectionCard>
     </div>
   );

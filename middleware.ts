@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const JA_PATHS = ['/ja'];
-const COOKIE = 'preferred_language';
+const COOKIE = 'locale_preference';
 
 // Paths that should never be redirected
 const BYPASS = [
@@ -16,7 +15,7 @@ const BYPASS = [
   '/ingest/',
 ];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Never touch API routes, static files, etc.
@@ -26,8 +25,9 @@ export function middleware(request: NextRequest) {
 
   const isJaPath = pathname.startsWith('/ja');
 
-  // 1. Explicit cookie preference always wins
+  // ── 1. Explicit cookie preference always wins ─────────────────────────────
   const cookiePref = request.cookies.get(COOKIE)?.value;
+
   if (cookiePref === 'ja' && !isJaPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/ja' + (pathname === '/' ? '' : pathname);
@@ -39,34 +39,73 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 2. No cookie yet — use IP country (Vercel sets x-vercel-ip-country)
-  if (!cookiePref) {
-    const country = request.headers.get('x-vercel-ip-country') ?? '';
-    if (country === 'JP' && !isJaPath) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/ja' + (pathname === '/' ? '' : pathname);
-      const res = NextResponse.redirect(url);
-      // Set cookie so we don't re-detect on every request
-      res.cookies.set(COOKIE, 'ja', {
-        path: '/',
-        maxAge: 60 * 60 * 24 * 365, // 1 year
-        sameSite: 'lax',
-      });
-      return res;
+  // If cookie is already set, respect it and move on
+  if (cookiePref) {
+    return NextResponse.next();
+  }
+
+  // ── 2. Direct navigation to /ja — respect it, set cookie ─────────────────
+  if (isJaPath) {
+    const res = NextResponse.next();
+    res.cookies.set(COOKIE, 'ja', {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    });
+    return res;
+  }
+
+  // ── 3. No cookie, not /ja — detect country via Vercel header or ipapi.co ──
+  const vercelCountry = request.headers.get('x-vercel-ip-country');
+
+  let country: string | null = vercelCountry;
+
+  // Fallback to ipapi.co if Vercel header not present (e.g. local dev)
+  if (!country) {
+    try {
+      const ip =
+        request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+        request.headers.get('x-real-ip') ||
+        '';
+      if (ip && ip !== '::1' && ip !== '127.0.0.1') {
+        const res = await fetch(`https://ipapi.co/${ip}/json/`, {
+          signal: AbortSignal.timeout(2000),
+        });
+        if (res.ok) {
+          const data = await res.json() as { country_code?: string };
+          country = data.country_code ?? null;
+        }
+      }
+    } catch {
+      // ipapi.co failed — default to English, never break the user experience
+      country = null;
     }
   }
 
-  return NextResponse.next();
+  if (country === 'JP') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/ja' + (pathname === '/' ? '' : pathname);
+    const redirectRes = NextResponse.redirect(url);
+    redirectRes.cookies.set(COOKIE, 'ja', {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    });
+    return redirectRes;
+  }
+
+  // Non-JP first visit — set en cookie and serve
+  const res = NextResponse.next();
+  res.cookies.set(COOKIE, 'en', {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: 'lax',
+  });
+  return res;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
-     * - favicon.ico
-     */
     '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

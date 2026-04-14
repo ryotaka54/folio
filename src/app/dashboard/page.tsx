@@ -36,7 +36,6 @@ import WeeklyCoach from '@/components/ai/WeeklyCoach';
 import ProTour from '@/components/ProTour';
 import ReferralWelcomeModal from '@/components/ReferralWelcomeModal';
 import FeedbackPrompt from '@/components/FeedbackPrompt';
-import LanguageToggle from '@/components/LanguageToggle';
 import PipelineInsights from '@/components/PipelineInsights';
 import ImportCSVModal from '@/components/ImportCSVModal';
 import { motion } from 'framer-motion';
@@ -481,7 +480,6 @@ function DashboardContent() {
         </div>
         <div className="flex items-center gap-2">
           {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
-          <LanguageToggle />
           <ThemeToggle />
         </div>
       </div>
@@ -540,7 +538,6 @@ function DashboardContent() {
               </button>
             )}
             {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
-            <LanguageToggle />
             <ThemeToggle />
             <Link
               href="/settings"

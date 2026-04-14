@@ -67,9 +67,9 @@ function CountdownBadge({ deadline }: { deadline: string }) {
   if (!cd) return null;
 
   const colors = {
-    safe:    { bg: '#DCFCE7', text: '#16A34A', border: '#86EFAC' },
-    warning: { bg: '#FEF3C7', text: '#D97706', border: '#FCD34D' },
-    danger:  { bg: '#FEE2E2', text: '#DC2626', border: '#FCA5A5' },
+    safe:    { bg: 'rgba(22,163,74,0.12)',  text: '#16A34A', border: 'rgba(22,163,74,0.3)'  },
+    warning: { bg: 'rgba(217,119,6,0.12)',  text: '#D97706', border: 'rgba(217,119,6,0.3)'  },
+    danger:  { bg: 'rgba(220,38,38,0.12)',  text: '#DC2626', border: 'rgba(220,38,38,0.3)'  },
   }[cd.urgency];
 
   return (

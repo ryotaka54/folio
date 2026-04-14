@@ -63,9 +63,9 @@ export default function SPITracker({ applicationId, initialData, isPro }: Props)
   };
 
   const RESULT_OPTIONS: { label: SPIResult; color: string; bg: string }[] = [
-    { label: '未受験', color: '#94A3B8', bg: '#F1F5F9' },
-    { label: '通過',   color: '#16A34A', bg: '#DCFCE7' },
-    { label: '不通過', color: '#DC2626', bg: '#FEE2E2' },
+    { label: '未受験', color: '#94A3B8', bg: 'rgba(148,163,184,0.15)' },
+    { label: '通過',   color: '#16A34A', bg: 'rgba(22,163,74,0.12)'  },
+    { label: '不通過', color: '#DC2626', bg: 'rgba(220,38,38,0.12)'  },
   ];
 
   if (!isPro) return null;
@@ -113,7 +113,7 @@ export default function SPITracker({ applicationId, initialData, isPro }: Props)
                 fontSize: 10,
                 fontWeight: 600,
                 color: data.result === '通過' ? '#16A34A' : '#DC2626',
-                background: data.result === '通過' ? '#DCFCE7' : '#FEE2E2',
+                background: data.result === '通過' ? 'rgba(22,163,74,0.12)' : 'rgba(220,38,38,0.12)',
                 borderRadius: 9999,
                 padding: '1px 8px',
                 fontFamily: "'Noto Sans JP', sans-serif",

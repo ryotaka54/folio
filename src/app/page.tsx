@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { TrendingUp, Zap, MessageSquare, Clock, Menu, X, GraduationCap, Calendar, CheckCircle, Award } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
-import LanguageToggle from '@/components/LanguageToggle';
+import LocaleSwitcher from '@/components/LocaleSwitcher';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
 import { Logo } from '@/components/Logo';
 import { capture } from '@/lib/analytics';
@@ -213,7 +213,6 @@ function LandingNav() {
               </div>
 
               <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-2 md:w-fit">
-                <LanguageToggle />
                 <ThemeToggle />
                 <Button asChild variant="outline" size="sm">
                   <Link href="/login">Log in</Link>
@@ -817,6 +816,7 @@ export default function Home() {
               <Link href="/privacy" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Privacy</Link>
               <Link href="/terms" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>Terms</Link>
               <span className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>© {new Date().getFullYear()} Applyd</span>
+              <LocaleSwitcher />
             </div>
           </div>
         </footer>
