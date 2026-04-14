@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import ThemeToggle from '@/components/ThemeToggle';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
+import { Logo } from '@/components/Logo';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
@@ -78,21 +79,6 @@ const F = "'Noto Sans JP', sans-serif";
 const G = "var(--font-geist), -apple-system, BlinkMacSystemFont, sans-serif";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Logo mark
-// ─────────────────────────────────────────────────────────────────────────────
-
-function LogoMark({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="7" fill="var(--accent-blue)" />
-      <rect x="7"  y="20" width="4" height="7" rx="1" fill="white" fillOpacity="0.35" />
-      <rect x="14" y="13" width="4" height="14" rx="1" fill="white" fillOpacity="0.65" />
-      <rect x="21" y="7"  width="4" height="20" rx="1" fill="white" />
-    </svg>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // App mockup — uses CSS variables, dark-mode-aware automatically
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -124,7 +110,7 @@ function AppMockup() {
         justifyContent: 'space-between',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <LogoMark size={20} />
+          <Logo size={20} variant="dark" />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.02em' }}>Applyd</span>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -222,7 +208,7 @@ export default function JaLandingPage() {
           height: 58, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <Link href="/ja" style={{ display: 'flex', alignItems: 'center', gap: 9, textDecoration: 'none' }}>
-            <LogoMark size={26} />
+            <Logo size={26} variant="dark" />
             <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--brand-navy)', letterSpacing: '-0.03em', fontFamily: G }}>Applyd</span>
           </Link>
 
@@ -840,7 +826,7 @@ export default function JaLandingPage() {
             {/* Brand */}
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <LogoMark size={22} />
+                <Logo size={22} variant="dark" />
                 <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', fontFamily: G }}>Applyd</span>
               </div>
               <p style={{ fontSize: 12, color: '#475569', letterSpacing: '0.05em', margin: 0, fontFamily: F, lineHeight: 1.8 }}>
