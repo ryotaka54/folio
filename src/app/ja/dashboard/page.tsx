@@ -5,440 +5,123 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { StoreProvider, useStore } from '@/lib/store';
-import { supabase } from '@/lib/supabase';
-import { SHUUKATSU_STAGES, SHUUKATSU_STAGE_COLORS } from '@/lib/constants';
-import { Application, PipelineStage, ShuukatsuStage } from '@/lib/types';
+import { SHUUKATSU_STAGES } from '@/lib/constants';
+import { Application, PipelineStage } from '@/lib/types';
 import { isPro as checkIsPro, FREE_TIER_LIMIT } from '@/lib/pro';
 import { CapExceededError } from '@/lib/store';
-import { getGreetingJa, formatDeadlineJa } from '@/lib/ja-utils';
+import { getGreetingJa } from '@/lib/ja-utils';
 import { Logo } from '@/components/Logo';
 import { ProLogo } from '@/components/ProLogo';
 import { ExtensionStatusProvider } from '@/lib/extension-status-context';
-import AddApplicationModal from '@/components/AddApplicationModal';
+import JaAddApplicationModal from '@/components/ja/AddApplicationModal';
 import ApplicationDrawer from '@/components/ApplicationDrawer';
+import PipelineView from '@/components/PipelineView';
+import TableView from '@/components/TableView';
+import MobileCardList from '@/components/MobileCardList';
 import UpgradeModal from '@/components/UpgradeModal';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import MobileBottomNav from '@/components/MobileBottomNav';
+import { motion } from 'framer-motion';
 
-const SHUUKATSU_STAGE_LIST = SHUUKATSU_STAGES.map(s => s.id) as ShuukatsuStage[];
+const SHUUKATSU_STAGE_LIST = SHUUKATSU_STAGES.map(s => s.id) as PipelineStage[];
 
-// ── Stats bar ─────────────────────────────────────────────────────────────────
+// ── Stats bar (Japanese-aware) ────────────────────────────────────────────────
 
 function JaStatsBar({ apps }: { apps: Application[] }) {
   const total = apps.length;
   const interviews = apps.filter(a =>
     ['一次面接', '二次面接', '最終面接'].includes(a.status)
   ).length;
-  const offers = apps.filter(a => ['内々定', '内定'].includes(a.status)).length;
-  const actNow = apps.filter(a => {
+  const now = new Date();
+  const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const deadlinesSoon = apps.filter(a => {
     if (!a.deadline) return false;
-    const { urgency } = formatDeadlineJa(a.deadline);
-    return urgency === 'danger' || urgency === 'warning';
+    const d = new Date(a.deadline + 'T00:00:00');
+    return d >= now && d <= sevenDays;
   }).length;
 
   const stats = [
-    { label: '合計', value: total },
-    { label: '面接中', value: interviews },
-    { label: '内定', value: offers },
-    { label: '要対応', value: actNow, highlight: actNow > 0 },
+    {
+      label: '合計',
+      value: total.toString(),
+      subtext: total === 0 ? '最初の選考を追加' : '選考中',
+      accent: null as null | 'green' | 'amber',
+    },
+    {
+      label: '応答率',
+      value: total >= 5 ? `${Math.round((interviews / total) * 100)}%` : '—',
+      subtext: total >= 5 ? '面接進捗率' : `あと${Math.max(0, 5 - total)}社で表示`,
+      accent: null,
+    },
+    {
+      label: '面接中',
+      value: interviews.toString(),
+      subtext: interviews > 0 ? 'よい調子です！' : '面接なし',
+      accent: interviews > 0 ? 'green' as const : null,
+    },
+    {
+      label: '期限が近い',
+      value: deadlinesSoon.toString(),
+      subtext: deadlinesSoon > 0 ? '7日以内' : '期限なし',
+      accent: deadlinesSoon > 0 ? 'amber' as const : null,
+    },
   ];
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
-      {stats.map(s => (
-        <div
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+      {stats.map((s, i) => (
+        <motion.div
           key={s.label}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: i * 0.05 }}
+          className="rounded-lg p-3 border"
           style={{
             background: 'var(--card-bg)',
-            border: '1px solid var(--border-gray)',
-            borderRadius: 12,
-            padding: '14px 16px',
+            borderColor: 'var(--border-gray)',
+            borderLeft: s.accent === 'green' ? '3px solid var(--green-success)' : s.accent === 'amber' ? '3px solid var(--amber-warning)' : undefined,
           }}
         >
-          <p style={{
-            fontSize: 22,
-            fontWeight: 700,
-            color: s.highlight ? '#EF4444' : 'var(--brand-navy)',
-            fontFamily: 'var(--font-geist), sans-serif',
-            letterSpacing: '-0.03em',
-            margin: 0,
-          }}>
-            {s.value}
-          </p>
-          <p style={{
-            fontSize: 11,
-            color: 'var(--muted-text)',
-            letterSpacing: '0.05em',
-            margin: '2px 0 0',
-            fontFamily: "'Noto Sans JP', sans-serif",
-          }}>
-            {s.label}
-          </p>
-        </div>
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.05em]" style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>{s.label}</span>
+          </div>
+          <div className="text-[22px] font-semibold leading-none mb-0.5"
+            style={{
+              color: s.accent === 'green' ? 'var(--green-success)' : s.accent === 'amber' ? 'var(--amber-warning)' : 'var(--brand-navy)',
+              letterSpacing: '-0.02em',
+              fontFamily: 'var(--font-geist), sans-serif',
+            }}
+          >{s.value}</div>
+          <p className="text-[10px]" style={{ color: 'var(--text-tertiary)', fontFamily: "'Noto Sans JP', sans-serif" }}>{s.subtext}</p>
+        </motion.div>
       ))}
     </div>
   );
 }
 
-// ── Shuukatsu card ────────────────────────────────────────────────────────────
-
-function JaCard({
-  app,
-  onClick,
-}: {
-  app: Application;
-  onClick: () => void;
-}) {
-  const stageColor = SHUUKATSU_STAGE_COLORS[app.status] ?? '#64748B';
-  const { label: deadlineLabel, urgency } = formatDeadlineJa(app.deadline);
-  const deadlineColor = urgency === 'danger' ? '#EF4444' : urgency === 'warning' ? '#F59E0B' : '#94A3B8';
-
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        width: '100%',
-        textAlign: 'left',
-        background: 'var(--card-bg)',
-        border: '1px solid var(--border-gray)',
-        borderRadius: 12,
-        padding: '14px 16px 14px 20px',
-        borderLeft: `3px solid ${stageColor}`,
-        cursor: 'pointer',
-        marginBottom: 8,
-        transition: 'box-shadow 0.15s',
-        display: 'block',
-      }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = `0 0 0 1px ${stageColor}40, 0 2px 8px rgba(0,0,0,0.06)`; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-    >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{
-            fontSize: 14,
-            fontWeight: 600,
-            color: 'var(--brand-navy)',
-            margin: 0,
-            fontFamily: "'Noto Sans JP', sans-serif",
-            letterSpacing: '0.02em',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}>
-            {app.company}
-          </p>
-          <p style={{
-            fontSize: 12,
-            color: 'var(--muted-text)',
-            margin: '2px 0 0',
-            fontFamily: "'Noto Sans JP', sans-serif",
-            letterSpacing: '0.05em',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}>
-            {app.role}
-          </p>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-          <span style={{
-            fontSize: 10,
-            fontWeight: 500,
-            color: stageColor,
-            background: `${stageColor}18`,
-            border: `1px solid ${stageColor}30`,
-            borderRadius: 9999,
-            padding: '2px 8px',
-            fontFamily: "'Noto Sans JP', sans-serif",
-            letterSpacing: '0.05em',
-            whiteSpace: 'nowrap',
-          }}>
-            {app.status}
-          </span>
-          {deadlineLabel && (
-            <span style={{
-              fontSize: 10,
-              color: deadlineColor,
-              fontFamily: 'var(--font-geist), sans-serif',
-              fontWeight: 500,
-            }}>
-              {deadlineLabel}
-            </span>
-          )}
-        </div>
-      </div>
-    </button>
-  );
-}
-
-// ── Pipeline column ───────────────────────────────────────────────────────────
-
-function StageColumn({
-  stage,
-  apps,
-  onCardClick,
-}: {
-  stage: typeof SHUUKATSU_STAGES[0];
-  apps: Application[];
-  onCardClick: (app: Application) => void;
-}) {
-  return (
-    <div style={{
-      flexShrink: 0,
-      width: 220,
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
-      {/* Column header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        marginBottom: 10,
-        padding: '0 2px',
-      }}>
-        <div style={{
-          width: 8,
-          height: 8,
-          borderRadius: '50%',
-          background: stage.color,
-          flexShrink: 0,
-        }} />
-        <span style={{
-          fontSize: 12,
-          fontWeight: 600,
-          color: 'var(--brand-navy)',
-          letterSpacing: '0.05em',
-          fontFamily: "'Noto Sans JP', sans-serif",
-        }}>
-          {stage.label}
-        </span>
-        {apps.length > 0 && (
-          <span style={{
-            fontSize: 10,
-            color: stage.color,
-            background: `${stage.color}18`,
-            borderRadius: 9999,
-            padding: '1px 6px',
-            fontFamily: 'var(--font-geist), sans-serif',
-            fontWeight: 600,
-            marginLeft: 'auto',
-          }}>
-            {apps.length}
-          </span>
-        )}
-      </div>
-
-      {/* Cards */}
-      <div style={{ flex: 1 }}>
-        {apps.map(app => (
-          <JaCard key={app.id} app={app} onClick={() => onCardClick(app)} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Mobile stage list ─────────────────────────────────────────────────────────
-
-function MobileStageList({
-  apps,
-  onCardClick,
-  onStatusChange,
-}: {
-  apps: Application[];
-  onCardClick: (app: Application) => void;
-  onStatusChange: (id: string, status: PipelineStage) => void;
-}) {
-  const [openStages, setOpenStages] = useState<Set<string>>(new Set(
-    SHUUKATSU_STAGES.filter(s => apps.some(a => a.status === s.id)).map(s => s.id)
-  ));
-  const [pickerApp, setPickerApp] = useState<Application | null>(null);
-
-  const toggle = (id: string) =>
-    setOpenStages(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-
-  return (
-    <div>
-      {SHUUKATSU_STAGES.map(stage => {
-        const stageApps = apps.filter(a => a.status === stage.id);
-        const isOpen = openStages.has(stage.id);
-        return (
-          <div key={stage.id} style={{ marginBottom: 8 }}>
-            <button
-              onClick={() => toggle(stage.id)}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '10px 14px',
-                background: 'var(--surface-gray)',
-                border: '1px solid var(--border-gray)',
-                borderRadius: isOpen ? '10px 10px 0 0' : 10,
-                cursor: 'pointer',
-              }}
-            >
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: stage.color }} />
-              <span style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: 'var(--brand-navy)',
-                letterSpacing: '0.05em',
-                fontFamily: "'Noto Sans JP', sans-serif",
-                flex: 1,
-                textAlign: 'left',
-              }}>
-                {stage.label}
-              </span>
-              <span style={{
-                fontSize: 11,
-                color: stageApps.length > 0 ? stage.color : 'var(--muted-text)',
-                background: stageApps.length > 0 ? `${stage.color}18` : 'transparent',
-                borderRadius: 9999,
-                padding: '1px 7px',
-                fontFamily: 'var(--font-geist), sans-serif',
-                fontWeight: 600,
-              }}>
-                {stageApps.length}
-              </span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-            {isOpen && stageApps.length > 0 && (
-              <div style={{
-                border: '1px solid var(--border-gray)',
-                borderTop: 'none',
-                borderRadius: '0 0 10px 10px',
-                padding: '8px 10px',
-                background: 'var(--card-bg)',
-              }}>
-                {stageApps.map(app => (
-                  <div key={app.id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <JaCard app={app} onClick={() => onCardClick(app)} />
-                    </div>
-                    <button
-                      onClick={() => setPickerApp(app)}
-                      style={{
-                        flexShrink: 0,
-                        height: 36,
-                        padding: '0 10px',
-                        fontSize: 11,
-                        fontFamily: "'Noto Sans JP', sans-serif",
-                        color: 'var(--accent-blue)',
-                        background: 'rgba(37,99,235,0.07)',
-                        border: '1px solid rgba(37,99,235,0.2)',
-                        borderRadius: 8,
-                        cursor: 'pointer',
-                        letterSpacing: '0.05em',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      移動
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
-
-      {/* Stage picker sheet */}
-      {pickerApp && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.4)' }}
-          onClick={() => setPickerApp(null)}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'var(--card-bg)',
-              borderRadius: '20px 20px 0 0',
-              padding: '16px 0 calc(24px + env(safe-area-inset-bottom))',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ width: 32, height: 4, borderRadius: 99, background: 'var(--border-gray)', margin: '0 auto 16px' }} />
-            <p style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--muted-text)',
-              letterSpacing: '0.05em',
-              padding: '0 20px 8px',
-              fontFamily: "'Noto Sans JP', sans-serif",
-            }}>
-              ステージを選択
-            </p>
-            {SHUUKATSU_STAGES.map(s => (
-              <button
-                key={s.id}
-                onClick={() => { onStatusChange(pickerApp.id, s.id as PipelineStage); setPickerApp(null); }}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '14px 20px',
-                  background: pickerApp.status === s.id ? `${s.color}10` : 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  minHeight: 52,
-                }}
-              >
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: s.color }} />
-                <span style={{
-                  fontSize: 14,
-                  fontWeight: pickerApp.status === s.id ? 600 : 400,
-                  color: pickerApp.status === s.id ? s.color : 'var(--brand-navy)',
-                  fontFamily: "'Noto Sans JP', sans-serif",
-                  letterSpacing: '0.05em',
-                }}>
-                  {s.label}
-                </span>
-                {pickerApp.status === s.id && (
-                  <svg style={{ marginLeft: 'auto' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Dashboard inner ───────────────────────────────────────────────────────────
+// ── Dashboard content ─────────────────────────────────────────────────────────
 
 function JaDashboardContent() {
   const { user, signOut } = useAuth();
   const { applications, loading, addApplication, updateApplication, deleteApplication, storeError, clearStoreError, retryLoad } = useStore();
   const router = useRouter();
 
+  const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
+  const [isMobile, setIsMobile] = useState(false);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<PipelineStage | 'all'>('all');
+  const [hideInactive, setHideInactive] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   const userIsPro = checkIsPro(user);
   const greeting = getGreetingJa();
+
+  const INACTIVE_STAGES: string[] = ['承諾'];
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -447,33 +130,52 @@ function JaDashboardContent() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Redirect if not onboarded
   useEffect(() => {
-    if (!loading && user && !user.onboarding_complete) {
-      router.push('/ja/onboarding');
-    }
+    if (!loading && user && !user.onboarding_complete) router.push('/ja/onboarding');
   }, [user, loading, router]);
 
-  // Listen for mobile add event
   useEffect(() => {
     const handler = () => setShowAddModal(true);
     window.addEventListener('applyd:add', handler);
     return () => window.removeEventListener('applyd:add', handler);
   }, []);
 
-  const filteredApps = useMemo(() => {
-    if (!search) return applications;
-    const q = search.toLowerCase();
-    return applications.filter(a =>
-      a.company.toLowerCase().includes(q) || a.role.toLowerCase().includes(q)
-    );
-  }, [applications, search]);
+  // Keyboard shortcut: N to add
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'n' && !e.metaKey && !e.ctrlKey && !(e.target as HTMLElement).matches('input,textarea,select')) {
+        setShowAddModal(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   const showToast = (msg: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast(msg);
     toastTimerRef.current = setTimeout(() => setToast(null), 4000);
   };
+
+  const inactiveCount = applications.filter(a => INACTIVE_STAGES.includes(a.status)).length;
+  const hiddenCount = inactiveCount;
+
+  const displayApplications = useMemo(() => {
+    if (!hideInactive) return applications;
+    return applications.filter(a => !INACTIVE_STAGES.includes(a.status));
+  }, [applications, hideInactive]);
+
+  const filteredApps = useMemo(() => {
+    let apps = displayApplications;
+    if (search) {
+      const q = search.toLowerCase();
+      apps = apps.filter(a => a.company.toLowerCase().includes(q) || a.role.toLowerCase().includes(q));
+    }
+    if (statusFilter !== 'all') {
+      apps = apps.filter(a => a.status === statusFilter);
+    }
+    return apps;
+  }, [displayApplications, search, statusFilter]);
 
   const handleAddSave = async (data: {
     company: string; role: string; location: string; category: string;
@@ -497,6 +199,11 @@ function JaDashboardContent() {
         setShowUpgradeModal(true);
       }
     }
+  };
+
+  const handleCardClick = (app: Application) => {
+    setSelectedApp(app);
+    setShowDrawer(true);
   };
 
   const handleUpdate = async (id: string, updates: Partial<Application>) => {
@@ -532,26 +239,39 @@ function JaDashboardContent() {
         </div>
       )}
 
+      {/* Free-tier nudge */}
+      {!userIsPro && !loading && applications.length >= FREE_TIER_LIMIT - 3 && applications.length < FREE_TIER_LIMIT && (
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-3">
+          <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg" style={{ background: 'rgba(37,99,235,0.07)', border: '1px solid rgba(37,99,235,0.2)' }}>
+            <p className="text-[13px]" style={{ color: 'var(--brand-navy)', fontFamily: "'Noto Sans JP', sans-serif" }}>
+              <span className="font-semibold">上限まで残り{FREE_TIER_LIMIT - applications.length}社</span> — Proにアップグレードして無制限に。
+            </p>
+            <button onClick={() => setShowUpgradeModal(true)} className="text-[12px] font-semibold px-3 py-1 rounded-md text-white flex-shrink-0" style={{ background: 'var(--accent-blue)' }}>
+              アップグレード ⚡
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Mobile top bar */}
-      <div className="lg:hidden flex items-center justify-between px-4 h-14 border-b border-border-gray bg-background sticky top-0 z-30"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div className="lg:hidden flex items-center justify-between px-4 h-14 border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="flex items-center gap-2">
           {userIsPro ? <ProLogo size={26} /> : <Logo size={26} variant="dark" />}
-          <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: 'var(--font-geist)' }}>Applyd</span>
+          <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: 'var(--font-geist), sans-serif' }}>Applyd</span>
+          {userIsPro && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>⚡ Pro</span>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-        </div>
+        <ThemeToggle />
       </div>
 
       {/* Desktop nav */}
-      <nav className="hidden lg:block border-b border-border-gray bg-background sticky top-0 z-30"
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-[52px]">
+      <nav className="hidden lg:block border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
           <div className="flex items-center gap-5">
             <Link href="/ja" className="flex items-center gap-2">
               {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
-              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: 'var(--font-geist)' }}>Applyd</span>
+              <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: 'var(--font-geist), sans-serif' }}>Applyd</span>
             </Link>
             <div className="flex items-center gap-0.5">
               {[
@@ -562,55 +282,49 @@ function JaDashboardContent() {
                 <Link
                   key={href}
                   href={href}
-                  style={{
-                    fontSize: 13,
-                    fontWeight: 500,
-                    padding: '6px 10px',
-                    borderRadius: 8,
-                    color: active ? 'var(--accent-blue)' : 'var(--muted-text)',
-                    background: active ? 'rgba(37,99,235,0.08)' : 'transparent',
-                    letterSpacing: '0.03em',
-                    textDecoration: 'none',
-                    fontFamily: "'Noto Sans JP', sans-serif",
-                  }}
+                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg"
+                  style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}
                 >
-                  {label}
+                  {active && (
+                    <motion.span
+                      layoutId="ja-nav-active"
+                      className="absolute inset-0 rounded-lg"
+                      style={{ background: 'rgba(37,99,235,0.08)' }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
+                    />
+                  )}
+                  <span className="relative">{label}</span>
                 </Link>
               ))}
             </div>
           </div>
           <div className="flex items-center gap-3">
             {user?.name && (
-              <span style={{ fontSize: 13, color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif", letterSpacing: '0.05em' }}>
+              <span className="text-sm hidden md:block" style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>
                 {user.name.split(' ')[0]}さん
               </span>
             )}
-            {!userIsPro && (
+            {userIsPro ? (
+              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff', letterSpacing: '0.02em' }}>
+                ⚡ Pro
+              </span>
+            ) : (
               <button
                 onClick={() => setShowUpgradeModal(true)}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 500,
-                  padding: '4px 12px',
-                  borderRadius: 9999,
-                  border: '1px solid var(--border-gray)',
-                  color: 'var(--muted-text)',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                  fontFamily: "'Noto Sans JP', sans-serif",
-                  letterSpacing: '0.05em',
-                }}
+                className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border transition-colors hover:border-accent-blue hover:text-accent-blue"
+                style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}
               >
                 アップグレード
               </button>
             )}
             <ThemeToggle />
-            <Link href="/settings" style={{ color: 'var(--muted-text)', display: 'flex', alignItems: 'center', padding: 6, borderRadius: 8 }}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <Link href="/settings" className="p-2 rounded-lg border border-transparent text-muted-text hover:text-accent-blue hover:bg-surface-gray transition-all" aria-label="設定">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </Link>
             <button
               onClick={async () => { await signOut(); router.push('/ja'); }}
-              style={{ fontSize: 12, color: 'var(--muted-text)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif", letterSpacing: '0.05em' }}
+              className="text-xs transition-colors"
+              style={{ color: 'var(--muted-text)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif" }}
             >
               ログアウト
             </button>
@@ -618,16 +332,11 @@ function JaDashboardContent() {
         </div>
       </nav>
 
-      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-8">
+      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-6">
+
         {/* Greeting */}
-        <div style={{ marginBottom: 20 }}>
-          <p style={{
-            fontSize: 18,
-            fontWeight: 600,
-            color: 'var(--brand-navy)',
-            letterSpacing: '-0.01em',
-            fontFamily: "'Noto Sans JP', sans-serif",
-          }}>
+        <div className="mb-5">
+          <p className="text-[17px] font-semibold leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: "'Noto Sans JP', sans-serif" }}>
             {greeting}{user?.name ? `、${user.name.split(' ')[0]}さん。` : '。'}
           </p>
         </div>
@@ -635,159 +344,182 @@ function JaDashboardContent() {
         {/* Stats */}
         {applications.length > 0 && <JaStatsBar apps={applications} />}
 
-        {/* Search + Add */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-tertiary)' }}
-              width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="企業名・職種で検索"
-              style={{
-                width: '100%',
-                height: isMobile ? 44 : 38,
-                paddingLeft: 36,
-                paddingRight: 12,
-                background: 'var(--background)',
-                border: '1px solid var(--border-gray)',
-                borderRadius: isMobile ? 12 : 8,
-                fontSize: isMobile ? 16 : 13,
-                color: 'var(--brand-navy)',
-                fontFamily: "'Noto Sans JP', sans-serif",
-                letterSpacing: '0.05em',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
+        {/* Controls */}
+        <div className="mt-2 flex flex-col gap-2">
+          {/* Mobile search */}
+          {isMobile && (
+            <div className="relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="企業名・職種で検索"
+                className="w-full h-11 pl-10 pr-3 bg-background border border-border-gray rounded-xl text-[16px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+              />
+            </div>
+          )}
+
+          {/* Desktop: search + add row */}
+          <div className="hidden lg:flex gap-2">
+            <div className="relative flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="企業名・職種で検索..."
+                className="w-full h-9 pl-9 pr-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              />
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors bg-accent-blue hover:bg-accent-blue-hover"
+              style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              選考を追加
+              <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
+            </button>
           </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="hidden lg:flex"
-            style={{
-              height: 38,
-              padding: '0 16px',
-              background: 'var(--accent-blue)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 500,
-              cursor: 'pointer',
-              fontFamily: "'Noto Sans JP', sans-serif",
-              letterSpacing: '0.05em',
-              alignItems: 'center',
-              gap: 6,
-              flexShrink: 0,
-            }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            選考を追加
-          </button>
+
+          {/* Desktop: view toggle + filter row */}
+          <div className="hidden lg:flex flex-wrap items-center gap-2">
+            <div className="flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
+              <button
+                onClick={() => setView('pipeline')}
+                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >パイプライン</button>
+              <button
+                onClick={() => setView('table')}
+                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'table' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
+                style={{ fontFamily: "'Noto Sans JP', sans-serif" }}
+              >テーブル</button>
+            </div>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value as PipelineStage | 'all')}
+              className="h-8 px-3 bg-background border border-border-gray rounded-md text-[12px] focus:outline-none focus:border-accent-blue transition-colors flex-shrink-0"
+              style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
+              <option value="all">すべてのステージ</option>
+              {SHUUKATSU_STAGE_LIST.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+            <button
+              onClick={() => setHideInactive(h => !h)}
+              className="h-8 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 transition-colors"
+              style={hideInactive
+                ? { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }
+                : { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff', fontFamily: "'Noto Sans JP', sans-serif" }}
+            >
+              {hideInactive ? `${hiddenCount}件を非表示中` : 'すべて表示'}
+            </button>
+          </div>
+
+          {displayApplications.length > 0 && (
+            <p className="text-[11px] text-right" style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-geist), sans-serif' }}>
+              {filteredApps.length === displayApplications.length
+                ? `${displayApplications.length}件`
+                : `${filteredApps.length} / ${displayApplications.length}件を表示中`}
+            </p>
+          )}
         </div>
 
         {/* Content */}
-        {loading ? (
-          <div style={{ display: 'flex', gap: 12, overflowX: 'auto' }}>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} style={{ flexShrink: 0, width: 220, borderRadius: 12, border: '1px solid var(--border-gray)', padding: 12, background: 'var(--card-bg)' }}>
-                <div style={{ height: 12, width: 80, borderRadius: 6, background: 'var(--surface-gray)', marginBottom: 12, animation: 'pulse 1.5s infinite' }} />
-                {[...Array(2)].map((_, j) => (
-                  <div key={j} style={{ height: 64, borderRadius: 8, background: 'var(--surface-gray)', marginBottom: 8, animation: 'pulse 1.5s infinite' }} />
-                ))}
+        <div className="mt-4 flex-1">
+          {loading ? (
+            <div className="flex gap-3 overflow-hidden">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex-1 min-w-[160px] rounded-lg border border-border-gray p-3" style={{ background: 'var(--card-bg)' }}>
+                  <div className="h-3 w-16 rounded mb-3 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+                  {[...Array(i === 1 ? 3 : i === 0 ? 2 : 1)].map((_, j) => (
+                    <div key={j} className="h-16 rounded-md mb-2 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : applications.length === 0 ? (
+            /* Empty state */
+            <div className="py-20 text-center border border-dashed border-border-gray rounded-xl">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(37,99,235,0.08)' }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </div>
-            ))}
-          </div>
-        ) : filteredApps.length === 0 ? (
-          <div style={{
-            textAlign: 'center',
-            padding: '60px 24px',
-            border: '1px dashed var(--border-gray)',
-            borderRadius: 16,
-          }}>
-            <p style={{ fontSize: 20, fontWeight: 700, color: 'var(--brand-navy)', marginBottom: 8, fontFamily: "'Noto Sans JP', sans-serif" }}>
-              まだ選考を追加していません
-            </p>
-            <p style={{ fontSize: 14, color: 'var(--muted-text)', marginBottom: 24, letterSpacing: '0.05em', fontFamily: "'Noto Sans JP', sans-serif" }}>
-              最初の選考を追加して、就活管理を始めましょう
-            </p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              style={{
-                height: 52,
-                padding: '0 32px',
-                background: 'var(--accent-blue)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 9999,
-                fontSize: 15,
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontFamily: "'Noto Sans JP', sans-serif",
-                letterSpacing: '0.05em',
-              }}
-            >
-              最初の選考を追加する
-            </button>
-          </div>
-        ) : isMobile ? (
-          <MobileStageList
-            apps={filteredApps}
-            onCardClick={app => { setSelectedApp(app); setShowDrawer(true); }}
-            onStatusChange={handleStatusChange}
-          />
-        ) : (
-          /* Desktop: horizontal kanban */
-          <div style={{ display: 'flex', gap: 16, overflowX: 'auto', paddingBottom: 16, alignItems: 'flex-start' }}>
-            {SHUUKATSU_STAGES.map(stage => (
-              <StageColumn
-                key={stage.id}
-                stage={stage}
-                apps={filteredApps.filter(a => a.status === stage.id)}
-                onCardClick={app => { setSelectedApp(app); setShowDrawer(true); }}
-              />
-            ))}
-          </div>
-        )}
+              <p className="text-[17px] font-semibold mb-2" style={{ color: 'var(--brand-navy)', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                まだ選考を追加していません
+              </p>
+              <p className="text-[13px] mb-6" style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                最初の選考を追加して、就活管理を始めましょう
+              </p>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[14px] font-medium text-white transition-colors"
+                style={{ background: 'var(--accent-blue)', fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                最初の選考を追加する
+              </button>
+            </div>
+          ) : filteredApps.length === 0 ? (
+            <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">
+              <h3 className="text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)', fontFamily: "'Noto Sans JP', sans-serif" }}>一致なし</h3>
+              <p className="text-[12px] mb-4" style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>フィルターを変えてみてください。</p>
+              <button
+                onClick={() => { setSearch(''); setStatusFilter('all'); setHideInactive(true); }}
+                className="inline-flex items-center h-8 px-3 text-[12px] font-medium rounded-md border border-border-gray transition-colors hover:bg-surface-gray"
+                style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}
+              >
+                フィルターをリセット
+              </button>
+            </div>
+          ) : isMobile ? (
+            <MobileCardList
+              applications={filteredApps}
+              stages={SHUUKATSU_STAGE_LIST}
+              onCardClick={handleCardClick}
+              onStatusChange={(id, status) => handleStatusChange(id, status)}
+            />
+          ) : view === 'pipeline' ? (
+            <PipelineView
+              applications={filteredApps}
+              stages={SHUUKATSU_STAGE_LIST}
+              onCardClick={handleCardClick}
+              onStatusChange={(id, status) => handleStatusChange(id, status)}
+            />
+          ) : (
+            <TableView
+              applications={filteredApps}
+              selectedIds={new Set()}
+              onSelectionChange={() => {}}
+              onRowClick={handleCardClick}
+            />
+          )}
+        </div>
 
         {/* Footer */}
-        <footer style={{
-          marginTop: 60,
-          paddingTop: 24,
-          borderTop: '1px solid var(--border-gray)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 12,
-        }}>
-          <div style={{ display: 'flex', gap: 20 }}>
+        <footer className="mt-16 pt-6 border-t border-border-gray flex justify-between flex-wrap gap-3">
+          <div className="flex gap-5">
             {[
               { href: '/settings', label: '設定' },
-              { href: '/privacy', label: 'プライバシーポリシー' },
-              { href: '/terms', label: '利用規約' },
+              { href: '/ja/privacy', label: 'プライバシー' },
+              { href: '/ja/terms', label: '利用規約' },
             ].map(l => (
-              <Link key={l.href} href={l.href} style={{ fontSize: 12, color: 'var(--muted-text)', textDecoration: 'none', fontFamily: "'Noto Sans JP', sans-serif", letterSpacing: '0.05em' }}>
+              <Link key={l.href} href={l.href} className="text-[12px] transition-colors hover:text-brand-navy" style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>
                 {l.label}
               </Link>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: 'var(--font-geist), sans-serif' }}>
-            © 2026 Applyd
-          </p>
+          <p className="text-[11px]" style={{ color: 'var(--text-tertiary)', fontFamily: 'var(--font-geist), sans-serif' }}>© {new Date().getFullYear()} Applyd</p>
         </footer>
       </main>
 
-      {/* Add Modal — uses English stages but pre-selects エントリー */}
-      <AddApplicationModal
+      {/* Add Modal — Japanese UI */}
+      <JaAddApplicationModal
         open={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSave={handleAddSave}
-        stages={SHUUKATSU_STAGE_LIST as PipelineStage[]}
+        stages={SHUUKATSU_STAGE_LIST}
         userId={user?.id}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
@@ -801,7 +533,7 @@ function JaDashboardContent() {
         onClose={() => { setShowDrawer(false); setSelectedApp(null); }}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
-        stages={SHUUKATSU_STAGE_LIST as PipelineStage[]}
+        stages={SHUUKATSU_STAGE_LIST}
         userId={user?.id}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
@@ -815,7 +547,6 @@ function JaDashboardContent() {
         reason={applications.length >= FREE_TIER_LIMIT ? 'cap' : 'billing'}
       />
 
-      {/* Mobile bottom nav */}
       <MobileBottomNav />
     </div>
   );
@@ -828,7 +559,7 @@ export default function JaDashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) router.push('/login');
+    if (!loading && !user) router.push('/ja/login');
   }, [user, loading, router]);
 
   if (loading || !user) return null;
