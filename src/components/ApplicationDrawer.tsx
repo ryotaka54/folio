@@ -7,6 +7,7 @@ import { ExternalLink, X, Mail } from 'lucide-react';
 import InterviewPrepPanel from '@/components/ai/InterviewPrepPanel';
 import OfferIntelligencePanel from '@/components/ai/OfferIntelligencePanel';
 import FollowUpEmailModal from '@/components/ai/FollowUpEmailModal';
+import MockInterviewModal from '@/components/MockInterviewModal';
 import InterviewTimeline from '@/components/InterviewTimeline';
 import ESManager from '@/components/ja/ESManager';
 import SPITracker from '@/components/ja/SPITracker';
@@ -37,6 +38,7 @@ type SaveStatus = 'idle' | 'saving' | 'saved';
 
 export default function ApplicationDrawer({ application, open, onClose, onUpdate, onDelete, stages, userId, isPro = false, onUpgrade = () => {}, isShuukatsu = false }: ApplicationDrawerProps) {
   const [showFollowUpEmail, setShowFollowUpEmail] = useState(false);
+  const [showMockInterview, setShowMockInterview] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -346,6 +348,21 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                       onUpgrade={onUpgrade}
                     />
                   )}
+                  {/* Mock Interview — always available once there's a company/role */}
+                  <button
+                    onClick={() => setShowMockInterview(true)}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg border border-border-gray text-[13px] font-medium transition-colors hover:bg-surface-gray"
+                    style={{ color: 'var(--brand-navy)', background: 'transparent', cursor: 'pointer' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                      <line x1="12" y1="19" x2="12" y2="22"/>
+                      <line x1="8" y1="22" x2="16" y2="22"/>
+                    </svg>
+                    Practice Mock Interview
+                    <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(37,99,235,0.1)', color: 'var(--accent-blue)' }}>Pro</span>
+                  </button>
                 </div>
               );
             })()}
@@ -363,6 +380,20 @@ export default function ApplicationDrawer({ application, open, onClose, onUpdate
                 isPro={isPro}
                 onUpgrade={onUpgrade}
                 onClose={() => setShowFollowUpEmail(false)}
+              />
+            )}
+
+            {/* Mock Interview Modal */}
+            {showMockInterview && userId && (
+              <MockInterviewModal
+                company={application.company}
+                role={application.role}
+                notes={application.notes || undefined}
+                userId={userId}
+                applicationId={application.id}
+                isPro={isPro}
+                onClose={() => setShowMockInterview(false)}
+                onUpgrade={() => { setShowMockInterview(false); onUpgrade(); }}
               />
             )}
 
