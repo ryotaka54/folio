@@ -13,6 +13,12 @@ const BYPASS = [
   '/robots',
   '/sitemap',
   '/ingest/',
+  // Auth pages — no Japanese equivalents exist, never redirect these
+  '/login',
+  '/signup',
+  '/forgot-password',
+  '/reset-password',
+  '/onboarding',
 ];
 
 export async function middleware(request: NextRequest) {
