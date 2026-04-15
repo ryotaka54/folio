@@ -51,7 +51,7 @@ function MicIcon({ active }: { active: boolean }) {
 
 // Pages where the bottom nav should be visible
 const EN_PATHS = ['/dashboard', '/calendar', '/community', '/settings', '/interview'];
-const JA_PATHS = ['/ja/dashboard', '/ja/calendar', '/ja/settings'];
+const JA_PATHS = ['/ja/dashboard', '/ja/calendar', '/ja/settings', '/ja/interview'];
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -81,6 +81,7 @@ export default function MobileBottomNav() {
     ? [
         { href: '/ja/dashboard', label: 'パイプライン', icon: (active: boolean) => <PipelineIcon active={active} /> },
         { href: '/calendar', label: 'カレンダー', icon: (active: boolean) => <CalendarIcon active={active} /> },
+        { href: '/ja/interview', label: '模擬面接', icon: (active: boolean) => <MicIcon active={active} /> },
       ]
     : [
         { href: '/dashboard', label: 'Pipeline', icon: (active: boolean) => <PipelineIcon active={active} /> },

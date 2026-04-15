@@ -24,6 +24,7 @@ const BYPASS = [
   '/install',
   '/admin',
   '/interview',
+  '/ja/interview',
 ];
 
 export async function middleware(request: NextRequest) {

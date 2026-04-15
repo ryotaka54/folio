@@ -63,12 +63,69 @@ Rules:
 4. If the answer is very short or clearly incomplete, score it 1-2.
 5. For technical questions, evaluate accuracy and depth, not just STAR structure.`;
 
+// ── Japanese system prompts ───────────────────────────────────────────────────
+
+const GENERATE_SYSTEM_JA = `あなたは一流企業のシニア面接官です。指定された企業・職種・求人情報に合わせて、リアルな面接質問を日本語で生成してください。
+マークダウン・バッククォート・コメントは一切使わず、有効なJSONオブジェクトのみで回答してください。
+
+出力形式:
+{
+  "questions": [
+    {
+      "q": "面接で実際に聞く質問文（日本語）",
+      "type": "behavioral" | "technical",
+      "why": "この企業・職種において、この質問で何を評価しているかを一文で（日本語）"
+    }
+  ]
+}
+
+ルール:
+1. 質問はこの企業の実際の選考プロセスを反映した内容にすること。
+2. 行動面接（behavioral）の質問はSTAR形式（状況・課題・行動・結果）で答えやすい具体的な状況設定を含めること。
+3. 技術面接（technical）の質問は求人情報に記載のスキルに基づくこと。
+4. ウォームアップから難問まで段階的に。最後の質問が最も難しいこと。
+5. 質問のテーマが重複しないこと。
+6. すべての文字列は日本語で記述すること。英語を使わないこと。`;
+
+const EVALUATE_SYSTEM_JA = `あなたは候補者の面接回答に対して構造的なフィードバックを行うシニア面接官です。
+マークダウン・バッククォート・コメントは一切使わず、有効なJSONオブジェクトのみで回答してください。
+
+出力形式:
+{
+  "score": <1〜5の整数>,
+  "star": {
+    "situation": { "rating": "strong" | "okay" | "missing", "note": "具体的なフィードバックを一文（日本語）" },
+    "task": { "rating": "strong" | "okay" | "missing", "note": "具体的なフィードバックを一文（日本語）" },
+    "action": { "rating": "strong" | "okay" | "missing", "note": "具体的なフィードバックを一文（日本語）" },
+    "result": { "rating": "strong" | "okay" | "missing", "note": "具体的なフィードバックを一文（日本語）" }
+  },
+  "strengths": ["具体的な強み1（日本語）", "具体的な強み2（日本語）"],
+  "improvements": ["改善すべき点1（日本語）", "改善すべき点2（日本語）"],
+  "overall": "率直で実践的な総合フィードバックを2〜3文（日本語）"
+}
+
+採点基準:
+5 = 非常に優秀 — 具体的・定量的・インパクトあり・完璧なSTAR構成
+4 = 優秀 — 良いストーリー、軽微な欠点（例：結果が定量化されていない）
+3 = 合格 — 質問に答えているが、具体性・深みが不足
+2 = 弱い — 曖昧、STARの重要要素が欠如、または関連性が薄い
+1 = 不合格 — 質問に答えていない、極端に短い、または的外れ
+
+ルール:
+1. 正直かつ率直に。点数を甘くしないこと。
+2. 候補者の実際の言葉を引用してフィードバックすること。
+3. 改善点は具体的かつ実践的であること。一般的なアドバイスは避けること。
+4. 回答が極端に短い・明らかに不完全な場合は1〜2点とすること。
+5. 技術的質問の場合は、STARだけでなく正確性と深みも評価すること。
+6. すべての文字列は日本語で記述すること。英語を使わないこと。`;
+
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { action, userId, company, role, notes } = body;
+    const { action, userId, company, role, notes, lang } = body;
+    const isJa = lang === 'ja';
 
     if (!userId || !company || !role || !action) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -104,7 +161,7 @@ ${notes ? `Job description / notes:\n${notes}` : ''}
 
 Generate exactly ${count} interview questions.`;
 
-      const raw = await callClaude(prompt, GENERATE_SYSTEM);
+      const raw = await callClaude(prompt, isJa ? GENERATE_SYSTEM_JA : GENERATE_SYSTEM);
       const data = JSON.parse(raw);
 
       await recordUsage(userId, 'mock_interview');
@@ -130,7 +187,7 @@ Candidate's answer:
 
 Evaluate this answer.`;
 
-      const raw = await callClaude(prompt, EVALUATE_SYSTEM);
+      const raw = await callClaude(prompt, isJa ? EVALUATE_SYSTEM_JA : EVALUATE_SYSTEM);
       const feedback = JSON.parse(raw);
 
       await recordUsage(userId, 'mock_interview');
