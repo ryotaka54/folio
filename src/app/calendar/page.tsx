@@ -682,7 +682,13 @@ const JA_DAYS = ['日','月','火','水','木','金','土'];
 function CalendarContent() {
   const { user, signOut } = useAuth();
   const userIsPro = isPro(user);
-  const isJa = user?.pipeline_type === 'shuukatsu';
+  const [isJa, setIsJa] = useState(false);
+  useEffect(() => {
+    setIsJa(
+      document.cookie.includes('locale_preference=ja') ||
+      user?.pipeline_type === 'shuukatsu'
+    );
+  }, [user]);
   const { applications, loading, updateApplication, deleteApplication } = useStore();
   const router = useRouter();
 

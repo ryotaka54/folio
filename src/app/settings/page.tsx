@@ -1092,7 +1092,13 @@ const JA_SECTION_LABELS: Record<string, string> = {
 
 function SettingsPageInner() {
   const { user, loading } = useAuth();
-  const isJa = user?.pipeline_type === 'shuukatsu';
+  const [isJa, setIsJa] = useState(false);
+  useEffect(() => {
+    setIsJa(
+      document.cookie.includes('locale_preference=ja') ||
+      user?.pipeline_type === 'shuukatsu'
+    );
+  }, [user]);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [section, setSection] = useState<Section>(() => {
