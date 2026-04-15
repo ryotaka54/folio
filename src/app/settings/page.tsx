@@ -1167,8 +1167,8 @@ function SettingsPageInner() {
             <Logo size={22} variant="dark" />
             <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </Link>
-          <span className="text-[13px]" style={{ color: 'var(--border-gray)' }}>/</span>
-          <span className="text-[13px] font-medium" style={{ color: 'var(--muted-text)' }}>{isJa ? '設定' : 'Settings'}</span>
+          {!isJa && <><span className="text-[13px]" style={{ color: 'var(--border-gray)' }}>/</span>
+          <span className="text-[13px] font-medium" style={{ color: 'var(--muted-text)' }}>Settings</span></>}
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
             <Link href={isJa ? '/ja/dashboard' : '/dashboard'} className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>
