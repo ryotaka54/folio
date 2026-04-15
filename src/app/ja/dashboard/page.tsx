@@ -78,14 +78,14 @@ function JaStatsBar({ apps }: { apps: Application[] }) {
       value: interviews.toString(),
       subtext: interviews === 0 ? '面接なし' : interviews === 1 ? '頑張ってください！' : 'よい調子です！',
       icon: <MessageSquare size={14} />,
-      accent: interviews > 0 ? 'green' as const : null,
+      accent: 'green' as const,
     },
     {
       label: '期限が近い',
       value: deadlinesSoon.toString(),
       subtext: deadlinesSoon === 0 ? '急ぎの期限なし' : `${deadlinesSoon}件・7日以内`,
       icon: <Clock size={14} />,
-      accent: deadlinesSoon > 0 ? 'amber' as const : null,
+      accent: 'amber' as const,
     },
   ];
 
