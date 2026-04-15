@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Download, Copy, Check, RotateCcw, ChevronDown, ChevronUp, LayoutDashboard, Calendar, Mic } from 'lucide-react';
+import { Download, Copy, Check, RotateCcw, ChevronDown, ChevronUp, LayoutDashboard, Calendar, Mic, History as HistoryIcon } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { StoreProvider, useStore } from '@/lib/store';
 import { isPro } from '@/lib/pro';
@@ -20,6 +20,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 type Phase = 'pick' | 'setup' | 'loading' | 'question' | 'evaluating' | 'feedback' | 'complete';
 type QuestionType = 'behavioral' | 'technical' | 'mixed';
 type InputMode = 'text' | 'voice';
+type View = 'session' | 'history';
 
 interface Question { q: string; type: 'behavioral' | 'technical'; why: string; }
 interface StarRating { rating: 'strong' | 'okay' | 'missing'; note: string; }
@@ -31,6 +32,14 @@ interface Feedback {
   overall: string;
 }
 interface TranscriptEntry { question: Question; answer: string; feedback: Feedback; }
+interface Session {
+  id: string;
+  company: string;
+  role: string;
+  questions: Question[];
+  transcript: TranscriptEntry[];
+  completed_at: string;
+}
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -258,6 +267,7 @@ function InterviewContent() {
   const { applications, loading } = useStore();
   const router = useRouter();
 
+  const [view, setView] = useState<View>('session');
   const [phase, setPhase] = useState<Phase>('pick');
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [questionCount, setQuestionCount] = useState(5);
@@ -272,9 +282,22 @@ function InterviewContent() {
   const [copied, setCopied] = useState(false);
   const [search, setSearch] = useState('');
   const [expandedQ, setExpandedQ] = useState<number | null>(null);
+  const [expandedSession, setExpandedSession] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [starCollapsed, setStarCollapsed] = useState(false);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (view !== 'history' || !user || !userIsPro) return;
+    setSessionsLoading(true);
+    fetch(`/api/ai/mock-interview?userId=${user.id}`)
+      .then(r => r.json())
+      .then(d => setSessions(d.sessions ?? []))
+      .catch(() => {})
+      .finally(() => setSessionsLoading(false));
+  }, [view, user, userIsPro]);
 
   const onVoiceTranscript = useCallback((text: string) => setAnswer(text), []);
   const voice = useVoice(onVoiceTranscript);
@@ -433,10 +456,153 @@ function InterviewContent() {
         </div>
       </nav>
 
+      {/* ── View switcher (only shown in pick/history, not mid-session) ─────── */}
+      {(phase === 'pick' || view === 'history') && (
+        <div style={{ maxWidth: 900, margin: '0 auto', padding: '20px 24px 0' }}>
+          <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.05)', borderRadius: 10, padding: 3, gap: 2 }}>
+            {(['session', 'history'] as View[]).map(v => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                style={{
+                  height: 32, padding: '0 16px', borderRadius: 8, border: 'none',
+                  background: view === v ? '#2563EB' : 'transparent',
+                  color: view === v ? '#fff' : 'rgba(255,255,255,0.45)',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                {v === 'session' ? (
+                  <><Mic size={13} /> New Session</>
+                ) : (
+                  <><HistoryIcon size={13} /> History</>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
 
+        {/* ── VIEW: HISTORY ────────────────────────────────────────────────── */}
+        {view === 'history' && (
+          <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px 80px' }}
+          >
+            {sessionsLoading ? (
+              <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
+                Loading sessions…
+              </div>
+            ) : sessions.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 15, marginBottom: 12 }}>No sessions yet.</p>
+                <button
+                  onClick={() => setView('session')}
+                  style={{ color: '#2563EB', fontSize: 13, background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  Start your first mock interview →
+                </button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {sessions.map((s, si) => {
+                  const scores = s.transcript.map(e => e.feedback.score);
+                  const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : 0;
+                  const color = SCORE_COLOR(avgScore);
+                  const isOpen = expandedSession === s.id;
+                  const date = new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                  return (
+                    <motion.div
+                      key={s.id}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: si * 0.05 }}
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, overflow: 'hidden' }}
+                    >
+                      {/* Session row */}
+                      <button
+                        onClick={() => setExpandedSession(isOpen ? null : s.id)}
+                        style={{ width: '100%', padding: '16px 18px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14 }}
+                      >
+                        <CompanyAvatar company={s.company} color={color} size={40} />
+                        <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+                          <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.company}</p>
+                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.role} · {date}</p>
+                        </div>
+
+                        {/* Mini score bar chart */}
+                        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 28, flexShrink: 0 }}>
+                          {scores.map((sc, i) => (
+                            <div key={i} style={{ width: 6, borderRadius: 2, background: SCORE_COLOR(sc), height: (sc / 5) * 28 }} title={`Q${i+1}: ${sc}/5`} />
+                          ))}
+                        </div>
+
+                        {/* Avg score */}
+                        <div style={{ textAlign: 'right', flexShrink: 0, minWidth: 52 }}>
+                          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{avgScore}</span>
+                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Mono', monospace" }}>/5</span>
+                        </div>
+
+                        <span style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+                          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        </span>
+                      </button>
+
+                      {/* Expanded transcript */}
+                      <AnimatePresence>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            style={{ overflow: 'hidden' }}
+                          >
+                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                              {s.transcript.map((e, qi) => (
+                                <div key={qi} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '12px 14px', borderLeft: `3px solid ${SCORE_COLOR(e.feedback.score)}` }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                                    <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', fontFamily: "'DM Mono', monospace" }}>Q{qi+1}</span>
+                                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.question.type}</span>
+                                    <span style={{ marginLeft: 'auto', fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 700, color: SCORE_COLOR(e.feedback.score) }}>{e.feedback.score}/5 — {SCORE_LABEL(e.feedback.score)}</span>
+                                  </div>
+                                  <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: '0 0 6px', lineHeight: 1.5 }}>{e.question.q}</p>
+                                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '0 0 8px', lineHeight: 1.6, fontStyle: 'italic' }}>{e.feedback.overall}</p>
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                                    {e.feedback.strengths.map((str, i) => (
+                                      <span key={i} style={{ fontSize: 11, padding: '3px 9px', borderRadius: 9999, background: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)' }}>{str}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+
+                              {/* Download button */}
+                              <motion.button
+                                onClick={() => downloadTranscript(s.company, s.role, s.transcript)}
+                                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                                style={{
+                                  marginTop: 4, height: 40, borderRadius: 10, background: '#2563EB',
+                                  border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#fff',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                                }}
+                              >
+                                <Download size={14} /> Download Report
+                              </motion.button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        )}
+
         {/* ── PHASE: PICK ──────────────────────────────────────────────────── */}
-        {phase === 'pick' && (
+        {phase === 'pick' && view === 'session' && (
           <motion.div key="pick" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
 
             {/* Hero */}
