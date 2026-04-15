@@ -402,7 +402,6 @@ function InterviewContent() {
             {[
               { href: '/dashboard', label: 'Dashboard' },
               { href: '/calendar', label: 'Calendar' },
-              { href: '/community', label: 'Community' },
               { href: '/interview', label: 'Interview', active: true },
             ].map(l => (
               <Link key={l.href} href={l.href} style={{

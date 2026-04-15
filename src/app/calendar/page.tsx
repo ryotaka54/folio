@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronLeft, ChevronRight, Calendar, Users, Lightbulb,
+  ChevronLeft, ChevronRight, Calendar, Lightbulb,
   X, ExternalLink, CheckCircle,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -851,9 +851,8 @@ function CalendarContent() {
                 <span>{isJa ? 'カレンダー' : 'Calendar'}</span>
               </Link>
               {!isJa && (
-                <Link href="/community" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors" style={{ color: 'var(--muted-text)' }}>
-                  <Users size={13} aria-hidden />
-                  <span className="hidden sm:inline">Community</span>
+                <Link href="/interview" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors" style={{ color: 'var(--muted-text)' }}>
+                  <span>Interview</span>
                 </Link>
               )}
             </div>

@@ -50,7 +50,7 @@ function MicIcon({ active }: { active: boolean }) {
 }
 
 // Pages where the bottom nav should be visible
-const EN_PATHS = ['/dashboard', '/calendar', '/community', '/settings', '/interview'];
+const EN_PATHS = ['/dashboard', '/calendar', '/settings', '/interview'];
 const JA_PATHS = ['/ja/dashboard', '/ja/calendar', '/ja/settings', '/ja/interview'];
 
 export default function MobileBottomNav() {

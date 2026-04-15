@@ -496,7 +496,6 @@ function DashboardContent() {
               {[
                 { href: '/dashboard', label: 'Dashboard', active: true },
                 { href: '/calendar',  label: 'Calendar',  active: false },
-                { href: '/community', label: 'Community', active: false },
                 { href: '/interview', label: 'Interview',  active: false },
               ].map(({ href, label, active }) => (
                 <Link
