@@ -22,48 +22,69 @@ import UpgradeModal from '@/components/UpgradeModal';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import MobileBottomNav from '@/components/MobileBottomNav';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
+import { TrendingUp, Zap, MessageSquare, Clock } from 'lucide-react';
 
 const SHUUKATSU_STAGE_LIST = SHUUKATSU_STAGES.map(s => s.id) as PipelineStage[];
 
 // ── Stats bar (Japanese-aware) ────────────────────────────────────────────────
 
 function JaStatsBar({ apps }: { apps: Application[] }) {
+  const reduce = useReducedMotion();
   const total = apps.length;
-  const interviews = apps.filter(a =>
-    ['一次面接', '二次面接', '最終面接'].includes(a.status)
-  ).length;
+
+  const interviewStages = ['一次面接', '二次面接', '最終面接', 'GD・グループ面接'];
+  const interviews = apps.filter(a => interviewStages.includes(a.status)).length;
+
+  const postEntryApps = apps.filter(a => !['エントリー', '不採用', '辞退', '承諾'].includes(a.status));
+  const responseRate = postEntryApps.length >= 5
+    ? Math.round((interviews / postEntryApps.length) * 100)
+    : null;
+
   const now = new Date();
   const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
   const deadlinesSoon = apps.filter(a => {
     if (!a.deadline) return false;
     const d = new Date(a.deadline + 'T00:00:00');
     return d >= now && d <= sevenDays;
   }).length;
 
+  const thisWeek = apps.filter(a => {
+    if (!a.created_at) return false;
+    return new Date(a.created_at) >= sevenDaysAgo;
+  }).length;
+
   const stats = [
     {
       label: '合計',
       value: total.toString(),
-      subtext: total === 0 ? '最初の選考を追加' : '選考中',
+      subtext: total === 0 ? '最初の選考を追加' : thisWeek > 0 ? `今週+${thisWeek}社` : '選考中',
+      icon: <TrendingUp size={14} />,
       accent: null as null | 'green' | 'amber',
     },
     {
       label: '応答率',
-      value: total >= 5 ? `${Math.round((interviews / total) * 100)}%` : '—',
-      subtext: total >= 5 ? '面接進捗率' : `あと${Math.max(0, 5 - total)}社で表示`,
+      value: responseRate !== null ? `${responseRate}%` : '—',
+      subtext: responseRate === null
+        ? `あと${Math.max(0, 5 - postEntryApps.length)}社で表示`
+        : responseRate >= 30 ? '平均以上です' : '20〜30%が目安',
+      icon: <Zap size={14} />,
       accent: null,
     },
     {
       label: '面接中',
       value: interviews.toString(),
-      subtext: interviews > 0 ? 'よい調子です！' : '面接なし',
+      subtext: interviews === 0 ? '面接なし' : interviews === 1 ? '頑張ってください！' : 'よい調子です！',
+      icon: <MessageSquare size={14} />,
       accent: interviews > 0 ? 'green' as const : null,
     },
     {
       label: '期限が近い',
       value: deadlinesSoon.toString(),
-      subtext: deadlinesSoon > 0 ? '7日以内' : '期限なし',
+      subtext: deadlinesSoon === 0 ? '急ぎの期限なし' : `${deadlinesSoon}件・7日以内`,
+      icon: <Clock size={14} />,
       accent: deadlinesSoon > 0 ? 'amber' as const : null,
     },
   ];
@@ -73,27 +94,28 @@ function JaStatsBar({ apps }: { apps: Application[] }) {
       {stats.map((s, i) => (
         <motion.div
           key={s.label}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: i * 0.05 }}
-          className="rounded-lg p-3 border"
+          className="rounded-lg p-4 border relative overflow-hidden"
           style={{
             background: 'var(--card-bg)',
             borderColor: 'var(--border-gray)',
             borderLeft: s.accent === 'green' ? '3px solid var(--green-success)' : s.accent === 'amber' ? '3px solid var(--amber-warning)' : undefined,
           }}
+          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
+          animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={reduce ? { duration: 0.01 } : { duration: 0.28, delay: i * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.05em]" style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>{s.label}</span>
+            <span style={{ color: 'var(--text-tertiary)' }}>{s.icon}</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.05em]" style={{ color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>{s.label}</span>
           </div>
-          <div className="text-[22px] font-semibold leading-none mb-0.5"
+          <div className="text-[28px] font-semibold leading-none mb-1"
             style={{
               color: s.accent === 'green' ? 'var(--green-success)' : s.accent === 'amber' ? 'var(--amber-warning)' : 'var(--brand-navy)',
               letterSpacing: '-0.02em',
               fontFamily: 'var(--font-geist), sans-serif',
             }}
           >{s.value}</div>
-          <p className="text-[10px]" style={{ color: 'var(--text-tertiary)', fontFamily: "'Noto Sans JP', sans-serif" }}>{s.subtext}</p>
+          <p className="text-[12px]" style={{ color: 'var(--text-tertiary)', fontFamily: "'Noto Sans JP', sans-serif" }}>{s.subtext}</p>
         </motion.div>
       ))}
     </div>

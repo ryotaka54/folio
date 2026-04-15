@@ -1,9 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import ThemeToggle from '@/components/ThemeToggle';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import { Logo } from '@/components/Logo';
+import { useAuth } from '@/lib/auth-context';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data
@@ -192,6 +195,15 @@ function CheckIcon({ blue }: { blue?: boolean }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function JaLandingPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) router.push('/ja/dashboard');
+  }, [user, loading, router]);
+
+  if (loading || user) return <div className="min-h-screen bg-background" />;
+
   return (
     <div style={{ fontFamily: F, background: 'var(--background)', color: 'var(--brand-navy)', overflowX: 'hidden' }}>
 

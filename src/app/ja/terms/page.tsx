@@ -1,139 +1,165 @@
-'use client';
-
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { Logo } from '@/components/Logo';
+
+const F = "'Noto Sans JP', sans-serif";
+const G = "var(--font-geist), -apple-system, sans-serif";
+
+const SECTIONS = [
+  {
+    title: '対象ユーザー',
+    content: [
+      'Applydは就活生のための選考管理サービスです。ご利用いただくことで、13歳以上であること、およびこの利用規約に同意することを確認いただいたものとします。',
+      '18歳未満の方は、保護者または法定代理人の同意を得ていることを確認してください。',
+    ],
+  },
+  {
+    title: 'アカウントについて',
+    items: [
+      'ログイン情報は安全に管理してください。パスワードを他者と共有しないでください。',
+      'アカウントで発生するすべての活動に対して責任を負います。',
+      '不正アクセスが疑われる場合はすぐに support@useapplyd.com までご連絡ください。',
+      '利用規約に違反したアカウントは予告なく停止または削除される場合があります。',
+    ],
+  },
+  {
+    title: 'あなたのデータ',
+    content: [
+      'Applydに登録した選考情報・メモ・採用担当者情報はすべてあなたのものです。私たちはあなたに代わって保管するだけで、第三者に販売することはありません。',
+      '設定からいつでもデータのエクスポートやアカウントの削除が可能です。削除後、30日以内にデータは完全に消去されます。',
+    ],
+  },
+  {
+    title: '禁止事項',
+    intro: '以下の行為を禁じます：',
+    items: [
+      '違法な目的またはいかなる規制にも違反する方法でApplydを使用すること。',
+      'サービスやインフラへの不正アクセスを試みること。',
+      '自動化された手段でデータをスクレイピング・クロールすること。',
+      'サービスの整合性またはパフォーマンスを妨害すること。',
+      '他の個人または法人になりすますこと。',
+      '悪意のあるコードやコンテンツをアップロードすること。',
+    ],
+  },
+  {
+    title: 'Proサブスクリプション',
+    items: [
+      'Applyd Proは月額または年額の有料プランで、無制限の選考管理と追加機能が利用できます。',
+      'サブスクリプションは選択したプランに応じて月次または年次で請求されます。',
+      'いつでもキャンセルできます。キャンセルは現在の請求期間終了時に有効となり、それまではProを引き続き利用できます。',
+      '請求に誤りがあると思われる場合は、請求日から7日以内に support@useapplyd.com までご連絡ください。',
+      'サブスクリプション料金は30日前の通知をもって変更する権利を留保します。',
+    ],
+  },
+  {
+    title: '知的財産権',
+    content: [
+      'Applydおよびそのコンテンツ・機能・デザインは当社が所有しており、知的財産法によって保護されています。',
+      'あなたが作成したコンテンツ（選考データ・メモ・採用担当者情報）の所有権はあなたに帰属します。',
+    ],
+  },
+  {
+    title: '免責事項',
+    content: [
+      'Applydは「現状のまま」「利用可能な状態で」提供され、いかなる保証も行いません。サービスが中断なく動作すること、または提供される情報（就活ベンチマークなど）が正確・完全であることを保証しません。',
+      '当社は、アプリ内に記載されているいかなる企業・求人サイト・大学とも提携・推薦・パートナーシップ関係にありません。',
+    ],
+  },
+  {
+    title: '責任の制限',
+    content: [
+      '適用法が許す最大限の範囲において、Applydはサービスの利用から生じるいかなる間接的・偶発的・特別・結果的損害についても責任を負いません。',
+      'いかなる請求に対しても、当社の総責任は請求の12ヶ月前にあなたが支払った金額を超えないものとします。',
+    ],
+  },
+  {
+    title: '利用規約の変更',
+    content: [
+      '利用規約は随時更新することがあります。変更の際はこのページの日付を更新し、重要な変更の場合はメールまたはアプリ内通知でお知らせします。',
+      '変更後もApplydを引き続きご利用いただくことで、更新された規約に同意したものとみなされます。',
+    ],
+  },
+  {
+    title: 'お問い合わせ',
+    content: ['利用規約に関するご質問は support@useapplyd.com までお送りください。できる限り早くご回答します。'],
+  },
+];
 
 export default function JaTermsPage() {
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'var(--background)',
-        color: 'var(--brand-navy)',
-        fontFamily: "'Noto Sans JP', sans-serif",
-      }}
-    >
-      {/* Nav */}
-      <nav
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
-          borderBottom: '1px solid var(--border-gray)',
-          background: 'var(--background)',
-          padding: '0 24px',
-          height: 56,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Link href="/ja" style={{ fontWeight: 700, fontSize: 16, color: 'var(--brand-navy)', textDecoration: 'none' }}>
-          Applyd
-        </Link>
-        <Link href="/ja" style={{ fontSize: 13, color: 'var(--muted-text)', textDecoration: 'none' }}>
-          ← トップに戻る
-        </Link>
+    <div className="min-h-screen bg-background" style={{ fontFamily: F }}>
+      <nav className="border-b border-border-gray bg-background sticky top-0 z-30">
+        <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-14">
+          <Link href="/ja" className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
+            <Logo size={22} variant="dark" />
+            <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: G }}>Applyd</span>
+          </Link>
+          <Link href="/ja/dashboard" className="inline-flex items-center gap-1.5 text-sm transition-colors hover:opacity-70" style={{ color: 'var(--muted-text)' }}>
+            <ArrowLeft size={15} />
+            ダッシュボードへ
+          </Link>
+        </div>
       </nav>
 
-      {/* Content */}
-      <main style={{ maxWidth: 740, margin: '0 auto', padding: '48px 24px 80px' }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 8, letterSpacing: '0.02em' }}>
-          利用規約
-        </h1>
-        <p style={{ fontSize: 13, color: 'var(--muted-text)', marginBottom: 40 }}>最終更新日: 2025年10月1日</p>
+      <main className="max-w-2xl mx-auto px-6 py-14">
+        <div className="mb-10">
+          <h1 className="text-[22px] font-semibold mb-2" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>利用規約</h1>
+          <p className="text-sm" style={{ color: 'var(--muted-text)' }}>最終更新日：2026年4月7日</p>
+          <p className="mt-4 text-sm leading-relaxed" style={{ color: 'var(--body-text)' }}>
+            これらの規約はApplydのご利用を規定するものです。できる限りわかりやすく記載しました。サービスをご利用いただく前にお読みください。
+          </p>
+        </div>
 
-        <Section title="第1条（適用）">
-          本利用規約（以下「本規約」）は、Applyd（以下「本サービス」）の利用条件を定めるものです。ユーザーは本規約に同意のうえ、本サービスをご利用ください。
-        </Section>
+        <div className="space-y-10">
+          {SECTIONS.map((section, i) => (
+            <section key={i}>
+              <h2 className="text-base font-semibold mb-3 pb-2 border-b border-border-gray" style={{ color: 'var(--brand-navy)' }}>
+                {section.title}
+              </h2>
+              <div className="space-y-3 text-sm leading-relaxed" style={{ color: 'var(--body-text)' }}>
+                {section.intro && <p>{section.intro}</p>}
+                {section.content?.map((para, j) => <p key={j}>{para}</p>)}
+                {section.items && (
+                  <ul className="space-y-2.5">
+                    {section.items.map((item, j) => (
+                      <li key={j} className="flex gap-3">
+                        <span className="mt-0.5 flex-shrink-0" style={{ color: 'var(--accent-blue)' }}>→</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </section>
+          ))}
+        </div>
 
-        <Section title="第2条（アカウント登録）">
-          <ul>
-            <li>本サービスの利用には、アカウント登録が必要です。</li>
-            <li>登録情報は正確かつ最新の状態を保つものとします。</li>
-            <li>アカウントのIDとパスワードの管理はユーザー自身の責任とします。</li>
-            <li>1人のユーザーが複数のアカウントを登録することは禁止します。</li>
-          </ul>
-        </Section>
+        <div className="mt-14 rounded-xl p-6 text-center" style={{ background: 'var(--card-bg)', border: '1px solid var(--border-gray)' }}>
+          <p className="text-sm font-medium mb-1" style={{ color: 'var(--brand-navy)' }}>
+            Applydをご利用いただくことで、これらの利用規約に同意したものとみなされます。
+          </p>
+          <p className="text-[12px] mb-5" style={{ color: 'var(--muted-text)' }}>
+            ご不明な点は{' '}
+            <a href="mailto:support@useapplyd.com" className="underline underline-offset-2 hover:opacity-80 transition-opacity">
+              support@useapplyd.com
+            </a>
+            {' '}まで。
+          </p>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <Link href="/ja/signup" className="inline-flex items-center h-9 px-5 rounded-lg text-[13px] font-semibold text-white transition-colors" style={{ background: 'var(--accent-blue)' }}>
+              同意してアカウントを作成
+            </Link>
+            <Link href="/ja" className="inline-flex items-center h-9 px-5 rounded-lg text-[13px] font-medium border transition-colors hover:bg-surface-gray" style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}>
+              同意しない・戻る
+            </Link>
+          </div>
+        </div>
 
-        <Section title="第3条（禁止事項）">
-          ユーザーは以下の行為を行ってはなりません。
-          <ul>
-            <li>法令または公序良俗に違反する行為</li>
-            <li>本サービスの運営を妨害する行為</li>
-            <li>他のユーザーに迷惑をかける行為</li>
-            <li>本サービスを不正な目的で利用する行為</li>
-            <li>本サービスのリバースエンジニアリング、改ざん</li>
-            <li>不正アクセスまたはそれに類する行為</li>
-          </ul>
-        </Section>
-
-        <Section title="第4条（有料プラン）">
-          <ul>
-            <li>一部の機能は有料プラン（Pro）への加入が必要です。</li>
-            <li>料金はStripeを通じて決済されます。</li>
-            <li>月額プランは月次で自動更新されます。</li>
-            <li>解約はいつでも可能で、解約後は次の更新日まで利用できます。</li>
-            <li>返金は原則として行いませんが、個別のケースについてはサポートまでお問い合わせください。</li>
-          </ul>
-        </Section>
-
-        <Section title="第5条（知的財産権）">
-          本サービスに関するすべての知的財産権は、本サービス運営者に帰属します。ユーザーが入力したデータの権利はユーザーに帰属します。
-        </Section>
-
-        <Section title="第6条（免責事項）">
-          <ul>
-            <li>本サービスは「現状のまま」提供されます。特定目的への適合性を保証しません。</li>
-            <li>本サービスの利用によって生じた損害について、運営者は責任を負いません。</li>
-            <li>本サービスは予告なくメンテナンス・変更・終了する場合があります。</li>
-          </ul>
-        </Section>
-
-        <Section title="第7条（サービスの変更・終了）">
-          本サービスの内容を変更または終了する場合、ユーザーに事前に通知するよう努めます。ただし、緊急の場合はこの限りではありません。
-        </Section>
-
-        <Section title="第8条（規約の変更）">
-          本規約は必要に応じて変更する場合があります。変更後の規約は本サービス上に掲載した時点から効力を生じます。
-        </Section>
-
-        <Section title="第9条（準拠法・管轄）">
-          本規約の解釈は日本法に準拠します。本サービスに関する紛争については、東京地方裁判所を第一審の専属管轄裁判所とします。
-        </Section>
-
-        <Section title="第10条（お問い合わせ）">
-          本規約に関するお問い合わせは、<Link href="/ja/support" style={{ color: 'var(--brand-navy)' }}>サポートページ</Link>よりご連絡ください。
-        </Section>
+        <div className="mt-10 pt-6 border-t border-border-gray flex items-center justify-between flex-wrap gap-3">
+          <Link href="/ja/privacy" className="text-[12px] transition-colors hover:opacity-70" style={{ color: 'var(--muted-text)' }}>プライバシーポリシー</Link>
+          <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>© 2026 Applyd</p>
+        </div>
       </main>
     </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section style={{ marginBottom: 36 }}>
-      <h2
-        style={{
-          fontSize: 16,
-          fontWeight: 700,
-          marginBottom: 12,
-          paddingBottom: 8,
-          borderBottom: '1px solid var(--border-gray)',
-          letterSpacing: '0.03em',
-        }}
-      >
-        {title}
-      </h2>
-      <div
-        style={{
-          fontSize: 14,
-          lineHeight: 1.9,
-          color: 'var(--brand-navy)',
-          opacity: 0.85,
-        }}
-      >
-        {children}
-      </div>
-    </section>
   );
 }

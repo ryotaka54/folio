@@ -20,8 +20,6 @@ const BYPASS = [
   '/community',
   '/help',
   '/contact',
-  '/privacy',
-  '/terms',
   '/demo',
   '/install',
   '/admin',

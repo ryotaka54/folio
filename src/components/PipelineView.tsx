@@ -111,9 +111,10 @@ function ColumnContent({
 
   if (apps.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-8 pointer-events-none gap-1">
-        <div className="w-4 h-4 rounded border-2 border-dashed" style={{ borderColor: 'var(--border-gray)' }} />
-        <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>Drop here</span>
+      <div className="flex flex-col items-center justify-center py-10 pointer-events-none">
+        <div className="w-8 h-8 rounded-lg border border-dashed flex items-center justify-center" style={{ borderColor: 'var(--border-gray)' }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)', opacity: 0.5 }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
       </div>
     );
   }
