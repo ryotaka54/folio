@@ -23,6 +23,7 @@ const BYPASS = [
   '/demo',
   '/install',
   '/admin',
+  '/interview',
 ];
 
 export async function middleware(request: NextRequest) {
@@ -30,6 +31,13 @@ export async function middleware(request: NextRequest) {
 
   // Never touch API routes, static files, etc.
   if (BYPASS.some(p => pathname.startsWith(p))) {
+    // Still stamp an 'en' cookie if no preference has been set yet,
+    // so English-first users are never later redirected to /ja
+    if (!request.cookies.get(COOKIE)?.value && !pathname.startsWith('/ja')) {
+      const res = NextResponse.next();
+      res.cookies.set(COOKIE, 'en', { path: '/', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' });
+      return res;
+    }
     return NextResponse.next();
   }
 

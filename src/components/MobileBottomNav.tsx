@@ -37,8 +37,20 @@ function ProfileIcon({ active }: { active: boolean }) {
   );
 }
 
+function MicIcon({ active }: { active: boolean }) {
+  const c = active ? 'var(--accent-blue)' : 'var(--text-tertiary)';
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={active ? 2.2 : 1.8} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="2" width="6" height="12" rx="3" />
+      <path d="M5 10a7 7 0 0 0 14 0" />
+      <line x1="12" y1="19" x2="12" y2="22" />
+      <line x1="9" y1="22" x2="15" y2="22" />
+    </svg>
+  );
+}
+
 // Pages where the bottom nav should be visible
-const EN_PATHS = ['/dashboard', '/calendar', '/community', '/settings'];
+const EN_PATHS = ['/dashboard', '/calendar', '/community', '/settings', '/interview'];
 const JA_PATHS = ['/ja/dashboard', '/ja/calendar', '/ja/settings'];
 
 export default function MobileBottomNav() {
@@ -73,6 +85,7 @@ export default function MobileBottomNav() {
     : [
         { href: '/dashboard', label: 'Pipeline', icon: (active: boolean) => <PipelineIcon active={active} /> },
         { href: '/calendar', label: 'Calendar', icon: (active: boolean) => <CalendarIcon active={active} /> },
+        { href: '/interview', label: 'Interview', icon: (active: boolean) => <MicIcon active={active} /> },
       ];
 
   const addLabel = isJa ? '追加' : 'Add';
