@@ -71,8 +71,11 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
           {stage}
         </span>
         <span
-          className="ml-auto text-[11px] font-medium px-1.5 py-0.5 rounded-full"
-          style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}
+          className="ml-auto text-[11px] font-semibold tabular-nums px-1.5 py-0.5 rounded-full"
+          style={{
+            background: count > 0 ? `${color}18` : 'var(--surface-gray)',
+            color: count > 0 ? color : 'var(--muted-text)',
+          }}
         >
           {count}
         </span>
@@ -80,10 +83,11 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
 
       <div
         ref={setNodeRef}
-        className={`flex-1 space-y-1.5 overflow-y-auto pipeline-column rounded-lg p-1.5 transition-colors ${isRejected ? 'opacity-50' : ''}`}
+        className={`flex-1 space-y-1.5 overflow-y-auto pipeline-column rounded-lg p-1.5 transition-all ${isRejected ? 'opacity-40' : ''}`}
         style={{
-          background: isOver ? `${color}08` : 'var(--card-bg)',
-          border: isOver ? `1px solid ${color}40` : '1px solid var(--border-gray)',
+          background: isOver ? `${color}0D` : 'var(--card-bg)',
+          border: isOver ? `1px solid ${color}50` : '1px solid var(--border-gray)',
+          borderTop: isOver ? `2px solid ${color}` : `2px solid ${color}60`,
           minHeight: 120,
         }}
       >

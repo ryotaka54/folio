@@ -42,6 +42,7 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const STAGE_COLORS: Record<string, string> = {
+  // English stages
   'Wishlist': '#8B5CF6',
   'Applied': '#2563EB',
   'OA / Online Assessment': '#06B6D4',
@@ -55,6 +56,19 @@ export const STAGE_COLORS: Record<string, string> = {
   'Offer — Negotiating': '#1D9E75',
   'Accepted': '#059669',
   'Declined': '#9CA3AF',
+  // Japanese shuukatsu stages
+  'エントリー': '#64748B',
+  '説明会':     '#0EA5E9',
+  'ES提出':     '#8B5CF6',
+  'SPI':        '#F59E0B',
+  '一次面接':   '#3B82F6',
+  '二次面接':   '#6366F1',
+  '最終面接':   '#EC4899',
+  '内々定':     '#10B981',
+  '内定':       '#22C55E',
+  '承諾':       '#94A3B8',
+  '不採用':     '#9CA3AF',
+  '辞退':       '#9CA3AF',
 };
 
 export const SCHOOL_YEARS = ['High school', 'Freshman', 'Sophomore', 'Junior', 'Senior', 'Graduate'];
