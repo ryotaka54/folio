@@ -684,9 +684,10 @@ function CalendarContent() {
   const userIsPro = isPro(user);
   const [isJa, setIsJa] = useState(false);
   useEffect(() => {
+    const cookiePref = document.cookie.match(/locale_preference=([^;]+)/)?.[1];
     setIsJa(
-      document.cookie.includes('locale_preference=ja') ||
-      user?.pipeline_type === 'shuukatsu'
+      cookiePref === 'ja' ||
+      (cookiePref === undefined && user?.pipeline_type === 'shuukatsu')
     );
   }, [user]);
   const { applications, loading, updateApplication, deleteApplication } = useStore();

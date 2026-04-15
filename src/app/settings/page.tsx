@@ -1094,9 +1094,10 @@ function SettingsPageInner() {
   const { user, loading } = useAuth();
   const [isJa, setIsJa] = useState(false);
   useEffect(() => {
+    const cookiePref = document.cookie.match(/locale_preference=([^;]+)/)?.[1];
     setIsJa(
-      document.cookie.includes('locale_preference=ja') ||
-      user?.pipeline_type === 'shuukatsu'
+      cookiePref === 'ja' ||
+      (cookiePref === undefined && user?.pipeline_type === 'shuukatsu')
     );
   }, [user]);
   const router = useRouter();
