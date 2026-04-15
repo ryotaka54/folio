@@ -39,6 +39,7 @@ import FeedbackPrompt from '@/components/FeedbackPrompt';
 import PipelineInsights from '@/components/PipelineInsights';
 import ImportCSVModal from '@/components/ImportCSVModal';
 import { motion } from 'framer-motion';
+import { LayoutDashboard, Calendar, Mic } from 'lucide-react';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
@@ -494,14 +495,14 @@ function DashboardContent() {
             </Link>
             <div className="flex items-center gap-0.5">
               {[
-                { href: '/dashboard', label: 'Dashboard', active: true },
-                { href: '/calendar',  label: 'Calendar',  active: false },
-                { href: '/interview', label: 'Interview',  active: false },
-              ].map(({ href, label, active }) => (
+                { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={13} aria-hidden />, active: true },
+                { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden />, active: false },
+                { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden />, active: false },
+              ].map(({ href, label, icon, active }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg"
+                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
                   style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)' }}
                 >
                   {active && (
@@ -512,6 +513,7 @@ function DashboardContent() {
                       transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
                     />
                   )}
+                  <span className="relative">{icon}</span>
                   <span className="relative">{label}</span>
                 </Link>
               ))}

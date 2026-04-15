@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Download, Copy, Check, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+import { Download, Copy, Check, RotateCcw, ChevronDown, ChevronUp, LayoutDashboard, Calendar, Mic } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { StoreProvider, useStore } from '@/lib/store';
 import { isPro } from '@/lib/pro';
@@ -387,38 +387,45 @@ function InterviewContent() {
     <div style={{ minHeight: '100vh', background: '#080C14', color: '#fff' }}>
 
       {/* ── Nav ─────────────────────────────────────────────────────────────── */}
-      <nav style={{
-        position: 'sticky', top: 0, zIndex: 30,
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        background: 'rgba(8,12,20,0.92)', backdropFilter: 'blur(12px)',
-        paddingTop: 'env(safe-area-inset-top)',
-      }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 52, display: 'flex', alignItems: 'center', gap: 20 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-            {userIsPro ? <ProLogo size={26} /> : <Logo size={26} variant="mono" />}
-            <span style={{ fontSize: 15, fontWeight: 600, color: '#fff', letterSpacing: '-0.02em' }}>Applyd</span>
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            {[
-              { href: '/dashboard', label: 'Dashboard' },
-              { href: '/calendar', label: 'Calendar' },
-              { href: '/interview', label: 'Interview', active: true },
-            ].map(l => (
-              <Link key={l.href} href={l.href} style={{
-                fontSize: 13, fontWeight: 500, padding: '6px 10px', borderRadius: 8,
-                color: l.active ? '#fff' : 'rgba(255,255,255,0.45)',
-                background: l.active ? 'rgba(37,99,235,0.18)' : 'transparent',
-                textDecoration: 'none', transition: 'all 0.15s',
-              }}>
-                {l.label}
-              </Link>
-            ))}
+      <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
+          <div className="flex items-center gap-5">
+            <Link href="/" className="flex items-center gap-2">
+              {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
+              <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+            </Link>
+            <div className="flex items-center gap-0.5">
+              {[
+                { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={13} aria-hidden /> },
+                { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden /> },
+                { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden />, active: true },
+              ].map(({ href, label, icon, active }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
+                  style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)' }}
+                >
+                  {active && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-0 rounded-lg"
+                      style={{ background: 'rgba(37,99,235,0.08)' }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
+                    />
+                  )}
+                  <span className="relative">{icon}</span>
+                  <span className="relative">{label}</span>
+                </Link>
+              ))}
+            </div>
           </div>
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="flex items-center gap-3">
             <ThemeToggle />
             <button
               onClick={async () => { await signOut(); router.push('/'); }}
-              style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}
+              className="text-[12px] transition-colors"
+              style={{ color: 'var(--muted-text)', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               Log out
             </button>

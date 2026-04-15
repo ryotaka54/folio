@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft, ChevronRight, Calendar, Lightbulb,
-  X, ExternalLink, CheckCircle,
+  X, ExternalLink, CheckCircle, LayoutDashboard, Mic,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
@@ -843,18 +843,29 @@ function CalendarContent() {
               <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
             <div className="flex items-center gap-0.5">
-              <Link href={isJa ? '/ja/dashboard' : '/dashboard'} className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors" style={{ color: 'var(--muted-text)' }}>
-                {isJa ? 'ダッシュボード' : 'Dashboard'}
-              </Link>
-              <Link href="/calendar" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5" style={{ color: 'var(--accent-blue)', background: 'rgba(37,99,235,0.08)' }}>
-                <Calendar size={13} aria-hidden />
-                <span>{isJa ? 'カレンダー' : 'Calendar'}</span>
-              </Link>
-              {!isJa && (
-                <Link href="/interview" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors" style={{ color: 'var(--muted-text)' }}>
-                  <span>Interview</span>
+              {[
+                { href: isJa ? '/ja/dashboard' : '/dashboard', label: isJa ? 'ダッシュボード' : 'Dashboard', icon: <LayoutDashboard size={13} aria-hidden />, active: false },
+                { href: '/calendar', label: isJa ? 'カレンダー' : 'Calendar', icon: <Calendar size={13} aria-hidden />, active: true },
+                ...(!isJa ? [{ href: '/interview', label: 'Interview', icon: <Mic size={13} aria-hidden />, active: false }] : []),
+              ].map(({ href, label, icon, active }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
+                  style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)' }}
+                >
+                  {active && (
+                    <motion.span
+                      layoutId="nav-active"
+                      className="absolute inset-0 rounded-lg"
+                      style={{ background: 'rgba(37,99,235,0.08)' }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
+                    />
+                  )}
+                  <span className="relative">{icon}</span>
+                  <span className="relative">{label}</span>
                 </Link>
-              )}
+              ))}
             </div>
           </div>
           <div className="flex items-center gap-2">
