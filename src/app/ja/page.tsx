@@ -34,18 +34,25 @@ const FEATURES = [
   },
   {
     n: '二',
+    title: 'AIと本番さながらの模擬面接。',
+    body: '企業名と職種を入力するだけで、その企業に特化した質問をAIが生成。テキストでも音声でも答えられ、STAR法でスコアリング。前日の深夜でも、面接本番と同じ緊張感で練習できる。',
+    tag: 'AI模擬面接',
+    isNew: true,
+  },
+  {
+    n: '三',
     title: 'AIが、面接の準備を一瞬で。',
     body: '企業名と職種を入れるだけでその企業に特化した頻出質問と対策をAIが自動生成。前日の深夜でも即座に準備できる。',
     tag: 'AI面接対策',
   },
   {
-    n: '三',
+    n: '四',
     title: 'ESを書いたら、ここに保存。',
     body: '志望動機・自己PR・ガクチカを企業ごとに保存。文字数カウント付きで提出前の最終確認もスムーズに。',
     tag: 'ES管理',
   },
   {
-    n: '四',
+    n: '五',
     title: '締め切りを、絶対に見逃さない。',
     body: '説明会・ES・面接のすべての期限を自動でトラッキング。あと何日かが色で一目でわかる。カレンダーとも連携。',
     tag: '締め切り管理',
@@ -270,9 +277,15 @@ export default function JaLandingPage() {
           {/* Left — text */}
           <div>
             {/* Eyebrow */}
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 14px', borderRadius: 9999, border: '1px solid rgba(37,99,235,0.25)', background: 'rgba(37,99,235,0.06)', marginBottom: 28 }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--accent-blue)', fontFamily: F }}>就活生のための無料ツール</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28, flexWrap: 'wrap' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 14px', borderRadius: 9999, border: '1px solid rgba(37,99,235,0.25)', background: 'rgba(37,99,235,0.06)' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--accent-blue)', fontFamily: F }}>就活生のための無料ツール</span>
+              </div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 9999, border: '1px solid rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.08)' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#10B981', fontFamily: F }}>NEW · AI模擬面接</span>
+              </div>
             </div>
 
             <h1 style={{
@@ -284,14 +297,14 @@ export default function JaLandingPage() {
               margin: '0 0 24px',
               fontFamily: F,
             }}>
-              就活を、<br />
-              もっと<span style={{
+              面接を練習して、<br />
+              内定を<span style={{
                 color: 'var(--accent-blue)',
                 textDecoration: 'underline',
                 textDecorationColor: 'var(--accent-blue)',
                 textDecorationThickness: '3px',
                 textUnderlineOffset: '6px',
-              }}>シンプル</span>に。
+              }}>勝ち取ろう。</span>
             </h1>
 
             <p style={{
@@ -300,7 +313,7 @@ export default function JaLandingPage() {
               margin: '0 0 36px', fontFamily: F,
             }}>
               エントリーから内定まですべての選考を一元管理。
-              AIが面接対策と選考対策を自動でサポートします。
+              AI模擬面接でSTAR法フィードバックを受け、面接本番に備える。
             </p>
 
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 20 }}>
@@ -398,11 +411,19 @@ export default function JaLandingPage() {
               borderTop: '1px solid var(--border-gray)',
             }}>
               <div style={{ order: i % 2 === 0 ? 0 : 1 }}>
-                <div style={{ marginBottom: 16 }}>
+                <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span style={{
                     fontSize: 11, fontWeight: 600, letterSpacing: '0.14em',
                     color: 'var(--text-tertiary)', fontFamily: F, textTransform: 'uppercase',
                   }}>{f.tag}</span>
+                  {f.isNew && (
+                    <span style={{
+                      fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
+                      color: '#10B981', background: 'rgba(16,185,129,0.12)',
+                      border: '1px solid rgba(16,185,129,0.25)',
+                      borderRadius: 9999, padding: '2px 8px', fontFamily: F,
+                    }}>NEW</span>
+                  )}
                 </div>
                 <p style={{
                   fontSize: 'clamp(22px, 2.8vw, 30px)', fontWeight: 700,
@@ -445,6 +466,36 @@ export default function JaLandingPage() {
                     </div>
                   )}
                   {i === 1 && (
+                    <div style={{ width: '100%', maxWidth: 300, background: '#080C14', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563EB' }} />
+                        <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', fontFamily: F, letterSpacing: '0.08em' }}>AI 模擬面接 · 質問 2 / 5</span>
+                      </div>
+                      <div style={{ padding: '12px 14px' }}>
+                        <div style={{ background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 8, padding: '10px 12px', marginBottom: 10, borderLeft: '2px solid #2563EB' }}>
+                          <p style={{ fontSize: 11, color: '#fff', margin: 0, fontFamily: F, letterSpacing: '0.04em', lineHeight: 1.7 }}>
+                            困難なプロジェクトでチームをまとめた経験を教えてください。
+                          </p>
+                        </div>
+                        {[
+                          { label: 'Situation', rating: 'strong', note: '状況説明が明確' },
+                          { label: 'Task',      rating: 'okay',   note: '役割をもう少し明確に' },
+                          { label: 'Action',    rating: 'strong', note: '行動の詳細が良い' },
+                          { label: 'Result',    rating: 'missing', note: '数値で示してください' },
+                        ].map(s => (
+                          <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                            <span style={{
+                              fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
+                              color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444',
+                              background: s.rating === 'strong' ? 'rgba(16,185,129,0.15)' : s.rating === 'okay' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.12)',
+                            }}>{s.label}</span>
+                            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', fontFamily: F, letterSpacing: '0.04em' }}>{s.note}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {i === 2 && (
                     <div style={{ width: '100%', maxWidth: 280 }}>
                       <div style={{ height: 10, borderRadius: 4, background: 'rgba(37,99,235,0.2)', marginBottom: 10, width: '60%' }} />
                       {['よくある質問①：入社後のキャリアパスは？','よくある質問②：チームの雰囲気は？','よくある質問③：残業について教えてください'].map((q, j) => (
@@ -457,7 +508,7 @@ export default function JaLandingPage() {
                       ))}
                     </div>
                   )}
-                  {i === 2 && (
+                  {i === 3 && (
                     <div style={{ width: '100%', maxWidth: 280 }}>
                       {['志望動機','自己PR','ガクチカ'].map((label, j) => (
                         <div key={j} style={{ marginBottom: 10 }}>
@@ -475,7 +526,7 @@ export default function JaLandingPage() {
                       ))}
                     </div>
                   )}
-                  {i === 3 && (
+                  {i === 4 && (
                     <div style={{ width: '100%', maxWidth: 280 }}>
                       {[
                         { label: 'Mercari ES締め切り', days: 2, color: '#EF4444' },

@@ -340,7 +340,7 @@ export default function Home() {
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-6"
                 style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                Free for students · AI that knows where you are in the process
+                Free for students · Pipeline + AI Mock Interviews in one place
               </div>
 
               {/* Headline */}
@@ -353,7 +353,7 @@ export default function Home() {
                   fontWeight: 700,
                 }}
               >
-                Stop managing your job search{' '}
+                Track every application.{' '}
                 <span
                   style={{
                     textDecoration: 'underline',
@@ -364,7 +364,7 @@ export default function Home() {
                     color: 'var(--brand-navy)',
                   }}
                 >
-                  on a spreadsheet.
+                  Ace every interview.
                 </span>
               </h1>
 
@@ -373,7 +373,7 @@ export default function Home() {
                 className="mt-5 max-w-[480px] text-[17px] text-center md:text-left"
                 style={{ color: 'var(--muted-text)', lineHeight: 1.65 }}
               >
-                Applyd is a kanban board built for recruiting — deadline alerts, AI interview prep, follow-up emails, offer negotiation — all in one place. Free to start.
+                Applyd is the recruiting OS built for students — kanban pipeline, deadline alerts, and a full AI mock interview room with STAR feedback. Free to start.
               </p>
 
               {/* CTAs */}
@@ -528,6 +528,142 @@ export default function Home() {
         {/* ── Universities ── */}
         <UniversitiesSection />
 
+        {/* ── Mock Interview — HERO FEATURE ── */}
+        <section style={{ background: '#080C14', padding: '96px 0 0', overflow: 'hidden' }}>
+          <div className="max-w-6xl mx-auto px-6">
+            {/* Section label */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] font-semibold mb-5"
+                style={{ background: 'rgba(37,99,235,0.15)', borderColor: 'rgba(37,99,235,0.35)', color: '#60A5FA', letterSpacing: '0.08em' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                NEW — AI MOCK INTERVIEW
+              </div>
+              <h2 className="text-[28px] md:text-[44px] font-bold leading-tight mb-4"
+                style={{ color: '#fff', letterSpacing: '-0.03em', maxWidth: 640 }}>
+                Practice out loud.<br />
+                <span style={{ color: '#60A5FA' }}>Get hired faster.</span>
+              </h2>
+              <p className="text-[16px] max-w-[500px]" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
+                Pick any application from your pipeline. AI generates tailored questions, scores every answer with a STAR rubric, and tells you exactly what to fix — in seconds.
+              </p>
+              <Link
+                href={user ? '/interview' : '/signup'}
+                className="mt-8 inline-flex items-center gap-2 h-12 px-7 rounded-xl text-[14px] font-semibold text-white transition-all"
+                style={{ background: '#2563EB', boxShadow: '0 4px 20px rgba(37,99,235,0.4)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 28px rgba(37,99,235,0.6)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(37,99,235,0.4)'; }}
+              >
+                {user ? 'Open Interview Room →' : 'Try it free →'}
+              </Link>
+            </motion.div>
+
+            {/* Dark UI preview */}
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="relative mx-auto rounded-t-2xl overflow-hidden border border-b-0"
+              style={{ maxWidth: 900, borderColor: 'rgba(255,255,255,0.08)', background: '#0D1117' }}
+            >
+              {/* Fake nav */}
+              <div className="flex items-center gap-3 px-5 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF5F57' }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FEBC2E' }} />
+                <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#28C840' }} />
+                <span className="ml-3 text-[11px]" style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>applyd.io/interview</span>
+              </div>
+
+              {/* Split panel preview */}
+              <div className="grid md:grid-cols-[2fr_3fr]">
+                {/* Left panel */}
+                <div className="p-6 border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-[14px] font-bold" style={{ background: 'rgba(37,99,235,0.2)', color: '#60A5FA' }}>G</div>
+                    <div>
+                      <p className="text-[13px] font-semibold" style={{ color: '#fff', margin: 0 }}>Google</p>
+                      <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)', margin: 0 }}>SWE Intern</p>
+                    </div>
+                  </div>
+                  {/* Progress ring placeholder */}
+                  <div className="flex flex-col items-center mb-6">
+                    <div className="relative w-20 h-20">
+                      <svg viewBox="0 0 80 80" className="w-20 h-20" style={{ transform: 'rotate(-90deg)' }}>
+                        <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5" />
+                        <circle cx="40" cy="40" r="32" fill="none" stroke="#2563EB" strokeWidth="5" strokeLinecap="round"
+                          strokeDasharray={`${2 * Math.PI * 32 * 0.4} ${2 * Math.PI * 32 * 0.6}`} />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-[18px] font-bold" style={{ color: '#fff', lineHeight: 1, fontFamily: 'monospace' }}>2</span>
+                        <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.4)' }}>/ 5</span>
+                      </div>
+                    </div>
+                    <p className="text-[9px] mt-2" style={{ color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', fontFamily: 'monospace' }}>QUESTION 2 OF 5</p>
+                  </div>
+                  <div className="space-y-2">
+                    {[['S','Situation','Set the scene'],['T','Task','Your responsibility'],['A','Action','What you did'],['R','Result','The outcome']].map(([k,l,d]) => (
+                      <div key={k} className="flex items-start gap-2.5">
+                        <span className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[9px] font-bold" style={{ background: 'rgba(37,99,235,0.2)', color: '#60A5FA' }}>{k}</span>
+                        <div>
+                          <p className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>{l}</p>
+                          <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)', margin: 0 }}>{d}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right panel */}
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(37,99,235,0.18)', color: '#60A5FA', letterSpacing: '0.08em' }}>BEHAVIORAL</span>
+                    <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.35)' }}>Common at Google L3+</span>
+                  </div>
+                  <div className="rounded-xl p-4 mb-4 border-l-2" style={{ background: 'rgba(255,255,255,0.04)', borderColor: '#2563EB', borderWidth: '0 0 0 2px' }}>
+                    <p className="text-[15px] font-semibold leading-relaxed" style={{ color: '#fff' }}>
+                      Tell me about a time you had to meet a tight deadline while maintaining code quality. What trade-offs did you make?
+                    </p>
+                  </div>
+                  <div className="rounded-xl p-3 border mb-4" style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(37,99,235,0.3)' }}>
+                    <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      During my last internship, our team had 3 days to ship a checkout flow before a product launch. I broke the work into parallel tracks — I owned the API layer while a teammate handled the UI...
+                    </p>
+                    <div className="mt-2 flex items-center gap-1">
+                      <div className="h-0.5 flex-1 rounded" style={{ background: 'rgba(37,99,235,0.4)' }} />
+                      <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace' }}>typing...</span>
+                    </div>
+                  </div>
+                  {/* STAR feedback preview */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: 'Situation', rating: 'strong', note: 'Clear timeline & stakes' },
+                      { label: 'Task', rating: 'strong', note: 'Ownership well stated' },
+                      { label: 'Action', rating: 'okay', note: 'Add more specifics' },
+                      { label: 'Result', rating: 'missing', note: 'Quantify the outcome' },
+                    ].map(s => (
+                      <div key={s.label} className="rounded-lg p-2.5" style={{
+                        background: s.rating === 'strong' ? 'rgba(16,185,129,0.1)' : s.rating === 'okay' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
+                        border: `1px solid ${s.rating === 'strong' ? 'rgba(16,185,129,0.2)' : s.rating === 'okay' ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.15)'}`,
+                      }}>
+                        <p className="text-[10px] font-bold mb-1" style={{ color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444', margin: '0 0 3px' }}>{s.label}</p>
+                        <p className="text-[11px]" style={{ color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444', margin: 0, opacity: 0.8 }}>{s.note}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          {/* Fade bottom edge into page */}
+          <div style={{ height: 80, background: 'linear-gradient(to bottom, #080C14, var(--background))' }} />
+        </section>
+
         {/* ── Community challenge teaser ── */}
         <CommunityTeaser />
 
@@ -535,100 +671,6 @@ export default function Home() {
         <div id="walkthrough" className="-mx-0" style={{ scrollMarginTop: 72 }}>
           <ProductWalkthrough />
         </div>
-
-        {/* ── Mock Interview callout ── */}
-        <section className="max-w-6xl mx-auto px-6 py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="rounded-2xl border overflow-hidden"
-            style={{ borderColor: 'rgba(37,99,235,0.22)', background: 'linear-gradient(135deg, rgba(37,99,235,0.04) 0%, var(--card-bg) 60%)' }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-              {/* Left */}
-              <div className="p-8 md:p-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] font-semibold mb-5"
-                  style={{ background: 'rgba(37,99,235,0.08)', borderColor: 'rgba(37,99,235,0.22)', color: 'var(--accent-blue)', letterSpacing: '0.08em' }}>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  PRO FEATURE — MOCK INTERVIEW
-                </div>
-                <h2 className="text-[24px] md:text-[30px] font-semibold mb-3 leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-                  Practice with AI the night before your interview.
-                </h2>
-                <p className="text-[14px] leading-relaxed mb-6" style={{ color: 'var(--muted-text)' }}>
-                  Paste a job description. Get tailored questions. Answer by typing or voice. AI scores your answer with a STAR rubric and tells you exactly what to fix — in seconds.
-                </p>
-                <div className="space-y-2.5 mb-7">
-                  {[
-                    'Questions pulled from the actual job description',
-                    'STAR rubric scoring (1–5) with line-by-line feedback',
-                    'Voice input supported — practice like the real thing',
-                    'Download a full transcript when you\'re done',
-                  ].map(item => (
-                    <div key={item} className="flex items-start gap-2.5">
-                      <svg className="mt-0.5 flex-shrink-0" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <circle cx="7" cy="7" r="7" fill="rgba(37,99,235,0.12)"/>
-                        <path d="M4.5 7.5l1.75 1.75L9.5 5" stroke="var(--accent-blue)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <span className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>{item}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  href={user ? '/dashboard' : '/signup'}
-                  className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-[13px] font-semibold text-white transition-all"
-                  style={{ background: 'var(--accent-blue)' }}
-                  onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
-                  onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
-                >
-                  {user ? 'Open dashboard →' : 'Try it free →'}
-                </Link>
-              </div>
-
-              {/* Right — preview */}
-              <div className="border-t md:border-t-0 md:border-l p-8" style={{ borderColor: 'rgba(37,99,235,0.15)', background: 'rgba(37,99,235,0.03)' }}>
-                <div className="text-[10px] font-bold uppercase tracking-[0.1em] mb-4" style={{ color: 'var(--text-tertiary)' }}>Live session preview</div>
-
-                <div className="rounded-xl border p-4 mb-3" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-[10px] font-semibold" style={{ color: 'var(--accent-blue)' }}>Question 2 of 5 · Behavioral</span>
-                    <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Stripe · SWE Intern</span>
-                  </div>
-                  <p className="text-[13px] leading-relaxed" style={{ color: 'var(--brand-navy)' }}>
-                    Tell me about a time you had to meet a tight deadline while maintaining quality. What did you do?
-                  </p>
-                </div>
-
-                {[
-                  { label: 'Situation', rating: 'strong',  note: 'Clear context, specific timeline' },
-                  { label: 'Task',      rating: 'okay',    note: 'Your role could be clearer' },
-                  { label: 'Action',    rating: 'strong',  note: 'Excellent — very specific steps' },
-                  { label: 'Result',    rating: 'missing', note: 'Add a number or outcome' },
-                ].map(s => (
-                  <div key={s.label} className="flex items-start gap-2.5 mb-2">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded flex-shrink-0" style={{
-                      color: s.rating === 'strong' ? '#16A34A' : s.rating === 'okay' ? '#D97706' : '#DC2626',
-                      background: s.rating === 'strong' ? 'rgba(22,163,74,0.12)' : s.rating === 'okay' ? 'rgba(217,119,6,0.12)' : 'rgba(220,38,38,0.12)',
-                    }}>{s.label}</span>
-                    <span className="text-[12px]" style={{ color: 'var(--muted-text)' }}>{s.note}</span>
-                  </div>
-                ))}
-
-                <div className="mt-4 pt-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--border-gray)' }}>
-                  <span className="text-[11px]" style={{ color: 'var(--muted-text)' }}>Overall score</span>
-                  <div className="flex gap-1">
-                    {[1,2,3,4,5].map(n => (
-                      <div key={n} className="w-2.5 h-2.5 rounded-full" style={{ background: n <= 3 ? 'var(--accent-blue)' : 'var(--border-gray)' }} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </section>
 
         {/* ── Testimonials ── */}
         <section className="max-w-6xl mx-auto px-6 py-20">
@@ -726,6 +768,7 @@ export default function Home() {
 
               <div className="space-y-3 mb-6">
                 {[
+                  { title: 'AI Mock Interview Room',  desc: 'A full dedicated interview environment — pick any application, get tailored questions, STAR scoring, voice input, and a downloadable transcript.' },
                   { title: 'Interview Intel',         desc: 'AI generates the exact questions this company asks the moment you hit interview stage.' },
                   { title: 'Follow Up Writer',        desc: 'Thank you, status check, negotiation, withdrawal — one click, calibrated to your stage.' },
                   { title: 'Strength Signal',         desc: 'Know how competitive you are before you invest hours on an application.' },
