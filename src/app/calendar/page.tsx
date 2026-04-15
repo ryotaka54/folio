@@ -519,22 +519,24 @@ const slideVariants = {
 };
 
 function CalendarGrid({
-  year, month, direction, eventsByDate, onEventClick, onMoreClick,
+  year, month, direction, eventsByDate, onEventClick, onMoreClick, isJa,
 }: {
   year: number; month: number; direction: number;
   eventsByDate: Record<string, CalEvent[]>;
   onEventClick: (app: Application) => void;
   onMoreClick: (date: string, events: CalEvent[]) => void;
+  isJa?: boolean;
 }) {
   const gridDays = useMemo(() => getMonthGrid(year, month), [year, month]);
   const today = todayYMD();
+  const dayHeaders = isJa ? JA_DAYS : DAYS_OF_WEEK;
 
   return (
     <div className="rounded-2xl border overflow-hidden flex-1" style={{ borderColor: 'var(--border-gray)' }}>
       {/* Day headers */}
       <div className="grid grid-cols-7 border-b" style={{ borderColor: 'var(--border-gray)', background: 'var(--surface-gray)' }}>
-        {DAYS_OF_WEEK.map(d => (
-          <div key={d} className="text-center py-2" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
+        {dayHeaders.map(d => (
+          <div key={d} className="text-center py-2" style={{ fontSize: 11, fontWeight: 600, letterSpacing: isJa ? '0.02em' : '0.07em', color: 'var(--text-tertiary)', textTransform: isJa ? undefined : 'uppercase' }}>
             {d}
           </div>
         ))}
@@ -674,9 +676,13 @@ function MobileWeekView({
 
 // ── Main content ─────────────────────────────────────────────────────────────
 
+const JA_MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+const JA_DAYS = ['日','月','火','水','木','金','土'];
+
 function CalendarContent() {
   const { user, signOut } = useAuth();
   const userIsPro = isPro(user);
+  const isJa = user?.pipeline_type === 'shuukatsu';
   const { applications, loading, updateApplication, deleteApplication } = useStore();
   const router = useRouter();
 
@@ -822,31 +828,33 @@ function CalendarContent() {
       <Toast message={toast} onDismiss={() => setToast(null)} />
 
       {/* ── Nav ─────────────────────────────────────────────────────────── */}
-      <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+      <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]" style={isJa ? { fontFamily: "'Noto Sans JP', sans-serif" } : undefined}>
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
           <div className="flex items-center gap-5">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href={isJa ? '/ja' : '/'} className="flex items-center gap-2">
               {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
               <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
             <div className="flex items-center gap-0.5">
-              <Link href="/dashboard" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors" style={{ color: 'var(--muted-text)' }}>
-                Dashboard
+              <Link href={isJa ? '/ja/dashboard' : '/dashboard'} className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors" style={{ color: 'var(--muted-text)' }}>
+                {isJa ? 'ダッシュボード' : 'Dashboard'}
               </Link>
               <Link href="/calendar" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5" style={{ color: 'var(--accent-blue)', background: 'rgba(37,99,235,0.08)' }}>
                 <Calendar size={13} aria-hidden />
-                <span>Calendar</span>
+                <span>{isJa ? 'カレンダー' : 'Calendar'}</span>
               </Link>
-              <Link href="/community" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors" style={{ color: 'var(--muted-text)' }}>
-                <Users size={13} aria-hidden />
-                <span className="hidden sm:inline">Community</span>
-              </Link>
+              {!isJa && (
+                <Link href="/community" className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors" style={{ color: 'var(--muted-text)' }}>
+                  <Users size={13} aria-hidden />
+                  <span className="hidden sm:inline">Community</span>
+                </Link>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <button onClick={() => signOut()} className="text-[12px] transition-colors" style={{ color: 'var(--muted-text)' }}>
-              Log out
+              {isJa ? 'ログアウト' : 'Log out'}
             </button>
           </div>
         </div>
@@ -857,20 +865,24 @@ function CalendarContent() {
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-start gap-4">
           {/* Left: title + stat pills */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0" style={isJa ? { fontFamily: "'Noto Sans JP', sans-serif" } : undefined}>
             <h1 className="text-[22px] font-semibold leading-none mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.025em' }}>
-              Calendar
+              {isJa ? 'カレンダー' : 'Calendar'}
             </h1>
             <p className="text-[13px] mb-3" style={{ color: 'var(--muted-text)' }}>
-              Your recruiting timeline at a glance.
+              {isJa ? '就活の締め切りと面接をひとつの画面で。' : 'Your recruiting timeline at a glance.'}
             </p>
             {/* Stat pills */}
             <div className="flex flex-wrap gap-2">
-              {[
+              {(isJa ? [
+                { label: '件予定', count: statCounts.upcoming, style: { background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)' } },
+                { label: '件今週', count: statCounts.thisWeek, style: { background: 'rgba(217,119,6,0.10)', color: 'var(--amber-warning)' } },
+                { label: '件面接', count: statCounts.interviews, style: { background: 'rgba(22,163,74,0.10)', color: 'var(--green-success)' } },
+              ] : [
                 { label: 'upcoming', count: statCounts.upcoming, style: { background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)' } },
                 { label: 'this week', count: statCounts.thisWeek, style: { background: 'rgba(217,119,6,0.10)', color: 'var(--amber-warning)' } },
                 { label: 'interviews', count: statCounts.interviews, style: { background: 'rgba(22,163,74,0.10)', color: 'var(--green-success)' } },
-              ].map(p => (
+              ]).map(p => (
                 <span key={p.label} className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={p.style}>
                   {p.count} {p.label}
                 </span>
@@ -895,7 +907,7 @@ function CalendarContent() {
                 className="px-3 h-8 rounded-lg border text-[12px] font-medium transition-colors"
                 style={{ borderColor: 'var(--border-gray)', color: 'var(--brand-navy)', background: 'var(--surface-gray)' }}
               >
-                Today
+                {isJa ? '今日' : 'Today'}
               </button>
               <button
                 onClick={nextMonth}
@@ -906,7 +918,7 @@ function CalendarContent() {
                 <ChevronRight size={15} />
               </button>
               <span className="text-[17px] font-semibold ml-1 tabular-nums" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', minWidth: 148 }}>
-                {MONTHS[month]} {year}
+                {isJa ? `${year}年${JA_MONTHS[month]}` : `${MONTHS[month]} ${year}`}
               </span>
             </div>
 
@@ -917,7 +929,7 @@ function CalendarContent() {
                 className="text-[11px] transition-colors"
                 style={{ color: 'var(--text-tertiary)', textDecoration: 'underline', textUnderlineOffset: 2 }}
               >
-                Export ICS
+                {isJa ? 'ICSエクスポート' : 'Export ICS'}
               </button>
               <button
                 onClick={() => setShowGCalModal(true)}
@@ -929,10 +941,12 @@ function CalendarContent() {
                 }}
               >
                 <Calendar size={13} />
-                <span className="hidden sm:inline">{isGCalConnected ? '✓ Google Calendar' : 'Sync with Google Calendar'}</span>
-                <span className="sm:hidden">
-                  <ExternalLink size={12} />
+                <span className="hidden sm:inline">
+                  {isJa
+                    ? (isGCalConnected ? '✓ Google Calendar' : 'Googleカレンダーと同期')
+                    : (isGCalConnected ? '✓ Google Calendar' : 'Sync with Google Calendar')}
                 </span>
+                <span className="sm:hidden"><ExternalLink size={12} /></span>
               </button>
             </div>
           </div>
@@ -953,7 +967,7 @@ function CalendarContent() {
               className="px-2.5 h-7 rounded-lg border text-[11px] font-medium"
               style={{ borderColor: 'var(--border-gray)', color: 'var(--brand-navy)', background: 'var(--surface-gray)' }}
             >
-              This week
+              {isJa ? '今週' : 'This week'}
             </button>
             <button
               onClick={() => { setWeekStart(prev => { const d = new Date(prev); d.setDate(d.getDate() + 7); return d; }); }}
@@ -973,7 +987,7 @@ function CalendarContent() {
                   ? { background: 'var(--background)', color: 'var(--brand-navy)', boxShadow: '0 1px 2px rgba(0,0,0,0.08)' }
                   : { color: 'var(--muted-text)' }}
               >
-                {v}
+                {isJa ? (v === 'week' ? '週' : 'リスト') : v}
               </button>
             ))}
           </div>
@@ -982,18 +996,22 @@ function CalendarContent() {
         {/* ── Content area ─────────────────────────────────────────────── */}
         {!hasEvents && !loading ? (
           // Empty state
-          <div className="flex flex-col items-center justify-center flex-1 py-20">
+          <div className="flex flex-col items-center justify-center flex-1 py-20" style={isJa ? { fontFamily: "'Noto Sans JP', sans-serif" } : undefined}>
             <Calendar size={48} style={{ color: 'var(--border-emphasis)', marginBottom: 16 }} />
-            <h2 className="text-[18px] font-semibold mb-2" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>No events yet</h2>
+            <h2 className="text-[18px] font-semibold mb-2" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
+              {isJa ? 'まだイベントがありません' : 'No events yet'}
+            </h2>
             <p className="text-[13px] mb-6 text-center max-w-xs" style={{ color: 'var(--muted-text)' }}>
-              Add deadlines to your applications and they&apos;ll appear here automatically.
+              {isJa
+                ? '選考に締め切りを設定すると、ここに自動で表示されます。'
+                : 'Add deadlines to your applications and they\'ll appear here automatically.'}
             </p>
             <Link
-              href="/dashboard"
+              href={isJa ? '/ja/dashboard' : '/dashboard'}
               className="px-5 py-2.5 rounded-xl text-[13px] font-medium transition-all"
               style={{ background: 'var(--accent-blue)', color: '#fff' }}
             >
-              Go to Dashboard
+              {isJa ? 'ダッシュボードへ' : 'Go to Dashboard'}
             </Link>
           </div>
         ) : (
@@ -1005,6 +1023,7 @@ function CalendarContent() {
                 eventsByDate={eventsByDate}
                 onEventClick={handleCardClick}
                 onMoreClick={(date, evs) => setPopover({ date, events: evs })}
+                isJa={isJa}
               />
             </div>
 
@@ -1099,7 +1118,9 @@ function CalendarContent() {
 
         {/* ── Keyboard shortcut bar ────────────────────────────────────── */}
         <p className="text-center text-[10px] pb-2" style={{ color: 'var(--text-tertiary)' }}>
-          ← → navigate months · T today · G sync Google Calendar · Esc close
+          {isJa
+            ? '← → 月切替 · T 今日 · G Googleカレンダー · Esc 閉じる'
+            : '← → navigate months · T today · G sync Google Calendar · Esc close'}
         </p>
       </main>
 

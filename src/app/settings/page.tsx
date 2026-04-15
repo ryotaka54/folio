@@ -1079,8 +1079,20 @@ function DataSection({ showToast }: { showToast: (msg: string, type?: 'success' 
 
 // ─── Main settings page ───────────────────────────────────────────────────────
 
+const JA_SECTION_LABELS: Record<string, string> = {
+  profile: 'プロフィール',
+  recruiting: '就活設定',
+  ai: 'AI機能',
+  appearance: '表示設定',
+  account: 'アカウント',
+  referrals: '友達紹介',
+  data: 'データ出力',
+  danger: '危険な操作',
+};
+
 function SettingsPageInner() {
   const { user, loading } = useAuth();
+  const isJa = user?.pipeline_type === 'shuukatsu';
   const router = useRouter();
   const searchParams = useSearchParams();
   const [section, setSection] = useState<Section>(() => {
@@ -1143,28 +1155,28 @@ function SettingsPageInner() {
       />
 
       {/* Nav */}
-      <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+      <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]" style={isJa ? { fontFamily: "'Noto Sans JP', sans-serif" } : undefined}>
         <div className="max-w-[960px] mx-auto px-4 md:px-6 flex items-center h-[52px] gap-2">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={isJa ? '/ja' : '/'} className="flex items-center gap-2">
             <Logo size={22} variant="dark" />
             <span className="text-[15px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
           </Link>
           <span className="text-[13px]" style={{ color: 'var(--border-gray)' }}>/</span>
-          <span className="text-[13px] font-medium" style={{ color: 'var(--muted-text)' }}>Settings</span>
+          <span className="text-[13px] font-medium" style={{ color: 'var(--muted-text)' }}>{isJa ? '設定' : 'Settings'}</span>
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
-            <Link href="/dashboard" className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>
-              ← Dashboard
+            <Link href={isJa ? '/ja/dashboard' : '/dashboard'} className="text-[12px] font-medium transition-colors" style={{ color: 'var(--muted-text)' }}>
+              {isJa ? '← ダッシュボード' : '← Dashboard'}
             </Link>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-[960px] mx-auto px-4 md:px-6 py-8">
+      <div className="max-w-[960px] mx-auto px-4 md:px-6 py-8" style={isJa ? { fontFamily: "'Noto Sans JP', sans-serif" } : undefined}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-[22px] font-semibold tracking-tight mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Settings</h1>
-          <p className="text-[14px]" style={{ color: 'var(--muted-text)' }}>Manage your account and preferences.</p>
+          <h1 className="text-[22px] font-semibold tracking-tight mb-1" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>{isJa ? '設定' : 'Settings'}</h1>
+          <p className="text-[14px]" style={{ color: 'var(--muted-text)' }}>{isJa ? 'アカウントと設定を管理します。' : 'Manage your account and preferences.'}</p>
         </div>
 
         {/* Mobile tab row */}
@@ -1181,7 +1193,7 @@ function SettingsPageInner() {
               }}
             >
               {s.icon}
-              {s.label}
+              {isJa ? JA_SECTION_LABELS[s.id] : s.label}
             </button>
           ))}
         </div>
@@ -1205,7 +1217,7 @@ function SettingsPageInner() {
                   }}
                 >
                   <span style={{ opacity: section === s.id ? 1 : 0.65 }}>{s.icon}</span>
-                  {s.label}
+                  {isJa ? JA_SECTION_LABELS[s.id] : s.label}
                 </button>
               ))}
             </nav>
