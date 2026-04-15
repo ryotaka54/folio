@@ -197,6 +197,8 @@ function JaDashboardContent() {
       if (err instanceof CapExceededError) {
         setShowAddModal(false);
         setShowUpgradeModal(true);
+      } else {
+        throw err;
       }
     }
   };
