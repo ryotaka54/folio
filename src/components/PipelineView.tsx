@@ -13,6 +13,7 @@ interface PipelineViewProps {
   stages: PipelineStage[];
   onCardClick: (app: Application) => void;
   onStatusChange: (appId: string, newStatus: PipelineStage) => void;
+  onCardContextMenu?: (app: Application, e: React.MouseEvent) => void;
 }
 
 // ── Priority sort: urgent deadlines first, then soonest deadline, then newest ─
@@ -38,7 +39,7 @@ function priorityScore(app: Application, now: number): number {
   return 10000 - ts / 1e10;
 }
 
-function DraggableCard({ application, onClick, muted }: { application: Application; onClick: () => void; muted?: boolean }) {
+function DraggableCard({ application, onClick, onContextMenu, muted }: { application: Application; onClick: () => void; onContextMenu?: (e: React.MouseEvent) => void; muted?: boolean }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: application.id,
     data: { application },
@@ -52,7 +53,7 @@ function DraggableCard({ application, onClick, muted }: { application: Applicati
       {...listeners}
       className={`touch-none draggable-card select-none ${isDragging ? 'draggable-active' : ''}`}
     >
-      <ApplicationCard application={application} onClick={onClick} muted={muted} />
+      <ApplicationCard application={application} onClick={onClick} onContextMenu={onContextMenu} muted={muted} />
     </div>
   );
 }
@@ -99,12 +100,13 @@ function DroppableColumn({ stage, count, color, isRejected, children }: {
 
 // ── Column content with priority sort + card cap ───────────────────────────
 function ColumnContent({
-  stage, apps, isRejected, onCardClick, firstCardTaggedRef,
+  stage, apps, isRejected, onCardClick, onCardContextMenu, firstCardTaggedRef,
 }: {
   stage: string;
   apps: Application[];
   isRejected: boolean;
   onCardClick: (app: Application) => void;
+  onCardContextMenu?: (app: Application, e: React.MouseEvent) => void;
   firstCardTaggedRef: { current: boolean };
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -130,7 +132,7 @@ function ColumnContent({
         if (isFirst) firstCardTaggedRef.current = true;
         return (
           <div key={app.id} {...(isFirst ? { 'data-tutorial-id': 'first-card' } : {})}>
-            <DraggableCard application={app} onClick={() => onCardClick(app)} muted={isRejected} />
+            <DraggableCard application={app} onClick={() => onCardClick(app)} onContextMenu={onCardContextMenu ? (e) => onCardContextMenu(app, e) : undefined} muted={isRejected} />
           </div>
         );
       })}
@@ -155,7 +157,7 @@ function ColumnContent({
   );
 }
 
-export default function PipelineView({ applications, stages, onCardClick, onStatusChange }: PipelineViewProps) {
+export default function PipelineView({ applications, stages, onCardClick, onStatusChange, onCardContextMenu }: PipelineViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const firstCardTaggedRef = { current: false };
 
@@ -212,6 +214,7 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
                     apps={stageApps}
                     isRejected={false}
                     onCardClick={onCardClick}
+                    onCardContextMenu={onCardContextMenu}
                     firstCardTaggedRef={firstCardTaggedRef}
                   />
                 </DroppableColumn>
@@ -230,6 +233,7 @@ export default function PipelineView({ applications, stages, onCardClick, onStat
                   apps={stageApps}
                   isRejected={true}
                   onCardClick={onCardClick}
+                  onCardContextMenu={onCardContextMenu}
                   firstCardTaggedRef={firstCardTaggedRef}
                 />
               </DroppableColumn>

@@ -9,6 +9,7 @@ interface TableViewProps {
   selectedIds: Set<string>;
   onSelectionChange: (ids: Set<string>) => void;
   onRowClick: (app: Application) => void;
+  onRowContextMenu?: (app: Application, e: React.MouseEvent) => void;
 }
 
 type SortKey = 'company' | 'role' | 'location' | 'category' | 'status' | 'deadline' | 'created_at';
@@ -34,7 +35,7 @@ const deadlineUrgency = (dateStr: string | null): { tier: 'overdue' | 'today' | 
   return { tier: 'normal', diffDays };
 };
 
-export default function TableView({ applications, selectedIds, onSelectionChange, onRowClick }: TableViewProps) {
+export default function TableView({ applications, selectedIds, onSelectionChange, onRowClick, onRowContextMenu }: TableViewProps) {
   const [sortKey, setSortKey] = useState<SortKey>('created_at');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
 
@@ -140,6 +141,7 @@ export default function TableView({ applications, selectedIds, onSelectionChange
                 <tr
                   key={app.id}
                   onClick={() => onRowClick(app)}
+                  onContextMenu={onRowContextMenu ? (e) => { e.preventDefault(); onRowContextMenu(app, e); } : undefined}
                   className={`border-t border-border-gray cursor-pointer transition-colors ${
                     selected
                       ? 'bg-accent-blue/5'

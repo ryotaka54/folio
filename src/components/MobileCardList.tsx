@@ -9,6 +9,7 @@ interface MobileCardListProps {
   stages: PipelineStage[];
   onCardClick: (app: Application) => void;
   onStatusChange: (appId: string, newStatus: PipelineStage) => void;
+  onCardContextMenu?: (app: Application, e: React.MouseEvent) => void;
 }
 
 // Bottom sheet for picking a new stage
@@ -117,6 +118,7 @@ function StageSection({
   defaultOpen,
   onCardClick,
   onMoveRequest,
+  onCardContextMenu,
 }: {
   stage: PipelineStage;
   apps: Application[];
@@ -124,6 +126,7 @@ function StageSection({
   defaultOpen: boolean;
   onCardClick: (app: Application) => void;
   onMoveRequest: (app: Application) => void;
+  onCardContextMenu?: (app: Application, e: React.MouseEvent) => void;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const color = STAGE_COLORS[stage] || '#6B7280';
@@ -157,6 +160,7 @@ function StageSection({
               {/* Main card tap area */}
               <button
                 onClick={() => onCardClick(app)}
+                onContextMenu={onCardContextMenu ? (e) => { e.preventDefault(); onCardContextMenu(app, e); } : undefined}
                 className="flex-1 text-left flex items-center gap-3 px-4 py-3 transition-colors active:bg-surface-gray min-w-0"
                 style={{ minHeight: 72, background: 'transparent' }}
               >
@@ -215,7 +219,7 @@ function StageSection({
   );
 }
 
-export default function MobileCardList({ applications, stages, onCardClick, onStatusChange }: MobileCardListProps) {
+export default function MobileCardList({ applications, stages, onCardClick, onStatusChange, onCardContextMenu }: MobileCardListProps) {
   const [pickerApp, setPickerApp] = useState<Application | null>(null);
   const stageFilterRef = useRef<HTMLDivElement>(null);
 
@@ -269,6 +273,7 @@ export default function MobileCardList({ applications, stages, onCardClick, onSt
                 defaultOpen={stage !== 'Rejected' && stage !== 'Declined'}
                 onCardClick={onCardClick}
                 onMoveRequest={app => setPickerApp(app)}
+                onCardContextMenu={onCardContextMenu}
               />
             </div>
           );

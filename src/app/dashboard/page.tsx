@@ -20,6 +20,7 @@ import EmptyState from '@/components/EmptyState';
 import MobileCardList from '@/components/MobileCardList';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
+import ContextMenu from '@/components/ContextMenu';
 import ExtensionBanner from '@/components/ExtensionBanner';
 import StreakBadge from '@/components/StreakBadge';
 import SmartNudges from '@/components/SmartNudges';
@@ -84,6 +85,7 @@ function DashboardContent() {
   const [addModalInitialUrl, setAddModalInitialUrl] = useState('');
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; app: Application } | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [toastUndo, setToastUndo] = useState<(() => void) | null>(null);
   const [offerConfetti, setOfferConfetti] = useState(false);
@@ -228,6 +230,11 @@ function DashboardContent() {
       setSelectedApp(app);
       setShowDrawer(true);
     });
+  };
+
+  const handleContextMenu = (app: Application, e: React.MouseEvent) => {
+    e.preventDefault();
+    setCtxMenu({ x: e.clientX, y: e.clientY, app });
   };
 
   const handleAutofillUrl = (url: string) => {
@@ -462,6 +469,17 @@ function DashboardContent() {
 
       {/* Offer confetti */}
       <OfferConfetti trigger={offerConfetti} />
+
+      {/* Context menu */}
+      {ctxMenu && (
+        <ContextMenu
+          x={ctxMenu.x}
+          y={ctxMenu.y}
+          onOpen={() => { handleCardClick(ctxMenu.app); setCtxMenu(null); }}
+          onDelete={() => { handleDelete(ctxMenu.app.id); setCtxMenu(null); }}
+          onClose={() => setCtxMenu(null)}
+        />
+      )}
 
       {/* Toast */}
       <Toast
@@ -774,6 +792,7 @@ function DashboardContent() {
               stages={stages as PipelineStage[]}
               onCardClick={handleCardClick}
               onStatusChange={(id, status) => handleStatusChange(id, status)}
+              onCardContextMenu={handleContextMenu}
             />
           ) : view === 'pipeline' ? (
             <div data-tutorial-id="pipeline-board">
@@ -782,6 +801,7 @@ function DashboardContent() {
                 stages={stages as PipelineStage[]}
                 onCardClick={handleCardClick}
                 onStatusChange={(id, status) => handleStatusChange(id, status)}
+                onCardContextMenu={handleContextMenu}
               />
             </div>
           ) : (
@@ -790,6 +810,7 @@ function DashboardContent() {
               selectedIds={selectedIds}
               onSelectionChange={setSelectedIds}
               onRowClick={handleCardClick}
+              onRowContextMenu={handleContextMenu}
             />
           )}
         </div>

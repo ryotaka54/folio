@@ -6,10 +6,11 @@ import { STAGE_COLORS } from '@/lib/constants';
 interface ApplicationCardProps {
   application: Application;
   onClick: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
   muted?: boolean;
 }
 
-export default function ApplicationCard({ application, onClick, muted }: ApplicationCardProps) {
+export default function ApplicationCard({ application, onClick, onContextMenu, muted }: ApplicationCardProps) {
   const stageColor = STAGE_COLORS[application.status] || '#6B7280';
 
   const deadlineInfo = (() => {
@@ -33,6 +34,7 @@ export default function ApplicationCard({ application, onClick, muted }: Applica
   return (
     <button
       onClick={onClick}
+      onContextMenu={onContextMenu ? (e) => { e.preventDefault(); onContextMenu(e); } : undefined}
       className="w-full text-left group relative rounded-xl overflow-hidden select-none"
       style={{
         background: 'var(--card-bg)',
