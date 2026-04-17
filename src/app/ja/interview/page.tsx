@@ -19,7 +19,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Phase = 'pick' | 'setup' | 'loading' | 'question' | 'evaluating' | 'feedback' | 'complete';
-type QuestionType = 'behavioral' | 'technical' | 'mixed';
+type QuestionType = 'behavioral' | 'technical' | 'mixed' | 'essentials';
 type InputMode = 'text' | 'voice';
 
 interface Question { q: string; type: 'behavioral' | 'technical'; why: string; }
@@ -32,6 +32,37 @@ interface Feedback {
   overall: string;
 }
 interface TranscriptEntry { question: Question; answer: string; feedback: Feedback; }
+
+interface SavedSession {
+  phase: 'question' | 'feedback';
+  selectedApp: Application;
+  questions: Question[];
+  currentIdx: number;
+  answer: string;
+  transcript: TranscriptEntry[];
+  feedback: Feedback | null;
+  questionCount: number;
+  questionType: QuestionType;
+  savedAt: number;
+}
+
+const SESSION_TTL = 2 * 60 * 60 * 1000;
+function sessionKey(userId: string) { return `applyd_interview_session_ja_${userId}`; }
+function saveSession(userId: string, s: SavedSession) {
+  try { localStorage.setItem(sessionKey(userId), JSON.stringify(s)); } catch { /* quota */ }
+}
+function loadSession(userId: string): SavedSession | null {
+  try {
+    const raw = localStorage.getItem(sessionKey(userId));
+    if (!raw) return null;
+    const s: SavedSession = JSON.parse(raw);
+    if (Date.now() - s.savedAt > SESSION_TTL) { localStorage.removeItem(sessionKey(userId)); return null; }
+    return s;
+  } catch { return null; }
+}
+function clearSession(userId: string) {
+  try { localStorage.removeItem(sessionKey(userId)); } catch { /* ignore */ }
+}
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 
@@ -267,6 +298,7 @@ function InterviewContent() {
   const router = useRouter();
 
   const [phase, setPhase] = useState<Phase>('pick');
+  const [savedSession, setSavedSession] = useState<SavedSession | null>(null);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [questionCount, setQuestionCount] = useState(5);
   const [questionType, setQuestionType] = useState<QuestionType>('mixed');
@@ -294,6 +326,28 @@ function InterviewContent() {
   useEffect(() => {
     if (phase === 'question') textareaRef.current?.focus();
   }, [phase, currentIdx]);
+
+  useEffect(() => {
+    if (!user) return;
+    const s = loadSession(user.id);
+    if (s) setSavedSession(s);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user) return;
+    if (phase === 'question' || phase === 'feedback') {
+      if (!selectedApp || questions.length === 0) return;
+      saveSession(user.id, {
+        phase, selectedApp, questions, currentIdx,
+        answer, transcript, feedback, questionCount, questionType,
+        savedAt: Date.now(),
+      });
+    } else if (phase === 'pick' || phase === 'complete') {
+      clearSession(user.id);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, currentIdx, answer, transcript, feedback]);
 
   const filteredApps = applications
     .filter(a => !['Rejected', 'Declined', 'Accepted'].includes(a.status))
@@ -368,6 +422,8 @@ function InterviewContent() {
           applicationId: selectedApp.id, questions, transcript: newTranscript,
         }),
       }).catch(() => {});
+      if (user) clearSession(user.id);
+      setSavedSession(null);
       setPhase('complete');
     } else {
       setCurrentIdx(i => i + 1);
@@ -484,6 +540,66 @@ function InterviewContent() {
               </motion.p>
             </div>
 
+            {/* Resume banner */}
+            {savedSession && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ maxWidth: 900, margin: '0 auto 0', padding: '0 24px 20px' }}
+              >
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 16,
+                  padding: '14px 18px', borderRadius: 14,
+                  background: 'rgba(37,99,235,0.1)', border: '1px solid rgba(37,99,235,0.25)',
+                }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: '0 0 2px', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                      ↩ 進行中のセッション: {savedSession.selectedApp.company} · {savedSession.selectedApp.role}
+                    </p>
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0, fontFamily: "'Noto Sans JP', sans-serif" }}>
+                      第 {savedSession.currentIdx + 1} 問 / 全 {savedSession.questions.length} 問
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setSelectedApp(savedSession.selectedApp);
+                      setQuestions(savedSession.questions);
+                      setCurrentIdx(savedSession.currentIdx);
+                      setAnswer(savedSession.answer);
+                      setTranscript(savedSession.transcript);
+                      setFeedback(savedSession.feedback);
+                      setQuestionCount(savedSession.questionCount);
+                      setQuestionType(savedSession.questionType);
+                      setPhase(savedSession.phase);
+                      setSavedSession(null);
+                    }}
+                    style={{
+                      height: 34, padding: '0 16px', borderRadius: 9,
+                      background: '#2563EB', border: 'none', cursor: 'pointer',
+                      fontSize: 13, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap',
+                      fontFamily: "'Noto Sans JP', sans-serif",
+                    }}
+                  >
+                    続きから →
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (user) clearSession(user.id);
+                      setSavedSession(null);
+                    }}
+                    style={{
+                      height: 34, padding: '0 14px', borderRadius: 9,
+                      background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
+                      cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.4)',
+                      fontFamily: "'Noto Sans JP', sans-serif",
+                    }}
+                  >
+                    キャンセル
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
             {/* App picker */}
             <div style={{ maxWidth: 900, margin: '0 auto', padding: '0 24px 80px' }}>
               {/* Search */}
@@ -599,16 +715,21 @@ function InterviewContent() {
                 options: [3, 5, 7].map(n => ({ value: String(n), label: `${n}問` })),
                 value: String(questionCount),
                 onChange: (v: string) => setQuestionCount(Number(v)),
+                hidden: questionType === 'essentials',
               },
               {
                 label: '重点分野',
                 options: [
-                  { value: 'mixed', label: '混合' },
+                  { value: 'mixed',      label: '混合' },
                   { value: 'behavioral', label: '行動面接' },
-                  { value: 'technical', label: '技術面接' },
+                  { value: 'technical',  label: '技術面接' },
+                  { value: 'essentials', label: '✦ 定番質問' },
                 ],
                 value: questionType,
-                onChange: (v: string) => setQuestionType(v as QuestionType),
+                onChange: (v: string) => {
+                  setQuestionType(v as QuestionType);
+                  if (v === 'essentials') setQuestionCount(5);
+                },
               },
               {
                 label: '入力方法',
@@ -619,11 +740,16 @@ function InterviewContent() {
                 value: inputMode,
                 onChange: (v: string) => setInputMode(v as InputMode),
               },
-            ].map(row => (
+            ].filter(row => !('hidden' in row && row.hidden)).map(row => (
               <div key={row.label} style={{ marginBottom: 28 }}>
                 <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.35)', margin: '0 0 10px', fontFamily: "'Noto Sans JP', sans-serif" }}>
                   {row.label}
                 </p>
+                {questionType === 'essentials' && row.label === '重点分野' && (
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', margin: '-6px 0 10px', fontStyle: 'italic', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                    どの面接でも聞かれる定番の質問 — この企業にあわせてカスタマイズ
+                  </p>
+                )}
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {row.options.map(opt => (
                     <button
