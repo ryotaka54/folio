@@ -85,10 +85,10 @@ export default function StatsBar({ applications }: StatsBarProps) {
           key={stat.label}
           className="rounded-lg p-4 bg-card-bg border border-border-gray relative overflow-hidden"
           style={stat.accent === 'green'
-            ? { borderLeft: '3px solid #16A34A' }
+            ? { borderLeft: '3px solid var(--green-success)' }
             : stat.accent === 'amber'
-            ? { borderLeft: '3px solid #D97706' }
-            : undefined}
+            ? { borderLeft: '3px solid var(--amber-warning)' }
+            : { borderLeft: '3px solid var(--border-gray)' }}
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12 }}
           animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
           transition={reduce ? { duration: 0.01 } : { duration: 0.28, delay: i * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}

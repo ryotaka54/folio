@@ -64,7 +64,7 @@ export default function ApplicationCard({ application, onClick, onContextMenu, m
       {/* Card body */}
       <div className="pl-4 pr-3 py-3">
         {/* Company + deadline row */}
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center justify-between gap-2">
           <div
             className="text-[13px] font-semibold leading-snug truncate"
             style={{ color: muted ? 'var(--text-tertiary)' : 'var(--brand-navy)' }}
@@ -73,10 +73,10 @@ export default function ApplicationCard({ application, onClick, onContextMenu, m
           </div>
           {deadlineInfo && (
             <span
-              className="flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none"
+              className="flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-md leading-none"
               style={deadlineInfo.urgent
                 ? { background: 'var(--error-bg)', color: 'var(--error-text)', border: '1px solid var(--error-border)' }
-                : { background: 'rgba(245,158,11,0.12)', color: 'var(--amber-warning)', border: '1px solid rgba(245,158,11,0.25)' }
+                : { background: 'rgba(245,158,11,0.10)', color: 'var(--amber-warning)', border: '1px solid rgba(245,158,11,0.22)' }
               }
             >
               {deadlineInfo.label}
@@ -86,7 +86,7 @@ export default function ApplicationCard({ application, onClick, onContextMenu, m
 
         {/* Role */}
         <div
-          className="text-[11.5px] mt-0.5 truncate"
+          className="text-[12px] mt-0.5 truncate"
           style={{ color: 'var(--muted-text)' }}
         >
           {application.role}

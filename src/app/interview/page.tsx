@@ -665,8 +665,8 @@ function InterviewContent() {
 
             {/* Hero */}
             <div style={{
-              padding: '64px 24px 48px',
-              background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(37,99,235,0.18) 0%, transparent 70%)',
+              padding: '36px 24px 24px',
+              background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(37,99,235,0.14) 0%, transparent 70%)',
               textAlign: 'center',
             }}>
               <motion.div
@@ -674,13 +674,13 @@ function InterviewContent() {
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                 style={{
-                  width: 64, height: 64, borderRadius: 20,
+                  width: 48, height: 48, borderRadius: 14,
                   background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 20px',
+                  margin: '0 auto 14px',
                 }}
               >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="9" y="2" width="6" height="12" rx="3" />
                   <path d="M5 10a7 7 0 0 0 14 0" />
                   <line x1="12" y1="19" x2="12" y2="22" />
@@ -688,18 +688,18 @@ function InterviewContent() {
                 </svg>
               </motion.div>
               <motion.h1
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 10px', color: '#fff' }}
+                style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 7px', color: '#fff' }}
               >
                 Mock Interview
               </motion.h1>
               <motion.p
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.18 }}
-                style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', margin: '0 auto', maxWidth: 420 }}
+                style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 auto', maxWidth: 380 }}
               >
                 Practice out loud. Get real STAR feedback. Get hired.
               </motion.p>

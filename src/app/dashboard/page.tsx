@@ -578,7 +578,7 @@ function DashboardContent() {
 
       <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-6">
         {/* Greeting + momentum + season */}
-        <div className="mb-5">
+        <div className="greeting-hero">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex-1 min-w-0">
               <p className="text-[17px] font-semibold leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>

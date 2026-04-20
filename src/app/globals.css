@@ -469,3 +469,23 @@ body {
   border-radius: 3px;
   transform: none;
 }
+
+/* ── Dashboard greeting hero ────────────────────────────────────────────── */
+.greeting-hero {
+  background: linear-gradient(135deg, var(--surface-gray) 0%, var(--card-bg) 75%);
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+/* ── Unified alert/nudge feed row ────────────────────────────────────────── */
+.feed-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-gray);
+  background: var(--card-bg);
+}

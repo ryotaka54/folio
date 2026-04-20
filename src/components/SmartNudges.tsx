@@ -40,18 +40,18 @@ export default function SmartNudges({ applications, onAddApp, onOpenApp }: Props
               ? { duration: 0.01 }
               : { duration: 0.24, delay: i * 0.08, ease: 'easeOut' }
             }
-            className="flex items-start gap-3 px-4 py-3 rounded-lg border"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-lg border"
             style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}
           >
-            <Lightbulb size={14} style={{ color: 'var(--accent-blue)', flexShrink: 0, marginTop: 1 }} />
-            <p className="flex-1 text-[12px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
+            <Lightbulb size={14} style={{ color: 'var(--accent-blue)', flexShrink: 0 }} />
+            <p className="flex-1 text-[12px] leading-snug" style={{ color: 'var(--muted-text)' }}>
               {nudge.message}
             </p>
             <div className="flex items-center gap-2 flex-shrink-0">
               {nudge.action && (
                 <button
                   onClick={() => { nudge.appId ? onOpenApp?.(nudge.appId) : onAddApp?.(); dismiss(nudge.id); }}
-                  className="text-[11px] font-medium underline underline-offset-2 transition-colors"
+                  className="flex items-center gap-1 text-[11px] font-semibold transition-opacity hover:opacity-70"
                   style={{ color: 'var(--accent-blue)' }}
                 >
                   {nudge.action}
@@ -60,7 +60,7 @@ export default function SmartNudges({ applications, onAddApp, onOpenApp }: Props
               {nudge.appId && !nudge.action && (
                 <button
                   onClick={() => { onOpenApp?.(nudge.appId!); dismiss(nudge.id); }}
-                  className="text-[11px] font-medium underline underline-offset-2 transition-colors"
+                  className="text-[11px] font-semibold transition-opacity hover:opacity-70"
                   style={{ color: 'var(--accent-blue)' }}
                 >
                   View
@@ -68,11 +68,11 @@ export default function SmartNudges({ applications, onAddApp, onOpenApp }: Props
               )}
               <button
                 onClick={() => dismiss(nudge.id)}
-                className="text-[13px] leading-none transition-opacity hover:opacity-60"
-                style={{ color: 'var(--text-tertiary)' }}
+                className="opacity-40 hover:opacity-70 transition-opacity"
+                style={{ color: 'var(--muted-text)' }}
                 aria-label="Dismiss"
               >
-                ✕
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
           </motion.div>

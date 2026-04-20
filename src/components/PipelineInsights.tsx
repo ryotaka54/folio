@@ -164,7 +164,7 @@ function DeadlineCard({ app, days, onOpen, onDismiss }: {
       >
         View <ChevronRight size={11} />
       </button>
-      <button onClick={onDismiss} className="text-[12px] opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
+      <button onClick={onDismiss} className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
         <X size={12} />
       </button>
     </div>
@@ -191,19 +191,19 @@ function StaleCard({ app, days, onOpen, onFollowUp, onDismiss }: {
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={onFollowUp}
-          className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-md text-white transition-opacity hover:opacity-85"
-          style={{ background: 'var(--accent-blue)' }}
+          className="flex items-center gap-1 text-[11px] font-semibold transition-opacity hover:opacity-70"
+          style={{ color: 'var(--accent-blue)' }}
         >
           <Mail size={10} /> Follow up
         </button>
         <button
           onClick={onOpen}
-          className="text-[11px] font-medium transition-colors hover:opacity-70"
+          className="text-[11px] font-semibold transition-opacity hover:opacity-70"
           style={{ color: 'var(--muted-text)' }}
         >
           View
         </button>
-        <button onClick={onDismiss} className="opacity-40 hover:opacity-70 transition-opacity" style={{ color: 'var(--muted-text)' }}>
+        <button onClick={onDismiss} className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
           <X size={12} />
         </button>
       </div>
