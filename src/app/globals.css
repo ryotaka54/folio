@@ -46,13 +46,33 @@
   /* shadcn raw vars (used by focus-visible ring utilities) */
   --ring: var(--accent-blue);
 
-  /* ── Design system v2 surface/text aliases ───── */
-  --bg: var(--background);
-  --bg-soft: var(--surface-gray);
-  --bg-sunk: var(--card-bg);
-  --border-emph: var(--border-emphasis);
-  --warn: var(--amber-warning);
-  --warn-bg: rgba(217,119,6,0.08);
+  /* ── Design system v2 — surface hierarchy ───── */
+  /* --bg > --bg-soft > --bg-sunk (darkening: cards > columns > deep surfaces) */
+  --bg:      var(--background);     /* #FFF  — card / topbar bg      */
+  --bg-soft: var(--card-bg);        /* #F9FAFB — column / hover bg   */
+  --bg-sunk: var(--surface-gray);   /* #F3F4F6 — deep / sunk surface */
+
+  /* ── Text hierarchy ─────────────────────────── */
+  --text:    var(--brand-navy);     /* #111827 */
+  --muted:   var(--muted-text);     /* #6B7280 */
+  --muted-2: var(--text-tertiary);  /* #9CA3AF */
+
+  /* ── Borders ─────────────────────────────────── */
+  --border:      var(--border-gray);      /* #E5E7EB */
+  --border-emph: var(--border-emphasis);  /* #D1D5DB */
+
+  /* ── Accent ──────────────────────────────────── */
+  --accent:        var(--accent-blue);       /* #2563EB */
+  --accent-2:      var(--accent-blue-hover); /* #1D4ED8 */
+  --accent-wash:   var(--light-accent);      /* #EFF6FF */
+  --accent-border: #BFDBFE;
+
+  /* ── Semantic ────────────────────────────────── */
+  --warn:       var(--amber-warning);  /* #D97706 */
+  --warn-bg:    rgba(217,119,6,0.08);
+  --success:    var(--green-success);  /* #16A34A */
+  --danger-bg:  var(--error-bg);       /* #FEF2F2 */
+
   --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
   --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
   --shadow-md: 0 2px 8px rgba(16,24,40,0.08);
@@ -106,13 +126,32 @@
 
   --ring: var(--accent-blue);
 
-  /* ── Design system v2 surface/text aliases ───── */
-  --bg: var(--background);
-  --bg-soft: var(--surface-gray);
-  --bg-sunk: var(--card-bg);
-  --border-emph: var(--border-emphasis);
-  --warn: var(--amber-warning);
-  --warn-bg: rgba(251,191,36,0.10);
+  /* ── Design system v2 — surface hierarchy ───── */
+  --bg:      var(--card-bg);        /* #161618 — card bg (lighter)   */
+  --bg-soft: var(--surface-gray);   /* #1E1E20 — hover / column bg   */
+  --bg-sunk: var(--background);     /* #0A0A0A — page / sunk bg      */
+
+  /* ── Text hierarchy ─────────────────────────── */
+  --text:    var(--brand-navy);     /* #F9FAFB */
+  --muted:   var(--muted-text);     /* #A1A1AA */
+  --muted-2: var(--text-tertiary);  /* #71717A */
+
+  /* ── Borders ─────────────────────────────────── */
+  --border:      var(--border-gray);      /* #2A2A2C */
+  --border-emph: var(--border-emphasis);  /* #3A3A3E */
+
+  /* ── Accent ──────────────────────────────────── */
+  --accent:        var(--accent-blue);       /* #3B82F6 */
+  --accent-2:      var(--accent-blue-hover); /* #60A5FA */
+  --accent-wash:   rgba(59,130,246,0.12);
+  --accent-border: rgba(59,130,246,0.30);
+
+  /* ── Semantic ────────────────────────────────── */
+  --warn:       var(--amber-warning);  /* #FBBF24 */
+  --warn-bg:    rgba(251,191,36,0.10);
+  --success:    var(--green-success);  /* #4ADE80 */
+  --danger-bg:  var(--error-bg);       /* rgba(239,68,68,0.12) */
+
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
   --shadow-md: 0 2px 10px rgba(0,0,0,0.30);
   --shadow-lg: 0 16px 32px rgba(0,0,0,0.40);
