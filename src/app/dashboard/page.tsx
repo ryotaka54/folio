@@ -39,8 +39,9 @@ import ReferralWelcomeModal from '@/components/ReferralWelcomeModal';
 import FeedbackPrompt from '@/components/FeedbackPrompt';
 import PipelineInsights from '@/components/PipelineInsights';
 import ImportCSVModal from '@/components/ImportCSVModal';
-import { motion } from 'framer-motion';
-import { LayoutDashboard, Calendar, Mic } from 'lucide-react';
+import TodayView from '@/components/TodayView';
+import PipelineBar from '@/components/PipelineBar';
+import { LayoutDashboard, Calendar, Mic, Home } from 'lucide-react';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
@@ -65,7 +66,7 @@ function DashboardContent() {
   const { isInstalled: extInstalled, isDismissed: extDismissed, isBannerEligible } = useExtensionStatus();
   const router = useRouter();
 
-  const [view, setView] = useState<'pipeline' | 'table'>('pipeline');
+  const [view, setView] = useState<'today' | 'pipeline' | 'table'>('today');
   const [isMobile, setIsMobile] = useState(false);
   // Detect mobile after mount to avoid SSR mismatch
   useEffect(() => {
@@ -506,33 +507,53 @@ function DashboardContent() {
       {/* Top nav — hidden on mobile (replaced by bottom tab bar) */}
       <nav className="hidden lg:block border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
-          <div className="flex items-center gap-5">
-            <Link href="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
               {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
-              <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+              <span className="text-[15px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
-            <div className="flex items-center gap-0.5">
+
+            {/* View switcher — Today / Pipeline / Table */}
+            <div
+              className="flex items-center gap-0.5 p-0.5 rounded-lg border border-border-gray"
+              style={{ background: 'var(--surface-gray)' }}
+            >
+              {([
+                { k: 'today' as const,    label: 'Today',    icon: <Home size={12} aria-hidden /> },
+                { k: 'pipeline' as const, label: 'Pipeline', icon: <LayoutDashboard size={12} aria-hidden /> },
+                { k: 'table' as const,    label: 'Table',    icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
+              ] as const).map(({ k, label, icon }) => {
+                const active = view === k;
+                return (
+                  <button
+                    key={k}
+                    onClick={() => { setView(k); capture('view_switched', { view: k }); }}
+                    className="flex items-center gap-1.5 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
+                    style={{
+                      background: active ? 'var(--card-bg)' : 'transparent',
+                      color: active ? 'var(--brand-navy)' : 'var(--muted-text)',
+                      boxShadow: active ? '0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px var(--border-gray)' : 'none',
+                    }}
+                  >
+                    {icon}{label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Page nav — Calendar & Interview */}
+            <div className="flex items-center gap-0.5 border-l border-border-gray pl-4">
               {[
-                { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={13} aria-hidden />, active: true },
-                { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden />, active: false },
-                { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden />, active: false },
-              ].map(({ href, label, icon, active }) => (
+                { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden /> },
+                { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden /> },
+              ].map(({ href, label, icon }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
-                  style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)' }}
+                  className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors hover:text-brand-navy"
+                  style={{ color: 'var(--muted-text)' }}
                 >
-                  {active && (
-                    <motion.span
-                      layoutId="nav-active"
-                      className="absolute inset-0 rounded-lg"
-                      style={{ background: 'rgba(37,99,235,0.08)' }}
-                      transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
-                    />
-                  )}
-                  <span className="relative">{icon}</span>
-                  <span className="relative">{label}</span>
+                  {icon}{label}
                 </Link>
               ))}
             </div>
@@ -577,190 +598,199 @@ function DashboardContent() {
       </nav>
 
       <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-6">
-        {/* Greeting + momentum + season */}
-        <div className="greeting-hero">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="flex-1 min-w-0">
-              <p className="text-[17px] font-semibold leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-                {greeting || (user?.name ? `Hey ${user.name.split(' ')[0]}.` : 'Welcome back.')}
-              </p>
-            </div>
-            {(() => {
-              const season = getSeasonInfo(user?.recruiting_season);
-              const momentum = computeMomentum(applications);
-              return (
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span
-                    className="text-[11px] font-medium px-2.5 py-1 rounded-full"
-                    style={{ background: momentum.color + '18', color: momentum.color }}
-                    title={`Momentum score: ${momentum.score}/100`}
-                  >
-                    {momentum.label}
-                  </span>
-                  {season.daysLeft > 0 && (
-                    <span
-                      className="text-[11px] font-medium px-2.5 py-1 rounded-full hidden sm:inline-flex items-center gap-1"
-                      style={{
-                        background: season.urgent ? 'rgba(217,119,6,0.12)' : 'var(--surface-gray)',
-                        color: season.urgent ? 'var(--amber-warning)' : 'var(--muted-text)',
-                      }}
-                    >
-                      {season.urgent && '⚠ '}{season.daysLeft}d left · {season.name}
-                    </span>
-                  )}
+        {/* Today view replaces all sections below */}
+        {view === 'today' && !isMobile && (
+          <TodayView
+            applications={displayApplications}
+            userName={user?.name?.split(' ')[0]}
+            onOpenApp={handleCardClick}
+          />
+        )}
+
+        {view !== 'today' && (
+          <>
+            {/* Greeting + momentum + season */}
+            <div className="greeting-hero">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[17px] font-semibold leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
+                    {greeting || (user?.name ? `Hey ${user.name.split(' ')[0]}.` : 'Welcome back.')}
+                  </p>
                 </div>
-              );
-            })()}
-          </div>
-          {seasonTip && (
-            <p className="mt-2 text-[12px] leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
-              {seasonTip}
-            </p>
-          )}
-        </div>
+                {(() => {
+                  const season = getSeasonInfo(user?.recruiting_season);
+                  const momentum = computeMomentum(applications);
+                  return (
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span
+                        className="text-[11px] font-medium px-2.5 py-1 rounded-full"
+                        style={{ background: momentum.color + '18', color: momentum.color }}
+                        title={`Momentum score: ${momentum.score}/100`}
+                      >
+                        {momentum.label}
+                      </span>
+                      {season.daysLeft > 0 && (
+                        <span
+                          className="text-[11px] font-medium px-2.5 py-1 rounded-full hidden sm:inline-flex items-center gap-1"
+                          style={{
+                            background: season.urgent ? 'rgba(217,119,6,0.12)' : 'var(--surface-gray)',
+                            color: season.urgent ? 'var(--amber-warning)' : 'var(--muted-text)',
+                          }}
+                        >
+                          {season.urgent && '⚠ '}{season.daysLeft}d left · {season.name}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+              {seasonTip && (
+                <p className="mt-2 text-[12px] leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
+                  {seasonTip}
+                </p>
+              )}
+            </div>
 
-        {/* Weekly AI Coach */}
-        {!isActive && user?.id && applications.length > 0 && (
-          <div className="mb-5">
-            <WeeklyCoach
-              userId={user.id}
-              isPro={userIsPro}
-              onUpgrade={() => setShowUpgradeModal(true)}
-            />
-          </div>
-        )}
+            {/* Weekly AI Coach */}
+            {!isActive && user?.id && applications.length > 0 && (
+              <div className="mb-5">
+                <WeeklyCoach
+                  userId={user.id}
+                  isPro={userIsPro}
+                  onUpgrade={() => setShowUpgradeModal(true)}
+                />
+              </div>
+            )}
 
-        {/* Stats */}
-        <div data-tutorial-id="stats-bar">
-          <StatsBar applications={displayApplications} />
-        </div>
+            {/* Stats */}
+            <div data-tutorial-id="stats-bar">
+              <StatsBar applications={displayApplications} />
+            </div>
 
-        {/* Funnel */}
-        <div data-tutorial-id="funnel-chart">
-          <FunnelChart applications={displayApplications} />
-        </div>
+            {/* Funnel */}
+            <div data-tutorial-id="funnel-chart">
+              <FunnelChart applications={displayApplications} />
+            </div>
 
-        {/* Weekly goal progress */}
-        {!isActive && applications.length > 0 && (
-          <WeeklyGoal
-            applications={applications}
-            onToast={msg => showToast(msg)}
-          />
-        )}
-
-        {/* Smart nudges */}
-        {!isActive && applications.length > 0 && (
-          <SmartNudges
-            applications={applications}
-            onAddApp={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-            onOpenApp={id => {
-              const app = applications.find(a => a.id === id);
-              if (app) handleCardClick(app);
-            }}
-          />
-        )}
-
-        {/* Proactive pipeline insights — stale apps + deadline alerts */}
-        {!isActive && applications.length > 0 && (
-          <PipelineInsights
-            applications={applications}
-            onOpenApp={id => {
-              const app = applications.find(a => a.id === id);
-              if (app) handleCardClick(app);
-            }}
-            onFollowUp={app => handleCardClick(app)}
-          />
-        )}
-
-        {/* Controls */}
-        <div className="mt-6 flex flex-col gap-2">
-          {/* Mobile: compact search only (Add is in bottom tab bar) */}
-          {isMobile && (
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search…"
-                className="w-full h-11 pl-10 pr-3 bg-background border border-border-gray rounded-xl text-[16px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+            {/* Weekly goal progress */}
+            {!isActive && applications.length > 0 && (
+              <WeeklyGoal
+                applications={applications}
+                onToast={msg => showToast(msg)}
               />
-            </div>
-          )}
+            )}
 
-          {/* Desktop: Row 1: Search + Add */}
-          <div className="hidden lg:flex gap-2">
-            <div data-tutorial-id="search-input" className="relative flex-1">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search company or role…"
-                className="w-full h-9 pl-9 pr-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+            {/* Smart nudges */}
+            {!isActive && applications.length > 0 && (
+              <SmartNudges
+                applications={applications}
+                onAddApp={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+                onOpenApp={id => {
+                  const app = applications.find(a => a.id === id);
+                  if (app) handleCardClick(app);
+                }}
               />
-            </div>
-            <button
-              data-tutorial-id="add-button"
-              onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-              className="h-9 px-4 text-[13px] font-medium text-white rounded-md flex items-center gap-1.5 flex-shrink-0 transition-colors bg-accent-blue hover:bg-accent-blue-hover"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Add
-              <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
-            </button>
-            <button
-              onClick={() => setShowImportModal(true)}
-              className="h-9 px-3 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 border transition-colors hover:border-accent-blue hover:text-accent-blue"
-              style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
-              title="Import from CSV"
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Import
-            </button>
-          </div>
-          {/* Row 2: View toggle + filters — desktop only */}
-          <div className="hidden lg:flex flex-wrap items-center gap-2">
-            <div data-tutorial-id="view-toggle" className="hidden lg:flex border border-border-gray rounded-md p-0.5 flex-shrink-0" style={{ background: 'var(--surface-gray)' }}>
-              <button
-                onClick={() => { setView('pipeline'); capture('view_switched', { view: 'pipeline' }); }}
-                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'pipeline' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
-              >Pipeline</button>
-              <button
-                onClick={() => { setView('table'); capture('view_switched', { view: 'table' }); }}
-                className={`px-3 h-7 text-[12px] font-medium rounded transition-colors ${view === 'table' ? 'bg-card-bg text-brand-navy' : 'text-muted-text'}`}
-              >Table</button>
-            </div>
-            <select
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value as PipelineStage | 'all')}
-              className="h-8 px-3 bg-background border border-border-gray rounded-md text-[12px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 transition-colors flex-shrink-0"
-              style={{ color: 'var(--muted-text)' }}
-            >
-              <option value="all">All statuses</option>
-              {stages.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <button
-              onClick={() => setHideInactive(h => !h)}
-              className="h-8 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 transition-colors"
-              style={hideInactive
-                ? { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }
-                : { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }}
-            >
-              {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
-            </button>
-          </div>
-          {displayApplications.length > 0 && (
-            <p className="text-[11px] text-right" style={{ color: 'var(--text-tertiary)' }}>
-              {filteredApps.length === displayApplications.length
-                ? `${displayApplications.length} application${displayApplications.length !== 1 ? 's' : ''}`
-                : `Showing ${filteredApps.length} of ${displayApplications.length}`}
-            </p>
-          )}
-        </div>
+            )}
 
-        {/* Content */}
-        <div className="mt-4 flex-1">
+            {/* Proactive pipeline insights — stale apps + deadline alerts */}
+            {!isActive && applications.length > 0 && (
+              <PipelineInsights
+                applications={applications}
+                onOpenApp={id => {
+                  const app = applications.find(a => a.id === id);
+                  if (app) handleCardClick(app);
+                }}
+                onFollowUp={app => handleCardClick(app)}
+              />
+            )}
+
+            {/* Pipeline filter bar */}
+            {!loading && displayApplications.length > 0 && (
+              <div className="mt-6 -mx-4 md:-mx-6">
+                <PipelineBar
+                  applications={displayApplications}
+                  stages={stages as PipelineStage[]}
+                  activeStage={statusFilter}
+                  onStageClick={s => setStatusFilter(s)}
+                />
+              </div>
+            )}
+
+            {/* Controls */}
+            <div className="mt-4 flex flex-col gap-2">
+              {/* Mobile: compact search only (Add is in bottom tab bar) */}
+              {isMobile && (
+                <div className="relative">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Search…"
+                    className="w-full h-11 pl-10 pr-3 bg-background border border-border-gray rounded-xl text-[16px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+                  />
+                </div>
+              )}
+
+              {/* Desktop: Search + Add + Import */}
+              <div className="hidden lg:flex gap-2">
+                <div data-tutorial-id="search-input" className="relative flex-1">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Search company or role…"
+                    className="w-full h-9 pl-9 pr-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
+                  />
+                </div>
+                <button
+                  data-tutorial-id="add-button"
+                  onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+                  className="h-9 px-4 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 transition-opacity hover:opacity-80"
+                  style={{ background: 'var(--brand-navy)', color: 'var(--background)' }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add
+                  <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
+                </button>
+                <button
+                  onClick={() => setShowImportModal(true)}
+                  className="h-9 px-3 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 border transition-colors hover:border-accent-blue hover:text-accent-blue"
+                  style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+                  title="Import from CSV"
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Import
+                </button>
+              </div>
+
+              {/* Filters row */}
+              <div className="hidden lg:flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setHideInactive(h => !h)}
+                  className="h-8 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 transition-colors"
+                  style={hideInactive
+                    ? { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }
+                    : { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }}
+                >
+                  {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
+                </button>
+              </div>
+
+              {displayApplications.length > 0 && (
+                <p className="text-[11px] text-right" style={{ color: 'var(--text-tertiary)' }}>
+                  {filteredApps.length === displayApplications.length
+                    ? `${displayApplications.length} application${displayApplications.length !== 1 ? 's' : ''}`
+                    : `Showing ${filteredApps.length} of ${displayApplications.length}`}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Content — hidden for today view on desktop (TodayView renders above) */}
+        {(view !== 'today' || isMobile) && <div className="mt-4 flex-1">
           {loading ? (
             <div className="flex gap-3 overflow-hidden">
               {[...Array(4)].map((_, i) => (
@@ -813,7 +843,7 @@ function DashboardContent() {
               onRowContextMenu={handleContextMenu}
             />
           )}
-        </div>
+        </div>}
 
         {/* Bulk action bar */}
         {selectedIds.size > 0 && (

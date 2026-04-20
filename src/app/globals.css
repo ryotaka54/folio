@@ -3,6 +3,8 @@
 
 
 :root {
+  color-scheme: light;
+
   /* Blue palette */
   --accent-blue: #2563EB;
   --accent-blue-hover: #1D4ED8;
@@ -43,9 +45,33 @@
 
   /* shadcn raw vars (used by focus-visible ring utilities) */
   --ring: var(--accent-blue);
+
+  /* ── Design system v2 surface/text aliases ───── */
+  --bg: var(--background);
+  --bg-soft: var(--surface-gray);
+  --bg-sunk: var(--card-bg);
+  --border-emph: var(--border-emphasis);
+  --warn: var(--amber-warning);
+  --warn-bg: rgba(217,119,6,0.08);
+  --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
+  --shadow-md: 0 2px 8px rgba(16,24,40,0.08);
+  --shadow-lg: 0 12px 24px rgba(16,24,40,0.12);
+
+  /* ── Stage pill tokens — light ───────────────── */
+  --pill-neutral-fg: #4B5563; --pill-neutral-bg: #F3F4F6; --pill-neutral-dot: #9CA3AF;
+  --pill-slate-fg:   #374151; --pill-slate-bg:   #F1F5F9; --pill-slate-dot:   #64748B;
+  --pill-indigo-fg:  #3730A3; --pill-indigo-bg:  #EEF2FF; --pill-indigo-dot:  #6366F1;
+  --pill-violet-fg:  #5B21B6; --pill-violet-bg:  #F5F3FF; --pill-violet-dot:  #8B5CF6;
+  --pill-amber-fg:   #92400E; --pill-amber-bg:   #FFFBEB; --pill-amber-dot:   #F59E0B;
+  --pill-green-fg:   #065F46; --pill-green-bg:   #ECFDF5; --pill-green-dot:   #10B981;
+  --pill-red-fg:     #7F1D1D; --pill-red-bg:     #FEF2F2; --pill-red-dot:     #EF4444;
+  --pill-pink-fg:    #831843; --pill-pink-bg:    #FDF2F8; --pill-pink-dot:    #EC4899;
 }
 
 .dark {
+  color-scheme: dark;
+
   --accent-blue: #3B82F6;
   --accent-blue-hover: #60A5FA;
   --light-accent: #172554;
@@ -79,6 +105,27 @@
   --progate-overlay: rgba(10, 10, 10, 0.82);
 
   --ring: var(--accent-blue);
+
+  /* ── Design system v2 surface/text aliases ───── */
+  --bg: var(--background);
+  --bg-soft: var(--surface-gray);
+  --bg-sunk: var(--card-bg);
+  --border-emph: var(--border-emphasis);
+  --warn: var(--amber-warning);
+  --warn-bg: rgba(251,191,36,0.10);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-md: 0 2px 10px rgba(0,0,0,0.30);
+  --shadow-lg: 0 16px 32px rgba(0,0,0,0.40);
+
+  /* ── Stage pill tokens — dark ────────────────── */
+  --pill-neutral-fg: #9CA3AF; --pill-neutral-bg: #1F2937; --pill-neutral-dot: #6B7280;
+  --pill-slate-fg:   #CBD5E1; --pill-slate-bg:   #1E293B; --pill-slate-dot:   #94A3B8;
+  --pill-indigo-fg:  #A5B4FC; --pill-indigo-bg:  #1E1B4B; --pill-indigo-dot:  #818CF8;
+  --pill-violet-fg:  #C4B5FD; --pill-violet-bg:  #2E1065; --pill-violet-dot:  #A78BFA;
+  --pill-amber-fg:   #FCD34D; --pill-amber-bg:   #292524; --pill-amber-dot:   #FBBF24;
+  --pill-green-fg:   #6EE7B7; --pill-green-bg:   #022C22; --pill-green-dot:   #34D399;
+  --pill-red-fg:     #FCA5A5; --pill-red-bg:     #450A0A; --pill-red-dot:     #F87171;
+  --pill-pink-fg:    #F9A8D4; --pill-pink-bg:    #500724; --pill-pink-dot:    #F472B6;
 }
 
 @theme inline {
