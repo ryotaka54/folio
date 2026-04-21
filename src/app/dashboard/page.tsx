@@ -8,12 +8,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { INTERNSHIP_STAGES, JOB_STAGES } from '@/lib/constants';
 import { Application, PipelineStage, Category } from '@/lib/types';
-import StatsBar from '@/components/StatsBar';
 import { Logo } from '@/components/Logo';
 import { ProLogo } from '@/components/ProLogo';
 import PipelineView from '@/components/PipelineView';
 import TableView from '@/components/TableView';
-import FunnelChart from '@/components/FunnelChart';
 import AddApplicationModal from '@/components/AddApplicationModal';
 import ApplicationDrawer from '@/components/ApplicationDrawer';
 import EmptyState from '@/components/EmptyState';
@@ -23,21 +21,16 @@ import Toast from '@/components/Toast';
 import ContextMenu from '@/components/ContextMenu';
 import ExtensionBanner from '@/components/ExtensionBanner';
 import StreakBadge from '@/components/StreakBadge';
-import SmartNudges from '@/components/SmartNudges';
-import WeeklyGoal from '@/components/WeeklyGoal';
 import OfferConfetti from '@/components/OfferConfetti';
 import { useTutorial } from '@/lib/tutorial-context';
 import { ExtensionStatusProvider, useExtensionStatus } from '@/lib/extension-status-context';
 import { capture } from '@/lib/analytics';
-import { computeGreeting, computeMomentum, getSeasonInfo, getSeasonalTip } from '@/lib/recruiting';
 import { isPro as checkIsPro, FREE_TIER_LIMIT } from '@/lib/pro';
 import { CapExceededError } from '@/lib/store';
 import UpgradeModal from '@/components/UpgradeModal';
-import WeeklyCoach from '@/components/ai/WeeklyCoach';
 import ProTour from '@/components/ProTour';
 import ReferralWelcomeModal from '@/components/ReferralWelcomeModal';
 import FeedbackPrompt from '@/components/FeedbackPrompt';
-import PipelineInsights from '@/components/PipelineInsights';
 import ImportCSVModal from '@/components/ImportCSVModal';
 import TodayView from '@/components/TodayView';
 import PipelineBar from '@/components/PipelineBar';
@@ -76,7 +69,6 @@ function DashboardContent() {
     return () => window.removeEventListener('resize', check);
   }, []);
   const [showFirstAppTip, setShowFirstAppTip] = useState(false);
-  const [search, setSearch] = useState('');
   const [hideInactive, setHideInactive] = useState(true);
   const [statusFilter, setStatusFilter] = useState<PipelineStage | 'all'>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -90,8 +82,6 @@ function DashboardContent() {
   const [toast, setToast] = useState<string | null>(null);
   const [toastUndo, setToastUndo] = useState<(() => void) | null>(null);
   const [offerConfetti, setOfferConfetti] = useState(false);
-  const [greeting, setGreeting] = useState('');
-  const [seasonTip, setSeasonTip] = useState('');
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradedSuccess, setUpgradedSuccess] = useState(false);
   const [showProWelcome, setShowProWelcome] = useState(false);
@@ -116,17 +106,9 @@ function DashboardContent() {
     return displayApplications.filter(app => {
       if (hideInactive && inactiveStatuses.includes(app.status)) return false;
       if (statusFilter !== 'all' && app.status !== statusFilter) return false;
-      if (search) {
-        const q = search.toLowerCase();
-        if (!app.company.toLowerCase().includes(q) && !app.role.toLowerCase().includes(q)) return false;
-      }
       return true;
     });
-  }, [displayApplications, search, hideInactive, statusFilter]);
-
-  const hiddenCount = useMemo(() =>
-    displayApplications.filter(a => inactiveStatuses.includes(a.status)).length,
-  [displayApplications]);
+  }, [displayApplications, hideInactive, statusFilter]);
 
   const showToast = (msg: string, undoFn?: () => void) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -396,13 +378,6 @@ function DashboardContent() {
     requestAndNotify();
   }, [applications, loading]);
 
-  // Compute greeting + season tip once applications are loaded
-  useEffect(() => {
-    if (!user || loading) return;
-    setGreeting(computeGreeting({ name: user.name ?? 'there', applications }));
-    setSeasonTip(getSeasonalTip());
-  }, [user, applications, loading]);
-
   // Detect offer status changes → trigger confetti
   useEffect(() => {
     const offerStatuses = ['Offer', 'Offer — Negotiating'];
@@ -506,7 +481,7 @@ function DashboardContent() {
 
       {/* Top nav — hidden on mobile (replaced by bottom tab bar) */}
       <nav className="hidden lg:block border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[56px]">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
               {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
@@ -521,7 +496,7 @@ function DashboardContent() {
               {([
                 { k: 'today' as const,    label: 'Today',    icon: <Home size={12} aria-hidden /> },
                 { k: 'pipeline' as const, label: 'Pipeline', icon: <LayoutDashboard size={12} aria-hidden /> },
-                { k: 'table' as const,    label: 'Table',    icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
+                { k: 'table' as const,    label: 'List',     icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
               ] as const).map(({ k, label, icon }) => {
                 const active = view === k;
                 return (
@@ -559,6 +534,17 @@ function DashboardContent() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {view !== 'today' && (
+              <button
+                onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+                className="h-8 px-3.5 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 transition-opacity hover:opacity-80"
+                style={{ background: 'var(--brand-navy)', color: 'var(--background)' }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+                <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
+              </button>
+            )}
             {user?.name && (
               <span className="text-sm text-muted-text hidden md:block">Hi, {user.name.split(' ')[0]}</span>
             )}
@@ -597,202 +583,73 @@ function DashboardContent() {
         </div>
       </nav>
 
-      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-6">
-        {/* Today view replaces all sections below */}
-        {view === 'today' && !isMobile && (
-          <TodayView
-            applications={displayApplications}
-            userName={user?.name?.split(' ')[0]}
-            onOpenApp={handleCardClick}
-          />
-        )}
-
-        {view !== 'today' && (
-          <>
-            {/* Greeting + momentum + season */}
-            <div className="greeting-hero">
-              <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div className="flex-1 min-w-0">
-                  <p className="text-[17px] font-semibold leading-snug" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-                    {greeting || (user?.name ? `Hey ${user.name.split(' ')[0]}.` : 'Welcome back.')}
-                  </p>
-                </div>
-                {(() => {
-                  const season = getSeasonInfo(user?.recruiting_season);
-                  const momentum = computeMomentum(applications);
-                  return (
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span
-                        className="text-[11px] font-medium px-2.5 py-1 rounded-full"
-                        style={{ background: momentum.color + '18', color: momentum.color }}
-                        title={`Momentum score: ${momentum.score}/100`}
-                      >
-                        {momentum.label}
-                      </span>
-                      {season.daysLeft > 0 && (
-                        <span
-                          className="text-[11px] font-medium px-2.5 py-1 rounded-full hidden sm:inline-flex items-center gap-1"
-                          style={{
-                            background: season.urgent ? 'rgba(217,119,6,0.12)' : 'var(--surface-gray)',
-                            color: season.urgent ? 'var(--amber-warning)' : 'var(--muted-text)',
-                          }}
-                        >
-                          {season.urgent && '⚠ '}{season.daysLeft}d left · {season.name}
-                        </span>
-                      )}
+      {view === 'today' ? (
+        <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-6">
+          {!isMobile && (
+            <TodayView
+              applications={displayApplications}
+              userName={user?.name?.split(' ')[0]}
+              onOpenApp={handleCardClick}
+            />
+          )}
+          {isMobile && (
+            <div className="mt-4 flex-1">
+              {loading ? (
+                <div className="flex gap-3 overflow-hidden">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex-1 min-w-[160px] rounded-lg border border-border-gray p-3" style={{ background: 'var(--card-bg)' }}>
+                      <div className="h-3 w-16 rounded mb-3 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+                      {[...Array(i === 1 ? 3 : i === 0 ? 2 : 1)].map((_, j) => (
+                        <div key={j} className="h-16 rounded-md mb-2 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
+                      ))}
                     </div>
-                  );
-                })()}
-              </div>
-              {seasonTip && (
-                <p className="mt-2 text-[12px] leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
-                  {seasonTip}
-                </p>
-              )}
-            </div>
-
-            {/* Weekly AI Coach */}
-            {!isActive && user?.id && applications.length > 0 && (
-              <div className="mb-5">
-                <WeeklyCoach
-                  userId={user.id}
-                  isPro={userIsPro}
-                  onUpgrade={() => setShowUpgradeModal(true)}
-                />
-              </div>
-            )}
-
-            {/* Stats */}
-            <div data-tutorial-id="stats-bar">
-              <StatsBar applications={displayApplications} />
-            </div>
-
-            {/* Funnel */}
-            <div data-tutorial-id="funnel-chart">
-              <FunnelChart applications={displayApplications} />
-            </div>
-
-            {/* Weekly goal progress */}
-            {!isActive && applications.length > 0 && (
-              <WeeklyGoal
-                applications={applications}
-                onToast={msg => showToast(msg)}
-              />
-            )}
-
-            {/* Smart nudges */}
-            {!isActive && applications.length > 0 && (
-              <SmartNudges
-                applications={applications}
-                onAddApp={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-                onOpenApp={id => {
-                  const app = applications.find(a => a.id === id);
-                  if (app) handleCardClick(app);
-                }}
-              />
-            )}
-
-            {/* Proactive pipeline insights — stale apps + deadline alerts */}
-            {!isActive && applications.length > 0 && (
-              <PipelineInsights
-                applications={applications}
-                onOpenApp={id => {
-                  const app = applications.find(a => a.id === id);
-                  if (app) handleCardClick(app);
-                }}
-                onFollowUp={app => handleCardClick(app)}
-              />
-            )}
-
-            {/* Pipeline filter bar */}
-            {!loading && displayApplications.length > 0 && (
-              <div className="mt-6 -mx-4 md:-mx-6">
-                <PipelineBar
-                  applications={displayApplications}
+                  ))}
+                </div>
+              ) : displayApplications.length === 0 ? (
+                <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} hideExtensionHint={bannerVisible} />
+              ) : (
+                <MobileCardList
+                  applications={filteredApps}
                   stages={stages as PipelineStage[]}
-                  activeStage={statusFilter}
-                  onStageClick={s => setStatusFilter(s)}
+                  onCardClick={handleCardClick}
+                  onStatusChange={(id, status) => handleStatusChange(id, status)}
+                  onCardContextMenu={handleContextMenu}
                 />
-              </div>
-            )}
-
-            {/* Controls */}
-            <div className="mt-4 flex flex-col gap-2">
-              {/* Mobile: compact search only (Add is in bottom tab bar) */}
-              {isMobile && (
-                <div className="relative">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Search…"
-                    className="w-full h-11 pl-10 pr-3 bg-background border border-border-gray rounded-xl text-[16px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
-                  />
-                </div>
-              )}
-
-              {/* Desktop: Search + Add + Import */}
-              <div className="hidden lg:flex gap-2">
-                <div data-tutorial-id="search-input" className="relative flex-1">
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-tertiary)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Search company or role…"
-                    className="w-full h-9 pl-9 pr-3 bg-background border border-border-gray rounded-md text-[13px] focus:outline-none focus:border-accent-blue focus:ring-2 focus:ring-accent-blue/20 placeholder:text-text-tertiary transition-colors"
-                  />
-                </div>
-                <button
-                  data-tutorial-id="add-button"
-                  onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-                  className="h-9 px-4 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 transition-opacity hover:opacity-80"
-                  style={{ background: 'var(--brand-navy)', color: 'var(--background)' }}
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  Add
-                  <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
-                </button>
-                <button
-                  onClick={() => setShowImportModal(true)}
-                  className="h-9 px-3 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 border transition-colors hover:border-accent-blue hover:text-accent-blue"
-                  style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
-                  title="Import from CSV"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                  Import
-                </button>
-              </div>
-
-              {/* Filters row */}
-              <div className="hidden lg:flex flex-wrap items-center gap-2">
-                <button
-                  onClick={() => setHideInactive(h => !h)}
-                  className="h-8 px-3 text-[12px] font-medium border rounded-md flex-shrink-0 transition-colors"
-                  style={hideInactive
-                    ? { background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }
-                    : { background: 'var(--accent-blue)', borderColor: 'var(--accent-blue)', color: '#fff' }}
-                >
-                  {hideInactive ? `${hiddenCount} hidden` : 'Showing all'}
-                </button>
-              </div>
-
-              {displayApplications.length > 0 && (
-                <p className="text-[11px] text-right" style={{ color: 'var(--text-tertiary)' }}>
-                  {filteredApps.length === displayApplications.length
-                    ? `${displayApplications.length} application${displayApplications.length !== 1 ? 's' : ''}`
-                    : `Showing ${filteredApps.length} of ${displayApplications.length}`}
-                </p>
               )}
             </div>
-          </>
-        )}
+          )}
 
-        {/* Content — hidden for today view on desktop (TodayView renders above) */}
-        {(view !== 'today' || isMobile) && <div className="mt-4 flex-1">
+          {/* Dashboard Footer */}
+          <footer className="mt-20 py-8 border-t border-border-gray flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-6">
+              <Link href="/settings" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Settings</Link>
+              <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help Center</Link>
+              <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Support</Link>
+              <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Terms of Service</Link>
+            </div>
+            <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+              © {new Date().getFullYear()} Applyd. All rights reserved.
+            </p>
+          </footer>
+        </main>
+      ) : (
+        <>
+          {/* PipelineBar — full width, directly under topbar */}
+          {!loading && displayApplications.length > 0 && (
+            <div style={{ borderBottom: '1px solid var(--border)' }}>
+              <PipelineBar
+                applications={displayApplications}
+                stages={stages as PipelineStage[]}
+                activeStage={statusFilter}
+                onStageClick={s => setStatusFilter(s)}
+              />
+            </div>
+          )}
+
+          {/* Pipeline / List content */}
           {loading ? (
-            <div className="flex gap-3 overflow-hidden">
+            <div style={{ padding: '20px 24px' }} className="flex gap-3 overflow-hidden">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="flex-1 min-w-[160px] rounded-lg border border-border-gray p-3" style={{ background: 'var(--card-bg)' }}>
                   <div className="h-3 w-16 rounded mb-3 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
@@ -803,13 +660,15 @@ function DashboardContent() {
               ))}
             </div>
           ) : displayApplications.length === 0 ? (
-            <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} hideExtensionHint={bannerVisible} />
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 24px' }}>
+              <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} hideExtensionHint={bannerVisible} />
+            </div>
           ) : filteredApps.length === 0 ? (
-            <div className="py-20 text-center border border-dashed border-border-gray rounded-lg">
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 24px', textAlign: 'center' }}>
               <h3 className="text-[13px] font-medium mb-2" style={{ color: 'var(--brand-navy)' }}>No matches</h3>
               <p className="text-[12px] mb-4" style={{ color: 'var(--muted-text)' }}>Try adjusting your filters.</p>
               <button
-                onClick={() => { setSearch(''); setStatusFilter('all'); setHideInactive(true); }}
+                onClick={() => { setStatusFilter('all'); setHideInactive(true); }}
                 className="inline-flex items-center h-8 px-3 text-[12px] font-medium rounded-md border border-border-gray transition-colors hover:bg-surface-gray"
                 style={{ color: 'var(--muted-text)' }}
               >
@@ -817,13 +676,15 @@ function DashboardContent() {
               </button>
             </div>
           ) : isMobile ? (
-            <MobileCardList
-              applications={filteredApps}
-              stages={stages as PipelineStage[]}
-              onCardClick={handleCardClick}
-              onStatusChange={(id, status) => handleStatusChange(id, status)}
-              onCardContextMenu={handleContextMenu}
-            />
+            <div style={{ padding: '16px' }}>
+              <MobileCardList
+                applications={filteredApps}
+                stages={stages as PipelineStage[]}
+                onCardClick={handleCardClick}
+                onStatusChange={(id, status) => handleStatusChange(id, status)}
+                onCardContextMenu={handleContextMenu}
+              />
+            </div>
           ) : view === 'pipeline' ? (
             <div data-tutorial-id="pipeline-board">
               <PipelineView
@@ -835,59 +696,47 @@ function DashboardContent() {
               />
             </div>
           ) : (
-            <TableView
-              applications={filteredApps}
-              selectedIds={selectedIds}
-              onSelectionChange={setSelectedIds}
-              onRowClick={handleCardClick}
-              onRowContextMenu={handleContextMenu}
-            />
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px 80px' }}>
+              <TableView
+                applications={filteredApps}
+                selectedIds={selectedIds}
+                onSelectionChange={setSelectedIds}
+                onRowClick={handleCardClick}
+                onRowContextMenu={handleContextMenu}
+              />
+            </div>
           )}
-        </div>}
+        </>
+      )}
 
-        {/* Bulk action bar */}
-        {selectedIds.size > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border-gray shadow-lg" style={{ background: 'var(--brand-navy)', color: '#fff' }}>
-            <span className="text-[12px] font-medium mr-1">{selectedIds.size} selected</span>
-            <select
-              value={bulkStatus}
-              onChange={e => setBulkStatus(e.target.value as PipelineStage | '')}
-              className="bg-white/10 border border-white/20 text-white text-[12px] rounded-md px-2 h-7 focus:outline-none"
-            >
-              <option value="">Move to…</option>
-              {stages.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <button
-              onClick={handleBulkStatusUpdate}
-              disabled={!bulkStatus}
-              className="px-3 h-7 bg-accent-blue text-white text-[12px] font-medium rounded-md disabled:opacity-40 transition-colors"
-            >
-              Apply
-            </button>
-            <div className="w-px h-4 bg-white/20 mx-1" />
-            <button onClick={handleBulkDelete} className="px-3 h-7 bg-red-500 text-white text-[12px] font-medium rounded-md hover:bg-red-600 transition-colors">
-              Delete
-            </button>
-            <button onClick={() => setSelectedIds(new Set())} className="ml-1 text-white/60 hover:text-white text-[12px]">
-              ✕
-            </button>
-          </div>
-        )}
-
-        {/* Dashboard Footer */}
-        <footer className="mt-20 py-8 border-t border-border-gray flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            <Link href="/settings" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Settings</Link>
-            <Link href="/help" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Help Center</Link>
-            <Link href="/contact" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Contact Support</Link>
-            <Link href="/privacy" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="text-xs font-medium text-muted-text hover:text-accent-blue transition-colors">Terms of Service</Link>
-          </div>
-          <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
-            © {new Date().getFullYear()} Applyd. All rights reserved.
-          </p>
-        </footer>
-      </main>
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border-gray shadow-lg" style={{ background: 'var(--brand-navy)', color: '#fff' }}>
+          <span className="text-[12px] font-medium mr-1">{selectedIds.size} selected</span>
+          <select
+            value={bulkStatus}
+            onChange={e => setBulkStatus(e.target.value as PipelineStage | '')}
+            className="bg-white/10 border border-white/20 text-white text-[12px] rounded-md px-2 h-7 focus:outline-none"
+          >
+            <option value="">Move to…</option>
+            {stages.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <button
+            onClick={handleBulkStatusUpdate}
+            disabled={!bulkStatus}
+            className="px-3 h-7 bg-accent-blue text-white text-[12px] font-medium rounded-md disabled:opacity-40 transition-colors"
+          >
+            Apply
+          </button>
+          <div className="w-px h-4 bg-white/20 mx-1" />
+          <button onClick={handleBulkDelete} className="px-3 h-7 bg-red-500 text-white text-[12px] font-medium rounded-md hover:bg-red-600 transition-colors">
+            Delete
+          </button>
+          <button onClick={() => setSelectedIds(new Set())} className="ml-1 text-white/60 hover:text-white text-[12px]">
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Add Modal */}
       <AddApplicationModal
