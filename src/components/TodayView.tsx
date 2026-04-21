@@ -545,8 +545,8 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
 
         /* Next Up hero — dark mode */
         .dark .next-up-hero {
-          background: #1C2333;
-          border: 1px solid rgba(255,255,255,0.07);
+          background: var(--card-bg);
+          border: 1px solid var(--border-gray);
         }
         .dark .next-up-badge { color: #60A5FA; }
         .dark .next-up-company { color: #fff; }
