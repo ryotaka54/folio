@@ -233,16 +233,11 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* Next-up hero */}
             {nextUp ? (
-              <div style={{
-                padding: 24, borderRadius: 14,
-                background: 'light-dark(var(--card-bg), var(--brand-navy))',
-                border: 'light-dark(1px solid var(--border-gray), 1px solid rgba(255,255,255,0.07))',
-                position: 'relative', overflow: 'hidden',
-              }}>
-                <div style={{
+              <div className="next-up-hero" style={{ padding: 24, borderRadius: 14, position: 'relative', overflow: 'hidden' }}>
+                <div className="next-up-badge" style={{
                   position: 'absolute', top: 16, right: 16,
                   display: 'flex', alignItems: 'center', gap: 5,
-                  fontSize: 11, color: 'light-dark(var(--accent-blue), #60A5FA)', fontWeight: 600,
+                  fontSize: 11, fontWeight: 600,
                   letterSpacing: '0.08em', textTransform: 'uppercase',
                 }}>
                   <Target size={11} /> Next up
@@ -250,60 +245,46 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                   <CompanyAvatar company={nextUp.company} size={52} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 21, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2, color: 'light-dark(var(--brand-navy), #fff)' }}>
+                    <div className="next-up-company" style={{ fontSize: 21, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                       {nextUp.company}
                     </div>
-                    <div style={{ fontSize: 14, color: 'light-dark(var(--muted-text), rgba(255,255,255,0.5))', marginTop: 2 }}>{nextUp.role}</div>
+                    <div className="next-up-role" style={{ fontSize: 14, marginTop: 2 }}>{nextUp.role}</div>
                     <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <StagePill stage={nextUp.status} />
-                      <span style={{
+                      <span className="next-up-deadline" style={{
                         display: 'inline-flex', alignItems: 'center', gap: 5,
                         fontSize: 12, fontWeight: 500,
-                        color: 'light-dark(var(--amber-warning), #F59E0B)',
                         padding: '4px 10px', borderRadius: 6,
-                        background: 'light-dark(var(--warn-bg, rgba(217,119,6,0.08)), rgba(180,100,0,0.35))',
                       }}>
                         <Clock size={11} /> Deadline {fmtDate(nextUp.deadline!)}
                       </span>
                     </div>
                     {nextUp.notes && (
-                      <div style={{
+                      <div className="next-up-note" style={{
                         marginTop: 12, padding: '10px 12px', borderRadius: 8,
-                        background: 'light-dark(var(--surface-gray), rgba(255,255,255,0.05))',
-                        border: 'light-dark(1px solid var(--border-gray), 1px solid rgba(255,255,255,0.1))',
-                        fontSize: 13, color: 'light-dark(var(--muted-text), rgba(255,255,255,0.65))', lineHeight: 1.5,
+                        fontSize: 13, lineHeight: 1.5,
                       }}>
-                        <span style={{ color: 'light-dark(var(--brand-navy), rgba(255,255,255,0.4))', fontWeight: 600, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 6 }}>Note</span>
+                        <span className="next-up-note-label" style={{ fontWeight: 600, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 6 }}>Note</span>
                         {nextUp.notes}
                       </div>
                     )}
                     <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <button
                         onClick={() => onOpenApp(nextUp)}
-                        style={{
-                          padding: '7px 16px', borderRadius: 8, border: 'none',
-                          background: 'light-dark(var(--brand-navy), #fff)',
-                          color: 'light-dark(var(--background), #111827)',
-                          fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-                        }}
+                        className="next-up-btn-primary"
+                        style={{ padding: '7px 16px', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}
                       >
                         Open
                       </button>
-                      <button style={{
+                      <button className="next-up-btn-secondary" style={{
                         padding: '7px 14px', borderRadius: 8,
-                        border: 'light-dark(1px solid var(--border-gray), 1px solid rgba(255,255,255,0.15))',
-                        background: 'light-dark(transparent, rgba(255,255,255,0.07))',
-                        color: 'light-dark(var(--brand-navy), rgba(255,255,255,0.85))',
                         fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
                         display: 'inline-flex', alignItems: 'center', gap: 6,
                       }}>
                         <Sparkles size={13} /> Prep with AI
                       </button>
-                      <button title="Add to calendar" style={{
+                      <button className="next-up-btn-secondary" title="Add to calendar" style={{
                         padding: '7px 12px', borderRadius: 8,
-                        border: 'light-dark(1px solid var(--border-gray), 1px solid rgba(255,255,255,0.15))',
-                        background: 'light-dark(transparent, rgba(255,255,255,0.07))',
-                        color: 'light-dark(var(--muted-text), rgba(255,255,255,0.65))',
                         fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
                         display: 'inline-flex', alignItems: 'center', gap: 6,
                       }}>
@@ -534,9 +515,57 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
 
       <style>{`
         @media (max-width: 900px) {
-          .today-grid {
-            grid-template-columns: 1fr !important;
-          }
+          .today-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* Next Up hero — light mode */
+        .next-up-hero {
+          background: var(--card-bg);
+          border: 1px solid var(--border-gray);
+        }
+        .next-up-badge { color: var(--accent-blue); }
+        .next-up-company { color: var(--brand-navy); }
+        .next-up-role { color: var(--muted-text); }
+        .next-up-deadline {
+          color: var(--amber-warning);
+          background: var(--warn-bg, rgba(217,119,6,0.08));
+        }
+        .next-up-note {
+          background: var(--surface-gray);
+          border: 1px solid var(--border-gray);
+          color: var(--muted-text);
+        }
+        .next-up-note-label { color: var(--brand-navy); }
+        .next-up-btn-primary { background: var(--brand-navy); color: var(--background); }
+        .next-up-btn-secondary {
+          border: 1px solid var(--border-gray);
+          background: transparent;
+          color: var(--brand-navy);
+        }
+
+        /* Next Up hero — dark mode */
+        .dark .next-up-hero {
+          background: #1C2333;
+          border: 1px solid rgba(255,255,255,0.07);
+        }
+        .dark .next-up-badge { color: #60A5FA; }
+        .dark .next-up-company { color: #fff; }
+        .dark .next-up-role { color: rgba(255,255,255,0.5); }
+        .dark .next-up-deadline {
+          color: #F59E0B;
+          background: rgba(180,100,0,0.35);
+        }
+        .dark .next-up-note {
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: rgba(255,255,255,0.65);
+        }
+        .dark .next-up-note-label { color: rgba(255,255,255,0.4); }
+        .dark .next-up-btn-primary { background: #fff; color: #111827; }
+        .dark .next-up-btn-secondary {
+          border: 1px solid rgba(255,255,255,0.15);
+          background: rgba(255,255,255,0.07);
+          color: rgba(255,255,255,0.8);
         }
       `}</style>
     </div>
