@@ -17,6 +17,7 @@ interface AppNotification {
 interface NotificationBellProps {
   userId: string;
   applications: Application[];
+  onOpenApp?: (app: Application) => void;
 }
 
 function relTime(iso: string): string {
@@ -85,7 +86,7 @@ async function generateNotifications(userId: string, applications: Application[]
   }
 }
 
-export default function NotificationBell({ userId, applications }: NotificationBellProps) {
+export default function NotificationBell({ userId, applications, onOpenApp }: NotificationBellProps) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -209,15 +210,21 @@ export default function NotificationBell({ userId, applications }: NotificationB
             </div>
           ) : (
             <div style={{ maxHeight: 360, overflowY: 'auto' }}>
-              {notifications.map(n => (
+              {notifications.map(n => {
+                const linkedApp = n.application_id ? applications.find(a => a.id === n.application_id) : undefined;
+                return (
                 <div
                   key={n.id}
+                  onClick={() => { if (linkedApp && onOpenApp) { onOpenApp(linkedApp); setOpen(false); } }}
                   style={{
                     padding: '11px 16px',
                     borderBottom: '1px solid var(--border-gray)',
                     background: n.read ? 'transparent' : 'var(--accent-wash)',
                     display: 'flex', alignItems: 'flex-start', gap: 10,
+                    cursor: linkedApp && onOpenApp ? 'pointer' : 'default',
                   }}
+                  onMouseEnter={e => { if (linkedApp && onOpenApp) (e.currentTarget as HTMLDivElement).style.background = 'var(--bg-soft)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = n.read ? 'transparent' : 'var(--accent-wash)'; }}
                 >
                   <div style={{
                     width: 28, height: 28, borderRadius: 7, flexShrink: 0,
@@ -239,7 +246,8 @@ export default function NotificationBell({ userId, applications }: NotificationB
                     <div className="live-dot" style={{ flexShrink: 0, marginTop: 4 }} />
                   )}
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

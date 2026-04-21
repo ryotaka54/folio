@@ -24,3 +24,4 @@ COMMENT ON COLUMN users.pipeline_type       IS 'Pipeline mode: english (INTERNSH
 COMMENT ON COLUMN applications.es_content   IS 'JSON: { motivation, selfPR, gakuchika, other } — ES管理';
 COMMENT ON COLUMN applications.spi_result   IS 'JSON: { format, examDate, result, memo } — SPI・適性検査記録';
 COMMENT ON COLUMN applications.naitei_details IS 'JSON: { offerDate, acceptanceDeadline, conditions, department, compensation, comparisonNotes } — 内定管理';
+

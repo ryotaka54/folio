@@ -6,7 +6,7 @@ import { Application } from '@/lib/types';
 import { appsAddedThisWeek, getWeeklyGoal } from '@/lib/recruiting';
 import CompanyAvatar from './CompanyAvatar';
 import StagePill from './StagePill';
-import { Clock, Flame, Trophy, Target, Mail, Sparkles, Calendar } from 'lucide-react';
+import { Clock, Flame, Trophy, Target, Mail, Sparkles } from 'lucide-react';
 
 interface TodayViewProps {
   applications: Application[];
@@ -119,33 +119,6 @@ function Section({ title, subtitle, action, onAction, children }: {
       {children}
     </section>
   );
-}
-
-function downloadIcs(app: Application) {
-  if (!app.deadline) return;
-  const dateStr = app.deadline.replace(/-/g, '');
-  const uid = `${app.id}@applyd`;
-  const summary = `${app.company} — ${app.role} Deadline`;
-  const ics = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Applyd//EN',
-    'BEGIN:VEVENT',
-    `UID:${uid}`,
-    `DTSTART;VALUE=DATE:${dateStr}`,
-    `DTEND;VALUE=DATE:${dateStr}`,
-    `SUMMARY:${summary}`,
-    `DESCRIPTION:Application deadline for ${app.role} at ${app.company}`,
-    'END:VEVENT',
-    'END:VCALENDAR',
-  ].join('\r\n');
-  const blob = new Blob([ics], { type: 'text/calendar' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${app.company.toLowerCase().replace(/\s+/g, '-')}-deadline.ics`;
-  a.click();
-  URL.revokeObjectURL(url);
 }
 
 export default function TodayView({ applications, userName, onOpenApp }: TodayViewProps) {
@@ -320,20 +293,6 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                       >
                         <Sparkles size={13} /> Prep with AI
                       </button>
-                      {nextUp.deadline && (
-                        <button
-                          onClick={() => downloadIcs(nextUp)}
-                          className="next-up-btn-secondary"
-                          title="Add to calendar"
-                          style={{
-                            padding: '7px 12px', borderRadius: 8,
-                            fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
-                            display: 'inline-flex', alignItems: 'center', gap: 6,
-                          }}
-                        >
-                          <Calendar size={13} /> Add to calendar
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>

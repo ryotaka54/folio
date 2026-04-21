@@ -5,6 +5,24 @@ import { Application } from './types';
 import { supabase } from './supabase';
 import { FREE_TIER_LIMIT } from './pro';
 
+// Best-effort Google Calendar sync — never throws, never blocks the user
+async function syncGCal(
+  action: 'create' | 'update' | 'delete',
+  app: Pick<Application, 'id' | 'user_id' | 'company' | 'role' | 'deadline' | 'status'> & { google_calendar_event_id?: string | null }
+): Promise<void> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) return;
+  try {
+    await fetch(`${url}/functions/v1/sync-google-calendar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, application: app }),
+    });
+  } catch {
+    // silently ignored — calendar sync is best-effort
+  }
+}
+
 /** Thrown when a free-tier user tries to exceed the application cap. */
 export class CapExceededError extends Error {
   constructor() { super('cap_exceeded'); this.name = 'CapExceededError'; }
@@ -101,6 +119,17 @@ export function StoreProvider({ children, userId, isPro = false }: { children: R
 
     const app = data as Application;
     setApplications(prev => [app, ...prev]);
+
+    // Trigger GCal sync if the new app has a deadline
+    if (app.deadline) {
+      syncGCal('create', {
+        id: app.id, user_id: userId,
+        company: app.company, role: app.role,
+        deadline: app.deadline, status: app.status,
+        google_calendar_event_id: null,
+      });
+    }
+
     return app;
   }, [userId]);
 
@@ -110,8 +139,10 @@ export function StoreProvider({ children, userId, isPro = false }: { children: R
 
     // Optimistic update — capture snapshot for rollback
     let snapshot: Application[] = [];
+    let prevApp: Application | undefined;
     setApplications(prev => {
       snapshot = prev;
+      prevApp = prev.find(a => a.id === id);
       return prev.map(a => a.id === id ? { ...a, ...updatedFields } : a);
     });
 
@@ -127,13 +158,26 @@ export function StoreProvider({ children, userId, isPro = false }: { children: R
       setStoreError(msg);
       throw new Error(msg);
     }
+
+    // GCal sync when deadline or status changes
+    if (prevApp && ('deadline' in updates || 'status' in updates)) {
+      const merged = { ...prevApp, ...updatedFields };
+      syncGCal('update', {
+        id, user_id: userId,
+        company: merged.company, role: merged.role,
+        deadline: merged.deadline, status: merged.status,
+        google_calendar_event_id: merged.google_calendar_event_id ?? null,
+      });
+    }
   }, [userId]);
 
   const deleteApplication = useCallback(async (id: string): Promise<void> => {
-    // Optimistic delete — capture snapshot for rollback
+    // Capture app before removing for GCal cleanup
     let snapshot: Application[] = [];
+    let deletedApp: Application | undefined;
     setApplications(prev => {
       snapshot = prev;
+      deletedApp = prev.find(a => a.id === id);
       return prev.filter(a => a.id !== id);
     });
 
@@ -148,6 +192,16 @@ export function StoreProvider({ children, userId, isPro = false }: { children: R
       const msg = 'Failed to delete. Please try again.';
       setStoreError(msg);
       throw new Error(msg);
+    }
+
+    // Clean up GCal event if app had a deadline
+    if (deletedApp?.deadline) {
+      syncGCal('delete', {
+        id, user_id: userId,
+        company: deletedApp.company, role: deletedApp.role,
+        deadline: deletedApp.deadline, status: deletedApp.status,
+        google_calendar_event_id: deletedApp.google_calendar_event_id ?? null,
+      });
     }
   }, [userId]);
 

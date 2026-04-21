@@ -565,7 +565,7 @@ function DashboardContent() {
                 Upgrade
               </button>
             )}
-            {user && <NotificationBell userId={user.id} applications={applications} />}
+            {user && <NotificationBell userId={user.id} applications={applications} onOpenApp={handleCardClick} />}
             {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
             <ThemeToggle />
             <Link

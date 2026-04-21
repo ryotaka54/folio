@@ -79,6 +79,7 @@ export interface Application {
   ai_interview_prep?: unknown;
   ai_strength_signal?: unknown;
   ai_offer_intelligence?: unknown;
+  google_calendar_event_id?: string | null;
 }
 
 export interface UserProfile {
