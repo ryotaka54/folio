@@ -13,21 +13,26 @@ function stableHue(name: string): number {
   return Math.abs(h) % 360;
 }
 
+function twoInitials(name: string): string {
+  const parts = name.split(/[\s./\-_]+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return (name.trim().slice(0, 2)).toUpperCase() || '??';
+}
+
 export default function CompanyAvatar({ company, size = 32 }: CompanyAvatarProps) {
-  const initial = company.trim().charAt(0).toUpperCase() || '?';
+  const initials = twoInitials(company);
   const hue = stableHue(company);
   const radius = Math.round(size * 0.28);
-  const fontSize = Math.round(size * 0.40);
+  const fontSize = Math.round(size * 0.34);
 
   return (
     <div
+      className="company-avatar"
       style={{
         width: size,
         height: size,
         borderRadius: radius,
-        background: `light-dark(oklch(0.94 0.05 ${hue}), oklch(0.32 0.09 ${hue}))`,
-        color: `light-dark(oklch(0.42 0.18 ${hue}), oklch(0.88 0.14 ${hue}))`,
-        boxShadow: `inset 0 0 0 1px light-dark(oklch(0.86 0.07 ${hue}), oklch(0.44 0.11 ${hue}))`,
+        '--av-hue': hue,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -36,9 +41,9 @@ export default function CompanyAvatar({ company, size = 32 }: CompanyAvatarProps
         letterSpacing: '-0.02em',
         flexShrink: 0,
         userSelect: 'none',
-      }}
+      } as React.CSSProperties}
     >
-      {initial}
+      {initials}
     </div>
   );
 }

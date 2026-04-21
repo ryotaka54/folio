@@ -34,6 +34,7 @@ import FeedbackPrompt from '@/components/FeedbackPrompt';
 import ImportCSVModal from '@/components/ImportCSVModal';
 import TodayView from '@/components/TodayView';
 import PipelineBar from '@/components/PipelineBar';
+import NotificationBell from '@/components/NotificationBell';
 import { LayoutDashboard, Calendar, Mic, Home } from 'lucide-react';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
@@ -564,6 +565,7 @@ function DashboardContent() {
                 Upgrade
               </button>
             )}
+            {user && <NotificationBell userId={user.id} applications={applications} />}
             {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
             <ThemeToggle />
             <Link

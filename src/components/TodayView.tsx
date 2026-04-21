@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Application } from '@/lib/types';
 import { appsAddedThisWeek, getWeeklyGoal } from '@/lib/recruiting';
 import CompanyAvatar from './CompanyAvatar';
@@ -120,8 +121,40 @@ function Section({ title, subtitle, action, onAction, children }: {
   );
 }
 
+function downloadIcs(app: Application) {
+  if (!app.deadline) return;
+  const dateStr = app.deadline.replace(/-/g, '');
+  const uid = `${app.id}@applyd`;
+  const summary = `${app.company} — ${app.role} Deadline`;
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Applyd//EN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTART;VALUE=DATE:${dateStr}`,
+    `DTEND;VALUE=DATE:${dateStr}`,
+    `SUMMARY:${summary}`,
+    `DESCRIPTION:Application deadline for ${app.role} at ${app.company}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${app.company.toLowerCase().replace(/\s+/g, '-')}-deadline.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function TodayView({ applications, userName, onOpenApp }: TodayViewProps) {
   const today = todayStr();
+  const router = useRouter();
+
+  const prepWithAI = useCallback((app: Application) => {
+    router.push(`/interview?company=${encodeURIComponent(app.company)}&role=${encodeURIComponent(app.role)}`);
+  }, [router]);
 
   const actionable = useMemo(() =>
     applications
@@ -276,20 +309,31 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                       >
                         Open
                       </button>
-                      <button className="next-up-btn-secondary" style={{
-                        padding: '7px 14px', borderRadius: 8,
-                        fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                      }}>
+                      <button
+                        onClick={() => prepWithAI(nextUp)}
+                        className="next-up-btn-secondary"
+                        style={{
+                          padding: '7px 14px', borderRadius: 8,
+                          fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
+                          display: 'inline-flex', alignItems: 'center', gap: 6,
+                        }}
+                      >
                         <Sparkles size={13} /> Prep with AI
                       </button>
-                      <button className="next-up-btn-secondary" title="Add to calendar" style={{
-                        padding: '7px 12px', borderRadius: 8,
-                        fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                      }}>
-                        <Calendar size={13} /> Add to calendar
-                      </button>
+                      {nextUp.deadline && (
+                        <button
+                          onClick={() => downloadIcs(nextUp)}
+                          className="next-up-btn-secondary"
+                          title="Add to calendar"
+                          style={{
+                            padding: '7px 12px', borderRadius: 8,
+                            fontSize: 13, cursor: 'pointer', fontFamily: 'inherit',
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                          }}
+                        >
+                          <Calendar size={13} /> Add to calendar
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
