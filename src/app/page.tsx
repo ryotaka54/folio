@@ -367,7 +367,7 @@ function CompanyItem({ name, domain }: { name: string; domain: string }) {
       {!failed && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`https://logo.clearbit.com/${domain}`}
+          src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
           alt=""
           width={22}
           height={22}
