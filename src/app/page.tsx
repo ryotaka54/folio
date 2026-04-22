@@ -339,54 +339,44 @@ function TodayViewPreview() {
 
 // ── Company outcomes bar ──────────────────────────────────────────────────────
 
-// slug: Simple Icons CDN slug (https://cdn.simpleicons.org/<slug>)
-// null: no logo available — render text pill fallback
-const OUTCOMES: { name: string; slug: string | null; hex: string }[] = [
-  { name: 'Google',        slug: 'google',        hex: '4285F4' },
-  { name: 'Stripe',        slug: 'stripe',        hex: '635BFF' },
-  { name: 'Anthropic',     slug: 'anthropic',     hex: '191919' },
-  { name: 'Meta',          slug: 'meta',          hex: '0866FF' },
-  { name: 'Apple',         slug: 'apple',         hex: '555555' },
-  { name: 'Microsoft',     slug: 'microsoft',     hex: '0078D4' },
-  { name: 'Amazon',        slug: 'amazon',        hex: 'FF9900' },
-  { name: 'Figma',         slug: 'figma',         hex: 'F24E1E' },
-  { name: 'Palantir',      slug: 'palantir',      hex: '101113' },
-  { name: 'Goldman Sachs', slug: null,            hex: '6195C9' },
-  { name: 'McKinsey',      slug: null,            hex: '2D6CC0' },
-  { name: 'Jane Street',   slug: null,            hex: '1A6B3C' },
-  { name: 'Citadel',       slug: null,            hex: '003087' },
-  { name: 'BCG',           slug: null,            hex: '005A2B' },
-  { name: 'Two Sigma',     slug: null,            hex: '1A4A8A' },
-  { name: 'Deloitte',      slug: 'deloitte',      hex: '86BC25' },
-  { name: 'Blackstone',    slug: null,            hex: '1A1A1A' },
-  { name: 'Bain & Co.',    slug: null,            hex: 'C8102E' },
+const OUTCOMES: { name: string; slug: string | null }[] = [
+  { name: 'Google',        slug: 'google' },
+  { name: 'Stripe',        slug: 'stripe' },
+  { name: 'Anthropic',     slug: 'anthropic' },
+  { name: 'Meta',          slug: 'meta' },
+  { name: 'Apple',         slug: 'apple' },
+  { name: 'Microsoft',     slug: 'microsoft' },
+  { name: 'Amazon',        slug: 'amazon' },
+  { name: 'Figma',         slug: 'figma' },
+  { name: 'Palantir',      slug: 'palantir' },
+  { name: 'Goldman Sachs', slug: 'goldmansachs' },
+  { name: 'Deloitte',      slug: 'deloitte' },
+  { name: 'McKinsey & Co.', slug: null },
+  { name: 'Jane Street',   slug: null },
+  { name: 'Citadel',       slug: null },
+  { name: 'BCG',           slug: null },
+  { name: 'Two Sigma',     slug: null },
+  { name: 'Blackstone',    slug: null },
+  { name: 'Bain & Co.',    slug: null },
 ];
 
-function CompanyLogo({ name, slug, hex }: { name: string; slug: string | null; hex: string }) {
-  if (slug) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, padding: '0 28px' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`https://cdn.simpleicons.org/${slug}/${hex}`}
-          alt={name}
-          width={16}
-          height={16}
-          style={{ width: 16, height: 16, objectFit: 'contain', flexShrink: 0 }}
-        />
-        <span style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--muted-text)', whiteSpace: 'nowrap' }}>{name}</span>
-      </div>
-    );
-  }
+function CompanyItem({ name, slug }: { name: string; slug: string | null }) {
+  const [failed, setFailed] = useState(false);
+  const showIcon = slug && !failed;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, padding: '0 28px' }}>
-      <span style={{
-        fontSize: 11, fontWeight: 600, color: `#${hex}`,
-        background: `#${hex}18`,
-        border: `1px solid #${hex}30`,
-        borderRadius: 5, padding: '2px 8px', whiteSpace: 'nowrap',
-        letterSpacing: '0.01em',
-      }}>{name}</span>
+    <div className="co-item" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 40px', flexShrink: 0 }}>
+      {showIcon && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`https://cdn.simpleicons.org/${slug}`}
+          alt=""
+          width={20}
+          height={20}
+          onError={() => setFailed(true)}
+          style={{ width: 20, height: 20, objectFit: 'contain', flexShrink: 0 }}
+        />
+      )}
+      <span style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--brand-navy)', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{name}</span>
     </div>
   );
 }
@@ -394,17 +384,21 @@ function CompanyLogo({ name, slug, hex }: { name: string; slug: string | null; h
 function CompanyBar() {
   const doubled = [...OUTCOMES, ...OUTCOMES];
   return (
-    <div style={{ borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)', background: 'var(--card-bg)', padding: '16px 0', overflow: 'hidden' }}>
+    <div style={{ borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)', background: 'var(--card-bg)', padding: '18px 0', overflow: 'hidden' }}>
       <style>{`
         @keyframes co-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-        .co-track { animation: co-scroll 42s linear infinite; display: flex; align-items: center; width: max-content; }
+        .co-track { animation: co-scroll 48s linear infinite; display: flex; align-items: center; width: max-content; }
         .co-track:hover { animation-play-state: paused; }
+        .co-item { opacity: 0.45; transition: opacity 0.25s, filter 0.25s; }
+        .co-item:hover { opacity: 1; }
+        .co-item img { filter: grayscale(1); transition: filter 0.25s; }
+        .co-item:hover img { filter: none; }
       `}</style>
-      <p className="text-center text-[10px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: 'var(--text-tertiary)' }}>Students have landed at</p>
+      <p className="text-center text-[10px] font-semibold uppercase tracking-[0.12em] mb-4" style={{ color: 'var(--text-tertiary)' }}>Students have landed at</p>
       <div style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}>
         <div className="co-track">
           {doubled.map((co, i) => (
-            <CompanyLogo key={i} {...co} />
+            <CompanyItem key={i} name={co.name} slug={co.slug} />
           ))}
         </div>
       </div>
