@@ -339,41 +339,40 @@ function TodayViewPreview() {
 
 // ── Company outcomes bar ──────────────────────────────────────────────────────
 
-const OUTCOMES: { name: string; slug: string | null }[] = [
-  { name: 'Google',        slug: 'google' },
-  { name: 'Stripe',        slug: 'stripe' },
-  { name: 'Anthropic',     slug: 'anthropic' },
-  { name: 'Meta',          slug: 'meta' },
-  { name: 'Apple',         slug: 'apple' },
-  { name: 'Microsoft',     slug: 'microsoft' },
-  { name: 'Amazon',        slug: 'amazon' },
-  { name: 'Figma',         slug: 'figma' },
-  { name: 'Palantir',      slug: 'palantir' },
-  { name: 'Goldman Sachs', slug: 'goldmansachs' },
-  { name: 'Deloitte',      slug: 'deloitte' },
-  { name: 'McKinsey & Co.', slug: null },
-  { name: 'Jane Street',   slug: null },
-  { name: 'Citadel',       slug: null },
-  { name: 'BCG',           slug: null },
-  { name: 'Two Sigma',     slug: null },
-  { name: 'Blackstone',    slug: null },
-  { name: 'Bain & Co.',    slug: null },
+const OUTCOMES: { name: string; domain: string }[] = [
+  { name: 'Google',         domain: 'google.com' },
+  { name: 'Stripe',         domain: 'stripe.com' },
+  { name: 'Anthropic',      domain: 'anthropic.com' },
+  { name: 'Meta',           domain: 'meta.com' },
+  { name: 'Apple',          domain: 'apple.com' },
+  { name: 'Microsoft',      domain: 'microsoft.com' },
+  { name: 'Amazon',         domain: 'amazon.com' },
+  { name: 'Figma',          domain: 'figma.com' },
+  { name: 'Palantir',       domain: 'palantir.com' },
+  { name: 'Goldman Sachs',  domain: 'goldmansachs.com' },
+  { name: 'McKinsey & Co.', domain: 'mckinsey.com' },
+  { name: 'Jane Street',    domain: 'janestreet.com' },
+  { name: 'Citadel',        domain: 'citadelsecurities.com' },
+  { name: 'BCG',            domain: 'bcg.com' },
+  { name: 'Two Sigma',      domain: 'twosigma.com' },
+  { name: 'Deloitte',       domain: 'deloitte.com' },
+  { name: 'Blackstone',     domain: 'blackstone.com' },
+  { name: 'Bain & Co.',     domain: 'bain.com' },
 ];
 
-function CompanyItem({ name, slug }: { name: string; slug: string | null }) {
+function CompanyItem({ name, domain }: { name: string; domain: string }) {
   const [failed, setFailed] = useState(false);
-  const showIcon = slug && !failed;
   return (
     <div className="co-item" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 40px', flexShrink: 0 }}>
-      {showIcon && (
+      {!failed && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={`https://cdn.simpleicons.org/${slug}`}
+          src={`https://logo.clearbit.com/${domain}`}
           alt=""
-          width={20}
-          height={20}
+          width={22}
+          height={22}
           onError={() => setFailed(true)}
-          style={{ width: 20, height: 20, objectFit: 'contain', flexShrink: 0 }}
+          style={{ width: 22, height: 22, objectFit: 'contain', flexShrink: 0, borderRadius: 5 }}
         />
       )}
       <span style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--brand-navy)', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{name}</span>
@@ -398,7 +397,7 @@ function CompanyBar() {
       <div style={{ maskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 5%, black 95%, transparent)' }}>
         <div className="co-track">
           {doubled.map((co, i) => (
-            <CompanyItem key={i} name={co.name} slug={co.slug} />
+            <CompanyItem key={i} name={co.name} domain={co.domain} />
           ))}
         </div>
       </div>
