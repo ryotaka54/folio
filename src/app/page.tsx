@@ -426,11 +426,11 @@ function FinalCTA({ user }: { user: unknown }) {
             color: '#fff',
             margin: '0 0 18px',
           }}>
-            Stop tracking in a spreadsheet.<br />
-            <span style={{ color: '#3B82F6' }}>Start landing offers.</span>
+            Your coach is ready.<br />
+            <span style={{ color: '#3B82F6' }}>Are you?</span>
           </h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, margin: '0 0 36px' }}>
-            2,400+ students already have a system. Free up to 15 apps, no card needed.
+            2,400+ students already have a system. Free up to 25 apps, no card needed.
           </p>
           <Link
             href={user ? '/dashboard' : '/signup'}
@@ -451,7 +451,7 @@ function FinalCTA({ user }: { user: unknown }) {
             {user ? 'Go to dashboard →' : 'Start free — no card needed →'}
           </Link>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', marginTop: 14 }}>
-            No credit card required · Free up to 15 apps
+            No credit card required · Free up to 25 apps
           </p>
         </motion.div>
       </div>
@@ -499,14 +499,14 @@ export default function Home() {
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-6"
                 style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                Free for students · Pipeline + AI Mock Interviews in one place
+                The AI recruiting coach built for students who get offers
               </div>
 
               <h1
                 className="max-w-[640px] text-[28px] sm:text-[38px] lg:text-[56px] text-center md:text-left"
                 style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em', lineHeight: 1.1, fontWeight: 700 }}
               >
-                Track every application.{' '}
+                Stop chasing applications.{' '}
                 <span style={{
                   textDecoration: 'underline',
                   textDecorationColor: 'var(--accent-blue)',
@@ -515,12 +515,12 @@ export default function Home() {
                   textDecorationSkipInk: 'none',
                   color: 'var(--brand-navy)',
                 }}>
-                  Ace every interview.
+                  Start getting offers.
                 </span>
               </h1>
 
               <p className="mt-5 max-w-[480px] text-[17px] text-center md:text-left" style={{ color: 'var(--muted-text)', lineHeight: 1.65 }}>
-                Juggling 30 applications across five portals and a Notion doc nobody updates? Applyd gives you one dashboard, real-time deadline alerts, and an AI interview coach that knows which company you&apos;re prepping for.
+                Most apps just track. Applyd reads your pipeline and tells you what to do next — interview prep auto-activates, deadline alerts fire before you miss them, and a weekly AI coach lands every Monday morning.
               </p>
 
               <div className="mt-8 flex flex-col items-center md:items-start gap-3 sm:flex-row">
@@ -535,7 +535,7 @@ export default function Home() {
 
               <div className="mt-5 flex items-center gap-5 flex-wrap justify-center md:justify-start">
                 <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-                  No credit card · free up to 15 apps
+                  No credit card · free up to 25 apps
                 </p>
                 <div className="flex items-center gap-1.5">
                   <div className="flex -space-x-1.5">
@@ -546,6 +546,11 @@ export default function Home() {
                   <span className="text-[12px] font-medium" style={{ color: 'var(--muted-text)' }}>
                     <AnimatedCounter target={2400} />+ students already tracking
                   </span>
+                </div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-medium"
+                  style={{ background: 'var(--surface-gray)', borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  Chrome extension · add from LinkedIn in one click
                 </div>
               </div>
             </AnimatedGroup>
@@ -696,6 +701,103 @@ export default function Home() {
           <ProductWalkthrough />
         </div>
 
+        {/* ── Weekly Coach showcase ── */}
+        <section style={{ background: '#060D1A', padding: '96px 0 0', overflow: 'hidden' }}>
+          <div className="max-w-6xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center text-center mb-14"
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] font-semibold mb-5"
+                style={{ background: 'rgba(16,185,129,0.12)', borderColor: 'rgba(16,185,129,0.3)', color: '#34D399', letterSpacing: '0.08em' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                WEEKLY AI COACH — ARRIVES EVERY MONDAY
+              </div>
+              <h2 className="text-[28px] md:text-[44px] font-bold leading-tight mb-4"
+                style={{ color: '#fff', letterSpacing: '-0.03em', maxWidth: 640 }}>
+                Your personal brief.<br />
+                <span style={{ color: '#34D399' }}>Every Monday morning.</span>
+              </h2>
+              <p className="text-[16px] max-w-[480px]" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
+                Nobody else does this. Applyd reads your entire pipeline, identifies what&apos;s stalled, and delivers a word-for-word action plan before you even open your laptop. No prompting. No searching. Just a plan.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="relative mx-auto rounded-t-2xl overflow-hidden border border-b-0"
+              style={{ maxWidth: 760, borderColor: 'rgba(255,255,255,0.08)', background: '#0D1117' }}
+            >
+              {/* Email chrome */}
+              <div className="flex items-center gap-3 px-5 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: '#0A0F18' }}>
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF5F57' }} />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FEBC2E' }} />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#28C840' }} />
+                </div>
+                <div className="flex-1 flex items-center gap-3 ml-2">
+                  <span className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>From: coach@applyd.io</span>
+                  <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+                  <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>Monday, 9:07 AM</span>
+                </div>
+                <div className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(52,211,153,0.12)', color: '#34D399' }}>Weekly Brief</div>
+              </div>
+
+              <div className="p-6 md:p-8">
+                <p className="text-[13px] font-bold mb-1" style={{ color: 'rgba(255,255,255,0.9)', letterSpacing: '-0.01em' }}>Your recruiting brief — Week of April 22</p>
+                <p className="text-[12px] mb-6" style={{ color: 'rgba(255,255,255,0.35)' }}>Hi Alex — here&apos;s what matters this week.</p>
+
+                <div className="grid md:grid-cols-3 gap-4 mb-6">
+                  {[
+                    { label: 'Active applications', value: '11', color: '#60A5FA' },
+                    { label: 'Need attention', value: '3', color: '#F59E0B' },
+                    { label: 'Upcoming deadlines', value: '2', color: '#EF4444' },
+                  ].map(s => (
+                    <div key={s.label} className="rounded-xl p-3 border text-center" style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}>
+                      <div className="text-[28px] font-bold mb-1" style={{ color: s.color, letterSpacing: '-0.03em', lineHeight: 1 }}>{s.value}</div>
+                      <div className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)' }}>{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.3)' }}>What needs your attention</p>
+                  {[
+                    { co: 'Amazon', note: '14 days since you applied with no response. A brief follow-up email today could restart the thread.', tag: 'Follow up', tagColor: '#F59E0B', tagBg: 'rgba(245,158,11,0.1)' },
+                    { co: 'Anthropic', note: 'Final round interview on Thursday. Your last prep session was 6 days ago — run a mock interview today.', tag: 'Prep now', tagColor: '#EF4444', tagBg: 'rgba(239,68,68,0.1)' },
+                    { co: 'Goldman Sachs', note: 'Application deadline is in 2 days. You haven\'t submitted yet — this one is time-sensitive.', tag: 'Deadline soon', tagColor: '#EF4444', tagBg: 'rgba(239,68,68,0.1)' },
+                  ].map(item => (
+                    <div key={item.co} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 mt-0.5" style={{ background: 'rgba(37,99,235,0.2)', color: '#60A5FA' }}>{item.co[0]}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-[12px] font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>{item.co}</p>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: item.tagBg, color: item.tagColor }}>{item.tag}</span>
+                        </div>
+                        <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{item.note}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-xl p-4" style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.15)' }}>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-2" style={{ color: '#34D399' }}>One thing to do today</p>
+                  <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                    Send a 2-line follow-up to your Amazon recruiter. Subject: <span style={{ color: '#fff', fontFamily: 'monospace', fontSize: 12 }}>&ldquo;Following up — SWE Intern application&rdquo;</span>. Applyd has a draft ready for you.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          <div style={{ height: 80, background: 'linear-gradient(to bottom, #060D1A, var(--background))' }} />
+        </section>
+
         {/* ── Product metrics bridge ── */}
         <section className="max-w-6xl mx-auto px-6 pb-12">
           <motion.div
@@ -779,6 +881,7 @@ export default function Home() {
                 { icon: <Calendar size={15} />, title: 'Calendar view', desc: 'Every deadline and interview in one place, with Google Calendar sync.' },
                 { icon: <Target size={15} />, title: 'Today view', desc: 'Next Up, On Deck, and Follow Up — your dashboard knows what needs attention right now.' },
                 { icon: <Brain size={15} />, title: '1 free mock interview', desc: 'Pick any company from your pipeline and get a full AI mock interview session — no card needed.' },
+                { icon: <Zap size={15} />, title: 'Browser extension', desc: 'See a job on LinkedIn or Handshake? Add it to your pipeline in one click — no copy-pasting.' },
               ].map((f, i) => (
                 <motion.div key={f.title}
                   initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -797,7 +900,7 @@ export default function Home() {
               ))}
             </div>
             <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-              No credit card required. Free up to 15 applications.
+              No credit card required. Free up to 25 applications.
             </p>
           </motion.div>
 
@@ -936,7 +1039,7 @@ export default function Home() {
               Why not just use a spreadsheet?
             </h2>
             <p className="text-[15px] max-w-lg mx-auto" style={{ color: 'var(--muted-text)' }}>
-              You could. Most students do. Here&apos;s what they&apos;re missing.
+              You could. Most students do — and most students don&apos;t follow up, miss deadlines, and walk into interviews underprepared. Here&apos;s the difference.
             </p>
           </motion.div>
 
@@ -958,17 +1061,17 @@ export default function Home() {
             </div>
 
             {[
+              { feature: 'Add jobs from LinkedIn in one click (browser extension)', vals: [false, false, true] },
               { feature: 'Recruiting-native stages (OA, Superday, Recruiter Screen)', vals: [false, false, true] },
               { feature: 'Automatic deadline alerts', vals: [false, false, true] },
               { feature: 'Today view — surfaces what needs attention right now', vals: [false, false, true] },
               { feature: 'Response rate analytics', vals: [false, false, true] },
-              { feature: 'Works on mobile', vals: ['Broken', 'Barely', true] },
-              { feature: 'AI mock interview (practice sessions)', vals: ['1 free', false, 'Unlimited'] },
+              { feature: 'Strength Signal — know your odds before you apply', vals: [false, false, true] },
+              { feature: 'AI mock interview (practice sessions)', vals: [false, false, 'Unlimited'] },
               { feature: 'AI interview intel — auto-activated at interview stage', vals: [false, false, true] },
               { feature: 'AI follow-up email generator', vals: [false, false, true] },
               { feature: 'AI offer negotiation guide', vals: [false, false, true] },
-              { feature: 'Weekly AI recruiting coach', vals: [false, false, true] },
-              { feature: 'Zero setup', vals: [false, false, true] },
+              { feature: 'Weekly AI recruiting coach (Monday brief)', vals: [false, false, true] },
               { feature: 'Free to start', vals: [true, true, true] },
             ].map((row, ri) => (
               <div

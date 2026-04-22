@@ -524,7 +524,7 @@ export default function JaLandingPage() {
               transition={{ duration: 0.4, delay: 0.55 }}
               style={{ fontSize: 12, color: 'var(--text-tertiary)', letterSpacing: '0.06em', fontFamily: F }}
             >
-              クレジットカード不要・最大15社まで無料
+              クレジットカード不要・最大25社まで無料
             </motion.p>
 
             {/* Trust stats */}
@@ -907,7 +907,7 @@ export default function JaLandingPage() {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
                 <span style={{ fontSize: 42, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.04em' }}>¥0</span>
               </div>
-              <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '0 0 24px', fontFamily: F, letterSpacing: '0.05em' }}>最大15社まで永久無料・AI模擬面接1回つき</p>
+              <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '0 0 24px', fontFamily: F, letterSpacing: '0.05em' }}>最大25社まで永久無料・AI模擬面接1回つき</p>
               <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
                 {['選考パイプライン管理', '締め切り管理', '基本統計ダッシュボード', 'カレンダー連携', 'スマートリマインダー', 'AI模擬面接 1回無料'].map(item => (
                   <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

@@ -1,6 +1,6 @@
 'use client';
 
-export const FREE_TIER_LIMIT = 15;
+export const FREE_TIER_LIMIT = 25;
 
 /** Returns true if the user has an active Pro subscription. */
 export function isPro(user: { pro?: boolean; pro_expires_at?: string | null } | null): boolean {
