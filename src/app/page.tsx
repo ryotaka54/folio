@@ -339,24 +339,27 @@ function TodayViewPreview() {
 
 // ── Company outcomes bar ──────────────────────────────────────────────────────
 
-const OUTCOMES = ['Google', 'Stripe', 'McKinsey', 'Jane Street', 'Anthropic', 'Goldman Sachs', 'Figma', 'Microsoft', 'Citadel', 'BCG', 'Meta', 'Amazon'];
+const OUTCOMES = [
+  'Google', 'Stripe', 'McKinsey', 'Jane Street', 'Anthropic', 'Goldman Sachs',
+  'Figma', 'Microsoft', 'Citadel', 'BCG', 'Meta', 'Amazon',
+  'Deloitte', 'Two Sigma', 'Palantir', 'Apple', 'Blackstone', 'Bain & Company',
+];
 
 function CompanyBar() {
+  const doubled = [...OUTCOMES, ...OUTCOMES];
   return (
-    <div style={{ borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)', background: 'var(--card-bg)', padding: '14px 0', overflow: 'hidden' }}>
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="flex items-center gap-6 overflow-x-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
-          <span className="text-[10px] font-semibold uppercase tracking-widest flex-shrink-0" style={{ color: 'var(--text-tertiary)' }}>Students have landed at</span>
-          <div className="flex items-center gap-6 flex-shrink-0">
-            {OUTCOMES.map(co => (
-              <span key={co} className="text-[12px] font-medium flex-shrink-0" style={{ color: 'var(--muted-text)' }}>{co}</span>
-            ))}
-          </div>
-          <div className="flex items-center gap-6 flex-shrink-0" aria-hidden>
-            {OUTCOMES.map(co => (
-              <span key={co + '2'} className="text-[12px] font-medium flex-shrink-0" style={{ color: 'var(--muted-text)' }}>{co}</span>
-            ))}
-          </div>
+    <div style={{ borderTop: '1px solid var(--border-gray)', borderBottom: '1px solid var(--border-gray)', background: 'var(--card-bg)', padding: '16px 0', overflow: 'hidden' }}>
+      <style>{`
+        @keyframes co-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .co-track { animation: co-scroll 36s linear infinite; display: flex; align-items: center; width: max-content; }
+        .co-track:hover { animation-play-state: paused; }
+      `}</style>
+      <p className="text-center text-[10px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: 'var(--text-tertiary)' }}>Students have landed at</p>
+      <div style={{ maskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 6%, black 94%, transparent)' }}>
+        <div className="co-track">
+          {doubled.map((co, i) => (
+            <span key={i} className="text-[12px] font-medium flex-shrink-0" style={{ color: 'var(--muted-text)', padding: '0 32px' }}>{co}</span>
+          ))}
         </div>
       </div>
     </div>
@@ -543,7 +546,7 @@ export default function Home() {
                 <span style={{ color: '#60A5FA' }}>Get hired faster.</span>
               </h2>
               <p className="text-[16px] max-w-[500px]" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
-                Pick any application from your pipeline. AI generates tailored questions, scores every answer with a STAR rubric, and tells you exactly what to fix — in seconds.
+                Pick any company from your pipeline. AI generates tailored questions, scores every answer with a STAR rubric, and tells you exactly what to fix — in seconds. Free users get one full session on the house.
               </p>
               <Link
                 href={user ? '/interview' : '/signup'}
@@ -666,7 +669,7 @@ export default function Home() {
           >
             {[
               { value: 2400, suffix: '+', label: 'students tracking', icon: <GraduationCap size={16} /> },
-              { value: 38, suffix: '%', label: 'avg. response rate tracked', icon: <TrendingUp size={16} /> },
+              { value: 14000, suffix: '+', label: 'applications tracked on Applyd', icon: <TrendingUp size={16} /> },
               { value: 3, suffix: 'h', label: 'saved per week vs. spreadsheet', icon: <Clock size={16} /> },
             ].map((s) => (
               <div key={s.label} className="text-center">
@@ -736,6 +739,7 @@ export default function Home() {
                 { icon: <Zap size={15} />, title: 'Smart nudges', desc: 'Stalled OA? Missed follow-up? Applyd notices and reminds you so you don\'t have to.' },
                 { icon: <Calendar size={15} />, title: 'Calendar view', desc: 'Every deadline and interview in one place, with Google Calendar sync.' },
                 { icon: <Target size={15} />, title: 'Today view', desc: 'Next Up, On Deck, and Follow Up — your dashboard knows what needs attention right now.' },
+                { icon: <Brain size={15} />, title: '1 free mock interview', desc: 'Pick any company from your pipeline and get a full AI mock interview session — no card needed.' },
               ].map((f, i) => (
                 <motion.div key={f.title}
                   initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
@@ -778,7 +782,7 @@ export default function Home() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
-                  { icon: <Brain size={12} />, title: 'AI Mock Interview Room', desc: 'Tailored questions, STAR scoring, voice input, downloadable transcript.' },
+                  { icon: <Brain size={12} />, title: 'Unlimited Mock Interviews', desc: 'Unlimited sessions, any company, STAR scoring, voice input, downloadable transcript.' },
                   { icon: <MessageSquare size={12} />, title: 'Interview Intel', desc: 'AI generates the exact questions this company asks the moment you hit interview stage.' },
                   { icon: <Zap size={12} />, title: 'Follow Up Writer', desc: 'Thank you, status check, negotiation, withdrawal — one click, calibrated to your stage.' },
                   { icon: <Target size={12} />, title: 'Strength Signal', desc: 'Know how competitive you are before you invest hours on an application.' },
@@ -920,7 +924,8 @@ export default function Home() {
               { feature: 'Today view — surfaces what needs attention right now', vals: [false, false, true] },
               { feature: 'Response rate analytics', vals: [false, false, true] },
               { feature: 'Works on mobile', vals: ['Broken', 'Barely', true] },
-              { feature: 'AI interview prep — auto-activated at interview stage', vals: [false, false, true] },
+              { feature: 'AI mock interview (practice sessions)', vals: ['1 free', false, 'Unlimited'] },
+              { feature: 'AI interview intel — auto-activated at interview stage', vals: [false, false, true] },
               { feature: 'AI follow-up email generator', vals: [false, false, true] },
               { feature: 'AI offer negotiation guide', vals: [false, false, true] },
               { feature: 'Weekly AI recruiting coach', vals: [false, false, true] },

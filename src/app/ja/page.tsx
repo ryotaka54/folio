@@ -907,9 +907,9 @@ export default function JaLandingPage() {
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
                 <span style={{ fontSize: 42, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.04em' }}>¥0</span>
               </div>
-              <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '0 0 24px', fontFamily: F, letterSpacing: '0.05em' }}>最大15社まで永久無料</p>
+              <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '0 0 24px', fontFamily: F, letterSpacing: '0.05em' }}>最大15社まで永久無料・AI模擬面接1回つき</p>
               <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
-                {['選考パイプライン管理', '締め切り管理', '基本統計ダッシュボード', 'カレンダー連携', 'スマートリマインダー'].map(item => (
+                {['選考パイプライン管理', '締め切り管理', '基本統計ダッシュボード', 'カレンダー連携', 'スマートリマインダー', 'AI模擬面接 1回無料'].map(item => (
                   <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <CheckIcon />
                     <span style={{ fontSize: 13, color: 'var(--brand-navy)', fontFamily: F, letterSpacing: '0.04em' }}>{item}</span>
@@ -971,7 +971,7 @@ export default function JaLandingPage() {
                   {[
                     '無制限の選考管理',
                     'AI面接対策（企業別・職種別）',
-                    'AI模擬面接（STAR法フィードバック）',
+                    'AI模擬面接（無制限・STAR法フィードバック）',
                     'ES管理・志望動機・ガクチカ保存',
                     'AIフォローアップメール生成',
                     'オファー交渉ガイド',
