@@ -524,7 +524,7 @@ export default function JaLandingPage() {
               transition={{ duration: 0.4, delay: 0.55 }}
               style={{ fontSize: 12, color: 'var(--text-tertiary)', letterSpacing: '0.06em', fontFamily: F }}
             >
-              クレジットカード不要・完全無料でスタート
+              クレジットカード不要・最大15社まで無料
             </motion.p>
 
             {/* Trust stats */}

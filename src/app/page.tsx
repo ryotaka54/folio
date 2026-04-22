@@ -391,7 +391,7 @@ function FinalCTA({ user }: { user: unknown }) {
             <span style={{ color: '#3B82F6' }}>Start landing offers.</span>
           </h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, margin: '0 0 36px' }}>
-            2,400+ students already have a system. Free forever, 2-minute setup.
+            2,400+ students already have a system. Free up to 15 apps, no card needed.
           </p>
           <Link
             href={user ? '/dashboard' : '/signup'}
@@ -412,7 +412,7 @@ function FinalCTA({ user }: { user: unknown }) {
             {user ? 'Go to dashboard →' : 'Start free — no card needed →'}
           </Link>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', marginTop: 14 }}>
-            No credit card required · Free forever up to 15 apps
+            No credit card required · Free up to 15 apps
           </p>
         </motion.div>
       </div>
@@ -496,7 +496,7 @@ export default function Home() {
 
               <div className="mt-5 flex items-center gap-5 flex-wrap justify-center md:justify-start">
                 <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-                  Free forever · 2 min setup
+                  No credit card · free up to 15 apps
                 </p>
                 <div className="flex items-center gap-1.5">
                   <div className="flex -space-x-1.5">
@@ -758,7 +758,7 @@ export default function Home() {
               ))}
             </div>
             <p className="mt-4 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-              No credit card required. Free forever, up to 15 applications.
+              No credit card required. Free up to 15 applications.
             </p>
           </motion.div>
 
