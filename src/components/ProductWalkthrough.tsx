@@ -37,6 +37,14 @@ const FEATURES = [
   { id: 'coach',     label: 'Weekly Coach',      desc: 'Monday briefing built from your real pipeline',  Icon: Calendar,   duration: 4000 },
 ] as const;
 
+const JA_FEATURES = [
+  { id: 'pipeline',  label: 'パイプライン管理', desc: 'OA・面接・内定まで就活に特化したカンバン', Icon: LayoutGrid, duration: 3500 },
+  { id: 'interview', label: 'AI面接対策',       desc: '面接段階に入ったらAIが即座に頻出質問を生成', Icon: Brain,      duration: 4000 },
+  { id: 'followup',  label: 'メール作成',       desc: '状況に合ったフォローアップをワンクリックで', Icon: Mail,       duration: 3500 },
+  { id: 'deadlines', label: '締め切り管理',     desc: '期限が近い選考を色でひと目で確認',           Icon: Clock,      duration: 3000 },
+  { id: 'coach',     label: '週次AIコーチ',     desc: '月曜の朝に届くあなた専用の行動プラン',       Icon: Calendar,   duration: 4000 },
+] as const;
+
 // ── Shared chrome components (always dark) ────────────────────────────────────
 
 function BrowserChrome() {
@@ -346,6 +354,256 @@ function WeeklyCoachPanel() {
   );
 }
 
+// ── Japanese panels ──────────────────────────────────────────────────────────
+
+function JaPipelinePanel() {
+  const cols = [
+    { label: 'エントリー済み', color: SC.Applied,     cards: [{ company: 'Mercari',    role: 'バックエンドエンジニア', deadline: '5日', red: false }] },
+    { label: 'OA',            color: SC.OA,           cards: [{ company: 'Recruit',    role: 'プロダクトマネージャー', deadline: null,  red: false }] },
+    { label: '電話面接',       color: SC.PhoneScreen,  cards: [{ company: 'CyberAgent', role: 'Webエンジニア',          deadline: '1日', red: true  }] },
+    { label: '最終面接',       color: SC.FinalRound,   cards: [{ company: 'DeNA',       role: 'iOSエンジニア',          deadline: null,  red: false }] },
+    { label: '内定',           color: SC.Offer,        cards: [{ company: 'Sansan',     role: 'バックエンドエンジニア', deadline: null,  red: false }] },
+  ];
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, padding: '8px 10px', gap: 7, overflow: 'hidden' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 5 }}>
+        {[
+          { label: '合計',   value: '5', sub: '選考中',  accent: null },
+          { label: '選考中', value: '4', sub: '進行中',  accent: null },
+          { label: '面接中', value: '2', sub: '今週',    accent: 'green' },
+          { label: '要対応', value: '1', sub: '1日後締切', accent: 'amber' },
+        ].map(s => (
+          <div key={s.label} style={{
+            borderRadius: 7, padding: '5px 7px', background: D.cardBg,
+            border: s.accent === 'green' ? `1px solid ${D.borderGray}` : s.accent === 'amber' ? `1px solid ${D.borderGray}` : `1px solid ${D.borderGray}`,
+            borderLeft: s.accent === 'green' ? '3px solid #16A34A' : s.accent === 'amber' ? '3px solid #D97706' : `1px solid ${D.borderGray}`,
+          }}>
+            <div style={{ fontSize: 6.5, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.05em', color: D.mutedText, marginBottom: 2 }}>{s.label}</div>
+            <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: s.accent === 'green' ? D.green : s.accent === 'amber' ? D.amber : D.brandNavy, marginBottom: 1 }}>{s.value}</div>
+            <div style={{ fontSize: 6.5, color: D.textTertiary }}>{s.sub}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 5, flex: 1, minHeight: 0 }}>
+        {cols.map(col => (
+          <div key={col.label} style={{ display: 'flex', flexDirection: 'column' as const }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginBottom: 4 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: col.color, flexShrink: 0 }} />
+              <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: '0.02em', color: D.mutedText, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{col.label}</span>
+              <span style={{ fontSize: 7, padding: '1px 4px', borderRadius: 3, border: `1px solid ${D.borderGray}`, background: D.surfaceGray, color: D.textTertiary }}>{col.cards.length}</span>
+            </div>
+            <div style={{ flex: 1, borderRadius: 7, padding: 4, background: D.cardBg, border: `1px solid ${D.borderGray}`, display: 'flex', flexDirection: 'column' as const, gap: 4, minHeight: 60 }}>
+              {col.cards.map(card => (
+                <div key={card.company} style={{ background: D.bg, border: `1px solid ${D.borderGray}`, borderRadius: 6, padding: '5px 6px' }}>
+                  <div style={{ fontSize: 9, fontWeight: 600, color: D.brandNavy, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{card.company}</div>
+                  <div style={{ fontSize: 8, color: D.mutedText, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{card.role}</div>
+                  {card.deadline && (
+                    <div style={{ marginTop: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                      <span style={{
+                        fontSize: 7, fontWeight: 600, padding: '1px 4px', borderRadius: 3,
+                        ...(card.red
+                          ? { background: 'rgba(239,68,68,0.12)', color: D.red, border: '1px solid rgba(239,68,68,0.25)' }
+                          : { background: 'rgba(217,119,6,0.12)', color: D.amber, border: '1px solid rgba(217,119,6,0.25)' }),
+                      }}>{card.deadline}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function JaInterviewIntelPanel() {
+  const sections = [
+    { title: '行動面接', items: [
+      '困難なプロジェクトでチームをまとめた経験を教えてください。',
+      '締め切りが迫る中で品質を保ちながら仕事を進めた経験は？',
+    ]},
+    { title: '技術面接', items: [
+      'マイクロサービスとモノリスの設計をどう使い分けますか？',
+    ]},
+    { title: '職種別', items: [
+      'Mercariのグロース戦略について、あなたの考えを聞かせてください。',
+      'ユーザーリテンション改善のためにどのような施策を提案しますか？',
+    ]},
+  ];
+  return (
+    <div style={{ flex: 1, padding: '8px 10px', overflow: 'hidden', display: 'flex', flexDirection: 'column' as const, gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 12, background: `${SC.FinalRound}15`, color: SC.FinalRound, border: `1px solid ${SC.FinalRound}30` }}>最終面接</span>
+        <span style={{ fontSize: 10, color: D.mutedText, fontWeight: 500 }}>Mercari</span>
+        <span style={{ fontSize: 10, color: D.textTertiary }}>· バックエンドエンジニア</span>
+      </div>
+      <div style={{ flex: 1, borderRadius: 8, border: `1px solid ${D.borderGray}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' as const }}>
+        <div style={{ background: D.surfaceGray, padding: '7px 10px', display: 'flex', alignItems: 'center', gap: 6, borderBottom: `1px solid ${D.borderGray}`, flexShrink: 0 }}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={D.accentBlue} strokeWidth="2">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4M21 5h-4"/>
+          </svg>
+          <span style={{ fontSize: 10, fontWeight: 600, color: D.brandNavy }}>AI 面接対策</span>
+          <span style={{ marginLeft: 'auto', fontSize: 8, color: D.textTertiary }}>Mercari · 5問</span>
+        </div>
+        <div style={{ padding: '8px 10px', overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column' as const, gap: 8 }}>
+          {sections.map(sec => (
+            <div key={sec.title}>
+              <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: '0.05em', color: D.textTertiary, marginBottom: 5 }}>{sec.title}</div>
+              <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 5 }}>
+                {sec.items.map(q => (
+                  <div key={q} style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                    <div style={{ width: 5, height: 5, borderRadius: '50%', background: D.accentBlue, marginTop: 3.5, flexShrink: 0 }} />
+                    <span style={{ fontSize: 9.5, color: D.brandNavy, lineHeight: 1.45 }}>{q}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function JaFollowUpPanel() {
+  return (
+    <div style={{ flex: 1, padding: '8px 10px', overflow: 'hidden', display: 'flex', flexDirection: 'column' as const, gap: 6 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 12, background: `${SC.PhoneScreen}15`, color: SC.PhoneScreen, border: `1px solid ${SC.PhoneScreen}30` }}>電話面接</span>
+        <span style={{ fontSize: 10, color: D.mutedText, fontWeight: 500 }}>CyberAgent</span>
+        <span style={{ fontSize: 10, color: D.textTertiary }}>· Webエンジニア</span>
+      </div>
+      <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' as const }}>
+        {['お礼メール', '進捗確認', '条件交渉', '辞退連絡'].map((t, i) => (
+          <div key={t} style={{
+            fontSize: 9, fontWeight: 500, padding: '3px 8px', borderRadius: 20,
+            background: i === 0 ? D.accentBlue : D.surfaceGray,
+            color: i === 0 ? '#fff' : D.mutedText,
+            border: `1px solid ${i === 0 ? D.accentBlue : D.borderGray}`,
+            cursor: 'default',
+          }}>{t}</div>
+        ))}
+      </div>
+      <div style={{ flex: 1, borderRadius: 8, border: `1px solid ${D.borderGray}`, background: D.cardBg, overflow: 'hidden', display: 'flex', flexDirection: 'column' as const }}>
+        <div style={{ padding: '7px 10px', borderBottom: `1px solid ${D.borderGray}`, background: D.surfaceGray, flexShrink: 0 }}>
+          <span style={{ fontSize: 9, color: D.textTertiary }}>件名: </span>
+          <span style={{ fontSize: 10, fontWeight: 600, color: D.brandNavy }}>本日の面接のお礼 — CyberAgent様</span>
+        </div>
+        <div style={{ padding: '8px 10px', overflow: 'auto', flex: 1 }}>
+          {[
+            '田中様',
+            '本日はお時間をいただきありがとうございました。面接を通じて、CyberAgentのエンジニア文化や技術的な挑戦について深く理解することができました。',
+            '特に、スケーラビリティへのアプローチについてお話しいただいた点が大変印象的でした。私自身の経験とも重なり、ぜひご一緒したいという思いがさらに強くなりました。',
+            'ご検討のほど、よろしくお願いいたします。\n\n田中 太郎',
+          ].map((para, i) => (
+            <p key={i} style={{ fontSize: 9.5, color: D.brandNavy, lineHeight: 1.55, marginBottom: 5, whiteSpace: 'pre-line' as const }}>{para}</p>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function JaDeadlinesPanel() {
+  return (
+    <div style={{ flex: 1, padding: '8px 10px', overflow: 'hidden', display: 'flex', flexDirection: 'column' as const, gap: 7 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 5 }}>
+        {[
+          { label: '要対応', value: '1', sub: '3日以内', accent: 'red' },
+          { label: 'もうすぐ', value: '2', sub: '7日以内', accent: 'amber' },
+          { label: '今後',   value: '2', sub: '2週間以内', accent: null },
+        ].map(s => (
+          <div key={s.label} style={{
+            borderRadius: 7, padding: '6px 8px', background: D.cardBg,
+            border: `1px solid ${D.borderGray}`,
+            borderLeft: s.accent === 'red' ? '3px solid #DC2626' : s.accent === 'amber' ? '3px solid #D97706' : `1px solid ${D.borderGray}`,
+          }}>
+            <div style={{ fontSize: 6.5, fontWeight: 700, letterSpacing: '0.05em', color: D.mutedText, marginBottom: 2 }}>{s.label}</div>
+            <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: s.accent === 'red' ? D.red : s.accent === 'amber' ? D.amber : D.brandNavy, marginBottom: 1 }}>{s.value}</div>
+            <div style={{ fontSize: 6.5, color: D.textTertiary }}>{s.sub}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 5 }}>
+        {[
+          { company: 'CyberAgent', role: 'Webエンジニア',   stage: '電話面接', stageColor: SC.PhoneScreen, deadline: 'あと1日', red: true  },
+          { company: 'Mercari',    role: 'バックエンドエンジニア', stage: 'エントリー済み', stageColor: SC.Applied, deadline: 'あと5日', red: false },
+          { company: 'Recruit',    role: 'プロダクトマネージャー', stage: 'OA',     stageColor: SC.OA,         deadline: 'あと7日', red: false },
+        ].map(item => (
+          <div key={item.company} style={{
+            background: D.cardBg, border: `1px solid ${D.borderGray}`, borderRadius: 8,
+            padding: '7px 10px', display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, color: D.brandNavy }}>{item.company}</div>
+              <div style={{ fontSize: 8.5, color: D.mutedText, marginTop: 1 }}>{item.role}</div>
+            </div>
+            <span style={{ fontSize: 8.5, fontWeight: 500, padding: '2px 6px', borderRadius: 4, background: `${item.stageColor}18`, color: item.stageColor, border: `1px solid ${item.stageColor}35`, flexShrink: 0 }}>{item.stage}</span>
+            <span style={{
+              fontSize: 8.5, fontWeight: 600, padding: '2px 6px', borderRadius: 4, flexShrink: 0,
+              ...(item.red
+                ? { background: 'rgba(220,38,38,0.12)', color: D.red, border: '1px solid rgba(220,38,38,0.25)' }
+                : { background: 'rgba(217,119,6,0.12)', color: D.amber, border: '1px solid rgba(217,119,6,0.25)' }),
+            }}>{item.deadline}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function JaWeeklyCoachPanel() {
+  return (
+    <div style={{ flex: 1, padding: '8px 10px', overflow: 'hidden' }}>
+      <div style={{
+        borderRadius: 10, border: '1px solid rgba(37,99,235,0.2)',
+        background: 'linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(37,99,235,0.02) 100%)',
+        padding: '11px 12px', height: '100%', overflow: 'auto',
+        display: 'flex', flexDirection: 'column' as const, gap: 9,
+        boxSizing: 'border-box' as const,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: D.brandNavy, marginBottom: 3, lineHeight: 1.35 }}>順調です — この勢いを維持しましょう</div>
+            <div style={{ fontSize: 9.5, color: D.mutedText, lineHeight: 1.5 }}>面接が2社、OA対応中が1社あります。CyberAgentの電話面接が最も急ぎです。</div>
+          </div>
+          <div style={{ fontSize: 8, fontWeight: 600, padding: '3px 8px', borderRadius: 20, background: `${D.accentBlue}15`, color: D.accentBlue, border: `1px solid ${D.accentBlue}25`, whiteSpace: 'nowrap' as const, flexShrink: 0 }}>4月7日週</div>
+        </div>
+        <div>
+          <div style={{ fontSize: 7.5, fontWeight: 700, letterSpacing: '0.05em', color: D.textTertiary, marginBottom: 6 }}>今週の優先事項</div>
+          <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 5 }}>
+            {[
+              { n: 1, text: 'CyberAgent電話面接の準備 — 締め切りまであと1日', urgent: true },
+              { n: 2, text: 'Mercari OAを7日以内に完了させること' },
+              { n: 3, text: 'Recruitへのフォローアップ — エントリーから5日経過' },
+            ].map(p => (
+              <div key={p.n} style={{ display: 'flex', gap: 7, alignItems: 'flex-start' }}>
+                <div style={{
+                  width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
+                  background: p.urgent ? 'rgba(239,68,68,0.15)' : `${D.accentBlue}15`,
+                  border: `1px solid ${p.urgent ? 'rgba(239,68,68,0.3)' : `${D.accentBlue}30`}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 8, fontWeight: 700, color: p.urgent ? D.red : D.accentBlue,
+                }}>{p.n}</div>
+                <span style={{ fontSize: 9.5, color: D.brandNavy, lineHeight: 1.45 }}>{p.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ background: D.surfaceGray, borderRadius: 7, padding: '7px 9px', border: `1px solid ${D.borderGray}` }}>
+          <div style={{ fontSize: 9, color: D.mutedText, lineHeight: 1.5 }}>
+            💡 3社以上の面接を並行している就活生は内定承諾が{' '}
+            <strong style={{ color: D.brandNavy }}>2.3倍速い</strong>という結果が出ています。
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const JA_PANELS: React.FC[] = [JaPipelinePanel, JaInterviewIntelPanel, JaFollowUpPanel, JaDeadlinesPanel, JaWeeklyCoachPanel];
+
 // ── Demo frame wrapper ────────────────────────────────────────────────────────
 
 function DemoFrame({ animKey, Panel }: { animKey: number; Panel: React.FC }) {
@@ -370,7 +628,9 @@ const PANELS: React.FC[] = [PipelinePanel, InterviewIntelPanel, FollowUpPanel, D
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function ProductWalkthrough() {
+export default function ProductWalkthrough({ locale = 'en' }: { locale?: 'en' | 'ja' }) {
+  const features = locale === 'ja' ? JA_FEATURES : FEATURES;
+  const panels   = locale === 'ja' ? JA_PANELS   : PANELS;
   const [active, setActive]           = useState(0);
   const [animKey, setAnimKey]         = useState(0);
   const [playing, setPlaying]         = useState(false);
@@ -395,11 +655,11 @@ export default function ProductWalkthrough() {
   useEffect(() => {
     if (!playing || reducedMotion) return;
     timerRef.current = setTimeout(() => {
-      setActive(a => (a + 1) % FEATURES.length);
+      setActive(a => (a + 1) % features.length);
       setAnimKey(k => k + 1);
-    }, FEATURES[active].duration);
+    }, features[active].duration);
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [active, animKey, playing, reducedMotion]);
+  }, [active, animKey, playing, reducedMotion, features]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -412,26 +672,26 @@ export default function ProductWalkthrough() {
     return () => obs.disconnect();
   }, []);
 
-  const ActivePanel = PANELS[active];
+  const ActivePanel = panels[active];
 
   return (
     <section className="py-20 px-6">
       <div className="max-w-[1100px] mx-auto">
         <div className="text-center mb-12">
           <p className="text-[11px] font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--accent-blue)' }}>
-            Product tour
+            {locale === 'ja' ? '製品ツアー' : 'Product tour'}
           </p>
           <h2 className="text-[28px] md:text-[36px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-            See how it works
+            {locale === 'ja' ? '使い方を見てみよう' : 'See how it works'}
           </h2>
           <p className="mt-2 text-[15px]" style={{ color: 'var(--muted-text)' }}>
-            Real AI features. Real pipeline stages. Built for your job search.
+            {locale === 'ja' ? '本物のAI機能。本物のパイプライン。あなたの就活のために。' : 'Real AI features. Real pipeline stages. Built for your job search.'}
           </p>
         </div>
 
         {/* Mobile: horizontal pill tabs */}
         <div className="flex lg:hidden gap-2 overflow-x-auto pb-2 -mx-1 px-1 mb-4" style={{ scrollbarWidth: 'none' }}>
-          {FEATURES.map((f, i) => (
+          {features.map((f, i) => (
             <button
               key={f.id}
               onClick={() => goTo(i)}
@@ -451,7 +711,7 @@ export default function ProductWalkthrough() {
 
           {/* Left: stacked feature tabs (desktop only) */}
           <div className="hidden lg:flex flex-col gap-1">
-            {FEATURES.map((f, i) => {
+            {features.map((f, i) => {
               const isActive = i === active;
               return (
                 <button
@@ -510,7 +770,7 @@ export default function ProductWalkthrough() {
 
         {/* Mobile: dots + browser frame */}
         <div className="flex lg:hidden justify-center gap-1.5 mt-5 mb-4">
-          {FEATURES.map((_, i) => (
+          {features.map((_, i) => (
             <button
               key={i}
               onClick={() => goTo(i)}

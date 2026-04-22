@@ -772,7 +772,7 @@ export default function JaLandingPage() {
               <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.18em', color: 'var(--accent-blue)', fontFamily: F, textTransform: 'uppercase' }}>製品ツアー</span>
             </div>
           </FadeUp>
-          <ProductWalkthrough />
+          <ProductWalkthrough locale="ja" />
         </div>
       </div>
 
