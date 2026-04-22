@@ -73,7 +73,7 @@ function BrowserChrome() {
   );
 }
 
-function AppNav() {
+function AppNav({ locale }: { locale: 'en' | 'ja' }) {
   return (
     <div style={{
       height: 36, background: D.cardBg, borderBottom: `1px solid ${D.borderGray}`,
@@ -82,7 +82,7 @@ function AppNav() {
       <Logo size={18} variant="dark" />
       <span style={{ fontSize: 11, fontWeight: 600, color: D.brandNavy, letterSpacing: '-0.02em' }}>Applyd</span>
       <div style={{ flex: 1 }} />
-      <span style={{ fontSize: 9, color: D.mutedText }}>Hi, Alex</span>
+      <span style={{ fontSize: 9, color: D.mutedText }}>{locale === 'ja' ? 'こんにちは、田中さん' : 'Hi, Alex'}</span>
       <div style={{
         width: 22, height: 22, borderRadius: 6, border: `1px solid ${D.borderGray}`,
         background: D.surfaceGray, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -606,7 +606,7 @@ const JA_PANELS: React.FC[] = [JaPipelinePanel, JaInterviewIntelPanel, JaFollowU
 
 // ── Demo frame wrapper ────────────────────────────────────────────────────────
 
-function DemoFrame({ animKey, Panel }: { animKey: number; Panel: React.FC }) {
+function DemoFrame({ animKey, Panel, locale }: { animKey: number; Panel: React.FC; locale: 'en' | 'ja' }) {
   return (
     <div style={{
       borderRadius: 14, border: `1px solid ${D.borderGray}`,
@@ -614,7 +614,7 @@ function DemoFrame({ animKey, Panel }: { animKey: number; Panel: React.FC }) {
       boxShadow: '0 24px 64px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.2)',
     }}>
       <BrowserChrome />
-      <AppNav />
+      <AppNav locale={locale} />
       <div style={{ height: 278, display: 'flex', flexDirection: 'column' as const, overflow: 'hidden' }}>
         <div key={animKey} style={{ flex: 1, display: 'flex', flexDirection: 'column' as const, animation: 'wt-panel-in 0.3s ease-out both' }}>
           <Panel />
@@ -764,7 +764,7 @@ export default function ProductWalkthrough({ locale = 'en' }: { locale?: 'en' | 
 
           {/* Right: browser frame (desktop) */}
           <div className="hidden lg:block">
-            <DemoFrame animKey={animKey} Panel={ActivePanel} />
+            <DemoFrame animKey={animKey} Panel={ActivePanel} locale={locale} />
           </div>
         </div>
 
@@ -783,7 +783,7 @@ export default function ProductWalkthrough({ locale = 'en' }: { locale?: 'en' | 
           ))}
         </div>
         <div className="lg:hidden">
-          <DemoFrame animKey={animKey} Panel={ActivePanel} />
+          <DemoFrame animKey={animKey} Panel={ActivePanel} locale={locale} />
         </div>
       </div>
     </section>
