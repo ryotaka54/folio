@@ -587,39 +587,11 @@ function DashboardContent() {
 
       {view === 'today' ? (
         <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-6 pb-mobile-nav lg:pb-6">
-          {!isMobile && (
-            <TodayView
-              applications={displayApplications}
-              userName={user?.name?.split(' ')[0]}
-              onOpenApp={handleCardClick}
-            />
-          )}
-          {isMobile && (
-            <div className="mt-4 flex-1">
-              {loading ? (
-                <div className="flex gap-3 overflow-hidden">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex-1 min-w-[160px] rounded-lg border border-border-gray p-3" style={{ background: 'var(--card-bg)' }}>
-                      <div className="h-3 w-16 rounded mb-3 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
-                      {[...Array(i === 1 ? 3 : i === 0 ? 2 : 1)].map((_, j) => (
-                        <div key={j} className="h-16 rounded-md mb-2 animate-pulse" style={{ background: 'var(--surface-gray)' }} />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : displayApplications.length === 0 ? (
-                <EmptyState onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }} onAutofillUrl={handleAutofillUrl} hideExtensionHint={bannerVisible} />
-              ) : (
-                <MobileCardList
-                  applications={filteredApps}
-                  stages={stages as PipelineStage[]}
-                  onCardClick={handleCardClick}
-                  onStatusChange={(id, status) => handleStatusChange(id, status)}
-                  onCardContextMenu={handleContextMenu}
-                />
-              )}
-            </div>
-          )}
+          <TodayView
+            applications={displayApplications}
+            userName={user?.name?.split(' ')[0]}
+            onOpenApp={handleCardClick}
+          />
 
           {/* Dashboard Footer */}
           <footer className="mt-20 py-8 border-t border-border-gray flex flex-col sm:flex-row items-center justify-between gap-4">
