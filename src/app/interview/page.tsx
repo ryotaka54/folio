@@ -8,6 +8,7 @@ import { Download, Copy, Check, RotateCcw, ChevronDown, ChevronUp, LayoutDashboa
 import { useAuth } from '@/lib/auth-context';
 import { StoreProvider, useStore } from '@/lib/store';
 import { isPro } from '@/lib/pro';
+import { authFetch } from '@/lib/auth-fetch';
 import { Application } from '@/lib/types';
 import { STAGE_COLORS } from '@/lib/constants';
 import { Logo } from '@/components/Logo';
@@ -181,7 +182,7 @@ function ProgressRing({ current, total, score }: { current: number; total: numbe
   return (
     <div style={{ position: 'relative', width: 96, height: 96 }}>
       <svg width="96" height="96" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="48" cy="48" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="5" />
+        <circle cx="48" cy="48" r={r} fill="none" style={{ stroke: 'var(--border-gray)' }} strokeWidth="5" />
         <motion.circle
           cx="48" cy="48" r={r} fill="none"
           stroke={scoreColor} strokeWidth="5"
@@ -196,10 +197,10 @@ function ProgressRing({ current, total, score }: { current: number; total: numbe
         position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
       }}>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
+        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 20, fontWeight: 700, color: 'var(--body-text)', lineHeight: 1 }}>
           {current}
         </span>
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>/ {total}</span>
+        <span style={{ fontSize: 10, color: 'var(--muted-text)', marginTop: 2 }}>/ {total}</span>
       </div>
     </div>
   );
@@ -282,7 +283,7 @@ function LoadingTypewriter({ company }: { company: string }) {
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -6 }}
-        style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 20 }}
+        style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--muted-text)', marginTop: 20 }}
       >
         {steps[idx]}
       </motion.p>
@@ -324,7 +325,7 @@ function InterviewContent() {
   useEffect(() => {
     if (view !== 'history' || !user || !userIsPro) return;
     setSessionsLoading(true);
-    fetch(`/api/ai/mock-interview?userId=${user.id}`)
+    authFetch(`/api/ai/mock-interview`)
       .then(r => r.json())
       .then(d => setSessions(d.sessions ?? []))
       .catch(() => {})
@@ -378,11 +379,10 @@ function InterviewContent() {
     setError('');
     setPhase('loading');
     try {
-      const res = await fetch('/api/ai/mock-interview', {
+      const res = await authFetch('/api/ai/mock-interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'generate', userId: user.id,
+          action: 'generate',
           company: selectedApp.company, role: selectedApp.role,
           notes: selectedApp.notes, count: questionCount, type: questionType,
         }),
@@ -403,11 +403,10 @@ function InterviewContent() {
     if (voice.listening) voice.stop();
     setPhase('evaluating');
     try {
-      const res = await fetch('/api/ai/mock-interview', {
+      const res = await authFetch('/api/ai/mock-interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'evaluate', userId: user.id,
+          action: 'evaluate',
           company: selectedApp.company, role: selectedApp.role,
           question: questions[currentIdx].q,
           questionType: questions[currentIdx].type,
@@ -430,11 +429,10 @@ function InterviewContent() {
     const newTranscript = [...transcript, entry];
     setTranscript(newTranscript);
     if (currentIdx + 1 >= questions.length) {
-      fetch('/api/ai/mock-interview', {
+      authFetch('/api/ai/mock-interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'save_session', userId: user.id,
+          action: 'save_session',
           company: selectedApp.company, role: selectedApp.role,
           applicationId: selectedApp.id, questions, transcript: newTranscript,
         }),
@@ -465,14 +463,14 @@ function InterviewContent() {
   if (!user) return null;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#080C14', color: '#fff' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--background)', color: 'var(--body-text)' }}>
 
       {/* ── Nav ─────────────────────────────────────────────────────────────── */}
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
         <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[56px]">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
+              {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="mono" />}
               <span className="text-[15px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
             {/* View switcher pill — same as dashboard */}
@@ -525,7 +523,7 @@ function InterviewContent() {
       {/* ── View switcher (only shown in pick/history, not mid-session) ─────── */}
       {(phase === 'pick' || view === 'history') && (
         <div style={{ maxWidth: 900, margin: '0 auto', padding: '20px 24px 0' }}>
-          <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.05)', borderRadius: 10, padding: 3, gap: 2 }}>
+          <div style={{ display: 'inline-flex', background: 'var(--surface-gray)', borderRadius: 10, padding: 3, gap: 2, border: '1px solid var(--border-gray)' }}>
             {(['session', 'history'] as View[]).map(v => (
               <button
                 key={v}
@@ -533,7 +531,7 @@ function InterviewContent() {
                 style={{
                   height: 32, padding: '0 16px', borderRadius: 8, border: 'none',
                   background: view === v ? '#2563EB' : 'transparent',
-                  color: view === v ? '#fff' : 'rgba(255,255,255,0.45)',
+                  color: view === v ? '#fff' : 'var(--muted-text)',
                   fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.15s',
                   display: 'flex', alignItems: 'center', gap: 6,
                 }}
@@ -557,12 +555,12 @@ function InterviewContent() {
             style={{ maxWidth: 760, margin: '0 auto', padding: '32px 24px 80px' }}
           >
             {sessionsLoading ? (
-              <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
+              <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--muted-text)', fontSize: 14 }}>
                 Loading sessions…
               </div>
             ) : sessions.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 15, marginBottom: 12 }}>No sessions yet.</p>
+                <p style={{ color: 'var(--muted-text)', fontSize: 15, marginBottom: 12 }}>No sessions yet.</p>
                 <button
                   onClick={() => setView('session')}
                   style={{ color: '#2563EB', fontSize: 13, background: 'none', border: 'none', cursor: 'pointer' }}
@@ -585,7 +583,7 @@ function InterviewContent() {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: si * 0.05 }}
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, overflow: 'hidden' }}
+                      style={{ background: 'var(--card-bg)', border: '1px solid var(--border-gray)', borderRadius: 14, overflow: 'hidden' }}
                     >
                       {/* Session row */}
                       <button
@@ -594,8 +592,8 @@ function InterviewContent() {
                       >
                         <CompanyAvatar company={s.company} color={color} size={40} />
                         <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
-                          <p style={{ fontWeight: 700, fontSize: 14, color: '#fff', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.company}</p>
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.role} · {date}</p>
+                          <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--body-text)', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.company}</p>
+                          <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.role} · {date}</p>
                         </div>
 
                         {/* Mini score bar chart */}
@@ -608,10 +606,10 @@ function InterviewContent() {
                         {/* Avg score */}
                         <div style={{ textAlign: 'right', flexShrink: 0, minWidth: 52 }}>
                           <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{avgScore}</span>
-                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Mono', monospace" }}>/5</span>
+                          <span style={{ fontSize: 11, color: 'var(--muted-text)', fontFamily: "'DM Mono', monospace" }}>/5</span>
                         </div>
 
-                        <span style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+                        <span style={{ color: 'var(--muted-text)', flexShrink: 0 }}>
                           {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </span>
                       </button>
@@ -625,16 +623,16 @@ function InterviewContent() {
                             exit={{ height: 0, opacity: 0 }}
                             style={{ overflow: 'hidden' }}
                           >
-                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            <div style={{ borderTop: '1px solid var(--border-gray)', padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
                               {s.transcript.map((e, qi) => (
-                                <div key={qi} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '12px 14px', borderLeft: `3px solid ${SCORE_COLOR(e.feedback.score)}` }}>
+                                <div key={qi} style={{ background: 'var(--surface-gray)', borderRadius: 10, padding: '12px 14px', borderLeft: `3px solid ${SCORE_COLOR(e.feedback.score)}` }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                                    <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', fontFamily: "'DM Mono', monospace" }}>Q{qi+1}</span>
-                                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.question.type}</span>
+                                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-tertiary)', fontFamily: "'DM Mono', monospace" }}>Q{qi+1}</span>
+                                    <span style={{ fontSize: 10, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.question.type}</span>
                                     <span style={{ marginLeft: 'auto', fontFamily: "'DM Mono', monospace", fontSize: 13, fontWeight: 700, color: SCORE_COLOR(e.feedback.score) }}>{e.feedback.score}/5 — {SCORE_LABEL(e.feedback.score)}</span>
                                   </div>
-                                  <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: '0 0 6px', lineHeight: 1.5 }}>{e.question.q}</p>
-                                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '0 0 8px', lineHeight: 1.6, fontStyle: 'italic' }}>{e.feedback.overall}</p>
+                                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--body-text)', margin: '0 0 6px', lineHeight: 1.5 }}>{e.question.q}</p>
+                                  <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '0 0 8px', lineHeight: 1.6, fontStyle: 'italic' }}>{e.feedback.overall}</p>
                                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                                     {e.feedback.strengths.map((str, i) => (
                                       <span key={i} style={{ fontSize: 11, padding: '3px 9px', borderRadius: 9999, background: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)' }}>{str}</span>
@@ -674,7 +672,7 @@ function InterviewContent() {
             {/* Hero */}
             <div style={{
               padding: '36px 24px 24px',
-              background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(37,99,235,0.14) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(37,99,235,0.1) 0%, transparent 70%)',
               textAlign: 'center',
             }}>
               <motion.div
@@ -683,7 +681,7 @@ function InterviewContent() {
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                 style={{
                   width: 48, height: 48, borderRadius: 14,
-                  background: 'rgba(37,99,235,0.15)', border: '1px solid rgba(37,99,235,0.3)',
+                  background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.25)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 14px',
                 }}
@@ -699,7 +697,7 @@ function InterviewContent() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 7px', color: '#fff' }}
+                style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 7px', color: 'var(--body-text)' }}
               >
                 Mock Interview
               </motion.h1>
@@ -707,7 +705,7 @@ function InterviewContent() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.18 }}
-                style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', margin: '0 auto', maxWidth: 380 }}
+                style={{ fontSize: 14, color: 'var(--muted-text)', margin: '0 auto', maxWidth: 380 }}
               >
                 Practice out loud. Get real STAR feedback. Get hired.
               </motion.p>
@@ -723,13 +721,13 @@ function InterviewContent() {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 16,
                   padding: '14px 18px', borderRadius: 14,
-                  background: 'rgba(37,99,235,0.1)', border: '1px solid rgba(37,99,235,0.25)',
+                  background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)',
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', margin: '0 0 2px' }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--body-text)', margin: '0 0 2px' }}>
                       ↩ In-progress session: {savedSession.selectedApp.company} · {savedSession.selectedApp.role}
                     </p>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                    <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: 0 }}>
                       Question {savedSession.currentIdx + 1} of {savedSession.questions.length}
                     </p>
                   </div>
@@ -761,8 +759,8 @@ function InterviewContent() {
                     }}
                     style={{
                       height: 34, padding: '0 14px', borderRadius: 9,
-                      background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)',
-                      cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.4)',
+                      background: 'var(--surface-gray)', border: '1px solid var(--border-gray)',
+                      cursor: 'pointer', fontSize: 13, color: 'var(--muted-text)',
                     }}
                   >
                     Cancel
@@ -781,7 +779,7 @@ function InterviewContent() {
                 style={{ marginBottom: 28 }}
               >
                 <div style={{ position: 'relative' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', stroke: 'var(--muted-text)' }}>
                     <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                   </svg>
                   <input
@@ -791,8 +789,8 @@ function InterviewContent() {
                     onChange={e => setSearch(e.target.value)}
                     style={{
                       width: '100%', height: 46, paddingLeft: 40, paddingRight: 16,
-                      background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: 12, fontSize: 14, color: '#fff', outline: 'none',
+                      background: 'var(--surface-gray)', border: '1px solid var(--border-gray)',
+                      borderRadius: 12, fontSize: 14, color: 'var(--body-text)', outline: 'none',
                       fontFamily: 'inherit', boxSizing: 'border-box',
                     }}
                   />
@@ -800,10 +798,10 @@ function InterviewContent() {
               </motion.div>
 
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '60px 0', color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>Loading…</div>
+                <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--muted-text)', fontSize: 14 }}>Loading…</div>
               ) : filteredApps.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                  <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 15 }}>No active applications found.</p>
+                  <p style={{ color: 'var(--muted-text)', fontSize: 15 }}>No active applications found.</p>
                   <Link href="/dashboard" style={{ color: '#2563EB', fontSize: 13, textDecoration: 'none', marginTop: 8, display: 'inline-block' }}>Go add some →</Link>
                 </div>
               ) : (
@@ -826,22 +824,22 @@ function InterviewContent() {
                             setPhase('setup');
                           }}
                           style={{
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.09)',
+                            background: 'var(--card-bg)',
+                            border: '1px solid var(--border-gray)',
                             borderRadius: 14, padding: '16px',
                             cursor: 'pointer', textAlign: 'left',
                             display: 'flex', alignItems: 'flex-start', gap: 14,
                             transition: 'border-color 0.2s',
                           }}
-                          onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.borderColor = `${color}50`}
-                          onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.09)'}
+                          onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.borderColor = `${color}60`}
+                          onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-gray)'}
                         >
                           <CompanyAvatar company={app.company} color={color} size={44} />
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontWeight: 700, fontSize: 15, color: '#fff', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <p style={{ fontWeight: 700, fontSize: 15, color: 'var(--body-text)', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {app.company}
                             </p>
-                            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: '0 0 10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '0 0 10px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {app.role}
                             </p>
                             <span style={{
@@ -866,7 +864,7 @@ function InterviewContent() {
         {phase === 'setup' && selectedApp && (
           <motion.div key="setup" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} style={{ maxWidth: 600, margin: '0 auto', padding: '48px 24px 80px' }}>
             {/* Back */}
-            <button onClick={() => setPhase('pick')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontSize: 13, padding: 0, marginBottom: 32, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <button onClick={() => setPhase('pick')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 13, padding: 0, marginBottom: 32, display: 'flex', alignItems: 'center', gap: 6 }}>
               ← Back
             </button>
 
@@ -874,8 +872,8 @@ function InterviewContent() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 40 }}>
               <CompanyAvatar company={selectedApp.company} color={appColor} size={56} />
               <div>
-                <h2 style={{ fontSize: 22, fontWeight: 800, color: '#fff', margin: '0 0 3px', letterSpacing: '-0.02em' }}>{selectedApp.company}</h2>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)', margin: 0 }}>{selectedApp.role}</p>
+                <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--body-text)', margin: '0 0 3px', letterSpacing: '-0.02em' }}>{selectedApp.company}</h2>
+                <p style={{ fontSize: 14, color: 'var(--muted-text)', margin: 0 }}>{selectedApp.role}</p>
               </div>
             </div>
 
@@ -913,11 +911,11 @@ function InterviewContent() {
               },
             ].filter(row => !('hidden' in row && row.hidden)).map(row => (
               <div key={row.label} style={{ marginBottom: 28 }}>
-                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', margin: '0 0 10px', fontFamily: "'DM Mono', monospace" }}>
+                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text-tertiary)', margin: '0 0 10px', fontFamily: "'DM Mono', monospace" }}>
                   {row.label}
                 </p>
                 {questionType === 'essentials' && row.label === 'QUESTION FOCUS' && (
-                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', margin: '-6px 0 10px', fontStyle: 'italic' }}>
+                  <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '-6px 0 10px', fontStyle: 'italic' }}>
                     Classic opener questions every interviewer asks — tailored to this company
                   </p>
                 )}
@@ -928,9 +926,9 @@ function InterviewContent() {
                       onClick={() => row.onChange(opt.value)}
                       style={{
                         height: 38, padding: '0 18px', borderRadius: 9,
-                        border: row.value === opt.value ? '1.5px solid #2563EB' : '1px solid rgba(255,255,255,0.12)',
-                        background: row.value === opt.value ? 'rgba(37,99,235,0.15)' : 'rgba(255,255,255,0.04)',
-                        color: row.value === opt.value ? '#60A5FA' : 'rgba(255,255,255,0.5)',
+                        border: row.value === opt.value ? '1.5px solid var(--accent-blue)' : '1px solid var(--border-gray)',
+                        background: row.value === opt.value ? 'rgba(37,99,235,0.1)' : 'var(--surface-gray)',
+                        color: row.value === opt.value ? 'var(--accent-blue)' : 'var(--muted-text)',
                         fontSize: 13, fontWeight: row.value === opt.value ? 600 : 400,
                         cursor: 'pointer', transition: 'all 0.15s',
                         fontFamily: 'inherit',
@@ -987,7 +985,7 @@ function InterviewContent() {
               style={{ width: 56, height: 56 }}
             >
               <svg viewBox="0 0 56 56" fill="none">
-                <circle cx="28" cy="28" r="24" stroke="rgba(37,99,235,0.15)" strokeWidth="4" />
+                <circle cx="28" cy="28" r="24" style={{ stroke: 'var(--border-gray)' }} strokeWidth="4" />
                 <circle cx="28" cy="28" r="24" stroke="#2563EB" strokeWidth="4" strokeLinecap="round"
                   strokeDasharray="40 110" />
               </svg>
@@ -1006,22 +1004,22 @@ function InterviewContent() {
               {/* Left panel */}
               <div style={{ position: 'sticky', top: 80 }}>
                 <div style={{
-                  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'var(--card-bg)', border: '1px solid var(--border-gray)',
                   borderRadius: 16, padding: '28px 24px',
                 }}>
                   {/* Company */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28 }}>
                     <CompanyAvatar company={selectedApp.company} color={appColor} size={36} />
                     <div>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: 0 }}>{selectedApp.company}</p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0 }}>{selectedApp.role}</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--body-text)', margin: 0 }}>{selectedApp.company}</p>
+                      <p style={{ fontSize: 11, color: 'var(--muted-text)', margin: 0 }}>{selectedApp.role}</p>
                     </div>
                   </div>
 
                   {/* Progress ring */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
                     <ProgressRing current={currentIdx + 1} total={questions.length} />
-                    <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 10, fontFamily: "'DM Mono', monospace" }}>
+                    <p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 10, fontFamily: "'DM Mono', monospace" }}>
                       QUESTION {currentIdx + 1} OF {questions.length}
                     </p>
                   </div>
@@ -1030,7 +1028,7 @@ function InterviewContent() {
                   <div>
                     <button
                       onClick={() => setStarCollapsed(v => !v)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 6, padding: 0, marginBottom: 10, fontFamily: "'DM Mono', monospace" }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 6, padding: 0, marginBottom: 10, fontFamily: "'DM Mono', monospace" }}
                     >
                       STAR FRAMEWORK {starCollapsed ? '▸' : '▾'}
                     </button>
@@ -1051,15 +1049,15 @@ function InterviewContent() {
                             <div key={item.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
                               <span style={{
                                 width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                                background: 'rgba(37,99,235,0.18)', border: '1px solid rgba(37,99,235,0.3)',
+                                background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.25)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 10, fontWeight: 800, color: '#60A5FA', fontFamily: "'DM Mono', monospace",
+                                fontSize: 10, fontWeight: 800, color: 'var(--accent-blue)', fontFamily: "'DM Mono', monospace",
                               }}>
                                 {item.key}
                               </span>
                               <div>
-                                <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)', margin: '2px 0 1px' }}>{item.label}</p>
-                                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', margin: 0 }}>{item.desc}</p>
+                                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--body-text)', margin: '2px 0 1px' }}>{item.label}</p>
+                                <p style={{ fontSize: 11, color: 'var(--muted-text)', margin: 0 }}>{item.desc}</p>
                               </div>
                             </div>
                           ))}
@@ -1084,21 +1082,21 @@ function InterviewContent() {
                       <span style={{
                         fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em',
                         padding: '4px 10px', borderRadius: 9999,
-                        background: currentQ.type === 'behavioral' ? 'rgba(37,99,235,0.18)' : 'rgba(139,92,246,0.18)',
-                        color: currentQ.type === 'behavioral' ? '#60A5FA' : '#A78BFA',
+                        background: currentQ.type === 'behavioral' ? 'rgba(37,99,235,0.12)' : 'rgba(139,92,246,0.12)',
+                        color: currentQ.type === 'behavioral' ? 'var(--accent-blue)' : '#8B5CF6',
                         fontFamily: "'DM Mono', monospace",
                       }}>
                         {currentQ.type}
                       </span>
-                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', fontStyle: 'italic' }}>{currentQ.why}</span>
+                      <span style={{ fontSize: 12, color: 'var(--muted-text)', fontStyle: 'italic' }}>{currentQ.why}</span>
                     </div>
 
                     {/* Question */}
                     <div style={{
-                      fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.5,
+                      fontSize: 20, fontWeight: 700, color: 'var(--body-text)', lineHeight: 1.5,
                       marginBottom: 24, padding: '20px 22px',
-                      background: 'rgba(255,255,255,0.04)', borderRadius: 14,
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'var(--card-bg)', borderRadius: 14,
+                      border: '1px solid var(--border-gray)',
                       borderLeft: `3px solid ${currentQ.type === 'behavioral' ? '#2563EB' : '#7C3AED'}`,
                     }}>
                       {currentQ.q}
@@ -1111,9 +1109,9 @@ function InterviewContent() {
                           <button key={m} onClick={() => { if (voice.listening) voice.stop(); setInputMode(m); }}
                             style={{
                               fontSize: 12, padding: '5px 14px', borderRadius: 8,
-                              border: inputMode === m ? '1px solid rgba(37,99,235,0.5)' : '1px solid rgba(255,255,255,0.1)',
-                              background: inputMode === m ? 'rgba(37,99,235,0.12)' : 'transparent',
-                              color: inputMode === m ? '#60A5FA' : 'rgba(255,255,255,0.35)',
+                              border: inputMode === m ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
+                              background: inputMode === m ? 'rgba(37,99,235,0.1)' : 'transparent',
+                              color: inputMode === m ? 'var(--accent-blue)' : 'var(--muted-text)',
                               cursor: 'pointer', fontFamily: 'inherit', fontWeight: inputMode === m ? 600 : 400,
                             }}>
                             {m === 'text' ? '⌨ Type' : '🎤 Voice'}
@@ -1133,26 +1131,26 @@ function InterviewContent() {
                         disabled={phase === 'evaluating'}
                         style={{
                           width: '100%', borderRadius: 12,
-                          border: answer.length > 0 ? '1px solid rgba(37,99,235,0.4)' : '1px solid rgba(255,255,255,0.1)',
-                          background: 'rgba(255,255,255,0.04)', color: '#fff', fontSize: 15,
+                          border: answer.length > 0 ? '1px solid rgba(37,99,235,0.4)' : '1px solid var(--border-gray)',
+                          background: 'var(--surface-gray)', color: 'var(--body-text)', fontSize: 15,
                           padding: '14px 16px', lineHeight: 1.75, resize: 'vertical',
                           outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit',
                           transition: 'border-color 0.2s',
                         }}
                         onFocus={e => (e.currentTarget.style.borderColor = 'rgba(37,99,235,0.6)')}
-                        onBlur={e => (e.currentTarget.style.borderColor = answer.length > 0 ? 'rgba(37,99,235,0.4)' : 'rgba(255,255,255,0.1)')}
+                        onBlur={e => (e.currentTarget.style.borderColor = answer.length > 0 ? 'rgba(37,99,235,0.4)' : 'var(--border-gray)')}
                         onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitAnswer(); }}
                       />
                     ) : (
                       /* Voice input */
                       <div style={{
-                        border: voice.listening ? '1px solid rgba(37,99,235,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                        border: voice.listening ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
                         borderRadius: 12, overflow: 'hidden', transition: 'border-color 0.2s',
                       }}>
-                        <div style={{ padding: '14px 16px', minHeight: 160, background: 'rgba(255,255,255,0.03)', fontSize: 15, lineHeight: 1.75, color: answer ? '#fff' : 'rgba(255,255,255,0.25)' }}>
+                        <div style={{ padding: '14px 16px', minHeight: 160, background: 'var(--surface-gray)', fontSize: 15, lineHeight: 1.75, color: answer ? 'var(--body-text)' : 'var(--text-tertiary)' }}>
                           {answer || 'Press the mic and speak your answer…'}
                         </div>
-                        <div style={{ padding: '12px 14px', borderTop: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)', display: 'flex', alignItems: 'center', gap: 14 }}>
+                        <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border-gray)', background: 'var(--card-bg)', display: 'flex', alignItems: 'center', gap: 14 }}>
                           <button
                             onClick={() => voice.listening ? voice.stop() : (setAnswer(''), voice.start())}
                             style={{
@@ -1173,11 +1171,11 @@ function InterviewContent() {
                             )}
                           </button>
                           <WaveformBars active={voice.listening} />
-                          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                          <span style={{ fontSize: 12, color: 'var(--muted-text)' }}>
                             {voice.listening ? 'Listening… click to stop' : 'Click mic to speak'}
                           </span>
                           {answer && (
-                            <button onClick={() => setAnswer('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <button onClick={() => setAnswer('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4 }}>
                               <RotateCcw size={11} /> Clear
                             </button>
                           )}
@@ -1186,7 +1184,7 @@ function InterviewContent() {
                     )}
 
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', fontFamily: "'DM Mono', monospace" }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: "'DM Mono', monospace" }}>
                         {inputMode === 'text' ? '⌘↵ to submit' : ''}
                       </span>
                       <motion.button
@@ -1196,15 +1194,15 @@ function InterviewContent() {
                         whileTap={answer.trim() ? { scale: 0.97 } : {}}
                         style={{
                           height: 44, padding: '0 22px', borderRadius: 11,
-                          background: answer.trim() && phase !== 'evaluating' ? '#2563EB' : 'rgba(255,255,255,0.07)',
-                          border: 'none', color: answer.trim() && phase !== 'evaluating' ? '#fff' : 'rgba(255,255,255,0.25)',
+                          background: answer.trim() && phase !== 'evaluating' ? '#2563EB' : 'var(--surface-gray)',
+                          border: 'none', color: answer.trim() && phase !== 'evaluating' ? '#fff' : 'var(--text-tertiary)',
                           fontSize: 14, fontWeight: 600, cursor: answer.trim() && phase !== 'evaluating' ? 'pointer' : 'not-allowed',
                           display: 'flex', alignItems: 'center', gap: 8,
                           transition: 'background 0.2s, color 0.2s', fontFamily: 'inherit',
                         }}
                       >
                         {phase === 'evaluating' ? (
-                          <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%' }} />
+                          <motion.span animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid var(--border-gray)', borderTopColor: 'var(--accent-blue)', borderRadius: '50%' }} />
                         ) : null}
                         {phase === 'evaluating' ? 'Analyzing…' : 'Submit Answer →'}
                       </motion.button>
@@ -1229,7 +1227,7 @@ function InterviewContent() {
               animate={{ opacity: 1, y: 0 }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 20, padding: '24px 28px',
-                background: 'rgba(255,255,255,0.03)', border: `1px solid ${SCORE_COLOR(feedback.score)}30`,
+                background: 'var(--card-bg)', border: `1px solid ${SCORE_COLOR(feedback.score)}30`,
                 borderRadius: 16, marginBottom: 28, borderLeft: `3px solid ${SCORE_COLOR(feedback.score)}`,
               }}
             >
@@ -1238,7 +1236,7 @@ function InterviewContent() {
                   <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 44, fontWeight: 800, color: SCORE_COLOR(feedback.score), lineHeight: 1 }}>
                     {feedback.score}
                   </span>
-                  <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.3)', fontFamily: "'DM Mono', monospace" }}>/5</span>
+                  <span style={{ fontSize: 18, color: 'var(--muted-text)', fontFamily: "'DM Mono', monospace" }}>/5</span>
                 </div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: SCORE_COLOR(feedback.score), margin: '4px 0 0', letterSpacing: '0.06em' }}>
                   {SCORE_LABEL(feedback.score).toUpperCase()}
@@ -1253,7 +1251,7 @@ function InterviewContent() {
                     transition={{ delay: 0.3 + i * 0.08, type: 'spring', stiffness: 400 }}
                     style={{
                       width: 12, height: 12, borderRadius: '50%',
-                      background: i <= feedback.score ? SCORE_COLOR(feedback.score) : 'rgba(255,255,255,0.1)',
+                      background: i <= feedback.score ? SCORE_COLOR(feedback.score) : 'var(--border-gray)',
                     }}
                   />
                 ))}
@@ -1261,7 +1259,7 @@ function InterviewContent() {
             </motion.div>
 
             {/* Question reminder */}
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', marginBottom: 20, fontStyle: 'italic', borderLeft: '2px solid rgba(255,255,255,0.1)', paddingLeft: 14 }}>
+            <p style={{ fontSize: 13, color: 'var(--muted-text)', marginBottom: 20, fontStyle: 'italic', borderLeft: '2px solid var(--border-gray)', paddingLeft: 14 }}>
               "{currentQ.q}"
             </p>
 
@@ -1303,7 +1301,7 @@ function InterviewContent() {
                 <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#F59E0B', margin: '0 0 10px', fontFamily: "'DM Mono', monospace" }}>TO IMPROVE</p>
                 <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {feedback.improvements.map((s, i) => (
-                    <li key={i} style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>{s}</li>
+                    <li key={i} style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.6 }}>{s}</li>
                   ))}
                 </ul>
               </motion.div>
@@ -1314,7 +1312,7 @@ function InterviewContent() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
-              style={{ padding: '16px 18px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, marginBottom: 28, fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, fontStyle: 'italic', border: '1px solid rgba(255,255,255,0.07)' }}
+              style={{ padding: '16px 18px', background: 'var(--card-bg)', borderRadius: 12, marginBottom: 28, fontSize: 14, color: 'var(--muted-text)', lineHeight: 1.7, fontStyle: 'italic', border: '1px solid var(--border-gray)' }}
             >
               {feedback.overall}
             </motion.div>
@@ -1348,11 +1346,11 @@ function InterviewContent() {
           >
             {/* Score */}
             <div style={{ textAlign: 'center', marginBottom: 48 }}>
-              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: 'var(--text-tertiary)', marginBottom: 12, fontFamily: "'DM Mono', monospace" }}>
                 SESSION COMPLETE
               </p>
               <AnimatedScore target={avg(transcript)} color={SCORE_COLOR(avg(transcript))} />
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 32, fontWeight: 800, color: 'rgba(255,255,255,0.25)', display: 'block', marginTop: -4 }}>/5</span>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 32, fontWeight: 800, color: 'var(--text-tertiary)', display: 'block', marginTop: -4 }}>/5</span>
               <p style={{ fontSize: 14, fontWeight: 600, color: SCORE_COLOR(avg(transcript)), marginTop: 6 }}>
                 {SCORE_LABEL(Math.round(avg(transcript)))} · {transcript.length} question{transcript.length !== 1 ? 's' : ''}
               </p>
@@ -1376,7 +1374,7 @@ function InterviewContent() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 6 }}>
                 {transcript.map((_, i) => (
-                  <span key={i} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', fontFamily: "'DM Mono', monospace", width: 28, textAlign: 'center' }}>Q{i+1}</span>
+                  <span key={i} style={{ fontSize: 9, color: 'var(--text-tertiary)', fontFamily: "'DM Mono', monospace", width: 28, textAlign: 'center' }}>Q{i+1}</span>
                 ))}
               </div>
             </div>
@@ -1389,7 +1387,7 @@ function InterviewContent() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + i * 0.07 }}
-                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12 }}
+                  style={{ background: 'var(--card-bg)', border: '1px solid var(--border-gray)', borderRadius: 12 }}
                 >
                   <button
                     onClick={() => setExpandedQ(expandedQ === i ? null : i)}
@@ -1402,16 +1400,16 @@ function InterviewContent() {
                       {e.feedback.score}
                     </span>
                     <div style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--body-text)', margin: '0 0 2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         Q{i+1}: {e.question.q}
                       </p>
                       {e.feedback.improvements[0] && (
-                        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontSize: 11, color: 'var(--muted-text)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           ↑ {e.feedback.improvements[0]}
                         </p>
                       )}
                     </div>
-                    <span style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>
+                    <span style={{ color: 'var(--muted-text)', flexShrink: 0 }}>
                       {expandedQ === i ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </span>
                   </button>
@@ -1424,10 +1422,10 @@ function InterviewContent() {
                         exit={{ height: 0, opacity: 0 }}
                         style={{ overflow: 'hidden' }}
                       >
-                        <div style={{ padding: '0 16px 16px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', margin: '14px 0 8px', fontStyle: 'italic' }}>Your answer:</p>
-                          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, margin: '0 0 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 8, padding: '10px 12px' }}>{e.answer}</p>
-                          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>{e.feedback.overall}</p>
+                        <div style={{ padding: '0 16px 16px', borderTop: '1px solid var(--border-gray)' }}>
+                          <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: '14px 0 8px', fontStyle: 'italic' }}>Your answer:</p>
+                          <p style={{ fontSize: 13, color: 'var(--body-text)', lineHeight: 1.6, margin: '0 0 12px', background: 'var(--surface-gray)', borderRadius: 8, padding: '10px 12px' }}>{e.answer}</p>
+                          <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>{e.feedback.overall}</p>
                         </div>
                       </motion.div>
                     )}
@@ -1453,8 +1451,8 @@ function InterviewContent() {
                 onClick={copyTranscript}
                 style={{
                   height: 50, padding: '0 20px', borderRadius: 13,
-                  border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)',
-                  color: copied ? '#10B981' : 'rgba(255,255,255,0.6)',
+                  border: '1px solid var(--border-gray)', background: 'var(--surface-gray)',
+                  color: copied ? '#10B981' : 'var(--muted-text)',
                   fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'inherit',
                 }}
               >
@@ -1464,7 +1462,7 @@ function InterviewContent() {
 
             <button
               onClick={() => { setPhase('pick'); setSelectedApp(null); setTranscript([]); setCurrentIdx(0); setAnswer(''); setFeedback(null); }}
-              style={{ width: '100%', height: 40, marginTop: 10, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+              style={{ width: '100%', height: 40, marginTop: 10, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: 'var(--muted-text)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
             >
               <RotateCcw size={13} /> Practice another role
             </button>
@@ -1474,7 +1472,7 @@ function InterviewContent() {
 
       {/* Progress bar for question/feedback phases */}
       {questions.length > 0 && (phase === 'question' || phase === 'evaluating' || phase === 'feedback') && (
-        <div style={{ position: 'fixed', top: 52, left: 0, right: 0, height: 2, background: 'rgba(255,255,255,0.06)', zIndex: 40 }}>
+        <div style={{ position: 'fixed', top: 52, left: 0, right: 0, height: 2, background: 'var(--border-gray)', zIndex: 40 }}>
           <motion.div
             style={{ height: '100%', background: '#2563EB', transformOrigin: 'left' }}
             initial={{ scaleX: 0 }}
