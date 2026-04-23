@@ -255,7 +255,7 @@ function DashboardContent() {
     return () => document.removeEventListener('applyd:add', handler);
   }, []);
 
-  // Handle ?add=1 from mobile nav when navigating from another page
+  // Handle ?add=1 and ?view= from nav links
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
@@ -263,6 +263,11 @@ function DashboardContent() {
       window.history.replaceState({}, '', '/dashboard');
       setAddModalInitialUrl('');
       setShowAddModal(true);
+    }
+    const v = params.get('view');
+    if (v === 'pipeline' || v === 'table' || v === 'today') {
+      setView(v);
+      window.history.replaceState({}, '', '/dashboard');
     }
   }, []);
 
@@ -465,18 +470,45 @@ function DashboardContent() {
         onUndo={toastUndo ?? undefined}
       />
 
-      {/* Mobile top bar — logo + theme toggle (replaces full desktop nav on small screens) */}
-      <div className="lg:hidden flex items-center justify-between px-4 h-14 border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
-        <div className="flex items-center gap-2">
-          {userIsPro ? <ProLogo size={26} /> : <Logo size={26} variant="dark" />}
-          <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
-          {userIsPro && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>⚡ Pro</span>
-          )}
+      {/* Mobile top bar — logo + view switcher + theme toggle */}
+      <div className="lg:hidden border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
+        <div className="flex items-center justify-between px-4 h-12">
+          <div className="flex items-center gap-2">
+            {userIsPro ? <ProLogo size={22} /> : <Logo size={22} variant="dark" />}
+            <span className="text-[14px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+            {userIsPro && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>⚡ Pro</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
+            <ThemeToggle />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          {applications.length > 0 && <StreakBadge onMilestone={msg => showToast(msg)} />}
-          <ThemeToggle />
+        {/* View switcher row — always visible on mobile */}
+        <div className="flex items-center gap-1 px-3 pb-2">
+          {([
+            { k: 'today' as const,    label: 'Today',    icon: <Home size={11} aria-hidden /> },
+            { k: 'pipeline' as const, label: 'Pipeline', icon: <LayoutDashboard size={11} aria-hidden /> },
+            { k: 'table' as const,    label: 'List',     icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
+          ] as const).map(({ k, label, icon }) => {
+            const active = view === k;
+            return (
+              <button
+                key={k}
+                onClick={() => { setView(k); capture('view_switched', { view: k }); }}
+                className="flex items-center gap-1 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
+                style={{
+                  background: active ? 'var(--card-bg)' : 'transparent',
+                  color: active ? 'var(--brand-navy)' : 'var(--muted-text)',
+                  border: active ? '1px solid var(--border-gray)' : '1px solid transparent',
+                  boxShadow: active ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                }}
+              >
+                {icon}{label}
+              </button>
+            );
+          })}
         </div>
       </div>
 

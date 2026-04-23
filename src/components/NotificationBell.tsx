@@ -122,12 +122,17 @@ export default function NotificationBell({ userId, applications, onOpenApp }: No
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const markAllRead = async () => {
+  const markAllRead = useCallback(async () => {
     const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
     if (unreadIds.length === 0) return;
-    await supabase.from('notifications').update({ read: true }).in('id', unreadIds);
+    // Optimistic first — badge disappears instantly, no waiting on network
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
+    await supabase
+      .from('notifications')
+      .update({ read: true })
+      .in('id', unreadIds)
+      .eq('user_id', userId);
+  }, [notifications, userId]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

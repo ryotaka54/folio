@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Download, Copy, Check, RotateCcw, ChevronDown, ChevronUp, LayoutDashboard, Calendar, Mic, History as HistoryIcon } from 'lucide-react';
+import { Download, Copy, Check, RotateCcw, ChevronDown, ChevronUp, LayoutDashboard, Calendar, Mic, History as HistoryIcon, Home } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { StoreProvider, useStore } from '@/lib/store';
 import { isPro } from '@/lib/pro';
@@ -477,7 +477,8 @@ function InterviewContent() {
             </Link>
             <div className="flex items-center gap-0.5">
               {[
-                { href: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={13} aria-hidden /> },
+                { href: '/dashboard', label: 'Today',    icon: <Home size={13} aria-hidden /> },
+                { href: '/dashboard?view=pipeline', label: 'Pipeline', icon: <LayoutDashboard size={13} aria-hidden /> },
                 { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden /> },
                 { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden />, active: true },
               ].map(({ href, label, icon, active }) => (
