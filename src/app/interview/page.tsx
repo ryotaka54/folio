@@ -469,35 +469,42 @@ function InterviewContent() {
 
       {/* ── Nav ─────────────────────────────────────────────────────────────── */}
       <nav className="border-b border-border-gray bg-background sticky top-0 z-30 pt-[env(safe-area-inset-top)]">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[52px]">
-          <div className="flex items-center gap-5">
-            <Link href="/" className="flex items-center gap-2">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between h-[56px]">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0">
               {userIsPro ? <ProLogo size={28} /> : <Logo size={28} variant="dark" />}
-              <span className="text-[16px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
+              <span className="text-[15px] font-semibold hidden sm:block" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Applyd</span>
             </Link>
-            <div className="flex items-center gap-0.5">
+            {/* View switcher pill — same as dashboard */}
+            <div className="flex items-center gap-0.5 p-0.5 rounded-lg border border-border-gray" style={{ background: 'var(--surface-gray)' }}>
               {[
-                { href: '/dashboard', label: 'Today',    icon: <Home size={13} aria-hidden /> },
-                { href: '/dashboard?view=pipeline', label: 'Pipeline', icon: <LayoutDashboard size={13} aria-hidden /> },
-                { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden /> },
-                { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden />, active: true },
+                { label: 'Today',    href: '/dashboard',                icon: <Home size={12} aria-hidden /> },
+                { label: 'Pipeline', href: '/dashboard?view=pipeline',  icon: <LayoutDashboard size={12} aria-hidden /> },
+                { label: 'List',     href: '/dashboard?view=table',     icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
+              ].map(({ label, href, icon }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  className="flex items-center gap-1.5 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
+                  style={{ background: 'transparent', color: 'var(--muted-text)' }}
+                >
+                  {icon}{label}
+                </Link>
+              ))}
+            </div>
+            {/* Page links */}
+            <div className="flex items-center gap-0.5 border-l border-border-gray pl-4">
+              {[
+                { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden />, active: false },
+                { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden />,     active: true },
               ].map(({ href, label, icon, active }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="relative text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5"
-                  style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)' }}
+                  className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
+                  style={{ color: active ? 'var(--accent-blue)' : 'var(--muted-text)', background: active ? 'rgba(37,99,235,0.08)' : 'transparent' }}
                 >
-                  {active && (
-                    <motion.span
-                      layoutId="nav-active"
-                      className="absolute inset-0 rounded-lg"
-                      style={{ background: 'rgba(37,99,235,0.08)' }}
-                      transition={{ type: 'spring', stiffness: 380, damping: 32, mass: 0.8 }}
-                    />
-                  )}
-                  <span className="relative">{icon}</span>
-                  <span className="relative">{label}</span>
+                  {icon}{label}
                 </Link>
               ))}
             </div>

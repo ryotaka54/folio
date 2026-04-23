@@ -558,8 +558,10 @@ function DashboardContent() {
                 <Link
                   key={href}
                   href={href}
-                  className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors hover:text-brand-navy"
+                  className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
                   style={{ color: 'var(--muted-text)' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'var(--brand-navy)'; (e.currentTarget as HTMLElement).style.background = 'var(--surface-gray)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'var(--muted-text)'; (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 >
                   {icon}{label}
                 </Link>
