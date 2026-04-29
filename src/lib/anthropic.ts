@@ -74,3 +74,28 @@ export async function callClaude(prompt: string, systemPrompt: string): Promise<
   // Strip markdown code fences if Claude wraps the JSON
   return block.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
 }
+
+export async function callClaudeVision(
+  imageBase64Array: string[],
+  textPrompt: string,
+  systemPrompt: string,
+): Promise<string> {
+  const client = getClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const content: any[] = [
+    ...imageBase64Array.map(data => ({
+      type: 'image',
+      source: { type: 'base64', media_type: 'image/jpeg', data },
+    })),
+    { type: 'text', text: textPrompt },
+  ];
+  const message = await client.messages.create({
+    model: AI_MODEL,
+    max_tokens: 512,
+    system: systemPrompt,
+    messages: [{ role: 'user', content }],
+  });
+  const block = message.content[0];
+  if (block.type !== 'text') throw new Error('Unexpected response type');
+  return block.text.trim();
+}

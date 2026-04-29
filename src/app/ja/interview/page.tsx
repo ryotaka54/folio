@@ -21,7 +21,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 
 type Phase = 'pick' | 'setup' | 'loading' | 'question' | 'evaluating' | 'feedback' | 'complete';
 type QuestionType = 'behavioral' | 'technical' | 'mixed' | 'essentials';
-type InputMode = 'text' | 'voice';
+type InputMode = 'text' | 'voice' | 'camera';
 
 interface Question { q: string; type: 'behavioral' | 'technical'; why: string; }
 interface StarRating { rating: 'strong' | 'okay' | 'missing'; note: string; }
@@ -31,6 +31,7 @@ interface Feedback {
   strengths: string[];
   improvements: string[];
   overall: string;
+  expressionAnalysis?: string;
 }
 interface TranscriptEntry { question: Question; answer: string; feedback: Feedback; }
 
@@ -133,6 +134,87 @@ function useVoice(onTranscript: (text: string) => void) {
   }, []);
 
   return { listening, supported, start, stop };
+}
+
+// ── Camera + Voice hook (ja-JP) ───────────────────────────────────────────────
+
+function useCameraVoice(onTranscript: (text: string) => void, lang = 'ja-JP') {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recRef = useRef<any>(null);
+  const framesRef = useRef<string[]>([]);
+  const captureRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [streaming, setStreaming] = useState(false);
+  const [supported, setSupported] = useState(false);
+
+  useEffect(() => {
+    const hasCam = !!(navigator.mediaDevices?.getUserMedia);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    setSupported(hasCam && !!(w.SpeechRecognition || w.webkitSpeechRecognition));
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (captureRef.current) clearInterval(captureRef.current);
+      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+      if (recRef.current) { try { recRef.current.stop(); } catch { /* ignore */ } }
+    };
+  }, []);
+
+  const start = useCallback(async () => {
+    framesRef.current = [];
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      streamRef.current = stream;
+      if (videoRef.current) { videoRef.current.srcObject = stream; void videoRef.current.play(); }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+      if (SR) {
+        const rec = new SR();
+        rec.continuous = true; rec.interimResults = true; rec.lang = lang;
+        let finalText = '';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        rec.onresult = (e: any) => {
+          let interim = '';
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) finalText += t + ' '; else interim = t;
+          }
+          onTranscript(finalText + interim);
+        };
+        rec.onend = () => {};
+        recRef.current = rec;
+        try { rec.start(); } catch { /* already started */ }
+      }
+      captureRef.current = setInterval(() => {
+        if (!canvasRef.current || !videoRef.current) return;
+        const cv = canvasRef.current;
+        cv.width = 320; cv.height = 240;
+        const ctx = cv.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(videoRef.current, 0, 0, 320, 240);
+        const frame = cv.toDataURL('image/jpeg', 0.6).split(',')[1];
+        framesRef.current.push(frame);
+        if (framesRef.current.length > 4) framesRef.current.shift();
+      }, 5000);
+      setStreaming(true);
+    } catch { /* camera permission denied */ }
+  }, [lang, onTranscript]);
+
+  const stop = useCallback(() => {
+    if (recRef.current) { try { recRef.current.stop(); } catch { /* ignore */ } }
+    if (captureRef.current) { clearInterval(captureRef.current); captureRef.current = null; }
+    if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
+    setStreaming(false);
+  }, []);
+
+  const getFrames = useCallback(() => [...framesRef.current], []);
+
+  return { streaming, supported, start, stop, getFrames, videoRef, canvasRef };
 }
 
 // ── Download transcript (Japanese) ────────────────────────────────────────────
@@ -319,6 +401,13 @@ function InterviewContent() {
 
   const onVoiceTranscript = useCallback((text: string) => setAnswer(text), []);
   const voice = useVoice(onVoiceTranscript);
+  const onCameraTranscript = useCallback((text: string) => setAnswer(text), []);
+  const camera = useCameraVoice(onCameraTranscript, 'ja-JP');
+
+  useEffect(() => {
+    if (inputMode !== 'camera') camera.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputMode]);
 
   useEffect(() => {
     if (!user && !loading) router.push('/ja');
@@ -359,6 +448,10 @@ function InterviewContent() {
 
   async function startInterview() {
     if (!selectedApp || !user) return;
+    if (!selectedApp.company?.trim() || !selectedApp.role?.trim()) {
+      setError('企業名または職種が入力されていません。アプリケーションを更新してください。');
+      return;
+    }
     setError('');
     setPhase('loading');
     try {
@@ -384,6 +477,8 @@ function InterviewContent() {
   async function submitAnswer() {
     if (!answer.trim() || !selectedApp || !user) return;
     if (voice.listening) voice.stop();
+    const frames = inputMode === 'camera' ? camera.getFrames() : [];
+    if (inputMode === 'camera' && camera.streaming) camera.stop();
     setPhase('evaluating');
     try {
       const res = await authFetch('/api/ai/mock-interview', {
@@ -394,6 +489,7 @@ function InterviewContent() {
           question: questions[currentIdx].q,
           questionType: questions[currentIdx].type,
           answer: answer.trim(),
+          ...(frames.length > 0 ? { frames } : {}),
         }),
       });
       const data = await res.json();
@@ -729,6 +825,7 @@ function InterviewContent() {
                 options: [
                   { value: 'text', label: '⌨ テキスト' },
                   ...(voice.supported ? [{ value: 'voice', label: '🎤 音声' }] : []),
+                  ...(camera.supported ? [{ value: 'camera', label: '📷 カメラ' }] : []),
                 ],
                 value: inputMode,
                 onChange: (v: string) => setInputMode(v as InputMode),
@@ -927,10 +1024,10 @@ function InterviewContent() {
                     </div>
 
                     {/* Input mode toggle */}
-                    {voice.supported && (
+                    {(voice.supported || camera.supported) && (
                       <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-                        {(['text', 'voice'] as InputMode[]).map(m => (
-                          <button key={m} onClick={() => { if (voice.listening) voice.stop(); setInputMode(m); }}
+                        {(['text', ...(voice.supported ? ['voice'] : []), ...(camera.supported ? ['camera'] : [])] as InputMode[]).map(m => (
+                          <button key={m} onClick={() => { if (voice.listening) voice.stop(); if (camera.streaming) camera.stop(); setInputMode(m); }}
                             style={{
                               fontSize: 12, padding: '5px 14px', borderRadius: 8,
                               border: inputMode === m ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
@@ -938,7 +1035,7 @@ function InterviewContent() {
                               color: inputMode === m ? 'var(--accent-blue)' : 'var(--muted-text)',
                               cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif", fontWeight: inputMode === m ? 600 : 400,
                             }}>
-                            {m === 'text' ? '⌨ テキスト' : '🎤 音声'}
+                            {m === 'text' ? '⌨ テキスト' : m === 'voice' ? '🎤 音声' : '📷 カメラ'}
                           </button>
                         ))}
                       </div>
@@ -965,6 +1062,62 @@ function InterviewContent() {
                         onBlur={e => (e.currentTarget.style.borderColor = answer.length > 0 ? 'rgba(37,99,235,0.4)' : 'var(--border-gray)')}
                         onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitAnswer(); }}
                       />
+                    ) : inputMode === 'camera' ? (
+                      /* Camera + Voice input */
+                      <div style={{
+                        border: camera.streaming ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
+                        borderRadius: 12, overflow: 'hidden', transition: 'border-color 0.2s',
+                      }}>
+                        <div style={{ position: 'relative', background: '#0A0A0A', aspectRatio: '16/9', maxHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <video
+                            ref={camera.videoRef}
+                            playsInline
+                            muted
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)', display: camera.streaming ? 'block' : 'none' }}
+                          />
+                          <canvas ref={camera.canvasRef} style={{ display: 'none' }} />
+                          {!camera.streaming && (
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" style={{ stroke: 'rgba(255,255,255,0.3)' }} strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.82v6.36a1 1 0 0 1-1.447.889L15 14" /><rect x="1" y="6" width="14" height="12" rx="2" />
+                              </svg>
+                              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: "'Noto Sans JP', sans-serif" }}>カメラオフ</span>
+                            </div>
+                          )}
+                          {camera.streaming && (
+                            <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 9999, padding: '3px 9px' }}>
+                              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EF4444' }} />
+                              <span style={{ fontSize: 10, color: '#fff', fontWeight: 700, letterSpacing: '0.08em' }}>収録中</span>
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ padding: '12px 14px', minHeight: 90, background: 'var(--surface-gray)', fontSize: 14, lineHeight: 1.75, color: answer ? 'var(--body-text)' : 'var(--text-tertiary)', borderTop: '1px solid var(--border-gray)', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                          {answer || 'カメラボタンを押して録音を開始してください…'}
+                        </div>
+                        <div style={{ padding: '10px 14px', borderTop: '1px solid var(--border-gray)', background: 'var(--card-bg)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <button
+                            onClick={() => camera.streaming ? camera.stop() : (setAnswer(''), void camera.start())}
+                            style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer', background: camera.streaming ? '#EF4444' : '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
+                          >
+                            {camera.streaming ? (
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                            ) : (
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.82v6.36a1 1 0 0 1-1.447.889L15 14" /><rect x="1" y="6" width="14" height="12" rx="2" />
+                              </svg>
+                            )}
+                          </button>
+                          <WaveformBars active={camera.streaming} />
+                          <span style={{ fontSize: 12, color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                            {camera.streaming ? '録音中… クリックして停止' : 'カメラと音声を開始'}
+                          </span>
+                          {answer && (
+                            <button onClick={() => setAnswer('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, fontFamily: "'Noto Sans JP', sans-serif" }}>
+                              <RotateCcw size={11} /> クリア
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     ) : (
                       /* Voice input */
                       <div style={{
@@ -1136,10 +1289,27 @@ function InterviewContent() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
-              style={{ padding: '16px 18px', background: 'var(--card-bg)', borderRadius: 12, marginBottom: 28, fontSize: 14, color: 'var(--muted-text)', lineHeight: 1.7, fontStyle: 'italic', border: '1px solid var(--border-gray)', fontFamily: "'Noto Sans JP', sans-serif" }}
+              style={{ padding: '16px 18px', background: 'var(--card-bg)', borderRadius: 12, marginBottom: feedback.expressionAnalysis ? 16 : 28, fontSize: 14, color: 'var(--muted-text)', lineHeight: 1.7, fontStyle: 'italic', border: '1px solid var(--border-gray)', fontFamily: "'Noto Sans JP', sans-serif" }}
             >
               {feedback.overall}
             </motion.div>
+
+            {/* Expression analysis (camera mode only) */}
+            {feedback.expressionAnalysis && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.78 }}
+                style={{ padding: '14px 16px', background: 'rgba(37,99,235,0.06)', border: '1px solid rgba(37,99,235,0.18)', borderRadius: 12, marginBottom: 28 }}
+              >
+                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--accent-blue)', margin: '0 0 8px', fontFamily: "'DM Mono', monospace" }}>
+                  📷 プレゼンス分析
+                </p>
+                <p style={{ fontSize: 13, color: 'var(--muted-text)', margin: 0, lineHeight: 1.7, fontFamily: "'Noto Sans JP', sans-serif" }}>
+                  {feedback.expressionAnalysis}
+                </p>
+              </motion.div>
+            )}
 
             {error && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12, fontFamily: "'Noto Sans JP', sans-serif" }}>{error}</p>}
 

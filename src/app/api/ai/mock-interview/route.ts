@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { checkRateLimit, recordUsage, callClaude, isProServer } from '@/lib/anthropic';
+import { checkRateLimit, recordUsage, callClaude, callClaudeVision, isProServer } from '@/lib/anthropic';
+import { getAuthUser } from '@/lib/server-auth';
 
 function getSupabase() {
   return createClient(
@@ -224,13 +225,24 @@ const ESSENTIAL_SYSTEM_JA = `あなたは就活の「定番質問」を専門と
 - 「why」フィールドにはこの企業での強い回答と弱い回答の違いを具体的に記述する
 - すべての文字列は日本語で記述。英語を使わないこと`;
 
+// ── Expression / presence analysis prompt ────────────────────────────────────
+
+const EXPRESSION_SYSTEM = `You are an interview presence coach reviewing screenshots taken during a live video interview. Provide a brief, constructive analysis (2-3 sentences max) of the candidate's visible presence.
+
+Focus ONLY on:
+- Eye contact and gaze direction (confident direct gaze vs. looking away)
+- Facial expression (engaged/confident vs. nervous/tense)
+- Posture and composure
+
+End with ONE specific, actionable improvement tip. Be encouraging but honest. Under 70 words total. Do NOT mention clothing or personal appearance.`;
+
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    if (!userId) return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+    const authedUser = await getAuthUser(request);
+    if (!authedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const userId = authedUser.id;
 
     const supabase = getSupabase();
     const { data: userRow } = await supabase.from('users').select('pro, pro_expires_at').eq('id', userId).single();
@@ -253,15 +265,18 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const authedUser = await getAuthUser(request);
+    if (!authedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const userId = authedUser.id;
+
     const body = await request.json();
-    const { action, userId, company, role, notes, lang } = body;
+    const { action, company, role, notes, lang } = body;
     const isJa = lang === 'ja';
 
-    if (!userId || !company || !role || !action) {
+    if (!company || !role || !action) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Auth check
     const supabase = getSupabase();
     const { data: userRow } = await supabase.from('users').select('pro, pro_expires_at').eq('id', userId).single();
     if (!isProServer(userRow)) {
@@ -315,7 +330,7 @@ Generate exactly ${count} interview questions that would actually be asked at ${
 
     // ── Evaluate answer ──────────────────────────────────────────────────────
     if (action === 'evaluate') {
-      const { question, questionType, answer } = body;
+      const { question, questionType, answer, frames } = body;
 
       if (!question || !answer) {
         return NextResponse.json({ error: 'Missing question or answer' }, { status: 400 });
@@ -333,6 +348,18 @@ Evaluate this answer from the perspective of what ${company} specifically looks 
 
       const raw = await callClaude(prompt, isJa ? EVALUATE_SYSTEM_JA : EVALUATE_SYSTEM);
       const feedback = JSON.parse(raw);
+
+      // Optional: analyze facial expression from captured webcam frames
+      if (Array.isArray(frames) && frames.length > 0) {
+        try {
+          const expressionAnalysis = await callClaudeVision(
+            frames.slice(-3),
+            `The candidate was answering this interview question: "${question}"\n\nAnalyze their on-camera presence and body language based on these screenshots.`,
+            EXPRESSION_SYSTEM,
+          );
+          feedback.expressionAnalysis = expressionAnalysis;
+        } catch { /* silently skip if vision fails */ }
+      }
 
       await recordUsage(userId, 'mock_interview');
 
