@@ -21,7 +21,7 @@ import UpgradeModal from '@/components/UpgradeModal';
 
 type Phase = 'pick' | 'setup' | 'loading' | 'question' | 'evaluating' | 'feedback' | 'complete';
 type QuestionType = 'behavioral' | 'technical' | 'mixed' | 'essentials';
-type InputMode = 'text' | 'voice' | 'camera';
+type InputMode = 'text' | 'voice';
 
 interface Question { q: string; type: 'behavioral' | 'technical'; why: string; }
 interface StarRating { rating: 'strong' | 'okay' | 'missing'; note: string; }
@@ -136,31 +136,25 @@ function useVoice(onTranscript: (text: string) => void) {
   return { listening, supported, start, stop };
 }
 
-// ── Camera + Voice hook (ja-JP) ───────────────────────────────────────────────
+// ── Camera hook (video-only, integrated into voice mode) ─────────────────────
 
-function useCameraVoice(onTranscript: (text: string) => void, lang = 'ja-JP') {
+function useCamera() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const recRef = useRef<any>(null);
   const framesRef = useRef<string[]>([]);
   const captureRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [streaming, setStreaming] = useState(false);
+  const [active, setActive] = useState(false);
   const [supported, setSupported] = useState(false);
 
   useEffect(() => {
-    const hasCam = !!(navigator.mediaDevices?.getUserMedia);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const w = window as any;
-    setSupported(hasCam && !!(w.SpeechRecognition || w.webkitSpeechRecognition));
+    setSupported(!!(navigator.mediaDevices?.getUserMedia));
   }, []);
 
   useEffect(() => {
     return () => {
       if (captureRef.current) clearInterval(captureRef.current);
       if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
-      if (recRef.current) { try { recRef.current.stop(); } catch { /* ignore */ } }
     };
   }, []);
 
@@ -170,26 +164,6 @@ function useCameraVoice(onTranscript: (text: string) => void, lang = 'ja-JP') {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       streamRef.current = stream;
       if (videoRef.current) { videoRef.current.srcObject = stream; void videoRef.current.play(); }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = window as any;
-      const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
-      if (SR) {
-        const rec = new SR();
-        rec.continuous = true; rec.interimResults = true; rec.lang = lang;
-        let finalText = '';
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        rec.onresult = (e: any) => {
-          let interim = '';
-          for (let i = e.resultIndex; i < e.results.length; i++) {
-            const t = e.results[i][0].transcript;
-            if (e.results[i].isFinal) finalText += t + ' '; else interim = t;
-          }
-          onTranscript(finalText + interim);
-        };
-        rec.onend = () => {};
-        recRef.current = rec;
-        try { rec.start(); } catch { /* already started */ }
-      }
       captureRef.current = setInterval(() => {
         if (!canvasRef.current || !videoRef.current) return;
         const cv = canvasRef.current;
@@ -201,20 +175,19 @@ function useCameraVoice(onTranscript: (text: string) => void, lang = 'ja-JP') {
         framesRef.current.push(frame);
         if (framesRef.current.length > 4) framesRef.current.shift();
       }, 5000);
-      setStreaming(true);
-    } catch { /* camera permission denied */ }
-  }, [lang, onTranscript]);
+      setActive(true);
+    } catch { /* camera not available or permission denied */ }
+  }, []);
 
   const stop = useCallback(() => {
-    if (recRef.current) { try { recRef.current.stop(); } catch { /* ignore */ } }
     if (captureRef.current) { clearInterval(captureRef.current); captureRef.current = null; }
     if (streamRef.current) { streamRef.current.getTracks().forEach(t => t.stop()); streamRef.current = null; }
-    setStreaming(false);
+    setActive(false);
   }, []);
 
   const getFrames = useCallback(() => [...framesRef.current], []);
 
-  return { streaming, supported, start, stop, getFrames, videoRef, canvasRef };
+  return { active, supported, start, stop, getFrames, videoRef, canvasRef };
 }
 
 // ── Download transcript (Japanese) ────────────────────────────────────────────
@@ -401,13 +374,7 @@ function InterviewContent() {
 
   const onVoiceTranscript = useCallback((text: string) => setAnswer(text), []);
   const voice = useVoice(onVoiceTranscript);
-  const onCameraTranscript = useCallback((text: string) => setAnswer(text), []);
-  const camera = useCameraVoice(onCameraTranscript, 'ja-JP');
-
-  useEffect(() => {
-    if (inputMode !== 'camera') camera.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputMode]);
+  const cam = useCamera();
 
   useEffect(() => {
     if (!user && !loading) router.push('/ja');
@@ -477,8 +444,8 @@ function InterviewContent() {
   async function submitAnswer() {
     if (!answer.trim() || !selectedApp || !user) return;
     if (voice.listening) voice.stop();
-    const frames = inputMode === 'camera' ? camera.getFrames() : [];
-    if (inputMode === 'camera' && camera.streaming) camera.stop();
+    const frames = inputMode === 'voice' ? cam.getFrames() : [];
+    if (cam.active) cam.stop();
     setPhase('evaluating');
     try {
       const res = await authFetch('/api/ai/mock-interview', {
@@ -825,7 +792,6 @@ function InterviewContent() {
                 options: [
                   { value: 'text', label: '⌨ テキスト' },
                   ...(voice.supported ? [{ value: 'voice', label: '🎤 音声' }] : []),
-                  ...(camera.supported ? [{ value: 'camera', label: '📷 カメラ' }] : []),
                 ],
                 value: inputMode,
                 onChange: (v: string) => setInputMode(v as InputMode),
@@ -1024,10 +990,10 @@ function InterviewContent() {
                     </div>
 
                     {/* Input mode toggle */}
-                    {(voice.supported || camera.supported) && (
+                    {voice.supported && (
                       <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-                        {(['text', ...(voice.supported ? ['voice'] : []), ...(camera.supported ? ['camera'] : [])] as InputMode[]).map(m => (
-                          <button key={m} onClick={() => { if (voice.listening) voice.stop(); if (camera.streaming) camera.stop(); setInputMode(m); }}
+                        {(['text', 'voice'] as InputMode[]).map(m => (
+                          <button key={m} onClick={() => { if (voice.listening) voice.stop(); if (cam.active) cam.stop(); setInputMode(m); }}
                             style={{
                               fontSize: 12, padding: '5px 14px', borderRadius: 8,
                               border: inputMode === m ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
@@ -1035,7 +1001,7 @@ function InterviewContent() {
                               color: inputMode === m ? 'var(--accent-blue)' : 'var(--muted-text)',
                               cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif", fontWeight: inputMode === m ? 600 : 400,
                             }}>
-                            {m === 'text' ? '⌨ テキスト' : m === 'voice' ? '🎤 音声' : '📷 カメラ'}
+                            {m === 'text' ? '⌨ テキスト' : '🎤 音声'}
                           </button>
                         ))}
                       </div>
@@ -1062,74 +1028,39 @@ function InterviewContent() {
                         onBlur={e => (e.currentTarget.style.borderColor = answer.length > 0 ? 'rgba(37,99,235,0.4)' : 'var(--border-gray)')}
                         onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitAnswer(); }}
                       />
-                    ) : inputMode === 'camera' ? (
-                      /* Camera + Voice input */
+                    ) : (
+                      /* Voice input with integrated camera preview */
                       <div style={{
-                        border: camera.streaming ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
+                        border: voice.listening ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
                         borderRadius: 12, overflow: 'hidden', transition: 'border-color 0.2s',
                       }}>
-                        <div style={{ position: 'relative', background: '#0A0A0A', aspectRatio: '16/9', maxHeight: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <video
-                            ref={camera.videoRef}
-                            playsInline
-                            muted
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)', display: camera.streaming ? 'block' : 'none' }}
-                          />
-                          <canvas ref={camera.canvasRef} style={{ display: 'none' }} />
-                          {!camera.streaming && (
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" style={{ stroke: 'rgba(255,255,255,0.3)' }} strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.82v6.36a1 1 0 0 1-1.447.889L15 14" /><rect x="1" y="6" width="14" height="12" rx="2" />
-                              </svg>
-                              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: "'Noto Sans JP', sans-serif" }}>カメラオフ</span>
-                            </div>
-                          )}
-                          {camera.streaming && (
+                        {/* Camera preview — collapses when inactive */}
+                        <div style={{ height: cam.active ? 180 : 0, overflow: 'hidden', transition: 'height 0.3s ease', background: '#0A0A0A', position: 'relative' }}>
+                          <video ref={cam.videoRef} playsInline muted
+                            style={{ width: '100%', height: 180, objectFit: 'cover', transform: 'scaleX(-1)', display: 'block' }} />
+                          <canvas ref={cam.canvasRef} style={{ display: 'none' }} />
+                          {cam.active && (
                             <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 9999, padding: '3px 9px' }}>
                               <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EF4444' }} />
                               <span style={{ fontSize: 10, color: '#fff', fontWeight: 700, letterSpacing: '0.08em' }}>収録中</span>
                             </div>
                           )}
                         </div>
-                        <div style={{ padding: '12px 14px', minHeight: 90, background: 'var(--surface-gray)', fontSize: 14, lineHeight: 1.75, color: answer ? 'var(--body-text)' : 'var(--text-tertiary)', borderTop: '1px solid var(--border-gray)', fontFamily: "'Noto Sans JP', sans-serif" }}>
-                          {answer || 'カメラボタンを押して録音を開始してください…'}
-                        </div>
-                        <div style={{ padding: '10px 14px', borderTop: '1px solid var(--border-gray)', background: 'var(--card-bg)', display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <button
-                            onClick={() => camera.streaming ? camera.stop() : (setAnswer(''), void camera.start())}
-                            style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer', background: camera.streaming ? '#EF4444' : '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.2s' }}
-                          >
-                            {camera.streaming ? (
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
-                            ) : (
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.82v6.36a1 1 0 0 1-1.447.889L15 14" /><rect x="1" y="6" width="14" height="12" rx="2" />
-                              </svg>
-                            )}
-                          </button>
-                          <WaveformBars active={camera.streaming} />
-                          <span style={{ fontSize: 12, color: 'var(--muted-text)', fontFamily: "'Noto Sans JP', sans-serif" }}>
-                            {camera.streaming ? '録音中… クリックして停止' : 'カメラと音声を開始'}
-                          </span>
-                          {answer && (
-                            <button onClick={() => setAnswer('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 4, fontFamily: "'Noto Sans JP', sans-serif" }}>
-                              <RotateCcw size={11} /> クリア
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      /* Voice input */
-                      <div style={{
-                        border: voice.listening ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
-                        borderRadius: 12, overflow: 'hidden', transition: 'border-color 0.2s',
-                      }}>
-                        <div style={{ padding: '14px 16px', minHeight: 160, background: 'var(--surface-gray)', fontSize: 15, lineHeight: 1.75, color: answer ? 'var(--body-text)' : 'var(--text-tertiary)', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                        <div style={{ padding: '14px 16px', minHeight: 120, background: 'var(--surface-gray)', fontSize: 15, lineHeight: 1.75, color: answer ? 'var(--body-text)' : 'var(--text-tertiary)', fontFamily: "'Noto Sans JP', sans-serif" }}>
                           {answer || 'マイクを押して話してください…'}
                         </div>
                         <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border-gray)', background: 'var(--card-bg)', display: 'flex', alignItems: 'center', gap: 14 }}>
                           <button
-                            onClick={() => voice.listening ? voice.stop() : (setAnswer(''), voice.start())}
+                            onClick={() => {
+                              if (voice.listening) {
+                                voice.stop();
+                                cam.stop();
+                              } else {
+                                setAnswer('');
+                                voice.start();
+                                void cam.start();
+                              }
+                            }}
                             style={{
                               width: 46, height: 46, borderRadius: '50%', border: 'none', cursor: 'pointer',
                               background: voice.listening ? '#EF4444' : '#2563EB',
