@@ -95,7 +95,7 @@ export default function OfferComparisonPanel({ applications }: Props) {
                 </div>
               )}
 
-              <div style={{ marginBottom: 10 }}>
+              <div style={{ marginBottom: 10, paddingLeft: 24 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--brand-navy)', marginBottom: 2 }}>{app.company}</div>
                 <div style={{ fontSize: 12, color: 'var(--muted-text)' }}>{app.role}</div>
               </div>

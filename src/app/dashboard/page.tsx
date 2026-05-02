@@ -530,7 +530,7 @@ function DashboardContent() {
           </div>
         </div>
         {/* View switcher row — always visible on mobile */}
-        <div className="flex items-center gap-1 px-3 pb-2">
+        <div className="flex items-center gap-1 px-3 pb-2 overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
           {([
             { k: 'today' as const,    label: 'Today',    icon: <Home size={11} aria-hidden /> },
             { k: 'pipeline' as const, label: 'Pipeline', icon: <LayoutDashboard size={11} aria-hidden /> },
@@ -542,12 +542,13 @@ function DashboardContent() {
               <button
                 key={k}
                 onClick={() => { setView(k); capture('view_switched', { view: k }); }}
-                className="relative flex items-center gap-1 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
+                className="relative flex items-center gap-1 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all flex-shrink-0"
                 style={{
                   background: active ? 'var(--card-bg)' : 'transparent',
                   color: active ? 'var(--brand-navy)' : 'var(--muted-text)',
                   border: active ? '1px solid var(--border-gray)' : '1px solid transparent',
                   boxShadow: active ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {icon}{label}

@@ -1430,6 +1430,53 @@ function InterviewContent() {
               "{currentQ.q}"
             </p>
 
+            {/* Leaderboard consent / posted status */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} style={{ marginBottom: 24 }}>
+              {!lbPosted ? (
+                <div style={{ border: '1px solid var(--border-gray)', borderRadius: 12, padding: '14px 16px', background: 'var(--surface-gray)' }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)', margin: '0 0 10px' }}>
+                    Post to the {selectedApp.company} leaderboard?
+                  </p>
+                  {[
+                    { label: `Post my score (${feedback.score}/5)`, checked: lbPostScore, set: setLbPostScore },
+                    { label: 'Include my answer text', checked: lbPostAnswer, set: setLbPostAnswer },
+                    { label: `Show my name (${user?.name?.split(' ')[0] ?? 'me'}) vs. Anonymous`, checked: lbShowName, set: setLbShowName },
+                  ].map(({ label, checked, set }) => (
+                    <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, fontSize: 13, color: 'var(--body-text)', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={checked} onChange={e => set(e.target.checked)} style={{ cursor: 'pointer', flexShrink: 0 }} />
+                      {label}
+                    </label>
+                  ))}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                    <button onClick={postToLeaderboard} disabled={!lbPostScore} style={{ height: 32, padding: '0 16px', borderRadius: 8, border: 'none', background: lbPostScore ? '#2563EB' : 'var(--border-gray)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: lbPostScore ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+                      Post
+                    </button>
+                    <button onClick={() => setLbPosted(true)} style={{ height: 32, padding: '0 14px', borderRadius: 8, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Skip
+                    </button>
+                  </div>
+                </div>
+              ) : lbEntryId ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 10, background: 'rgba(16,185,129,0.06)', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: '#10B981', fontSize: 13 }}>✓ Posted</span>
+                    <a href={`/leaderboard/${selectedApp.company.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2563EB', textDecoration: 'none' }}>
+                      View {selectedApp.company} leaderboard →
+                    </a>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {lbPostedWithAnswer && (
+                      <button onClick={() => manageLeaderboardEntry('hide_answer')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', cursor: 'pointer', fontFamily: 'inherit' }}>Hide answer</button>
+                    )}
+                    {lbPostedWithName && (
+                      <button onClick={() => manageLeaderboardEntry('anonymize')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', cursor: 'pointer', fontFamily: 'inherit' }}>Make anonymous</button>
+                    )}
+                    <button onClick={() => manageLeaderboardEntry('delete')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#EF4444', cursor: 'pointer', fontFamily: 'inherit' }}>Remove</button>
+                  </div>
+                </div>
+              ) : null}
+            </motion.div>
+
             {/* STAR breakdown */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 24 }}>
               {(['situation', 'task', 'action', 'result'] as const).map((k, i) => (
@@ -1500,53 +1547,6 @@ function InterviewContent() {
                 </p>
               </motion.div>
             )}
-
-            {/* Leaderboard consent / posted status */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.82 }} style={{ marginBottom: 24 }}>
-              {!lbPosted ? (
-                <div style={{ border: '1px solid var(--border-gray)', borderRadius: 12, padding: '14px 16px' }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)', margin: '0 0 12px' }}>
-                    Post to the {selectedApp.company} leaderboard?
-                  </p>
-                  {[
-                    { label: `Post my score (${feedback.score}/5)`, checked: lbPostScore, set: setLbPostScore },
-                    { label: 'Include my answer text', checked: lbPostAnswer, set: setLbPostAnswer },
-                    { label: `Show my name (${user?.name?.split(' ')[0] ?? 'me'}) vs. Anonymous`, checked: lbShowName, set: setLbShowName },
-                  ].map(({ label, checked, set }) => (
-                    <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: 'var(--body-text)', cursor: 'pointer' }}>
-                      <input type="checkbox" checked={checked} onChange={e => set(e.target.checked)} style={{ cursor: 'pointer' }} />
-                      {label}
-                    </label>
-                  ))}
-                  <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                    <button onClick={postToLeaderboard} disabled={!lbPostScore} style={{ height: 34, padding: '0 16px', borderRadius: 8, border: 'none', background: lbPostScore ? '#2563EB' : 'var(--border-gray)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: lbPostScore ? 'pointer' : 'default', fontFamily: 'inherit' }}>
-                      Post
-                    </button>
-                    <button onClick={() => setLbPosted(true)} style={{ height: 34, padding: '0 14px', borderRadius: 8, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
-                      Skip
-                    </button>
-                  </div>
-                </div>
-              ) : lbEntryId ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 10, background: 'rgba(16,185,129,0.06)', gap: 10, flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ color: '#10B981', fontSize: 13 }}>✓ Posted</span>
-                    <a href={`/leaderboard/${selectedApp.company.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2563EB', textDecoration: 'none' }}>
-                      View {selectedApp.company} leaderboard →
-                    </a>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {lbPostedWithAnswer && (
-                      <button onClick={() => manageLeaderboardEntry('hide_answer')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', cursor: 'pointer', fontFamily: 'inherit' }}>Hide answer</button>
-                    )}
-                    {lbPostedWithName && (
-                      <button onClick={() => manageLeaderboardEntry('anonymize')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', cursor: 'pointer', fontFamily: 'inherit' }}>Make anonymous</button>
-                    )}
-                    <button onClick={() => manageLeaderboardEntry('delete')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#EF4444', cursor: 'pointer', fontFamily: 'inherit' }}>Remove</button>
-                  </div>
-                </div>
-              ) : null}
-            </motion.div>
 
             {error && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12 }}>{error}</p>}
 
