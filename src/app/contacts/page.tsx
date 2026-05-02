@@ -96,9 +96,9 @@ export default function ContactsPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--background)' }}>
       {/* Nav */}
-      <nav style={{ height: 56, borderBottom: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', background: 'var(--card-bg)', position: 'sticky', top: 0, zIndex: 30 }}>
+      <nav style={{ height: 56, borderBottom: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', background: 'var(--card-bg)', position: 'sticky', top: 0, zIndex: 30, boxShadow: '0 1px 0 var(--border-gray)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center' }}><Logo size={24} variant="dark" /></Link>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center' }}><Logo size={24} /></Link>
           <span style={{ fontSize: 12, color: 'var(--muted-text)' }}>/</span>
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)' }}>Contacts</span>
         </div>
@@ -117,7 +117,7 @@ export default function ContactsPage() {
           </div>
           <button
             onClick={() => setShowAddForm(f => !f)}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 16px', borderRadius: 8, background: 'var(--brand-navy)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', flexShrink: 0 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 16px', borderRadius: 8, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', flexShrink: 0 }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add contact
@@ -168,9 +168,9 @@ export default function ContactsPage() {
                 onClick={() => setRelFilter(f.value)}
                 style={{
                   height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-                  background: relFilter === f.value ? 'var(--brand-navy)' : 'transparent',
+                  background: relFilter === f.value ? '#2563EB' : 'transparent',
                   color: relFilter === f.value ? '#fff' : 'var(--muted-text)',
-                  border: relFilter === f.value ? 'none' : '1px solid var(--border-gray)',
+                  border: relFilter === f.value ? '1px solid #2563EB' : '1px solid var(--border-gray)',
                 }}
               >
                 {f.label}

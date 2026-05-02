@@ -622,21 +622,7 @@ function DashboardContent() {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            {view !== 'today' && (
-              <button
-                onClick={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
-                className="h-8 px-3.5 text-[13px] font-medium rounded-md flex items-center gap-1.5 flex-shrink-0 transition-opacity hover:opacity-80"
-                style={{ background: 'var(--brand-navy)', color: 'var(--background)' }}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add
-                <kbd className="hidden lg:inline-flex items-center px-1 rounded text-[10px] ml-0.5" style={{ border: '1px solid rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.15)', fontFamily: 'inherit', lineHeight: '1.6' }}>N</kbd>
-              </button>
-            )}
-            {user?.name && (
-              <span className="text-sm text-muted-text hidden md:block">Hi, {user.name.split(' ')[0]}</span>
-            )}
+          <div className="flex items-center gap-2">
             {userIsPro ? (
               <span
                 className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
