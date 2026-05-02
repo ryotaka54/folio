@@ -32,6 +32,7 @@ interface Feedback {
   improvements: string[];
   overall: string;
   expressionAnalysis?: string;
+  roast_mode?: boolean;
 }
 interface TranscriptEntry { question: Question; answer: string; feedback: Feedback; }
 interface Session {
@@ -372,6 +373,7 @@ function InterviewContent() {
   const [expandedQ, setExpandedQ] = useState<number | null>(null);
   const [expandedSession, setExpandedSession] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [roastMode, setRoastMode] = useState(false);
   const [starCollapsed, setStarCollapsed] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
@@ -473,6 +475,7 @@ function InterviewContent() {
           question: questions[currentIdx].q,
           questionType: questions[currentIdx].type,
           answer: answer.trim(),
+          roast_mode: roastMode,
           ...(frames.length > 0 ? { frames } : {}),
         }),
       });
@@ -1004,6 +1007,20 @@ function InterviewContent() {
               </div>
             ))}
 
+            {/* Roast mode toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', marginBottom: 28, background: roastMode ? 'rgba(220,38,38,0.06)' : 'var(--surface-gray)', borderRadius: 10, border: roastMode ? '1px solid rgba(220,38,38,0.25)' : '1px solid var(--border-gray)', transition: 'all 0.2s' }}>
+              <div>
+                <span style={{ fontSize: 13, fontWeight: 600, color: roastMode ? '#DC2626' : 'var(--brand-navy)' }}>🔥 Brutal feedback</span>
+                <span style={{ fontSize: 12, color: 'var(--muted-text)', marginLeft: 8 }}>No diplomacy. Claude calls it exactly as it is.</span>
+              </div>
+              <button
+                onClick={() => setRoastMode(r => !r)}
+                style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: roastMode ? '#DC2626' : 'var(--border-gray)', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}
+              >
+                <span style={{ position: 'absolute', top: 2, left: roastMode ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
+              </button>
+            </div>
+
             {error && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 16 }}>{error}</p>}
 
             {/* CTA */}
@@ -1305,6 +1322,18 @@ function InterviewContent() {
           <motion.div key="feedback" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ maxWidth: 680, margin: '0 auto', padding: '48px 24px 80px' }}
           >
+            {/* Roast mode banner */}
+            {feedback.roast_mode && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.22)', borderRadius: 10, padding: '8px 14px', marginBottom: 18 }}
+              >
+                <span style={{ fontSize: 16 }}>🔥</span>
+                <span style={{ fontSize: 12, color: '#DC2626', fontWeight: 600 }}>Brutal mode — no diplomatic softening</span>
+              </motion.div>
+            )}
+
             {/* Score reveal */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

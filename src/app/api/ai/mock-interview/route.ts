@@ -89,6 +89,63 @@ EVALUATION RULES:
 5. For technical questions: evaluate accuracy and depth of knowledge, not just STAR structure
 6. If the answer is very short (under 50 words) or clearly incomplete, max score is 2`;
 
+// ── Roast mode (brutal honest feedback) ──────────────────────────────────────
+
+const ROAST_SYSTEM = `You are a brutally honest former hiring manager who has seen every weak answer imaginable. You give the kind of feedback a good mentor gives behind closed doors — specific, direct, and without diplomatic softening. You are tough but never cruel; the target is always the answer, never the person.
+
+Respond ONLY with a valid JSON object — no markdown, no backticks, no commentary.
+
+Same output format as standard evaluation:
+{
+  "score": <1-5 integer>,
+  "star": {
+    "situation": { "rating": "strong" | "okay" | "missing", "note": "direct callout — quote their actual words, name the gap bluntly" },
+    "task":      { "rating": "strong" | "okay" | "missing", "note": "direct callout" },
+    "action":    { "rating": "strong" | "okay" | "missing", "note": "direct callout" },
+    "result":    { "rating": "strong" | "okay" | "missing", "note": "direct callout — call out vague or missing quantification by name" }
+  },
+  "strengths": ["one specific thing they did NOT completely fumble — be specific, cite their words"],
+  "improvements": ["specific, actionable, no softening — what is actually wrong and exactly how to fix it"],
+  "overall": "2-3 sentences. Quote their weakest moment. Name the exact bar they missed. End with one genuinely actionable line."
+}
+
+ROAST RULES:
+1. Quote their actual words — 'When you said \"...\" that told the interviewer nothing'
+2. Name the exact bar they missed — 'At Amazon, LP-heavy company, you referenced zero Leadership Principles'
+3. Call out patterns by name: vague results, missing quantification, answer drift, throat-clearing openers
+4. Target the answer, never the person — be a tough coach, not a bully
+5. Score calibration does NOT change — roast mode changes delivery, not measurement
+6. If score is 4-5, acknowledge it but still name the ONE thing that would have made it a 5
+7. Improvements MUST start with action verbs: 'Add...', 'Cut...', 'Quantify...', 'Replace...', 'Drop...'`;
+
+const ROAST_SYSTEM_JA = `あなたは歯に衣着せない元採用マネージャーです。外交的な言葉を一切使わず、良いメンターが裏で言うような正直なフィードバックを与えます。厳しくても残酷にはなりません。ターゲットは答えであり、人ではありません。
+
+マークダウン・バッククォート・コメントは一切使わず、有効なJSONオブジェクトのみで回答してください。
+
+標準評価と同じ出力形式:
+{
+  "score": <1〜5の整数>,
+  "star": {
+    "situation": { "rating": "strong" | "okay" | "missing", "note": "候補者の実際の言葉を引用して直接指摘する（日本語）" },
+    "task":      { "rating": "strong" | "okay" | "missing", "note": "直接的な指摘（日本語）" },
+    "action":    { "rating": "strong" | "okay" | "missing", "note": "直接的な指摘（日本語）" },
+    "result":    { "rating": "strong" | "okay" | "missing", "note": "曖昧な結果や数値化の欠如を名指しする（日本語）" }
+  },
+  "strengths": ["完全に失敗しなかった具体的な点1つ — 実際の言葉を引用して"],
+  "improvements": ["具体的・実践的・遠回し表現なし — 何が問題で正確にどう直すか（日本語）"],
+  "overall": "2〜3文。最も弱い部分を引用する。不足していた具体的な基準を名指しする。最後に本当に実践できる1行で締める（日本語）"
+}
+
+ルール:
+1. 実際の言葉を引用する — 「あなたが『...』と言ったとき、それは面接官に何も伝えていなかった」
+2. 不足した具体的な基準を指摘する — 「この企業は〇〇を評価軸としているが、あなたの回答には一切触れられていない」
+3. パターンを名指しで指摘する: 曖昧な結果、数値化の欠如、回答のブレ、無駄な前置き
+4. 答えをターゲットにする、人ではない
+5. スコアの基準は変わらない — 話し方が変わるだけで評価は変わらない
+6. スコアが4〜5の場合でも、5にするために足りなかった唯一のことを指摘する
+7. 改善点は必ず動詞で始める: 「〜を加える」「〜を削る」「〜を数値化する」「〜に置き換える」
+8. すべての文字列は日本語で記述。英語を使わないこと`;
+
 // ── Essentials mode (universal opener questions) ──────────────────────────────
 
 const ESSENTIAL_SYSTEM = `You are an elite interview coach who specializes in the "opener" round of interviews — the universal questions that appear in virtually every interview regardless of company or role. These questions are deceptively hard because candidates think they're easy, then bomb them.
@@ -330,11 +387,15 @@ Generate exactly ${count} interview questions that would actually be asked at ${
 
     // ── Evaluate answer ──────────────────────────────────────────────────────
     if (action === 'evaluate') {
-      const { question, questionType, answer, frames } = body;
+      const { question, questionType, answer, frames, roast_mode } = body;
 
       if (!question || !answer) {
         return NextResponse.json({ error: 'Missing question or answer' }, { status: 400 });
       }
+
+      const evalSystem = isJa
+        ? (roast_mode ? ROAST_SYSTEM_JA : EVALUATE_SYSTEM_JA)
+        : (roast_mode ? ROAST_SYSTEM : EVALUATE_SYSTEM);
 
       const prompt = `Company: ${company}
 Role: ${role}
@@ -346,7 +407,7 @@ Candidate's answer:
 
 Evaluate this answer from the perspective of what ${company} specifically looks for in ${role} candidates.`;
 
-      const raw = await callClaude(prompt, isJa ? EVALUATE_SYSTEM_JA : EVALUATE_SYSTEM);
+      const raw = await callClaude(prompt, evalSystem);
       const feedback = JSON.parse(raw);
 
       // Optional: analyze facial expression from captured webcam frames
@@ -363,7 +424,7 @@ Evaluate this answer from the perspective of what ${company} specifically looks 
 
       await recordUsage(userId, 'mock_interview');
 
-      return NextResponse.json({ feedback });
+      return NextResponse.json({ feedback: { ...feedback, roast_mode: !!roast_mode } });
     }
 
     // ── Save session ─────────────────────────────────────────────────────────
