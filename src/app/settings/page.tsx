@@ -1158,7 +1158,7 @@ function LeaderboardSection({ showToast }: { showToast: (msg: string, type?: 'su
   const patchEntry = async (id: string, action: 'hide_answer' | 'anonymize') => {
     setActioning(id + action);
     try {
-      const res = await authFetch(`/api/leaderboard/${id}`, { method: 'PATCH', body: JSON.stringify({ action }) });
+      const res = await authFetch(`/api/leaderboard/entries/${id}`, { method: 'PATCH', body: JSON.stringify({ action }) });
       if (!res.ok) throw new Error();
       setEntries(prev => prev.map(e => e.id !== id ? e : {
         ...e,
@@ -1176,7 +1176,7 @@ function LeaderboardSection({ showToast }: { showToast: (msg: string, type?: 'su
   const deleteEntry = async (id: string) => {
     setActioning(id + 'delete');
     try {
-      const res = await authFetch(`/api/leaderboard/${id}`, { method: 'DELETE' });
+      const res = await authFetch(`/api/leaderboard/entries/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       setEntries(prev => prev.filter(e => e.id !== id));
       setConfirmDeleteId(null);

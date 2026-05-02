@@ -554,10 +554,10 @@ function InterviewContent() {
     if (!lbEntryId) return;
     try {
       if (action === 'delete') {
-        await authFetch(`/api/leaderboard/${lbEntryId}`, { method: 'DELETE' });
+        await authFetch(`/api/leaderboard/entries/${lbEntryId}`, { method: 'DELETE' });
         setLbPosted(false); setLbEntryId(null);
       } else {
-        await authFetch(`/api/leaderboard/${lbEntryId}`, {
+        await authFetch(`/api/leaderboard/entries/${lbEntryId}`, {
           method: 'PATCH',
           body: JSON.stringify({ action }),
         });
