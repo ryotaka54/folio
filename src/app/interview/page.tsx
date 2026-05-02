@@ -374,6 +374,14 @@ function InterviewContent() {
   const [expandedSession, setExpandedSession] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [roastMode, setRoastMode] = useState(false);
+  // Leaderboard consent state — reset on each new question
+  const [lbPostScore, setLbPostScore] = useState(true);
+  const [lbPostAnswer, setLbPostAnswer] = useState(false);
+  const [lbShowName, setLbShowName] = useState(false);
+  const [lbPosted, setLbPosted] = useState(false);
+  const [lbEntryId, setLbEntryId] = useState<string | null>(null);
+  const [lbPostedWithAnswer, setLbPostedWithAnswer] = useState(false);
+  const [lbPostedWithName, setLbPostedWithName] = useState(false);
   const [starCollapsed, setStarCollapsed] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
@@ -509,8 +517,54 @@ function InterviewContent() {
     } else {
       setCurrentIdx(i => i + 1);
       setAnswer(''); setFeedback(null);
+      // Reset leaderboard consent for new question
+      setLbPosted(false); setLbEntryId(null); setLbPostScore(true); setLbPostAnswer(false); setLbShowName(false);
       setPhase('question');
     }
+  }
+
+  async function postToLeaderboard() {
+    if (!selectedApp || !feedback || !currentQ) return;
+    const slug = selectedApp.company.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    try {
+      const res = await authFetch('/api/leaderboard', {
+        method: 'POST',
+        body: JSON.stringify({
+          company: selectedApp.company,
+          company_slug: slug,
+          role: selectedApp.role,
+          question: currentQ.q,
+          question_type: currentQ.type,
+          score: feedback.score,
+          answer_text: lbPostAnswer ? answer.trim() : null,
+          display_name: lbShowName && user?.name ? user.name.split(' ')[0] : null,
+          lang: 'en',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) return;
+      setLbEntryId(data.id);
+      setLbPostedWithAnswer(lbPostAnswer);
+      setLbPostedWithName(lbShowName);
+      setLbPosted(true);
+    } catch { /* silently skip */ }
+  }
+
+  async function manageLeaderboardEntry(action: 'hide_answer' | 'anonymize' | 'delete') {
+    if (!lbEntryId) return;
+    try {
+      if (action === 'delete') {
+        await authFetch(`/api/leaderboard/${lbEntryId}`, { method: 'DELETE' });
+        setLbPosted(false); setLbEntryId(null);
+      } else {
+        await authFetch(`/api/leaderboard/${lbEntryId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ action }),
+        });
+        if (action === 'hide_answer') setLbPostedWithAnswer(false);
+        if (action === 'anonymize') setLbPostedWithName(false);
+      }
+    } catch { /* silently skip */ }
   }
 
   function copyTranscript() {
@@ -1446,6 +1500,53 @@ function InterviewContent() {
                 </p>
               </motion.div>
             )}
+
+            {/* Leaderboard consent / posted status */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.82 }} style={{ marginBottom: 24 }}>
+              {!lbPosted ? (
+                <div style={{ border: '1px solid var(--border-gray)', borderRadius: 12, padding: '14px 16px' }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)', margin: '0 0 12px' }}>
+                    Post to the {selectedApp.company} leaderboard?
+                  </p>
+                  {[
+                    { label: `Post my score (${feedback.score}/5)`, checked: lbPostScore, set: setLbPostScore },
+                    { label: 'Include my answer text', checked: lbPostAnswer, set: setLbPostAnswer },
+                    { label: `Show my name (${user?.name?.split(' ')[0] ?? 'me'}) vs. Anonymous`, checked: lbShowName, set: setLbShowName },
+                  ].map(({ label, checked, set }) => (
+                    <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, fontSize: 13, color: 'var(--body-text)', cursor: 'pointer' }}>
+                      <input type="checkbox" checked={checked} onChange={e => set(e.target.checked)} style={{ cursor: 'pointer' }} />
+                      {label}
+                    </label>
+                  ))}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                    <button onClick={postToLeaderboard} disabled={!lbPostScore} style={{ height: 34, padding: '0 16px', borderRadius: 8, border: 'none', background: lbPostScore ? '#2563EB' : 'var(--border-gray)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: lbPostScore ? 'pointer' : 'default', fontFamily: 'inherit' }}>
+                      Post
+                    </button>
+                    <button onClick={() => setLbPosted(true)} style={{ height: 34, padding: '0 14px', borderRadius: 8, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      Skip
+                    </button>
+                  </div>
+                </div>
+              ) : lbEntryId ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 10, background: 'rgba(16,185,129,0.06)', gap: 10, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: '#10B981', fontSize: 13 }}>✓ Posted</span>
+                    <a href={`/leaderboard/${selectedApp.company.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2563EB', textDecoration: 'none' }}>
+                      View {selectedApp.company} leaderboard →
+                    </a>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {lbPostedWithAnswer && (
+                      <button onClick={() => manageLeaderboardEntry('hide_answer')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', cursor: 'pointer', fontFamily: 'inherit' }}>Hide answer</button>
+                    )}
+                    {lbPostedWithName && (
+                      <button onClick={() => manageLeaderboardEntry('anonymize')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', cursor: 'pointer', fontFamily: 'inherit' }}>Make anonymous</button>
+                    )}
+                    <button onClick={() => manageLeaderboardEntry('delete')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#EF4444', cursor: 'pointer', fontFamily: 'inherit' }}>Remove</button>
+                  </div>
+                </div>
+              ) : null}
+            </motion.div>
 
             {error && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12 }}>{error}</p>}
 

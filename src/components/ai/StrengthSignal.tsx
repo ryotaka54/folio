@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import ProGate from '@/components/ProGate';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface StrengthData {
   score: number;
@@ -14,7 +15,6 @@ interface StrengthData {
 }
 
 interface StrengthSignalProps {
-  userId: string;
   applicationId?: string;
   company: string;
   role: string;
@@ -60,7 +60,7 @@ function Skeleton() {
 }
 
 export default function StrengthSignal({
-  userId, applicationId, company, role, category, location, isPro, cached, onUpgrade,
+  applicationId, company, role, category, location, isPro, cached, onUpgrade,
 }: StrengthSignalProps) {
   const [data, setData] = useState<StrengthData | null>(cached ?? null);
   const [loading, setLoading] = useState(false);
@@ -71,10 +71,9 @@ export default function StrengthSignal({
     if (!company.trim() || !role.trim() || triggered || data) return;
     setTriggered(true);
     setLoading(true);
-    fetch('/api/ai/strength-signal', {
+    authFetch('/api/ai/strength-signal', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, applicationId, company, role, category, location }),
+      body: JSON.stringify({ applicationId, company, role, category, location }),
     })
       .then(r => r.json())
       .then(json => {

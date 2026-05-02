@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Sparkles, DollarSign } from 'lucide-react';
 import ProGate from '@/components/ProGate';
+import { authFetch } from '@/lib/auth-fetch';
 
 interface OfferData {
   salaryRange: string;
@@ -14,7 +15,6 @@ interface OfferData {
 }
 
 interface OfferIntelligencePanelProps {
-  userId: string;
   applicationId: string;
   company: string;
   role: string;
@@ -54,7 +54,7 @@ function Section({ title, items }: { title: string; items: string[] }) {
 }
 
 export default function OfferIntelligencePanel({
-  userId, applicationId, company, role, category, location, isPro, cached, onUpgrade, isShuukatsu = false,
+  applicationId, company, role, category, location, isPro, cached, onUpgrade, isShuukatsu = false,
 }: OfferIntelligencePanelProps) {
   const [expanded, setExpanded] = useState(false);
   const [data, setData] = useState<OfferData | null>(cached ?? null);
@@ -68,10 +68,9 @@ export default function OfferIntelligencePanel({
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/ai/offer-intelligence', {
+      const res = await authFetch('/api/ai/offer-intelligence', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, applicationId, company, role, category, location }),
+        body: JSON.stringify({ applicationId, company, role, category, location }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'Failed');

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { Application, PipelineStage } from '@/lib/types';
 import CompanyAvatar from './CompanyAvatar';
 import CategoryTag from './CategoryTag';
+import TagPill from './TagPill';
 import {
   DndContext, DragEndEvent, DragStartEvent,
   useDraggable, useDroppable,
@@ -116,6 +117,12 @@ function KanbanCard({
       </div>
       <div style={{ marginTop: 9, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
         {app.category && <CategoryTag category={app.category} />}
+        {app.tags && app.tags.slice(0, 2).map(tag => (
+          <TagPill key={tag.id} tag={tag} small />
+        ))}
+        {app.tags && app.tags.length > 2 && (
+          <span style={{ fontSize: 10, color: 'var(--muted-text)' }}>+{app.tags.length - 2}</span>
+        )}
         {deadline && (
           <span style={{
             fontSize: 10.5, padding: '2px 6px', borderRadius: 4,

@@ -60,6 +60,16 @@ export type Category =
   | 'Healthcare & Life Sciences'
   | 'Other';
 
+export const TAG_COLORS = ['#6366F1','#10B981','#F59E0B','#EF4444','#8B5CF6','#3B82F6','#EC4899','#64748B'] as const;
+
+export interface Tag {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string;
+  created_at: string;
+}
+
 export interface Application {
   id: string;
   user_id: string;
@@ -80,6 +90,34 @@ export interface Application {
   ai_strength_signal?: unknown;
   ai_offer_intelligence?: unknown;
   google_calendar_event_id?: string | null;
+  tags?: Tag[];
+  salary_min?: number | null;
+  salary_max?: number | null;
+  equity_shares?: number | null;
+  equity_cliff?: number | null;
+  signing_bonus?: number | null;
+  bonus_target?: number | null;
+  offer_deadline?: string | null;
+  offer_notes?: string;
+}
+
+export type RelationshipType = 'recruiter' | 'referral' | 'employee' | 'alumni' | 'other';
+
+export interface Contact {
+  id: string;
+  user_id: string;
+  name: string;
+  company: string;
+  role: string;
+  linkedin_url: string;
+  email: string;
+  phone: string;
+  relationship_type: RelationshipType;
+  notes: string;
+  last_contact_date: string | null;
+  created_at: string;
+  updated_at: string;
+  application_ids?: string[];
 }
 
 export interface UserProfile {
@@ -99,4 +137,6 @@ export interface UserProfile {
   pro_expires_at?: string | null;
   pipeline_type?: 'english' | 'shuukatsu';
   language_preference?: 'en' | 'ja';
+  email_deadline_reminders?: boolean;
+  email_weekly_digest?: boolean;
 }

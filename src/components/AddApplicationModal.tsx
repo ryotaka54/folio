@@ -24,7 +24,6 @@ interface AddApplicationModalProps {
   }) => Promise<void>;
   stages: PipelineStage[];
   initialJobLink?: string;
-  userId?: string;
   isPro?: boolean;
   onUpgrade?: () => void;
 }
@@ -50,7 +49,7 @@ function guessCategory(role: string): Category | '' {
   return '';
 }
 
-export default function AddApplicationModal({ open, onClose, onSave, stages, initialJobLink, userId, isPro = false, onUpgrade = () => {} }: AddApplicationModalProps) {
+export default function AddApplicationModal({ open, onClose, onSave, stages, initialJobLink, isPro = false, onUpgrade = () => {} }: AddApplicationModalProps) {
   const defaultStatus = (stages.includes('Wishlist' as PipelineStage) ? 'Wishlist' : stages[0]) as PipelineStage;
   const { isInstalled, hintCount, incrementHintCount } = useExtensionStatus();
 
@@ -232,9 +231,8 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
               )}
             </div>
 
-            {userId && company.trim() && role.trim() && (
+            {company.trim() && role.trim() && (
               <StrengthSignal
-                userId={userId}
                 company={company}
                 role={role}
                 category={category || undefined}

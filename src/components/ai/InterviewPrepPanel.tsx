@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import ProGate from '@/components/ProGate';
+import { authFetch } from '@/lib/auth-fetch';
 
 // ── v2 data shape — compact, scannable ──────────────────────────────────────
 interface PrepQuestion {
@@ -26,7 +27,6 @@ interface InterviewPrepData {
 }
 
 interface InterviewPrepPanelProps {
-  userId: string;
   applicationId: string;
   company: string;
   role: string;
@@ -239,7 +239,7 @@ function isV2Data(data: InterviewPrepData): boolean {
 }
 
 export default function InterviewPrepPanel({
-  userId, applicationId, company, role, stage, notes, jobLink, isPro, cached, onUpgrade, isShuukatsu = false,
+  applicationId, company, role, stage, notes, jobLink, isPro, cached, onUpgrade, isShuukatsu = false,
 }: InterviewPrepPanelProps) {
   const [expanded, setExpanded] = useState(false);
   const [data, setData] = useState<InterviewPrepData | null>(cached ?? null);
@@ -253,10 +253,9 @@ export default function InterviewPrepPanel({
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/ai/interview-prep', {
+      const res = await authFetch('/api/ai/interview-prep', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, applicationId, company, role, stage, notes, job_link: jobLink }),
+        body: JSON.stringify({ applicationId, company, role, stage, notes, job_link: jobLink }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'Failed');

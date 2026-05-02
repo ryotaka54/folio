@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { X, Copy, Check, Sparkles } from 'lucide-react';
 import ProGate from '@/components/ProGate';
+import { authFetch } from '@/lib/auth-fetch';
 
 const EMAIL_TYPES = [
   { id: 'thank-you', label: 'Thank You' },
@@ -18,7 +19,6 @@ interface EmailResult {
 }
 
 interface FollowUpEmailModalProps {
-  userId: string;
   company: string;
   role: string;
   stage: string;
@@ -75,7 +75,7 @@ function EmailResult({ result }: { result: EmailResult }) {
 }
 
 export default function FollowUpEmailModal({
-  userId, company, role, stage, recruiterName, recruiterEmail, notes, isPro, onUpgrade, onClose,
+  company, role, stage, recruiterName, recruiterEmail, notes, isPro, onUpgrade, onClose,
 }: FollowUpEmailModalProps) {
   const [emailType, setEmailType] = useState('thank-you');
   const [result, setResult] = useState<EmailResult | null>(null);
@@ -87,10 +87,9 @@ export default function FollowUpEmailModal({
     setError('');
     setResult(null);
     try {
-      const res = await fetch('/api/ai/follow-up-email', {
+      const res = await authFetch('/api/ai/follow-up-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, company, role, stage, recruiterName, recruiterEmail, notes, emailType }),
+        body: JSON.stringify({ company, role, stage, recruiterName, recruiterEmail, notes, emailType }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'Failed');

@@ -77,12 +77,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           recruiting_season: data.recruiting_season || '',
           created_at: data.created_at,
           onboarding_complete: data.onboarding_complete || localOnboarding === 'true',
-          // localStorage wins — we don't write tutorial_completed to DB, so DB default (false) must not override it
-          tutorial_completed: localTutorial === 'true' || data.tutorial_completed === true,
+          tutorial_completed: data.tutorial_completed === true || localTutorial === 'true',
           pro: data.pro ?? false,
           stripe_customer_id: data.stripe_customer_id ?? undefined,
           stripe_subscription_id: data.stripe_subscription_id ?? undefined,
           pro_expires_at: data.pro_expires_at ?? null,
+          email_deadline_reminders: data.email_deadline_reminders ?? false,
+          email_weekly_digest: data.email_weekly_digest ?? false,
         });
       } else {
         // No profile row exists — auto-create one so future writes succeed

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthUser } from '@/lib/server-auth';
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
@@ -15,11 +16,12 @@ function getSupabase() {
 
 export async function POST(request: Request) {
   try {
+    const authedUser = await getAuthUser(request);
+    if (!authedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const userId = authedUser.id;
+
     const stripe = getStripe();
     const supabaseAdmin = getSupabase();
-
-    const { userId } = await request.json();
-    if (!userId) return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
 
     const { data: profile } = await supabaseAdmin
       .from('users')

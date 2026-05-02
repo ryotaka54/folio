@@ -1,5 +1,7 @@
 'use client';
 
+import { authFetch } from '@/lib/auth-fetch';
+
 export const FREE_TIER_LIMIT = 25;
 
 /** Returns true if the user has an active Pro subscription. */
@@ -19,11 +21,9 @@ export async function startCheckout(opts: {
   priceId: string;
 }): Promise<string | null> {
   try {
-    const res = await fetch('/api/create-checkout-session', {
+    const res = await authFetch('/api/create-checkout-session', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        userId: opts.userId,
         email: opts.email,
         priceId: opts.priceId,
       }),

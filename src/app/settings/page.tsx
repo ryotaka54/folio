@@ -12,12 +12,13 @@ import { useAuth } from '@/lib/auth-context';
 import { supabase } from '@/lib/supabase';
 import { SCHOOL_YEARS, CAREER_LEVELS, RECRUITING_SEASONS, AI_FREE_DAILY_LIMIT, AI_PRO_DAILY_LIMIT } from '@/lib/constants';
 import { isPro, FREE_TIER_LIMIT } from '@/lib/pro';
+import { authFetch } from '@/lib/auth-fetch';
 import UpgradeModal from '@/components/UpgradeModal';
 import ReferralCard from '@/components/ReferralCard';
 
 // ─── Section types ────────────────────────────────────────────────────────────
 
-type Section = 'profile' | 'recruiting' | 'ai' | 'appearance' | 'account' | 'referrals' | 'data' | 'danger';
+type Section = 'profile' | 'recruiting' | 'ai' | 'leaderboard' | 'notifications' | 'appearance' | 'account' | 'referrals' | 'data' | 'danger';
 
 interface SectionMeta { id: Section; label: string; icon: ReactNode; danger?: boolean }
 
@@ -41,6 +42,8 @@ const SECTIONS: SectionMeta[] = [
   { id: 'profile', label: 'Profile', icon: <UserIcon /> },
   { id: 'recruiting', label: 'Recruiting', icon: <BriefcaseIcon /> },
   { id: 'ai', label: 'AI Features', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> },
+  { id: 'leaderboard', label: 'Leaderboard', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 21V9M12 9c0-2-1-4-4-4H3v4c0 2 1 4 4 4h5M12 9c0-2 1-4 4-4h5v4c0 2-1 4-4 4h-5"/></svg> },
+  { id: 'notifications', label: 'Notifications', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> },
   { id: 'appearance', label: 'Appearance', icon: <PaletteIcon /> },
   { id: 'account', label: 'Account', icon: <ShieldIcon /> },
   { id: 'referrals', label: 'Referrals', icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg> },
@@ -417,8 +420,57 @@ function TargetField({ storageKey, placeholder }: { storageKey: string; placehol
 }
 
 // ─── Section: Notifications ───────────────────────────────────────────────────
-// TODO: Add email_notifications, deadline_reminders, weekly_digest columns to users table in Supabase.
-// Currently saved to localStorage as fallback.
+
+function NotificationsSection({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const { user, updateProfile } = useAuth();
+  const userIsPro = isPro(user);
+
+  const toggle = async (key: 'email_deadline_reminders' | 'email_weekly_digest', value: boolean) => {
+    if (!userIsPro) return;
+    updateProfile({ [key]: value });
+    const res = await authFetch('/api/notifications/preferences', {
+      method: 'PATCH',
+      body: JSON.stringify({ [key]: value }),
+    });
+    if (!res.ok) {
+      updateProfile({ [key]: !value });
+      showToast('Failed to save', 'error');
+    }
+  };
+
+  const deadlineOn = user?.email_deadline_reminders ?? false;
+  const digestOn   = user?.email_weekly_digest ?? false;
+
+  return (
+    <div>
+      <div className="mb-4">
+        <h2 className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>Notifications</h2>
+        <p className="text-[13px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Email alerts to keep your job search on track.</p>
+      </div>
+
+      <SectionCard title="Email notifications">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Deadline reminders</p>
+              <p className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>Get an email when an application deadline is 3 days away.</p>
+              {!userIsPro && <p className="text-[11px] mt-1 font-medium" style={{ color: 'var(--accent-blue)' }}>Pro only</p>}
+            </div>
+            <Toggle checked={deadlineOn} onChange={v => toggle('email_deadline_reminders', v)} disabled={!userIsPro} />
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[13px] font-medium" style={{ color: 'var(--brand-navy)' }}>Weekly digest</p>
+              <p className="text-[12px] mt-0.5" style={{ color: 'var(--muted-text)' }}>A Monday summary of your pipeline — deadlines, stalled apps, and next steps.</p>
+              {!userIsPro && <p className="text-[11px] mt-1 font-medium" style={{ color: 'var(--accent-blue)' }}>Pro only</p>}
+            </div>
+            <Toggle checked={digestOn} onChange={v => toggle('email_weekly_digest', v)} disabled={!userIsPro} />
+          </div>
+        </div>
+      </SectionCard>
+    </div>
+  );
+}
 
 // ─── Section: AI Features ─────────────────────────────────────────────────────
 
@@ -564,10 +616,9 @@ function PlanCard() {
     if (!user) return;
     setLoadingPortal(true);
     try {
-      const res = await fetch('/api/create-portal-session', {
+      const res = await authFetch('/api/create-portal-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({}),
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
@@ -1077,12 +1128,199 @@ function DataSection({ showToast }: { showToast: (msg: string, type?: 'success' 
 
 
 
+// ─── Section: Leaderboard posts ───────────────────────────────────────────────
+
+interface LbEntry {
+  id: string;
+  company: string;
+  role: string;
+  question: string;
+  score: number;
+  has_answer: boolean;
+  has_name: boolean;
+  lang: string;
+  created_at: string;
+}
+
+function LeaderboardSection({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
+  const [entries, setEntries] = useState<LbEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actioning, setActioning] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  useEffect(() => {
+    authFetch('/api/leaderboard/mine')
+      .then(r => r.json())
+      .then(d => { setEntries(d.entries ?? []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const patchEntry = async (id: string, action: 'hide_answer' | 'anonymize') => {
+    setActioning(id + action);
+    try {
+      const res = await authFetch(`/api/leaderboard/${id}`, { method: 'PATCH', body: JSON.stringify({ action }) });
+      if (!res.ok) throw new Error();
+      setEntries(prev => prev.map(e => e.id !== id ? e : {
+        ...e,
+        has_answer: action === 'hide_answer' ? false : e.has_answer,
+        has_name: action === 'anonymize' ? false : e.has_name,
+      }));
+      showToast(action === 'hide_answer' ? 'Answer hidden' : 'Made anonymous');
+    } catch {
+      showToast('Failed — check your connection', 'error');
+    } finally {
+      setActioning(null);
+    }
+  };
+
+  const deleteEntry = async (id: string) => {
+    setActioning(id + 'delete');
+    try {
+      const res = await authFetch(`/api/leaderboard/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      setEntries(prev => prev.filter(e => e.id !== id));
+      setConfirmDeleteId(null);
+      showToast('Entry removed from leaderboard');
+    } catch {
+      showToast('Failed — check your connection', 'error');
+    } finally {
+      setActioning(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
+        <div className="w-6 h-6 rounded-full border-2 border-accent-blue border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 600, color: 'var(--brand-navy)', marginBottom: 4, letterSpacing: '-0.01em' }}>My Leaderboard Posts</h2>
+        <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.5 }}>
+          Manage your interview scores posted to the public leaderboard. You can hide your answer, make it anonymous, or remove it entirely at any time.
+        </p>
+      </div>
+
+      {entries.length === 0 ? (
+        <SectionCard>
+          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+            <p style={{ fontSize: 14, color: 'var(--muted-text)', marginBottom: 6 }}>No leaderboard posts yet.</p>
+            <p style={{ fontSize: 13, color: 'var(--muted-text)' }}>
+              Practice a mock interview and post your score to compete with others.
+            </p>
+          </div>
+        </SectionCard>
+      ) : (
+        <div style={{ borderRadius: 10, border: '1px solid var(--border-gray)', overflow: 'hidden' }}>
+          {entries.map((entry, i) => {
+            const isConfirmingDelete = confirmDeleteId === entry.id;
+            return (
+              <div
+                key={entry.id}
+                style={{
+                  padding: '14px 16px',
+                  borderTop: i > 0 ? '1px solid var(--border-gray)' : undefined,
+                  background: 'var(--card-bg)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)' }}>{entry.company}</span>
+                      <span style={{ fontSize: 11, color: 'var(--muted-text)' }}>·</span>
+                      <span style={{ fontSize: 12, color: 'var(--muted-text)' }}>{entry.role}</span>
+                      {entry.lang === 'ja' && (
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99, background: 'rgba(139,92,246,0.1)', color: '#7C3AED', border: '1px solid rgba(139,92,246,0.2)' }}>JA</span>
+                      )}
+                    </div>
+                    <p style={{ fontSize: 12, color: 'var(--muted-text)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {entry.question.length > 80 ? entry.question.slice(0, 80) + '…' : entry.question}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, padding: '1px 8px', borderRadius: 99, background: entry.score >= 4 ? 'rgba(22,163,74,0.1)' : entry.score >= 3 ? 'rgba(234,179,8,0.1)' : 'rgba(220,38,38,0.1)', color: entry.score >= 4 ? '#16A34A' : entry.score >= 3 ? '#A16207' : '#DC2626', border: `1px solid ${entry.score >= 4 ? 'rgba(22,163,74,0.2)' : entry.score >= 3 ? 'rgba(234,179,8,0.2)' : 'rgba(220,38,38,0.2)'}` }}>
+                        {entry.score}/5
+                      </span>
+                      {entry.has_answer && (
+                        <span style={{ fontSize: 11, color: 'var(--muted-text)' }}>Answer visible</span>
+                      )}
+                      {entry.has_name && (
+                        <span style={{ fontSize: 11, color: 'var(--muted-text)' }}>Name shown</span>
+                      )}
+                      <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+                        {new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {!isConfirmingDelete && (
+                    <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                      {entry.has_answer && (
+                        <button
+                          onClick={() => patchEntry(entry.id, 'hide_answer')}
+                          disabled={actioning === entry.id + 'hide_answer'}
+                          style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'var(--surface-gray)', color: 'var(--muted-text)', cursor: 'pointer', opacity: actioning === entry.id + 'hide_answer' ? 0.5 : 1 }}
+                        >
+                          Hide answer
+                        </button>
+                      )}
+                      {entry.has_name && (
+                        <button
+                          onClick={() => patchEntry(entry.id, 'anonymize')}
+                          disabled={actioning === entry.id + 'anonymize'}
+                          style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'var(--surface-gray)', color: 'var(--muted-text)', cursor: 'pointer', opacity: actioning === entry.id + 'anonymize' ? 0.5 : 1 }}
+                        >
+                          Make anon
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setConfirmDeleteId(entry.id)}
+                        style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(220,38,38,0.25)', background: 'rgba(220,38,38,0.05)', color: '#DC2626', cursor: 'pointer' }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {isConfirmingDelete && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, padding: '10px 12px', borderRadius: 8, background: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.15)' }}>
+                    <span style={{ fontSize: 13, color: 'var(--brand-navy)', flex: 1 }}>Remove this entry from the leaderboard?</span>
+                    <button
+                      onClick={() => deleteEntry(entry.id)}
+                      disabled={actioning === entry.id + 'delete'}
+                      style={{ fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 6, border: 'none', background: '#DC2626', color: '#fff', cursor: 'pointer', opacity: actioning === entry.id + 'delete' ? 0.6 : 1 }}
+                    >
+                      {actioning === entry.id + 'delete' ? 'Removing…' : 'Yes, remove'}
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(null)}
+                      style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'var(--surface-gray)', color: 'var(--muted-text)', cursor: 'pointer' }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main settings page ───────────────────────────────────────────────────────
 
 const JA_SECTION_LABELS: Record<string, string> = {
   profile: 'プロフィール',
   recruiting: '就活設定',
   ai: 'AI機能',
+  leaderboard: 'リーダーボード',
+  notifications: '通知設定',
   appearance: '表示設定',
   account: 'アカウント',
   referrals: '友達紹介',
@@ -1136,6 +1374,8 @@ function SettingsPageInner() {
     profile: <ProfileSection showToast={showToast} />,
     recruiting: <RecruitingSection showToast={showToast} />,
     ai: <AISection />,
+    leaderboard: <LeaderboardSection showToast={showToast} />,
+    notifications: <NotificationsSection showToast={showToast} />,
     appearance: <AppearanceSection />,
     account: <AccountSection showToast={showToast} />,
     referrals: (

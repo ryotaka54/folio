@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { checkRateLimit, recordUsage, recordEvent, callClaude } from '@/lib/anthropic';
-import { isProServer } from '@/lib/anthropic';
+import { checkRateLimit, recordUsage, recordEvent, callClaude, isProServer } from '@/lib/anthropic';
+import { getAuthUser } from '@/lib/server-auth';
 
 function getSupabase() {
   return createClient(
@@ -33,10 +33,9 @@ const SYSTEM_JA = `あなたは就活生の専任コーチです。学生の実�
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await request.json();
-    if (!userId) {
-      return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
-    }
+    const authedUser = await getAuthUser(request);
+    if (!authedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const userId = authedUser.id;
 
     const supabase = getSupabase();
     const { data: profile } = await supabase

@@ -543,7 +543,6 @@ function JaDashboardContent() {
         onClose={() => setShowAddModal(false)}
         onSave={handleAddSave}
         stages={SHUUKATSU_STAGE_LIST}
-        userId={user?.id}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
       />

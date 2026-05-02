@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, X } from 'lucide-react';
 import ProGate from '@/components/ProGate';
+import { authFetch } from '@/lib/auth-fetch';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface CoachData {
@@ -14,7 +15,6 @@ interface CoachData {
 }
 
 interface WeeklyCoachProps {
-  userId: string;
   isPro: boolean;
   onUpgrade: () => void;
 }
@@ -48,7 +48,7 @@ function Skeleton() {
   );
 }
 
-export default function WeeklyCoach({ userId, isPro, onUpgrade }: WeeklyCoachProps) {
+export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
   const [data, setData] = useState<CoachData | null>(null);
   const [loading, setLoading] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -63,10 +63,9 @@ export default function WeeklyCoach({ userId, isPro, onUpgrade }: WeeklyCoachPro
   useEffect(() => {
     if (!isPro || dismissed || !shouldShowCoach()) return;
     setLoading(true);
-    fetch('/api/ai/weekly-coach', {
+    authFetch('/api/ai/weekly-coach', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId }),
+      body: JSON.stringify({}),
     })
       .then(r => r.json())
       .then(json => {
@@ -75,7 +74,7 @@ export default function WeeklyCoach({ userId, isPro, onUpgrade }: WeeklyCoachPro
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [isPro, dismissed, userId]);
+  }, [isPro, dismissed]);
 
   const handleDismiss = () => {
     localStorage.setItem(getDismissKey(), '1');

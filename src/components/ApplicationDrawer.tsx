@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Application, PipelineStage } from '@/lib/types';
+import { Application, PipelineStage, Tag } from '@/lib/types';
 import { CATEGORIES } from '@/lib/constants';
+import TagManager from '@/components/TagManager';
+import OfferDetailsPanel from '@/components/OfferDetailsPanel';
+import ContactLinkPanel from '@/components/ContactLinkPanel';
 import { ExternalLink, X } from 'lucide-react';
 import InterviewPrepPanel from '@/components/ai/InterviewPrepPanel';
 import OfferIntelligencePanel from '@/components/ai/OfferIntelligencePanel';
@@ -59,6 +62,9 @@ interface ApplicationDrawerProps {
   isPro?: boolean;
   onUpgrade?: () => void;
   isShuukatsu?: boolean;
+  allTags?: Tag[];
+  onAllTagsChange?: (tags: Tag[]) => void;
+  onTagsChange?: (applicationId: string, tags: Tag[]) => void;
 }
 
 type SaveStatus = 'idle' | 'saving' | 'saved';
@@ -66,6 +72,7 @@ type SaveStatus = 'idle' | 'saving' | 'saved';
 export default function ApplicationDrawer({
   application, open, onClose, onUpdate, onDelete, stages,
   userId, isPro = false, onUpgrade = () => {}, isShuukatsu = false,
+  allTags = [], onAllTagsChange, onTagsChange,
 }: ApplicationDrawerProps) {
   const [showFollowUpEmail, setShowFollowUpEmail] = useState(false);
   const [showMockInterview, setShowMockInterview] = useState(false);
@@ -409,7 +416,6 @@ export default function ApplicationDrawer({
                 {/* Interview prep panel (expanded) */}
                 {showInterviewPrep && userId && (
                   <InterviewPrepPanel
-                    userId={userId}
                     applicationId={application.id}
                     company={application.company}
                     role={application.role}
@@ -426,7 +432,6 @@ export default function ApplicationDrawer({
                 {/* Company dossier panel (expanded) */}
                 {showCompanyDossier && userId && (
                   <OfferIntelligencePanel
-                    userId={userId}
                     applicationId={application.id}
                     company={application.company}
                     role={application.role}
@@ -445,6 +450,14 @@ export default function ApplicationDrawer({
                   onUpdate={(steps) => onUpdate(application.id, { interview_steps: steps })}
                   isShuukatsu={isShuukatsu}
                 />
+
+                {/* Offer Details Panel — EN only, offer stages */}
+                {!isShuukatsu && ['Offer', 'Offer — Negotiating', 'Accepted'].includes(application.status) && (
+                  <OfferDetailsPanel
+                    application={application}
+                    onUpdate={updates => onUpdate(application.id, updates)}
+                  />
+                )}
 
                 {/* Shuukatsu Pro panels */}
                 {isShuukatsu && application && (
@@ -471,7 +484,6 @@ export default function ApplicationDrawer({
                 {/* Follow-Up Email Modal */}
                 {showFollowUpEmail && userId && (
                   <FollowUpEmailModal
-                    userId={userId}
                     company={application.company}
                     role={application.role}
                     stage={application.status}
@@ -490,7 +502,6 @@ export default function ApplicationDrawer({
                     company={application.company}
                     role={application.role}
                     notes={application.notes || undefined}
-                    userId={userId}
                     applicationId={application.id}
                     isPro={isPro}
                     onClose={() => setShowMockInterview(false)}
@@ -515,6 +526,30 @@ export default function ApplicationDrawer({
                     </div>
                   </div>
                 </div>
+
+                {/* Tags */}
+                {onTagsChange && (
+                  <div className="border-t border-border-gray pt-4 mt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--muted-text)' }}><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                      <h3 className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Tags</h3>
+                    </div>
+                    <TagManager
+                      applicationId={application.id}
+                      appliedTags={application.tags ?? []}
+                      allTags={allTags}
+                      onTagsChange={tags => onTagsChange(application.id, tags)}
+                      onAllTagsChange={onAllTagsChange ?? (() => {})}
+                    />
+                  </div>
+                )}
+
+                {/* Contacts linked to this application */}
+                {userId && (
+                  <div className="border-t border-border-gray pt-4 mt-4">
+                    <ContactLinkPanel applicationId={application.id} applications={[]} />
+                  </div>
+                )}
 
                 {/* Timestamps */}
                 <div className="border-t border-border-gray pt-4 mt-4">

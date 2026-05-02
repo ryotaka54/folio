@@ -7,7 +7,9 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { INTERNSHIP_STAGES, JOB_STAGES } from '@/lib/constants';
-import { Application, PipelineStage, Category } from '@/lib/types';
+import { Application, PipelineStage, Category, Tag } from '@/lib/types';
+import TagFilterBar from '@/components/TagFilterBar';
+import OfferComparisonPanel from '@/components/OfferComparisonPanel';
 import { Logo } from '@/components/Logo';
 import { ProLogo } from '@/components/ProLogo';
 import PipelineView from '@/components/PipelineView';
@@ -26,6 +28,7 @@ import { useTutorial } from '@/lib/tutorial-context';
 import { ExtensionStatusProvider, useExtensionStatus } from '@/lib/extension-status-context';
 import { capture } from '@/lib/analytics';
 import { isPro as checkIsPro, FREE_TIER_LIMIT } from '@/lib/pro';
+import { authFetch } from '@/lib/auth-fetch';
 import { CapExceededError } from '@/lib/store';
 import UpgradeModal from '@/components/UpgradeModal';
 import ProTour from '@/components/ProTour';
@@ -35,7 +38,7 @@ import ImportCSVModal from '@/components/ImportCSVModal';
 import TodayView from '@/components/TodayView';
 import PipelineBar from '@/components/PipelineBar';
 import NotificationBell from '@/components/NotificationBell';
-import { LayoutDashboard, Calendar, Mic, Home } from 'lucide-react';
+import { LayoutDashboard, Calendar, Mic, Home, Users } from 'lucide-react';
 
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
@@ -60,7 +63,7 @@ function DashboardContent() {
   const { isInstalled: extInstalled, isDismissed: extDismissed, isBannerEligible } = useExtensionStatus();
   const router = useRouter();
 
-  const [view, setView] = useState<'today' | 'pipeline' | 'table'>('today');
+  const [view, setView] = useState<'today' | 'pipeline' | 'table' | 'offers'>('today');
   const [isMobile, setIsMobile] = useState(false);
   // Detect mobile after mount to avoid SSR mismatch
   useEffect(() => {
@@ -89,6 +92,9 @@ function DashboardContent() {
   const [showReferralWelcome, setShowReferralWelcome] = useState(false);
   const userIsPro = checkIsPro(user);
   const prevStatusesRef = useRef<Record<string, string>>({});
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [tagMap, setTagMap] = useState<Record<string, Tag[]>>({});
+  const [activeTags, setActiveTags] = useState<string[]>([]);
 
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
   const pendingDeleteRef = useRef<{ id: string; app: Application } | null>(null);
@@ -97,6 +103,7 @@ function DashboardContent() {
 
   const stages = user?.mode === 'job' ? JOB_STAGES : INTERNSHIP_STAGES;
   const inactiveStatuses = ['Rejected', 'Declined'];
+  const offerCount = applications.filter(a => ['Offer', 'Offer — Negotiating', 'Accepted'].includes(a.status)).length;
 
   const displayApplications = useMemo(
     () => isActive && demoApplications.length > 0 ? [...applications, ...demoApplications] : applications,
@@ -104,12 +111,15 @@ function DashboardContent() {
   );
 
   const filteredApps = useMemo(() => {
-    return displayApplications.filter(app => {
-      if (hideInactive && inactiveStatuses.includes(app.status)) return false;
-      if (statusFilter !== 'all' && app.status !== statusFilter) return false;
-      return true;
-    });
-  }, [displayApplications, hideInactive, statusFilter]);
+    return displayApplications
+      .filter(app => {
+        if (hideInactive && inactiveStatuses.includes(app.status)) return false;
+        if (statusFilter !== 'all' && app.status !== statusFilter) return false;
+        if (activeTags.length > 0 && !activeTags.every(tid => (tagMap[app.id] ?? []).some(t => t.id === tid))) return false;
+        return true;
+      })
+      .map(app => ({ ...app, tags: tagMap[app.id] ?? app.tags ?? [] }));
+  }, [displayApplications, hideInactive, statusFilter, activeTags, tagMap]);
 
   const showToast = (msg: string, undoFn?: () => void) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -312,6 +322,40 @@ function DashboardContent() {
     };
   }, []);
 
+  // Load tags + build tagMap whenever applications change
+  useEffect(() => {
+    if (!user || loading || applications.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const [tagsRes, linkRows] = await Promise.all([
+          authFetch('/api/tags').then(r => r.json()),
+          supabase
+            .from('application_tags')
+            .select('application_id, tag_id')
+            .in('application_id', applications.map(a => a.id))
+            .then(r => r.data ?? []),
+        ]);
+        if (cancelled) return;
+        const tags: Tag[] = tagsRes.tags ?? [];
+        setAllTags(tags);
+        const byId = Object.fromEntries(tags.map(t => [t.id, t]));
+        const map: Record<string, Tag[]> = {};
+        for (const row of linkRows as { application_id: string; tag_id: string }[]) {
+          const tag = byId[row.tag_id];
+          if (!tag) continue;
+          (map[row.application_id] ??= []).push(tag);
+        }
+        setTagMap(map);
+      } catch { /* non-critical */ }
+    })();
+    return () => { cancelled = true; };
+  }, [user, loading, applications]);
+
+  const handleTagsChange = (applicationId: string, tags: Tag[]) => {
+    setTagMap(prev => ({ ...prev, [applicationId]: tags }));
+  };
+
   // Dynamic page title + app badge
   useEffect(() => {
     if (loading) return;
@@ -491,13 +535,14 @@ function DashboardContent() {
             { k: 'today' as const,    label: 'Today',    icon: <Home size={11} aria-hidden /> },
             { k: 'pipeline' as const, label: 'Pipeline', icon: <LayoutDashboard size={11} aria-hidden /> },
             { k: 'table' as const,    label: 'List',     icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
+            { k: 'offers' as const,   label: 'Offers',   icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><path d="M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M21 7c0 4.97-4.03 9-9 9S3 11.97 3 7"/></svg> },
           ] as const).map(({ k, label, icon }) => {
             const active = view === k;
             return (
               <button
                 key={k}
                 onClick={() => { setView(k); capture('view_switched', { view: k }); }}
-                className="flex items-center gap-1 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
+                className="relative flex items-center gap-1 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
                 style={{
                   background: active ? 'var(--card-bg)' : 'transparent',
                   color: active ? 'var(--brand-navy)' : 'var(--muted-text)',
@@ -506,6 +551,9 @@ function DashboardContent() {
                 }}
               >
                 {icon}{label}
+                {k === 'offers' && offerCount >= 2 && (
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16A34A', flexShrink: 0 }} />
+                )}
               </button>
             );
           })}
@@ -530,13 +578,14 @@ function DashboardContent() {
                 { k: 'today' as const,    label: 'Today',    icon: <Home size={12} aria-hidden /> },
                 { k: 'pipeline' as const, label: 'Pipeline', icon: <LayoutDashboard size={12} aria-hidden /> },
                 { k: 'table' as const,    label: 'List',     icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
+                { k: 'offers' as const,   label: 'Offers',   icon: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><path d="M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M21 7c0 4.97-4.03 9-9 9S3 11.97 3 7"/></svg> },
               ] as const).map(({ k, label, icon }) => {
                 const active = view === k;
                 return (
                   <button
                     key={k}
                     onClick={() => { setView(k); capture('view_switched', { view: k }); }}
-                    className="flex items-center gap-1.5 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
+                    className="relative flex items-center gap-1.5 px-2.5 h-7 text-[12px] font-medium rounded-md transition-all"
                     style={{
                       background: active ? 'var(--card-bg)' : 'transparent',
                       color: active ? 'var(--brand-navy)' : 'var(--muted-text)',
@@ -544,6 +593,9 @@ function DashboardContent() {
                     }}
                   >
                     {icon}{label}
+                    {k === 'offers' && offerCount >= 2 && (
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16A34A', flexShrink: 0 }} />
+                    )}
                   </button>
                 );
               })}
@@ -554,6 +606,7 @@ function DashboardContent() {
               {[
                 { href: '/calendar',  label: 'Calendar',  icon: <Calendar size={13} aria-hidden /> },
                 { href: '/interview', label: 'Interview',  icon: <Mic size={13} aria-hidden /> },
+                { href: '/contacts',  label: 'Contacts',   icon: <Users size={13} aria-hidden /> },
               ].map(({ href, label, icon }) => (
                 <Link
                   key={href}
@@ -641,6 +694,8 @@ function DashboardContent() {
             </p>
           </footer>
         </main>
+      ) : view === 'offers' ? (
+        <OfferComparisonPanel applications={displayApplications} />
       ) : (
         <>
           {/* PipelineBar — full width, directly under topbar */}
@@ -651,6 +706,18 @@ function DashboardContent() {
                 stages={stages as PipelineStage[]}
                 activeStage={statusFilter}
                 onStageClick={s => setStatusFilter(s)}
+              />
+            </div>
+          )}
+
+          {/* Tag filter bar */}
+          {allTags.length > 0 && (
+            <div className="max-w-[1200px] mx-auto px-4 md:px-6">
+              <TagFilterBar
+                tags={allTags}
+                activeTags={activeTags}
+                onToggle={id => setActiveTags(prev => prev.includes(id) ? prev.filter(t => t !== id) : [...prev, id])}
+                onClear={() => setActiveTags([])}
               />
             </div>
           )}
@@ -753,7 +820,6 @@ function DashboardContent() {
         onSave={handleAddSave}
         stages={stages as PipelineStage[]}
         initialJobLink={addModalInitialUrl}
-        userId={user?.id}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
       />
@@ -775,7 +841,7 @@ function DashboardContent() {
       {/* Detail Drawer */}
       <ApplicationDrawer
         key={selectedApp?.id}
-        application={selectedApp}
+        application={selectedApp ? { ...selectedApp, tags: tagMap[selectedApp.id] ?? selectedApp.tags ?? [] } : null}
         open={showDrawer}
         onClose={() => { setShowDrawer(false); setSelectedApp(null); }}
         onUpdate={handleUpdate}
@@ -784,6 +850,9 @@ function DashboardContent() {
         userId={user?.id}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
+        allTags={allTags}
+        onAllTagsChange={setAllTags}
+        onTagsChange={handleTagsChange}
       />
 
       {/* Upgrade Modal */}

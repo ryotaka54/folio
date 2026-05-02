@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { checkRateLimit, recordUsage, recordEvent, callClaude } from '@/lib/anthropic';
-import { isProServer } from '@/lib/anthropic';
+import { checkRateLimit, recordUsage, recordEvent, callClaude, isProServer } from '@/lib/anthropic';
+import { getAuthUser } from '@/lib/server-auth';
 
 function getSupabase() {
   return createClient(
@@ -24,8 +24,12 @@ The JSON must match this shape exactly:
 
 export async function POST(request: Request) {
   try {
-    const { userId, applicationId, company, role, category, location } = await request.json();
-    if (!userId || !applicationId) {
+    const authedUser = await getAuthUser(request);
+    if (!authedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const userId = authedUser.id;
+
+    const { applicationId, company, role, category, location } = await request.json();
+    if (!applicationId) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 

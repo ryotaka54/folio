@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, Download, Copy, Check, X, ChevronRight, RotateCcw } from 'lucide-react';
+import { authFetch } from '@/lib/auth-fetch';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -45,7 +46,6 @@ interface Props {
   company: string;
   role: string;
   notes?: string;
-  userId: string;
   applicationId?: string;
   isPro: boolean;
   onClose: () => void;
@@ -238,7 +238,7 @@ function ScoreDots({ score }: { score: number }) {
 
 // ── Main modal ────────────────────────────────────────────────────────────────
 
-export default function MockInterviewModal({ company, role, notes, userId, applicationId, isPro, onClose, onUpgrade }: Props) {
+export default function MockInterviewModal({ company, role, notes, applicationId, isPro, onClose, onUpgrade }: Props) {
   const [phase, setPhase] = useState<Phase>('setup');
   const [questionCount, setQuestionCount] = useState(5);
   const [questionType, setQuestionType] = useState<QuestionType>('mixed');
@@ -291,10 +291,9 @@ export default function MockInterviewModal({ company, role, notes, userId, appli
     setError('');
     setPhase('loading_questions');
     try {
-      const res = await fetch('/api/ai/mock-interview', {
+      const res = await authFetch('/api/ai/mock-interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'generate', userId, company, role, notes, count: questionCount, type: questionType }),
+        body: JSON.stringify({ action: 'generate', company, role, notes, count: questionCount, type: questionType }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to generate questions');
@@ -316,11 +315,10 @@ export default function MockInterviewModal({ company, role, notes, userId, appli
     if (voice.listening) voice.stop();
     setPhase('evaluating');
     try {
-      const res = await fetch('/api/ai/mock-interview', {
+      const res = await authFetch('/api/ai/mock-interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'evaluate', userId, company, role,
+          action: 'evaluate', company, role,
           question: questions[currentIdx].q,
           questionType: questions[currentIdx].type,
           answer: answer.trim(),
@@ -346,11 +344,10 @@ export default function MockInterviewModal({ company, role, notes, userId, appli
 
     if (currentIdx + 1 >= questions.length) {
       // Save session silently
-      fetch('/api/ai/mock-interview', {
+      authFetch('/api/ai/mock-interview', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'save_session', userId, company, role, applicationId,
+          action: 'save_session', company, role, applicationId,
           questions, transcript: newTranscript,
         }),
       }).catch(() => {});

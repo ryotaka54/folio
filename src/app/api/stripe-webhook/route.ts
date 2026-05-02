@@ -13,11 +13,13 @@ function getSupabase() {
   );
 }
 
-/** Derive renewal date from the first subscription item's current_period_end */
 function getExpiresAt(sub: Stripe.Subscription): string {
   const item = sub.items?.data?.[0];
-  const ts: number | undefined = (item as Stripe.SubscriptionItem & { current_period_end?: number }).current_period_end;
-  return ts ? new Date(ts * 1000).toISOString() : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const ts = (item as Stripe.SubscriptionItem & { current_period_end?: number })?.current_period_end;
+  if (!ts || typeof ts !== 'number') {
+    throw new Error(`Invalid current_period_end on subscription ${sub.id}`);
+  }
+  return new Date(ts * 1000).toISOString();
 }
 
 async function getUserIdFromCustomer(supabaseAdmin: ReturnType<typeof getSupabase>, customerId: string): Promise<string | null> {
