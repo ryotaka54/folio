@@ -34,6 +34,8 @@ export default function ContactsPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [apiError, setApiError] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
@@ -45,10 +47,11 @@ export default function ContactsPage() {
       authFetch('/api/contacts').then(r => r.json()),
       supabase.from('applications').select('id,company,role,status,location,category,deadline,job_link,notes,recruiter_name,recruiter_email,interview_steps,created_at,updated_at').eq('user_id', user.id).order('created_at', { ascending: false }),
     ]).then(([cd, { data: apps }]) => {
+      if (cd.error) setApiError(true);
       setContacts(cd.contacts ?? []);
       setApplications((apps ?? []) as Application[]);
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch(() => { setLoading(false); setApiError(true); });
   }, [user]);
 
   const filtered = contacts.filter(c => {
@@ -68,6 +71,9 @@ export default function ContactsPage() {
       setDrawerOpen(true);
       setNewName('');
       setShowAddForm(false);
+      setCreateError('');
+    } else {
+      setCreateError('保存できませんでした。データベースの設定を確認してください。');
     }
     setCreating(false);
   };
@@ -149,6 +155,9 @@ export default function ContactsPage() {
             >
               Cancel
             </button>
+            {createError && (
+              <p style={{ fontSize: 12, color: '#EF4444', margin: 0, alignSelf: 'center' }}>{createError}</p>
+            )}
           </div>
         )}
 
@@ -183,6 +192,22 @@ export default function ContactsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <div className="inline-block w-8 h-8 rounded-full border-2 border-accent-blue border-t-transparent animate-spin" />
+          </div>
+        ) : apiError && contacts.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>⚠️</div>
+            <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--brand-navy)', marginBottom: 8 }}>データベースの設定が必要です</p>
+            <p style={{ fontSize: 13, color: 'var(--muted-text)', marginBottom: 16, maxWidth: 420, margin: '0 auto 16px' }}>
+              コンタクト機能を使うには、Supabaseダッシュボードで以下のSQLを実行してください。
+            </p>
+            <a
+              href="https://supabase.com/dashboard"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-block', height: 36, padding: '0 20px', lineHeight: '36px', borderRadius: 8, background: 'var(--accent-blue)', color: '#fff', textDecoration: 'none', fontSize: 13, fontWeight: 600 }}
+            >
+              Supabase Dashboard を開く →
+            </a>
           </div>
         ) : filtered.length === 0 && contacts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 24px' }}>

@@ -5,12 +5,14 @@ import { Application } from '@/lib/types';
 
 interface Props { applications: Application[] }
 
-const OFFER_STAGES = new Set(['Offer', 'Offer — Negotiating', 'Accepted']);
+const OFFER_STAGES = new Set(['Offer', 'Offer — Negotiating', 'Accepted', '内々定', '内定']);
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
   'Offer':              { bg: 'rgba(22,163,74,0.12)',  color: '#16A34A' },
   'Offer — Negotiating':{ bg: 'rgba(217,119,6,0.12)',  color: '#D97706' },
   'Accepted':           { bg: 'rgba(37,99,235,0.12)',  color: '#2563EB' },
+  '内々定':              { bg: 'rgba(22,163,74,0.12)',  color: '#16A34A' },
+  '内定':               { bg: 'rgba(37,99,235,0.12)',  color: '#2563EB' },
 };
 
 function initials(name: string) {

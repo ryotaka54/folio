@@ -12,6 +12,8 @@ interface TodayViewProps {
   applications: Application[];
   userName?: string;
   onOpenApp: (app: Application) => void;
+  locale?: 'ja';
+  prepRoute?: string; // defaults to '/interview'
 }
 
 const TERMINAL = new Set(['Rejected', 'Declined', 'Accepted', '承諾', '内定']);
@@ -39,6 +41,18 @@ function fmtDate(iso: string): string {
   if (diff > 0 && diff < 7) return `in ${diff}d`;
   if (diff < 0 && diff > -14) return `${-diff}d ago`;
   return new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function fmtDateJa(iso: string): string {
+  const today = todayStr();
+  const diff = daysBetween(iso, today);
+  if (diff === 0) return '今日';
+  if (diff === 1) return '明日';
+  if (diff === -1) return '昨日';
+  if (diff > 0 && diff < 7) return `${diff}日後`;
+  if (diff < 0 && diff > -14) return `${-diff}日前`;
+  const d = new Date(iso + 'T00:00:00');
+  return `${d.getMonth() + 1}月${d.getDate()}日`;
 }
 
 function build28DayActivity(applications: Application[]) {
@@ -121,13 +135,13 @@ function Section({ title, subtitle, action, onAction, children }: {
   );
 }
 
-export default function TodayView({ applications, userName, onOpenApp }: TodayViewProps) {
+export default function TodayView({ applications, userName, onOpenApp, locale, prepRoute = '/interview' }: TodayViewProps) {
   const today = todayStr();
   const router = useRouter();
 
   const prepWithAI = useCallback((app: Application) => {
-    router.push(`/interview?company=${encodeURIComponent(app.company)}&role=${encodeURIComponent(app.role)}`);
-  }, [router]);
+    router.push(`${prepRoute}?company=${encodeURIComponent(app.company)}&role=${encodeURIComponent(app.role)}`);
+  }, [router, prepRoute]);
 
   const actionable = useMemo(() =>
     applications
@@ -143,7 +157,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
   const stuck = useMemo(() =>
     applications
       .filter(a => {
-        if (a.status !== 'Applied') return false;
+        if (a.status !== 'Applied' && a.status !== 'エントリー') return false;
         const ref = a.updated_at || a.created_at;
         if (!ref) return false;
         return daysBetween(today, ref.split('T')[0]) >= 14;
@@ -198,7 +212,9 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
   const weeklyGoal = weeklyGoalData?.goal ?? 10;
   const goalPct = Math.min(100, Math.round((weeklyCount / weeklyGoal) * 100));
 
-  const dateLabel = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const dateLabel = locale === 'ja'
+    ? new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
+    : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   return (
     <div style={{ padding: '28px 24px 80px', maxWidth: 1300, margin: '0 auto' }}>
@@ -211,9 +227,14 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
         }}>
           {dateLabel}
         </div>
-        <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.2, color: 'var(--brand-navy)' }}>
-          {userName ? `Morning, ${userName}.` : 'Good morning.'}{' '}
-          <span style={{ color: 'var(--muted-text)' }}>Here's where things stand.</span>
+        <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.2, color: 'var(--brand-navy)', fontFamily: locale === 'ja' ? "'Noto Sans JP', sans-serif" : undefined }}>
+          {locale === 'ja'
+            ? (userName ? `${userName}さん、` : 'こんにちは。')
+            : (userName ? `Morning, ${userName}.` : 'Good morning.')}
+          {' '}
+          <span style={{ color: 'var(--muted-text)' }}>
+            {locale === 'ja' ? '今日の選考状況です。' : "Here's where things stand."}
+          </span>
         </h1>
       </div>
 
@@ -224,8 +245,12 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
           border: '1px dashed var(--border-gray)',
           borderRadius: 14,
         }}>
-          <p style={{ fontSize: 15, color: 'var(--muted-text)', margin: '0 0 8px' }}>No applications yet.</p>
-          <p style={{ fontSize: 13, color: 'var(--text-tertiary)', margin: 0 }}>Add your first application to see your command center here.</p>
+          <p style={{ fontSize: 15, color: 'var(--muted-text)', margin: '0 0 8px' }}>
+            {locale === 'ja' ? 'まだ選考を追加していません。' : 'No applications yet.'}
+          </p>
+          <p style={{ fontSize: 13, color: 'var(--text-tertiary)', margin: 0 }}>
+            {locale === 'ja' ? '最初の選考を追加すると、ここに表示されます。' : 'Add your first application to see your command center here.'}
+          </p>
         </div>
       ) : (
         <div style={{
@@ -246,7 +271,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                   fontSize: 11, fontWeight: 600,
                   letterSpacing: '0.08em', textTransform: 'uppercase',
                 }}>
-                  <Target size={11} /> Next up
+                  <Target size={11} /> {locale === 'ja' ? '次の期限' : 'Next up'}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                   <CompanyAvatar company={nextUp.company} size={52} />
@@ -262,7 +287,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                         fontSize: 12, fontWeight: 500,
                         padding: '4px 10px', borderRadius: 6,
                       }}>
-                        <Clock size={11} /> Deadline {fmtDate(nextUp.deadline!)}
+                        <Clock size={11} /> {locale === 'ja' ? `締め切り ${fmtDateJa(nextUp.deadline!)}` : `Deadline ${fmtDate(nextUp.deadline!)}`}
                       </span>
                     </div>
                     {nextUp.notes && (
@@ -270,7 +295,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                         marginTop: 12, padding: '10px 12px', borderRadius: 8,
                         fontSize: 13, lineHeight: 1.5,
                       }}>
-                        <span className="next-up-note-label" style={{ fontWeight: 600, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 6 }}>Note</span>
+                        <span className="next-up-note-label" style={{ fontWeight: 600, fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase', marginRight: 6 }}>{locale === 'ja' ? 'メモ' : 'Note'}</span>
                         {nextUp.notes}
                       </div>
                     )}
@@ -280,7 +305,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                         className="next-up-btn-primary"
                         style={{ padding: '7px 16px', borderRadius: 8, border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}
                       >
-                        Open
+                        {locale === 'ja' ? '開く' : 'Open'}
                       </button>
                       <button
                         onClick={() => prepWithAI(nextUp)}
@@ -291,7 +316,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                           display: 'inline-flex', alignItems: 'center', gap: 6,
                         }}
                       >
-                        <Sparkles size={13} /> Prep with AI
+                        <Sparkles size={13} /> {locale === 'ja' ? 'AIで面接対策' : 'Prep with AI'}
                       </button>
                     </div>
                   </div>
@@ -304,14 +329,21 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                 background: 'var(--card-bg)',
                 textAlign: 'center',
               }}>
-                <p style={{ fontSize: 14, color: 'var(--muted-text)', margin: '0 0 4px' }}>No upcoming deadlines</p>
-                <p style={{ fontSize: 12, color: 'var(--text-tertiary)', margin: 0 }}>Add deadlines to applications to see them here.</p>
+                <p style={{ fontSize: 14, color: 'var(--muted-text)', margin: '0 0 4px' }}>
+                  {locale === 'ja' ? '期限のある選考はありません' : 'No upcoming deadlines'}
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--text-tertiary)', margin: 0 }}>
+                  {locale === 'ja' ? '締め切りを設定すると、ここに表示されます。' : 'Add deadlines to applications to see them here.'}
+                </p>
               </div>
             )}
 
             {/* On deck */}
             {onDeck.length > 0 && (
-              <Section title="On deck" subtitle={`${actionable.length} with upcoming deadlines`}>
+              <Section
+              title={locale === 'ja' ? '期限が近い' : 'On deck'}
+              subtitle={locale === 'ja' ? `締め切りまで${actionable.length}件` : `${actionable.length} with upcoming deadlines`}
+            >
                 <div style={{
                   border: '1px solid var(--border-gray)',
                   borderRadius: 12,
@@ -347,8 +379,8 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                           fontSize: 11, fontWeight: 500,
                           border: '1px solid var(--border-gray)',
                         }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1 }}>{days === 0 ? 'Now' : days}</div>
-                          {days !== 0 && <div style={{ fontSize: 9, marginTop: 1, opacity: 0.8 }}>{days === 1 ? 'day' : 'days'}</div>}
+                          <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1 }}>{days === 0 ? (locale === 'ja' ? '今日' : 'Now') : days}</div>
+                          {days !== 0 && <div style={{ fontSize: 9, marginTop: 1, opacity: 0.8 }}>{locale === 'ja' ? '日' : (days === 1 ? 'day' : 'days')}</div>}
                         </div>
                         <CompanyAvatar company={a.company} size={28} />
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -365,7 +397,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
 
             {/* Nudge these */}
             {stuck.length > 0 && (
-              <Section title="Nudge these" subtitle="Applied 2+ weeks ago, no movement">
+              <Section title={locale === 'ja' ? 'フォローアップ' : 'Nudge these'} subtitle={locale === 'ja' ? '2週間以上動きなし' : 'Applied 2+ weeks ago, no movement'}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
                   {stuck.map(a => {
                     const ref = a.updated_at || a.created_at;
@@ -389,7 +421,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                         <CompanyAvatar company={a.company} size={32} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.company}</div>
-                          <div style={{ fontSize: 11.5, color: 'var(--muted-text)' }}>Applied {days}d ago · no movement</div>
+                          <div style={{ fontSize: 11.5, color: 'var(--muted-text)' }}>{locale === 'ja' ? `${days}日前に応募・進展なし` : `Applied ${days}d ago · no movement`}</div>
                         </div>
                         <span style={{
                           fontSize: 11, color: 'var(--accent-blue)',
@@ -397,7 +429,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                           padding: '3px 7px', borderRadius: 5, fontWeight: 500, flexShrink: 0,
                           display: 'inline-flex', alignItems: 'center', gap: 4,
                         }}>
-                          <Mail size={10} /> Follow up
+                          <Mail size={10} /> {locale === 'ja' ? '連絡する' : 'Follow up'}
                         </span>
                       </button>
                     );
@@ -422,8 +454,8 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                     <Flame size={14} />
                   </div>
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>Momentum</div>
-                    <div style={{ fontSize: 11, color: 'var(--muted-text)' }}>Last 4 weeks</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? 'アクティビティ' : 'Momentum'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted-text)' }}>{locale === 'ja' ? '過去4週間' : 'Last 4 weeks'}</div>
                   </div>
                 </div>
                 {weeklyDelta !== 0 && (
@@ -432,7 +464,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                     color: weeklyDelta > 0 ? 'var(--green-success)' : 'var(--danger)',
                     background: weeklyDelta > 0 ? 'var(--success-bg)' : 'var(--error-bg)',
                   }}>
-                    {weeklyDelta > 0 ? '+' : ''}{weeklyDelta} vs last week
+                    {weeklyDelta > 0 ? '+' : ''}{weeklyDelta} {locale === 'ja' ? '先週比' : 'vs last week'}
                   </span>
                 )}
               </div>
@@ -442,9 +474,9 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                 marginTop: 12, paddingTop: 12,
                 borderTop: '1px solid var(--border-gray)',
               }}>
-                <AnimatedStat value={streak} label="day streak" />
-                <AnimatedStat value={weeklyCount} label="this week" />
-                <AnimatedStat value={responseRate !== null ? `${responseRate}%` : '—'} label="response rate" />
+                <AnimatedStat value={streak} label={locale === 'ja' ? '日連続' : 'day streak'} />
+                <AnimatedStat value={weeklyCount} label={locale === 'ja' ? '今週' : 'this week'} />
+                <AnimatedStat value={responseRate !== null ? `${responseRate}%` : '—'} label={locale === 'ja' ? '回答率' : 'response rate'} />
               </div>
             </div>
 
@@ -460,7 +492,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
                   }}>
                     <Trophy size={14} />
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>Moving forward</div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '選考が進んでいます' : 'Moving forward'}</div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {recentWins.map(a => (
@@ -492,7 +524,7 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
             {/* Weekly goal */}
             <div style={{ padding: 20, borderRadius: 14, border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>Weekly goal</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '週間目標' : 'Weekly goal'}</div>
                 <div style={{ fontSize: 12, color: 'var(--muted-text)', fontFamily: 'var(--mono, ui-monospace)', fontVariantNumeric: 'tabular-nums' }}>
                   {weeklyCount} / {weeklyGoal}
                 </div>
@@ -508,8 +540,8 @@ export default function TodayView({ applications, userName, onOpenApp }: TodayVi
               </div>
               <div style={{ marginTop: 10, fontSize: 12, color: 'var(--muted-text)', lineHeight: 1.5 }}>
                 {weeklyCount >= weeklyGoal
-                  ? '🎉 Goal hit — great week.'
-                  : `${weeklyGoal - weeklyCount} more to hit your goal this week.`}
+                  ? (locale === 'ja' ? '🎉 目標達成！素晴らしい週でした。' : '🎉 Goal hit — great week.')
+                  : (locale === 'ja' ? `あと${weeklyGoal - weeklyCount}社で今週の目標達成です。` : `${weeklyGoal - weeklyCount} more to hit your goal this week.`)}
               </div>
             </div>
           </div>
