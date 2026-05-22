@@ -72,7 +72,8 @@ Give me a negotiation strategy including typical salary ranges, tactics, and key
     await supabase
       .from('applications')
       .update({ ai_offer_intelligence: result })
-      .eq('id', applicationId);
+      .eq('id', applicationId)
+      .eq('user_id', userId);
 
     await recordUsage(userId, 'offer-intelligence');
     await recordEvent(userId, 'offer-intelligence', { company, role });

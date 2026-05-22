@@ -101,7 +101,8 @@ Rate how competitive this application is likely to be.`;
       await supabase
         .from('applications')
         .update({ ai_strength_signal: result })
-        .eq('id', applicationId);
+        .eq('id', applicationId)
+        .eq('user_id', userId);
     }
 
     await recordUsage(userId, 'strength-signal');

@@ -15,10 +15,16 @@ export async function GET(request: Request) {
     if (!authedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const supabase = getSupabase();
-    const [{ data: contacts }, { data: links }] = await Promise.all([
-      supabase.from('contacts').select('*').eq('user_id', authedUser.id).order('name'),
-      supabase.from('contact_applications').select('contact_id, application_id'),
-    ]);
+    const { data: contacts } = await supabase
+      .from('contacts').select('*').eq('user_id', authedUser.id).order('name');
+
+    const contactIds = (contacts ?? []).map(c => c.id);
+    const { data: links } = contactIds.length > 0
+      ? await supabase
+          .from('contact_applications')
+          .select('contact_id, application_id')
+          .in('contact_id', contactIds)
+      : { data: [] };
 
     const appIds: Record<string, string[]> = {};
     for (const row of links ?? []) {

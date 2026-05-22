@@ -29,6 +29,7 @@ import TagFilterBar from '@/components/TagFilterBar';
 import NotificationBell from '@/components/NotificationBell';
 import StreakBadge from '@/components/StreakBadge';
 import { authFetch } from '@/lib/auth-fetch';
+import { supabase } from '@/lib/supabase';
 import { LayoutDashboard, Home, Calendar, Mic, Users } from 'lucide-react';
 
 const SHUUKATSU_STAGE_LIST = SHUUKATSU_STAGES.map(s => s.id) as PipelineStage[];
@@ -107,14 +108,25 @@ function JaDashboardContent() {
 
   useEffect(() => {
     if (!user || applications.length === 0) return;
-    authFetch('/api/tags/applications').then(r => r.json()).then(d => {
-      const map: Record<string, Tag[]> = {};
-      for (const { application_id, tag } of (d.links ?? [])) {
-        (map[application_id] ??= []).push(tag);
-      }
-      setTagMap(map);
-    }).catch(() => {});
-  }, [user, applications.length]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: linkRows } = await supabase
+          .from('application_tags')
+          .select('application_id, tag_id')
+          .in('application_id', applications.map(a => a.id));
+        if (cancelled) return;
+        const map: Record<string, Tag[]> = {};
+        for (const row of (linkRows ?? []) as { application_id: string; tag_id: string }[]) {
+          const tag = allTags.find(t => t.id === row.tag_id);
+          if (!tag) continue;
+          (map[row.application_id] ??= []).push(tag);
+        }
+        setTagMap(map);
+      } catch { /* non-critical */ }
+    })();
+    return () => { cancelled = true; };
+  }, [user, applications, allTags]);
 
   const showToast = useCallback((msg: string) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);

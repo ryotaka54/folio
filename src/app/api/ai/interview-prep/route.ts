@@ -171,7 +171,8 @@ Give me a focused, high-impact interview prep plan. Quality over quantity.`;
     await supabase
       .from('applications')
       .update({ ai_interview_prep: result })
-      .eq('id', applicationId);
+      .eq('id', applicationId)
+      .eq('user_id', userId);
 
     await recordUsage(userId, 'interview-prep');
     await recordEvent(userId, 'interview-prep', { company, role, stage });
