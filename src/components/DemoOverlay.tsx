@@ -18,6 +18,10 @@ export default function DemoOverlay() {
   const [demo, setDemo] = useState<DemoState>(INITIAL_STATE);
 
   useEffect(() => {
+    // createPortal needs document.body, which doesn't exist during SSR — this
+    // mount gate prevents a hydration mismatch (server renders null, client
+    // renders the portal only after this effect fires).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     return subscribe(setDemo);
   }, []);

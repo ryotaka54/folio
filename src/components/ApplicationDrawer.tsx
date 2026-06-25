@@ -88,13 +88,6 @@ export default function ApplicationDrawer({
   const reduce = useReducedMotion();
 
   useEffect(() => {
-    setShowDeleteConfirm(false);
-    setShowInterviewPrep(false);
-    setShowCompanyDossier(false);
-    setSaveStatus('idle');
-  }, [application?.id]);
-
-  useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     if (open) window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);

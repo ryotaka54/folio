@@ -11,7 +11,11 @@ export default function StreakBadge({ onMilestone }: Props) {
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
+    // touchStreak() has side effects (reads/writes localStorage) and is
+    // idempotent per calendar day, so it must run as an effect, not during
+    // render — its return value is the actual state we want to display.
     const data = touchStreak();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStreak(data.count);
     if (data.count > 1) {
       const msg = getStreakMilestone(data.count);

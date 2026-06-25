@@ -35,20 +35,15 @@ interface ContactDrawerProps {
 export default function ContactDrawer({ contact, open, onClose, onUpdate, onDelete, applications }: ContactDrawerProps) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [linkedAppIds, setLinkedAppIds] = useState<string[]>([]);
+  // Initialized from `contact` directly — the parent remounts this component
+  // via `key={contact?.id}` whenever the selected contact changes, so this
+  // never needs to be reset by an effect.
+  const [linkedAppIds, setLinkedAppIds] = useState<string[]>(contact?.application_ids ?? []);
   const [linkSearch, setLinkSearch] = useState('');
   const [linkOpen, setLinkOpen] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const reduce = useReducedMotion();
-
-  useEffect(() => {
-    setShowDeleteConfirm(false);
-    setLinkSearch('');
-    setLinkOpen(false);
-    setSaveStatus('idle');
-    setLinkedAppIds(contact?.application_ids ?? []);
-  }, [contact?.id]);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

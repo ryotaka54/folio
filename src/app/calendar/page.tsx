@@ -1186,6 +1186,7 @@ function CalendarContent() {
 
       {/* ── Overlays ──────────────────────────────────────────────────────── */}
       <ApplicationDrawer
+        key={selectedApp?.id}
         application={selectedApp}
         open={showDrawer}
         onClose={() => { setShowDrawer(false); setSelectedApp(null); }}

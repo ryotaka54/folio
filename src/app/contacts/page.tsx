@@ -241,6 +241,7 @@ export default function ContactsPage() {
       </div>
 
       <ContactDrawer
+        key={selected?.id}
         contact={selected}
         open={drawerOpen}
         onClose={() => { setDrawerOpen(false); setSelected(null); }}

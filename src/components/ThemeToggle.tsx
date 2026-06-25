@@ -10,6 +10,10 @@ export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  // next-themes can't know the resolved theme until after mount (it reads
+  // localStorage/system preference client-side) — this gate avoids rendering
+  // the wrong theme during SSR and causing a hydration mismatch.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return <div className="w-[72px] h-6" />;

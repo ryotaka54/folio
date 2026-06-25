@@ -19,17 +19,22 @@ export default function WeeklyGoal({ applications, onToast }: Props) {
   const isMonday = new Date().getDay() === 1;
 
   useEffect(() => {
+    // getWeeklyGoal() reads localStorage, which doesn't exist during SSR —
+    // this must run client-side only, after mount.
     const stored = getWeeklyGoal();
     if (stored) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setGoalState(stored.goal);
     } else if (isMonday) {
       setShowPrompt(true);
     }
   }, [isMonday]);
 
-  // Celebrate hitting the goal
+  // Celebrate hitting the goal — celebratedGoal is a guard so onToast (a real
+  // side effect outside this component) fires exactly once per goal reached.
   useEffect(() => {
     if (goal && applied >= goal && celebratedGoal !== goal) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCelebratedGoal(goal);
       onToast?.(`Goal reached! You applied to ${applied} companies this week. 🎉`);
     }
