@@ -113,7 +113,7 @@ export default function FollowUpEmailModal({
               <Sparkles size={14} style={{ color: 'var(--accent-blue)' }} />
               <h2 className="text-[14px] font-semibold" style={{ color: 'var(--brand-navy)' }}>AI Follow-Up Email</h2>
             </div>
-            <button onClick={onClose} className="p-1 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
+            <button onClick={onClose} aria-label="Close" className="p-1 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
               <X size={16} />
             </button>
           </div>

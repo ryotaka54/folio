@@ -114,16 +114,16 @@ export default function InterviewTimeline({ steps, onUpdate, isShuukatsu = false
                   )}
                   <div className="flex items-center gap-0.5 flex-shrink-0">
                     {index > 0 && (
-                      <button onClick={(e) => { e.stopPropagation(); moveStep(index, 'up'); }} className="p-0.5 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
+                      <button onClick={(e) => { e.stopPropagation(); moveStep(index, 'up'); }} aria-label={ja ? '上に移動' : 'Move up'} className="p-0.5 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
                         <ChevronUp size={12} />
                       </button>
                     )}
                     {index < steps.length - 1 && (
-                      <button onClick={(e) => { e.stopPropagation(); moveStep(index, 'down'); }} className="p-0.5 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
+                      <button onClick={(e) => { e.stopPropagation(); moveStep(index, 'down'); }} aria-label={ja ? '下に移動' : 'Move down'} className="p-0.5 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
                         <ChevronDown size={12} />
                       </button>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); removeStep(step.id); }} className="p-0.5 rounded hover:bg-red-500/10 transition-colors" style={{ color: 'var(--muted-text)' }}>
+                    <button onClick={(e) => { e.stopPropagation(); removeStep(step.id); }} aria-label={ja ? '削除' : 'Delete step'} className="p-0.5 rounded hover:bg-red-500/10 transition-colors" style={{ color: 'var(--muted-text)' }}>
                       <Trash2 size={12} />
                     </button>
                   </div>

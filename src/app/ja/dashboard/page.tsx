@@ -47,6 +47,7 @@ function JaDashboardContent() {
   const [statusFilter, setStatusFilter] = useState<PipelineStage | 'all'>('all');
   const [hideInactive, setHideInactive] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [addModalInitialStatus, setAddModalInitialStatus] = useState<PipelineStage | undefined>(undefined);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -512,6 +513,7 @@ function JaDashboardContent() {
               stages={SHUUKATSU_STAGE_LIST}
               onCardClick={handleCardClick}
               onStatusChange={(id, status) => handleStatusChange(id, status)}
+              onAddToStage={stage => { setAddModalInitialStatus(stage); setShowAddModal(true); }}
             />
           ) : (
             <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px 80px' }}>
@@ -549,9 +551,10 @@ function JaDashboardContent() {
 
       <JaAddApplicationModal
         open={showAddModal}
-        onClose={() => setShowAddModal(false)}
+        onClose={() => { setShowAddModal(false); setAddModalInitialStatus(undefined); }}
         onSave={handleAddSave}
         stages={SHUUKATSU_STAGE_LIST}
+        initialStatus={addModalInitialStatus}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
       />

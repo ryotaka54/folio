@@ -80,6 +80,7 @@ function DashboardContent() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [addModalInitialUrl, setAddModalInitialUrl] = useState('');
+  const [addModalInitialStatus, setAddModalInitialStatus] = useState<PipelineStage | undefined>(undefined);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [showDrawer, setShowDrawer] = useState(false);
   const [ctxMenu, setCtxMenu] = useState<{ x: number; y: number; app: Application } | null>(null);
@@ -769,6 +770,7 @@ function DashboardContent() {
                 onCardClick={handleCardClick}
                 onStatusChange={(id, status) => handleStatusChange(id, status)}
                 onCardContextMenu={handleContextMenu}
+                onAddToStage={stage => { setAddModalInitialStatus(stage); setAddModalInitialUrl(''); setShowAddModal(true); }}
               />
             </div>
           ) : (
@@ -817,10 +819,11 @@ function DashboardContent() {
       {/* Add Modal */}
       <AddApplicationModal
         open={showAddModal}
-        onClose={() => { setShowAddModal(false); setAddModalInitialUrl(''); }}
+        onClose={() => { setShowAddModal(false); setAddModalInitialUrl(''); setAddModalInitialStatus(undefined); }}
         onSave={handleAddSave}
         stages={stages as PipelineStage[]}
         initialJobLink={addModalInitialUrl}
+        initialStatus={addModalInitialStatus}
         isPro={userIsPro}
         onUpgrade={() => setShowUpgradeModal(true)}
       />

@@ -195,7 +195,7 @@ export default function ImportCSVModal({ open, onClose, onImport, stages }: Prop
             <FileText size={16} style={{ color: 'var(--accent-blue)' }} />
             <span className="text-[14px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Import from CSV</span>
           </div>
-          <button onClick={handleClose} className="text-muted-text hover:text-body-text transition-colors">
+          <button onClick={handleClose} aria-label="Close" className="text-muted-text hover:text-body-text transition-colors">
             <X size={16} />
           </button>
         </div>

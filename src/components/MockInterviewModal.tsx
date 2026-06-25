@@ -395,7 +395,7 @@ export default function MockInterviewModal({ company, role, notes, applicationId
               {currentIdx + 1} / {questions.length}
             </span>
           )}
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', display: 'flex', padding: 4 }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', display: 'flex', padding: 4 }}>
             <X size={18} />
           </button>
         </div>

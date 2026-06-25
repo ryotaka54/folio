@@ -271,7 +271,7 @@ function DayPopover({
       >
         <div className="flex items-center justify-between mb-4">
           <span className="text-[14px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{label}</span>
-          <button onClick={onClose} style={{ color: 'var(--text-tertiary)' }}><X size={15} /></button>
+          <button onClick={onClose} aria-label="Close" style={{ color: 'var(--text-tertiary)' }}><X size={15} /></button>
         </div>
         <div className="space-y-1.5">
           {events.map(ev => {
@@ -362,7 +362,7 @@ function GoogleCalendarModal({
               Connect Google Calendar
             </span>
           </div>
-          <button onClick={onClose} style={{ color: 'var(--text-tertiary)' }}><X size={16} /></button>
+          <button onClick={onClose} aria-label="Close" style={{ color: 'var(--text-tertiary)' }}><X size={16} /></button>
         </div>
 
         {isConnected ? (
@@ -1021,6 +1021,7 @@ function CalendarContent() {
               onClick={() => { setWeekStart(prev => { const d = new Date(prev); d.setDate(d.getDate() - 7); return d; }); }}
               className="w-7 h-7 rounded-lg border flex items-center justify-center"
               style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+              aria-label={isJa ? '前の週' : 'Previous week'}
             >
               <ChevronLeft size={13} />
             </button>
@@ -1035,6 +1036,7 @@ function CalendarContent() {
               onClick={() => { setWeekStart(prev => { const d = new Date(prev); d.setDate(d.getDate() + 7); return d; }); }}
               className="w-7 h-7 rounded-lg border flex items-center justify-center"
               style={{ borderColor: 'var(--border-gray)', color: 'var(--muted-text)' }}
+              aria-label={isJa ? '次の週' : 'Next week'}
             >
               <ChevronRight size={13} />
             </button>

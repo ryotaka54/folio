@@ -343,6 +343,7 @@ function HallOfFameModal({ entry, onClose }: { entry: CommunityIdea; onClose: ()
       >
         <button
           onClick={onClose}
+          aria-label="Close"
           className="absolute top-4 right-4 p-1 rounded-lg transition-colors"
           style={{ color: 'var(--text-tertiary)' }}
         >

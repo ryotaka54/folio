@@ -152,11 +152,12 @@ function DraggableCard({ app, onClick }: { app: Application; onClick: () => void
 
 // ── DroppableColumn ──────────────────────────────────────────────────────────
 function DroppableColumn({
-  stage, apps, onCardClick,
+  stage, apps, onCardClick, onAddToStage,
 }: {
   stage: PipelineStage;
   apps: Application[];
   onCardClick: (app: Application) => void;
+  onAddToStage?: (stage: PipelineStage) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
   const sv = stageVars(stage);
@@ -187,13 +188,14 @@ function DroppableColumn({
           </span>
         </div>
         <button
-          onClick={() => {}}
+          onClick={() => onAddToStage?.(stage)}
           style={{
             color: 'var(--muted)', background: 'none', border: 'none',
             cursor: 'pointer', padding: 2, display: 'flex',
             borderRadius: 4,
           }}
           title={`Add to ${stage}`}
+          aria-label={`Add application to ${stage}`}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
@@ -238,10 +240,11 @@ interface PipelineViewProps {
   onCardClick: (app: Application) => void;
   onStatusChange: (appId: string, newStatus: PipelineStage) => void;
   onCardContextMenu?: (app: Application, e: React.MouseEvent) => void;
+  onAddToStage?: (stage: PipelineStage) => void;
 }
 
 export default function PipelineView({
-  applications, stages, onCardClick, onStatusChange,
+  applications, stages, onCardClick, onStatusChange, onAddToStage,
 }: PipelineViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const activeStages = stages.filter(s => !TERMINAL.has(s));
@@ -291,6 +294,7 @@ export default function PipelineView({
               stage={stage as PipelineStage}
               apps={grouped[stage] || []}
               onCardClick={onCardClick}
+              onAddToStage={onAddToStage}
             />
           ))}
         </div>

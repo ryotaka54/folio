@@ -22,6 +22,7 @@ interface AddApplicationModalProps {
   }) => Promise<void>;
   stages: PipelineStage[];
   initialJobLink?: string;
+  initialStatus?: PipelineStage;
   isPro?: boolean;
   onUpgrade?: () => void;
 }
@@ -47,7 +48,7 @@ const JA_CATEGORIES: { value: Category; label: string }[] = [
 ];
 
 export default function JaAddApplicationModal({
-  open, onClose, onSave, stages, initialJobLink, isPro = false, onUpgrade = () => {},
+  open, onClose, onSave, stages, initialJobLink, initialStatus, isPro = false, onUpgrade = () => {},
 }: AddApplicationModalProps) {
   const defaultStatus = (stages.includes('Wishlist' as PipelineStage) ? 'Wishlist' : stages[0]) as PipelineStage;
   const { isInstalled, hintCount, incrementHintCount } = useExtensionStatus();
@@ -69,7 +70,7 @@ export default function JaAddApplicationModal({
     if (open) {
       setCompany(''); setRole(''); setLocation('');
       setCategory('');
-      setStatus(defaultStatus);
+      setStatus(initialStatus ?? defaultStatus);
       setDeadline(''); setNotes(''); setError('');
       setIsAutofilling(false); setIsSaving(false);
       setJobLink(initialJobLink || '');

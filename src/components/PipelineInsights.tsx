@@ -164,7 +164,7 @@ function DeadlineCard({ app, days, onOpen, onDismiss }: {
       >
         View <ChevronRight size={11} />
       </button>
-      <button onClick={onDismiss} className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
+      <button onClick={onDismiss} aria-label="Dismiss" className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
         <X size={12} />
       </button>
     </div>
@@ -203,7 +203,7 @@ function StaleCard({ app, days, onOpen, onFollowUp, onDismiss }: {
         >
           View
         </button>
-        <button onClick={onDismiss} className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
+        <button onClick={onDismiss} aria-label="Dismiss" className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
           <X size={12} />
         </button>
       </div>
@@ -221,7 +221,7 @@ function NoActivityCard({ days, onDismiss }: { days: number; onDismiss: () => vo
       <p className="flex-1 text-[12px] leading-snug" style={{ color: 'var(--muted-text)' }}>
         No pipeline activity in <span className="font-medium" style={{ color: 'var(--body-text)' }}>{days} days</span> — recruiting seasons move fast. Time to apply somewhere new?
       </p>
-      <button onClick={onDismiss} className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
+      <button onClick={onDismiss} aria-label="Dismiss" className="opacity-40 hover:opacity-70 transition-opacity flex-shrink-0" style={{ color: 'var(--muted-text)' }}>
         <X size={12} />
       </button>
     </div>

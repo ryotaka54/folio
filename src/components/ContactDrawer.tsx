@@ -157,7 +157,7 @@ export default function ContactDrawer({ contact, open, onClose, onUpdate, onDele
                       Saved
                     </span>
                   )}
-                  <button onClick={onClose} className="p-1 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
+                  <button onClick={onClose} aria-label="Close" className="p-1 rounded hover:bg-surface-gray transition-colors" style={{ color: 'var(--muted-text)' }}>
                     <X size={16} />
                   </button>
                 </div>
