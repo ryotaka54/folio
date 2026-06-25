@@ -247,7 +247,7 @@ export default function OfferComparisonPanel({ applications }: Props) {
             background: 'var(--surface-gray)', borderBottom: '2px solid var(--border-gray)',
           }}>
             <div style={{ padding: '14px 16px', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--muted-text)' }}>COMPARISON</div>
-            {comparing.map((app, i) => {
+            {comparing.map((app) => {
               const hue = companyHue(app.company);
               return (
                 <div key={app.id} style={{ padding: '14px 16px', borderLeft: '1px solid var(--border-gray)' }}>
@@ -279,8 +279,7 @@ export default function OfferComparisonPanel({ applications }: Props) {
             { label: 'Vesting cliff', key: 'cliff', fn: (a: Application) => a.equity_cliff ? `${a.equity_cliff} months` : '—', num: () => 0 },
             { label: 'Total comp', key: 'tc', fn: (a: Application) => { const tc = totalComp(a); return tc > 0 ? `$${tc.toLocaleString()}` : '—'; }, num: totalComp, highlight: true },
             { label: 'Decision by', key: 'deadline', fn: (a: Application) => a.offer_deadline ? new Date(a.offer_deadline + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—', num: () => 0 },
-          ].map(({ label, key, fn, num, highlight }, i) => {
-            const vals = comparing.map(fn);
+          ].map(({ label, key, fn, num, highlight }) => {
             const nums = comparing.map(num);
             const winnerIdx = nums[0] !== nums[1] ? (nums[0] > nums[1] ? 0 : 1) : -1;
             return (

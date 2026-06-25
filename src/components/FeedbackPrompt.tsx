@@ -101,7 +101,7 @@ export default function FeedbackPrompt({ userId, applicationCount }: Props) {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <p className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>
-                      How's Applyd working for you?
+                      How&apos;s Applyd working for you?
                     </p>
                     <p className="text-[11px] mt-0.5" style={{ color: 'var(--muted-text)' }}>
                       Takes 5 seconds — honest answers only.

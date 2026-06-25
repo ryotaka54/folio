@@ -86,17 +86,21 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-function DeadlineInfo({ deadline }: { deadline: string | null }) {
+function deadlineLabel(deadline: string | null): { label: string; urgent: boolean } | null {
   if (!deadline) return null;
   const d = new Date(deadline + 'T00:00:00');
   const diffDays = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  let label: string;
-  let urgent: boolean;
-  if (diffDays < 0)        { label = 'Overdue'; urgent = true; }
-  else if (diffDays === 0) { label = 'Today';   urgent = true; }
-  else if (diffDays <= 3)  { label = `${diffDays}d`; urgent = true; }
-  else if (diffDays <= 7)  { label = `${diffDays}d`; urgent = false; }
-  else return null;
+  if (diffDays < 0)        return { label: 'Overdue', urgent: true };
+  if (diffDays === 0)      return { label: 'Today',   urgent: true };
+  if (diffDays <= 3)       return { label: `${diffDays}d`, urgent: true };
+  if (diffDays <= 7)       return { label: `${diffDays}d`, urgent: false };
+  return null;
+}
+
+function DeadlineInfo({ deadline }: { deadline: string | null }) {
+  const info = deadlineLabel(deadline);
+  if (!info) return null;
+  const { label, urgent } = info;
 
   return (
     <span
@@ -114,7 +118,6 @@ function DeadlineInfo({ deadline }: { deadline: string | null }) {
 function StageSection({
   stage,
   apps,
-  stages,
   defaultOpen,
   onCardClick,
   onMoveRequest,
@@ -122,7 +125,6 @@ function StageSection({
 }: {
   stage: PipelineStage;
   apps: Application[];
-  stages: PipelineStage[];
   defaultOpen: boolean;
   onCardClick: (app: Application) => void;
   onMoveRequest: (app: Application) => void;
@@ -269,7 +271,6 @@ export default function MobileCardList({ applications, stages, onCardClick, onSt
               <StageSection
                 stage={stage}
                 apps={stageApps}
-                stages={stages}
                 defaultOpen={stage !== 'Rejected' && stage !== 'Declined'}
                 onCardClick={onCardClick}
                 onMoveRequest={app => setPickerApp(app)}

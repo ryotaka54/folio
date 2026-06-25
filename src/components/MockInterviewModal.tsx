@@ -595,7 +595,7 @@ export default function MockInterviewModal({ company, role, notes, applicationId
 
             {/* Question reminder */}
             <p style={{ fontSize: 13, color: 'var(--muted-text)', marginBottom: 16, fontStyle: 'italic' }}>
-              "{currentQ.q}"
+              &quot;{currentQ.q}&quot;
             </p>
 
             {/* STAR breakdown */}

@@ -300,7 +300,7 @@ function WaveformBars({ active }: { active: boolean }) {
   );
 }
 
-function StarCard({ k, label, data }: { k: string; label: string; data: StarRating }) {
+function StarCard({ label, data }: { label: string; data: StarRating }) {
   const cfg = STAR_CFG[data.rating];
   return (
     <motion.div
@@ -1358,7 +1358,7 @@ function InterviewContent() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + i * 0.08 }}
                 >
-                  <StarCard k={k} label={STAR_LABELS[k]} data={feedback.star[k]} />
+                  <StarCard label={STAR_LABELS[k]} data={feedback.star[k]} />
                 </motion.div>
               ))}
             </div>

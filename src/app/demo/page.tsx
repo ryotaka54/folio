@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback, Suspense } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import DemoScene from './DemoScene';
 

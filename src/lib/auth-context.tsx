@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { UserProfile, Mode } from './types';
+import { UserProfile } from './types';
 import { supabase } from './supabase';
 import { identify, capture, reset as analyticsReset } from './analytics';
 
@@ -28,7 +28,7 @@ function clearStaleAuthTokens() {
     }
     // Also clear our custom key
     localStorage.removeItem('applyd-auth-token');
-  } catch (e) {
+  } catch {
     // Silent fail
   }
 }

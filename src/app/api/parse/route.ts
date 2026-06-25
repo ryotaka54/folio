@@ -45,9 +45,9 @@ export async function POST(request: Request) {
     ph.capture({ distinctId: 'server', event: 'autofill_parse_success', properties: { has_company: !!company, has_role: !!role, has_location: !!location } });
     return NextResponse.json({ company, role, location, category: guessCategory(role, url) });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     ph.capture({ distinctId: 'server', event: 'autofill_parse_failed', properties: { reason: 'exception' } });
-    console.error('Job scraping failed:', error.message);
+    console.error('Job scraping failed:', error instanceof Error ? error.message : error);
     return NextResponse.json({ error: 'Failed to extract job details' }, { status: 500 });
   }
 }

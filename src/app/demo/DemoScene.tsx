@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Application, PipelineStage, Category } from '@/lib/types';
-import { INTERNSHIP_STAGES, STAGE_COLORS } from '@/lib/constants';
+import { STAGE_COLORS } from '@/lib/constants';
 import StatsBar from '@/components/StatsBar';
 import FunnelChart from '@/components/FunnelChart';
 import ApplicationCard from '@/components/ApplicationCard';
@@ -337,8 +337,6 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
   const [cursorY,       setCursorY]       = useState(40);
   const [cursorVisible, setCursorVisible] = useState(false);
   const [highlightBtn,  setHighlightBtn]  = useState(false);
-  const [movingCardId,  setMovingCardId]  = useState<string | null>(null);
-  const [actNowPulse,   setActNowPulse]   = useState(false);
   const [highlightCard, setHighlightCard] = useState<string | null>(null);
   const [tooltipText,   setTooltipText]   = useState<string | null>(null);
   const [phoneStage,    setPhoneStage]    = useState<'hidden'|'in'|'tapping'|'popup'|'out'>('hidden');
@@ -371,7 +369,7 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
     setApps([]); setModalOpen(false);
     setModalFields({ company: '', role: '', category: '', status: '', deadline: '' });
     setHighlightSave(false); setCursorVisible(false); setHighlightBtn(false);
-    setMovingCardId(null); setActNowPulse(false); setHighlightCard(null);
+    setHighlightCard(null);
     setTooltipText(null); setPhoneStage('hidden'); setFunnelVisible(false);
     setEndSlate(false); setFadingOut(false); setPhase(0);
   }, []);
@@ -419,7 +417,6 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
         for (let i = 1; i <= 4; i++) {
           await psleep(440);
           setApps(prev => [...prev, ALL_APPS[i]]);
-          if (i === 3) { setActNowPulse(true); setTimeout(() => setActNowPulse(false), 1800); }
         }
         await psleep(1200);
       }
@@ -428,24 +425,21 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
       if (PHASE_LIST.includes(4)) {
         setPhase(4);
         const movingId = ALL_APPS[1].id;
-        setMovingCardId(movingId);
         await psleep(1000);
         setApps(prev => prev.map(a => a.id === movingId ? { ...a, status: 'OA / Online Assessment' as PipelineStage } : a));
-        setMovingCardId(null);
         await psleep(1200);
       }
 
       // Phase 5 — deadline alert
       if (PHASE_LIST.includes(5)) {
         setPhase(5);
-        setActNowPulse(true);
         await psleep(700);
         const dlCardId = ALL_APPS[3].id;
         setHighlightCard(dlCardId);
         await psleep(600);
         setTooltipText(`⚠ Deadline approaching — ${ALL_APPS[3].company}`);
         await psleep(2200);
-        setTooltipText(null); setActNowPulse(false); setHighlightCard(null);
+        setTooltipText(null); setHighlightCard(null);
         await psleep(600);
       }
 

@@ -75,7 +75,7 @@ function OfferMockup() {
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-navy)' }}>Offer Negotiation Guide</span>
         </div>
         <div style={{ fontSize: 11, color: 'var(--muted-text)', lineHeight: 1.5 }}>
-          Market range for SWE at Stripe, SF: <span style={{ color: 'var(--brand-navy)', fontWeight: 600 }}>$165k–$210k</span>. Your offer of $170k sits in the 35th percentile. Counter at $195k — here's the script…
+          Market range for SWE at Stripe, SF: <span style={{ color: 'var(--brand-navy)', fontWeight: 600 }}>$165k–$210k</span>. Your offer of $170k sits in the 35th percentile. Counter at $195k — here&apos;s the script…
         </div>
       </div>
       <div style={{ borderRadius: 10, border: '1px solid rgba(124,58,237,0.2)', background: 'rgba(124,58,237,0.04)', padding: '11px 14px' }}>

@@ -211,7 +211,7 @@ export default function NotificationBell({ userId, applications, onOpenApp }: No
           {/* List */}
           {notifications.length === 0 ? (
             <div style={{ padding: '28px 16px', textAlign: 'center' }}>
-              <p style={{ fontSize: 13, color: 'var(--muted-text)', margin: 0 }}>You're all caught up</p>
+              <p style={{ fontSize: 13, color: 'var(--muted-text)', margin: 0 }}>You&apos;re all caught up</p>
             </div>
           ) : (
             <div style={{ maxHeight: 360, overflowY: 'auto' }}>

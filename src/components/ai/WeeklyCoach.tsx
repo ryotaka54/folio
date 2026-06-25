@@ -52,7 +52,6 @@ export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
   const [data, setData] = useState<CoachData | null>(null);
   const [loading, setLoading] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined' && localStorage.getItem(getDismissKey())) {
@@ -72,7 +71,7 @@ export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
         if (json.error) throw new Error(json.error);
         setData(json.result);
       })
-      .catch((e: Error) => setError(e.message))
+      .catch((e: Error) => console.error('Weekly coach fetch failed:', e.message))
       .finally(() => setLoading(false));
   }, [isPro, dismissed]);
 

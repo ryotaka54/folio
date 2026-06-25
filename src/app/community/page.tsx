@@ -12,13 +12,11 @@ import { isPro } from '@/lib/pro';
 import ThemeToggle from '@/components/ThemeToggle';
 import Toast from '@/components/Toast';
 import {
-  CHALLENGE_START_DATE,
   getChallengeDay,
   hasVotedToday,
   markVotedToday,
   secondsUntilMidnight,
   type CommunityIdea,
-  type ChallengeConfig,
 } from '@/lib/community';
 
 // ── Shimmer keyframe (injected once) ────────────────────────────────────────
@@ -414,7 +412,6 @@ export default function CommunityPage() {
   const [ideas, setIdeas] = useState<CommunityIdea[]>([]);
   const [winner, setWinner] = useState<CommunityIdea | null>(null);
   const [hallOfFame, setHallOfFame] = useState<CommunityIdea[]>([]);
-  const [config, setConfig] = useState<ChallengeConfig | null>(null);
   const [loading, setLoading] = useState(true);
 
   // ── UI state
@@ -446,8 +443,6 @@ export default function CommunityPage() {
         ]);
 
         if (configRes.data) {
-          setConfig(configRes.data as ChallengeConfig);
-
           // Fetch today's winner if set
           if (configRes.data.current_day_winner_id) {
             const { data: w } = await supabase

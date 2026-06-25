@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Sparkles, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
 import ProGate from '@/components/ProGate';
 import { authFetch } from '@/lib/auth-fetch';
 

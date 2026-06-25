@@ -105,9 +105,9 @@ export function StoreProvider({ children, userId, isPro = false }: { children: R
     }
 
     const now = new Date().toISOString();
-    const payload = { ...appData, user_id: userId, created_at: now, updated_at: now };
     // Temporarily omit interview_steps until it is created in the production database
-    delete (payload as any).interview_steps;
+    const { interview_steps: _omitSteps, ...appDataNoSteps } = appData;
+    const payload = { ...appDataNoSteps, user_id: userId, created_at: now, updated_at: now };
 
     const { data, error } = await supabase
       .from('applications')
@@ -134,8 +134,9 @@ export function StoreProvider({ children, userId, isPro = false }: { children: R
   }, [userId]);
 
   const updateApplication = useCallback(async (id: string, updates: Partial<Application>): Promise<void> => {
-    const updatedFields = { ...updates, updated_at: new Date().toISOString() };
-    delete (updatedFields as any).interview_steps; // Temp fix until db column exists
+    // Temp fix until db column exists
+    const { interview_steps: _omitSteps, ...updatesNoSteps } = updates;
+    const updatedFields = { ...updatesNoSteps, updated_at: new Date().toISOString() };
 
     // Optimistic update — capture snapshot for rollback
     let snapshot: Application[] = [];

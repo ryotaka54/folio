@@ -39,9 +39,7 @@ export default function JaLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {/* Next.js hoists these <link> tags to <head> automatically from Server Components */}
-      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
-      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link

@@ -534,7 +534,7 @@ function AISection() {
 // ─── Section: Appearance ──────────────────────────────────────────────────────
 
 function AppearanceSection() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [themeSaved, setThemeSaved] = useState(false);
   const themeSavedTimer = useRef<NodeJS.Timeout | null>(null);

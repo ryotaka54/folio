@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronLeft, ChevronRight, Calendar, Lightbulb,
+  ChevronLeft, ChevronRight, Calendar,
   X, ExternalLink, CheckCircle, LayoutDashboard, Mic, Home, Users,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -303,13 +303,12 @@ function DayPopover({
 // ── Google Calendar modal ────────────────────────────────────────────────────
 
 function GoogleCalendarModal({
-  onClose, isConnected, connectedEmail, userId, onConnect, onDisconnect,
+  onClose, isConnected, connectedEmail, userId, onDisconnect,
 }: {
   onClose: () => void;
   isConnected: boolean;
   connectedEmail: string | null;
   userId: string;
-  onConnect: () => void;
   onDisconnect: () => void;
 }) {
   useEffect(() => {
@@ -584,12 +583,11 @@ function CalendarGrid({
 // ── Mobile week view ─────────────────────────────────────────────────────────
 
 function MobileWeekView({
-  weekStart, eventsByDate, onEventClick, onMoreClick,
+  weekStart, eventsByDate, onEventClick,
 }: {
   weekStart: Date;
   eventsByDate: Record<string, CalEvent[]>;
   onEventClick: (app: Application) => void;
-  onMoreClick: (date: string, events: CalEvent[]) => void;
 }) {
   const today = todayYMD();
   const days = Array.from({ length: 7 }, (_, i) => {
@@ -805,7 +803,6 @@ function CalendarContent() {
     upcoming: events.filter(e => e.date >= today).length,
     thisWeek: events.filter(e => e.date >= today && e.date <= in7).length,
     interviews: events.filter(e => e.type === 'interview' && e.date >= today).length,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [events, today, in7]);
 
   const handleCardClick = useCallback((app: Application) => {
@@ -1099,7 +1096,6 @@ function CalendarContent() {
                     weekStart={weekStart}
                     eventsByDate={eventsByDate}
                     onEventClick={handleCardClick}
-                    onMoreClick={(date, evs) => setPopover({ date, events: evs })}
                   />
                   {/* Upcoming — next events beyond the visible week */}
                   {(() => {
@@ -1213,7 +1209,6 @@ function CalendarContent() {
             isConnected={isGCalConnected}
             connectedEmail={gCalEmail}
             userId={user.id}
-            onConnect={() => setIsGCalConnected(true)}
             onDisconnect={handleDisconnect}
           />
         )}

@@ -301,7 +301,7 @@ function WaveformBars({ active }: { active: boolean }) {
   );
 }
 
-function StarCard({ k, label, data }: { k: string; label: string; data: StarRating }) {
+function StarCard({ label, data }: { label: string; data: StarRating }) {
   const cfg = STAR_CFG[data.rating];
   return (
     <motion.div
@@ -1458,7 +1458,7 @@ function InterviewContent() {
 
             {/* Question reminder */}
             <p style={{ fontSize: 13, color: 'var(--muted-text)', marginBottom: 20, fontStyle: 'italic', borderLeft: '2px solid var(--border-gray)', paddingLeft: 14 }}>
-              "{currentQ.q}"
+              &quot;{currentQ.q}&quot;
             </p>
 
             {/* Leaderboard consent / posted status */}
@@ -1517,7 +1517,7 @@ function InterviewContent() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + i * 0.08 }}
                 >
-                  <StarCard k={k} label={k.charAt(0).toUpperCase() + k.slice(1)} data={feedback.star[k]} />
+                  <StarCard label={k.charAt(0).toUpperCase() + k.slice(1)} data={feedback.star[k]} />
                 </motion.div>
               ))}
             </div>

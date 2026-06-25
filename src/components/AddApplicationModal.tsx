@@ -94,7 +94,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
       setCompanyInfo(info);
     }, 400);
     return () => { if (companyLookupTimer.current) clearTimeout(companyLookupTimer.current); };
-  }, [company]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [company]);
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };

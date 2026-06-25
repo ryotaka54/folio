@@ -8,7 +8,7 @@ import LocaleSwitcher from '@/components/LocaleSwitcher';
 import { Logo } from '@/components/Logo';
 import { useAuth } from '@/lib/auth-context';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
-import { motion, useInView } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Data

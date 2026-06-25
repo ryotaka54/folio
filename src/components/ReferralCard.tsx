@@ -117,7 +117,7 @@ export default function ReferralCard() {
 
   if (!data) return null;
 
-  const { confirmedCount, progressInCurrentCycle, nextRewardAt, rewardEvery, rewardsGranted, referrals } = data;
+  const { confirmedCount, progressInCurrentCycle, rewardEvery, rewardsGranted, referrals } = data;
   const pct = Math.min((progressInCurrentCycle / rewardEvery) * 100, 100);
   const remaining = rewardEvery - progressInCurrentCycle;
 

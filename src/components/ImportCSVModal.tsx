@@ -3,7 +3,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Upload, X, Check, AlertCircle, FileText } from 'lucide-react';
 import type { PipelineStage, Category } from '@/lib/types';
-import { INTERNSHIP_STAGES, JOB_STAGES } from '@/lib/constants';
 
 interface ImportRow {
   company: string;
@@ -22,8 +21,6 @@ interface Props {
   onImport: (rows: ImportRow[]) => Promise<void>;
   stages: PipelineStage[];
 }
-
-const ALL_STAGES = [...new Set([...INTERNSHIP_STAGES, ...JOB_STAGES])] as PipelineStage[];
 
 const VALID_CATEGORIES = new Set<string>([
   'Engineering', 'Product Management', 'Design', 'Data Science', 'Finance',

@@ -17,7 +17,7 @@ const migrations = [
 for (const file of migrations) {
   console.log(`\nRunning: ${file}`);
   const sql = readFileSync(file, 'utf8');
-  const { error } = await admin.rpc('exec_sql', { sql }).catch(() => ({ error: null }));
+  await admin.rpc('exec_sql', { sql }).catch(() => ({ error: null }));
 
   // Supabase JS client doesn't support raw SQL directly — use fetch against the REST API
   const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec_sql`, {

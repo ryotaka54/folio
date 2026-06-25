@@ -184,7 +184,7 @@ function QuestionBlock({ group, user, companySlug }: { group: QuestionGroup; use
       <div style={{ padding: '20px 22px', borderBottom: '1px solid var(--border-gray)', background: 'var(--surface-gray)' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--brand-navy)', margin: 0, lineHeight: 1.55, flex: 1 }}>
-            "{group.question}"
+            &quot;{group.question}&quot;
           </p>
           <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: 'rgba(37,99,235,0.1)', color: '#2563EB', whiteSpace: 'nowrap', flexShrink: 0, letterSpacing: '0.04em' }}>
             {group.question_type.toUpperCase()}
