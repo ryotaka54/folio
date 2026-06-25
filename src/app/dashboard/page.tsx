@@ -121,6 +121,8 @@ function DashboardContent() {
       .map(app => ({ ...app, tags: tagMap[app.id] ?? app.tags ?? [] }));
   }, [displayApplications, hideInactive, statusFilter, activeTags, tagMap]);
 
+  const hiddenCount = hideInactive ? displayApplications.filter(a => inactiveStatuses.includes(a.status)).length : 0;
+
   const showToast = (msg: string, undoFn?: () => void) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToast(msg);
@@ -694,6 +696,18 @@ function DashboardContent() {
                 activeStage={statusFilter}
                 onStageClick={s => setStatusFilter(s)}
               />
+            </div>
+          )}
+
+          {/* Hidden apps notice */}
+          {hiddenCount > 0 && (
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '6px 24px 0' }}>
+              <button
+                onClick={() => setHideInactive(false)}
+                style={{ fontSize: 12, color: 'var(--muted-text)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}
+              >
+                {hiddenCount} rejected app{hiddenCount !== 1 ? 's' : ''} hidden — <span style={{ color: 'var(--accent-blue)', textDecoration: 'underline' }}>show</span>
+              </button>
             </div>
           )}
 

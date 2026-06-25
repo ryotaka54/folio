@@ -60,8 +60,8 @@ export default function PipelineBar({ applications, stages, activeStage, onStage
       background: 'var(--card-bg)',
       borderBottom: '1px solid var(--border-gray)',
     }}>
-      {/* Proportional stacked bar */}
-      <div style={{
+      {/* Proportional stacked bar — only shown when 2+ active-stage apps exist */}
+      {total >= 2 && <div style={{
         display: 'flex',
         width: '100%',
         height: 8,
@@ -71,9 +71,7 @@ export default function PipelineBar({ applications, stages, activeStage, onStage
         border: '1px solid var(--border-gray)',
         marginBottom: 12,
       }}>
-        {total === 0 ? (
-          <div style={{ flex: 1, background: 'var(--surface-gray)' }} />
-        ) : activeStages.map(stage => {
+        {activeStages.map(stage => {
           const count = counts[stage] || 0;
           if (count === 0) return null;
           const color = STAGE_COLORS[stage] || '#6B7280';
@@ -95,7 +93,7 @@ export default function PipelineBar({ applications, stages, activeStage, onStage
             />
           );
         })}
-      </div>
+      </div>}
 
       {/* Stage chips */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
