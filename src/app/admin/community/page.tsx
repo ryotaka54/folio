@@ -66,6 +66,9 @@ export default function AdminCommunityPage() {
   }, []);
 
   useEffect(() => {
+    // loadIdeas synchronously calls setLoading(true) before its first
+    // await — that's the fetch-trigger pattern, not a derived value.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (isAdmin) loadIdeas();
   }, [isAdmin, loadIdeas]);
 

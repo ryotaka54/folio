@@ -845,6 +845,9 @@ export default function TutorialOverlay() {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const positionRafRef = useRef<number | null>(null);
 
+  // Mount gate avoids a hydration mismatch for the DOM-dependent spotlight
+  // logic below, which can't run until after the client has mounted.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
 
   // Mobile detection
@@ -885,9 +888,12 @@ export default function TutorialOverlay() {
     handleComplete();
   }, [handleComplete]);
 
-  // Update spotlight position when step changes
+  // Update spotlight position when step changes — synchronizes with the DOM
+  // (querySelector/getBoundingClientRect/scrollIntoView), so it must run
+  // post-render; the early-exit reset below is part of that same sync.
   useEffect(() => {
     if (!isActive || !mounted || !step || step.type === 'modal') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTooltipVisible(false);
       return;
     }
@@ -960,7 +966,7 @@ export default function TutorialOverlay() {
       if (e.target instanceof HTMLButtonElement || e.target instanceof HTMLInputElement) return;
       if (e.key === 'ArrowRight' || e.key === 'Enter') {
         e.preventDefault();
-        isLast ? handleComplete() : next();
+        if (isLast) handleComplete(); else next();
       }
       if (e.key === 'ArrowLeft') {
         e.preventDefault();

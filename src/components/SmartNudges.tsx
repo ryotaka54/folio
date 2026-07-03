@@ -50,7 +50,7 @@ export default function SmartNudges({ applications, onAddApp, onOpenApp }: Props
             <div className="flex items-center gap-2 flex-shrink-0">
               {nudge.action && (
                 <button
-                  onClick={() => { nudge.appId ? onOpenApp?.(nudge.appId) : onAddApp?.(); dismiss(nudge.id); }}
+                  onClick={() => { if (nudge.appId) onOpenApp?.(nudge.appId); else onAddApp?.(); dismiss(nudge.id); }}
                   className="flex items-center gap-1 text-[11px] font-semibold transition-opacity hover:opacity-70"
                   style={{ color: 'var(--accent-blue)' }}
                 >

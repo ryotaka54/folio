@@ -24,8 +24,8 @@ interface Props {
 
 // ── Confetti burst ────────────────────────────────────────────────────────────
 
-function ConfettiBurst() {
-  const pieces = Array.from({ length: 16 }, (_, i) => ({
+function generateConfettiPieces() {
+  return Array.from({ length: 16 }, (_, i) => ({
     id: i,
     color: ['#EF4444', '#fff', '#1E3A8A', '#F59E0B', '#22C55E'][i % 5],
     left: `${Math.random() * 100}%`,
@@ -33,6 +33,10 @@ function ConfettiBurst() {
     delay: `${Math.random() * 0.4}s`,
     duration: `${0.8 + Math.random() * 0.6}s`,
   }));
+}
+
+function ConfettiBurst() {
+  const pieces = generateConfettiPieces();
 
   return (
     <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>

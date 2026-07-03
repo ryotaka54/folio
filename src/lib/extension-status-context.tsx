@@ -30,6 +30,9 @@ export function ExtensionStatusProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // localStorage isn't available during SSR — read it client-side, after
+    // mount; mounted also gates the message-listener effect below.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     setIsInstalled(localStorage.getItem(LS_INSTALLED) === 'true');
     setIsDismissed(localStorage.getItem(LS_DISMISSED) === 'true');
@@ -42,7 +45,7 @@ export function ExtensionStatusProvider({ children }: { children: ReactNode }) {
     if (user?.id) {
       supabase.from('users').update({ extension_installed: true }).eq('id', user.id).then(() => {});
     }
-  }, [user?.id]);
+  }, [user]);
 
   useEffect(() => {
     if (!mounted) return;
@@ -63,7 +66,7 @@ export function ExtensionStatusProvider({ children }: { children: ReactNode }) {
     if (user?.id) {
       supabase.from('users').update({ extension_banner_dismissed: true }).eq('id', user.id).then(() => {});
     }
-  }, [user?.id]);
+  }, [user]);
 
   const incrementHintCount = useCallback((): number => {
     const next = hintCount + 1;
@@ -73,7 +76,7 @@ export function ExtensionStatusProvider({ children }: { children: ReactNode }) {
       supabase.from('users').update({ extension_hint_count: next }).eq('id', user.id).then(() => {});
     }
     return next;
-  }, [hintCount, user?.id]);
+  }, [hintCount, user]);
 
   const isBannerEligible = useCallback((createdAt?: string): boolean => {
     if (!createdAt) return false;

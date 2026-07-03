@@ -93,6 +93,9 @@ export default function JaOnboarding() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [saving, setSaving] = useState(false);
 
+  // Mount gate avoids a hydration mismatch for the theme-class sync below,
+  // which reads resolvedTheme (only resolved client-side by next-themes).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
 
   // Preserve the user's theme preference in the cookie so it survives this page

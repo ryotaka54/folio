@@ -54,13 +54,18 @@ export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
+    // localStorage isn't available during SSR — read it client-side, after mount.
     if (typeof window !== 'undefined' && localStorage.getItem(getDismissKey())) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDismissed(true);
     }
   }, []);
 
   useEffect(() => {
     if (!isPro || dismissed || !shouldShowCoach()) return;
+    // Kicks off the API fetch below — part of the same synchronization
+    // with the external request, not a derived value.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     authFetch('/api/ai/weekly-coach', {
       method: 'POST',

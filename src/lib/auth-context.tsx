@@ -109,7 +109,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Load session on mount
+  // Load session on mount — loadProfile is intentionally excluded from deps:
+  // it's an inline async fn that would be recreated every render, so including
+  // it would trigger an infinite re-initialization loop.
   useEffect(() => {
     let mounted = true;
     let resolved = false;
@@ -187,7 +189,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const signUp = useCallback(async (email: string, password: string) => {
     // Clear any stale tokens before signup

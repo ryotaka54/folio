@@ -65,6 +65,7 @@ function toYMD(d: Date): string {
 }
 
 function todayYMD(): string { return toYMD(new Date()); }
+function in30DaysYMD(): string { return toYMD(new Date(Date.now() + 30 * 86400000)); }
 
 function classifyEvent(app: Application): EventType | null {
   if (!app.deadline) return null;
@@ -427,7 +428,7 @@ function GoogleCalendarModal({
 
 function UpcomingSidebar({ events, onEventClick }: { events: CalEvent[]; onEventClick: (app: Application) => void }) {
   const today = todayYMD();
-  const in30 = toYMD(new Date(Date.now() + 30 * 86400000));
+  const in30 = in30DaysYMD();
 
   const overdue = events.filter(e => e.date < today && e.type !== 'overdue' ? false : e.type === 'overdue');
   const upcoming = events

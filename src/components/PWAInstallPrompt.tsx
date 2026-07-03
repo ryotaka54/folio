@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -100,7 +101,7 @@ export default function PWAInstallPrompt() {
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-        <img src="/icons/icon-96.png" alt="Applyd" width={36} height={36} style={{ borderRadius: 9, flexShrink: 0 }} />
+        <Image src="/icons/icon-96.png" alt="Applyd" width={36} height={36} style={{ borderRadius: 9, flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>
             Add Applyd to {osLabel}

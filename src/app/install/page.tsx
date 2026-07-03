@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Logo } from '@/components/Logo';
 
 type OS = 'mac' | 'windows' | 'other';
@@ -106,6 +107,9 @@ export default function InstallPage() {
   const [installing, setInstalling] = useState(false);
 
   useEffect(() => {
+    // These all read browser-only APIs (navigator/matchMedia), unavailable
+    // during SSR — detect client-side, after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOs(detectOS());
     setBrowser(detectBrowser());
     setInstalled(isStandalone());
@@ -191,7 +195,7 @@ export default function InstallPage() {
                 className="w-20 h-20 rounded-[22px] mx-auto mb-6 flex items-center justify-center shadow-xl"
                 style={{ background: '#2563EB' }}
               >
-                <img src="/icons/icon-96.png" alt="Applyd" width={64} height={64} style={{ borderRadius: 14 }} />
+                <Image src="/icons/icon-96.png" alt="Applyd" width={64} height={64} style={{ borderRadius: 14 }} />
               </div>
               <h1 className="text-[36px] font-semibold mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}>
                 Applyd for {platformLabel}

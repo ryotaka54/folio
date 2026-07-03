@@ -69,6 +69,9 @@ export default function StrengthSignal({
 
   useEffect(() => {
     if (!company.trim() || !role.trim() || triggered || data) return;
+    // Kicks off the API fetch below — triggered/loading are part of that
+    // same synchronization with the external request, not a derived value.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTriggered(true);
     setLoading(true);
     authFetch('/api/ai/strength-signal', {

@@ -131,7 +131,7 @@ export function StoreProvider({ children, userId, isPro = false }: { children: R
     }
 
     return app;
-  }, [userId]);
+  }, [userId, isPro]);
 
   const updateApplication = useCallback(async (id: string, updates: Partial<Application>): Promise<void> => {
     // Temp fix until db column exists

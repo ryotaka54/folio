@@ -640,6 +640,9 @@ export default function ProductWalkthrough({ locale = 'en' }: { locale?: 'en' | 
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // window.matchMedia isn't available during SSR — read the initial value
+    // client-side, then subscribe for live changes below.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReducedMotion(mq.matches);
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener('change', handler);

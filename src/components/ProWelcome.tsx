@@ -32,6 +32,10 @@ export default function ProWelcome({ onDone }: ProWelcomeProps) {
   const [stars, setStars] = useState<{ x: number; y: number; delay: number; size: number }[]>([]);
 
   useEffect(() => {
+    // Math.random() during render would differ between server and client and
+    // cause a hydration mismatch — generate the decorative star positions
+    // client-side only, after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStars(Array.from({ length: 24 }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,

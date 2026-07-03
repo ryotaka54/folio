@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 435" width="800" height="870">
+  <!-- Furukawa Farms Brand Seal — vector recreation of hexagon mark -->
+
+  <!-- Hexagon (pointy-top, center 200,185, circumradius 155) -->
+  <polygon
+    points="200,30 334,108 334,263 200,340 66,263 66,108"
+    fill="none"
+    stroke="#000000"
+    stroke-width="5"
+    stroke-linejoin="miter"
+  />
+
+  <!-- 竜 kanji centered inside hexagon -->
+  <text
+    x="200"
+    y="185"
+    font-family="'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', 'MS Mincho', serif"
+    font-size="175"
+    font-weight="700"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    fill="#000000"
+  >竜</text>
+
+  <!-- FURUKAWA FARMS — curved arc below hexagon -->
+  <!-- Arc: center (200,200), radius 215; from (71,372) clockwise to (329,372) -->
+  <defs>
+    <path id="furukawa-arc" d="M 71,372 A 215,215 0 0,1 329,372"/>
+  </defs>
+  <text
+    font-family="'Futura', 'Century Gothic', 'Avenir', 'Trebuchet MS', Arial, sans-serif"
+    font-size="22"
+    letter-spacing="5"
+    fill="#000000"
+  >
+    <textPath href="#furukawa-arc" startOffset="50%" text-anchor="middle">FURUKAWA FARMS</textPath>
+  </text>
+</svg>

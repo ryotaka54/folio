@@ -44,7 +44,12 @@ export const TestimonialStack = ({ testimonials, visibleBehind = 2 }: Testimonia
     cardRefs.current[activeIndex]?.classList.add('is-dragging');
   };
 
+  // React Compiler can't preserve memoization here (known limitation with
+  // closures passed to addEventListener/removeEventListener pairs below) —
+  // the manual useCallback is required so the listener cleanup matches by
+  // reference.
   const handleDragMove = useCallback(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     (e: MouseEvent | TouchEvent) => {
       if (!isDragging) return;
       const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;

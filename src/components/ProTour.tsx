@@ -445,6 +445,8 @@ export default function ProTour({ onDone }: ProTourProps) {
   const [spotVisible, setSpotVisible] = useState(false);
   const posRafRef = useRef<number | null>(null);
 
+  // Mount gate avoids SSR/CSR mismatches for the window-size check below.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -492,9 +494,12 @@ export default function ProTour({ onDone }: ProTourProps) {
     return () => window.removeEventListener('keydown', fn);
   }, [handleSkip, next, prev]);
 
-  // Spotlight positioning
+  // Spotlight positioning — this effect synchronizes with the DOM
+  // (querySelector/getBoundingClientRect/scrollIntoView), so it must run
+  // post-render; the setSpotVisible(false) resets are part of that same sync.
   useEffect(() => {
     if (!mounted || !currentStep || currentStep.type !== 'spotlight') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSpotVisible(false);
       return;
     }

@@ -40,6 +40,8 @@ import PipelineBar from '@/components/PipelineBar';
 import NotificationBell from '@/components/NotificationBell';
 import { LayoutDashboard, Calendar, Mic, Home, Users } from 'lucide-react';
 
+const INACTIVE_STATUSES = ['Rejected', 'Declined'];
+
 const DEMO_APPS_INTERNSHIP: Application[] = [
   { id: 'demo-1', user_id: 'demo', company: 'Stripe', role: 'Software Engineer Intern', location: 'San Francisco, CA', category: 'Engineering', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
   { id: 'demo-2', user_id: 'demo', company: 'Google', role: 'PM Intern', location: 'Mountain View, CA', category: 'Product Management', status: 'Applied', deadline: null, job_link: '', notes: '', recruiter_name: '', recruiter_email: '', interview_steps: [], created_at: '', updated_at: '' },
@@ -103,7 +105,6 @@ function DashboardContent() {
   const firstAppTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const stages = user?.mode === 'job' ? JOB_STAGES : INTERNSHIP_STAGES;
-  const inactiveStatuses = ['Rejected', 'Declined'];
   const offerCount = applications.filter(a => ['Offer', 'Offer — Negotiating', 'Accepted'].includes(a.status)).length;
 
   const displayApplications = useMemo(
@@ -114,7 +115,7 @@ function DashboardContent() {
   const filteredApps = useMemo(() => {
     return displayApplications
       .filter(app => {
-        if (hideInactive && inactiveStatuses.includes(app.status)) return false;
+        if (hideInactive && INACTIVE_STATUSES.includes(app.status)) return false;
         if (statusFilter !== 'all' && app.status !== statusFilter) return false;
         if (activeTags.length > 0 && !activeTags.every(tid => (tagMap[app.id] ?? []).some(t => t.id === tid))) return false;
         return true;
@@ -122,7 +123,7 @@ function DashboardContent() {
       .map(app => ({ ...app, tags: tagMap[app.id] ?? app.tags ?? [] }));
   }, [displayApplications, hideInactive, statusFilter, activeTags, tagMap]);
 
-  const hiddenCount = hideInactive ? displayApplications.filter(a => inactiveStatuses.includes(a.status)).length : 0;
+  const hiddenCount = hideInactive ? displayApplications.filter(a => INACTIVE_STATUSES.includes(a.status)).length : 0;
 
   const showToast = (msg: string, undoFn?: () => void) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -316,11 +317,13 @@ function DashboardContent() {
     }
   }, [user, startTutorial, applications]);
 
-  // Cleanup timers on unmount
+  // Cleanup timers on unmount — these are user-managed timer refs (not DOM
+  // node refs), so reading .current in cleanup is correct: we intentionally
+  // want the value at unmount time, not at setup time when they're all null.
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-      if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+      if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current); // eslint-disable-line react-hooks/exhaustive-deps
       if (firstAppTimerRef.current) clearTimeout(firstAppTimerRef.current);
     };
   }, []);

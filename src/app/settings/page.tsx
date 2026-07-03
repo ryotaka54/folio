@@ -157,16 +157,23 @@ function InlineToast({ message, type, onDismiss }: { message: string | null; typ
 function ProfileSection({ showToast }: { showToast: (msg: string, type?: 'success' | 'error') => void }) {
   const { user, updateProfile } = useAuth();
   const [name, setName] = useState(user?.name ?? '');
+  const [prevUserName, setPrevUserName] = useState(user?.name);
   const [email, setEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const dirty = name !== (user?.name ?? '');
 
-  useEffect(() => {
+  // user?.name loads asynchronously from auth context; reset the editable
+  // draft to match it once it (re)settles, without clobbering in-progress edits.
+  if (user?.name !== prevUserName) {
+    setPrevUserName(user?.name);
     setName(user?.name ?? '');
+  }
+
+  useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user?.email) setEmail(data.user.email);
     });
-  }, [user?.name]);
+  }, []);
 
   const handleSave = async () => {
     if (!dirty || saving) return;
@@ -393,6 +400,9 @@ function TargetField({ storageKey, placeholder }: { storageKey: string; placehol
   const savedTimer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    // localStorage isn't available during SSR — read the stored value
+    // client-side, after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (storageKey) setValue(localStorage.getItem(storageKey) ?? '');
     return () => { if (savedTimer.current) clearTimeout(savedTimer.current); };
   }, [storageKey]);
@@ -539,6 +549,9 @@ function AppearanceSection() {
   const [themeSaved, setThemeSaved] = useState(false);
   const themeSavedTimer = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
+    // next-themes can't resolve the theme until after mount — this gate
+    // avoids rendering the wrong theme during SSR and a hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     return () => { if (themeSavedTimer.current) clearTimeout(themeSavedTimer.current); };
   }, []);
@@ -1332,7 +1345,10 @@ function SettingsPageInner() {
   const { user, loading } = useAuth();
   const [isJa, setIsJa] = useState(false);
   useEffect(() => {
+    // document.cookie isn't available during SSR — read it client-side,
+    // after mount.
     const cookiePref = document.cookie.match(/locale_preference=([^;]+)/)?.[1];
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsJa(
       cookiePref === 'ja' ||
       (cookiePref === undefined && user?.pipeline_type === 'shuukatsu')

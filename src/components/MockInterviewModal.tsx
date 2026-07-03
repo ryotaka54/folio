@@ -168,6 +168,9 @@ function useVoice(onTranscript: (text: string) => void) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const w = window as any;
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    // Feature detection requires the browser's window object, which isn't
+    // available during SSR — this must run client-side, after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSupported(!!SR);
     if (!SR) return;
 
