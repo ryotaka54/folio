@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function FurukawaLayout({ children }: { children: ReactNode }) {
   return (
-    <div className={`${shippori.variable} ${noto.variable}`}>
+    <div className={`${shippori.variable} ${noto.variable}`} style={{ overflowX: 'hidden' }}>
       {children}
     </div>
   )

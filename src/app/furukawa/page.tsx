@@ -953,7 +953,7 @@ export default function FurukawaPage() {
         )}
       </AnimatePresence>
 
-      <main style={{ background: C.white, color: C.heading }} className="antialiased" data-splash={splashDone ? 'done' : 'active'}>
+      <main style={{ background: C.white, color: C.heading, overflowX: 'hidden' }} className="antialiased" data-splash={splashDone ? 'done' : 'active'}>
         <style>{`
           @media (max-width: 680px) {
             .fw-nav { display: none !important; }
