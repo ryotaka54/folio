@@ -134,16 +134,21 @@ function BrandMark({ size = 32, color = C.onDark }: { size?: number; color?: str
 
 // ─── Brand seal — full hexagon + 竜 + curved FURUKAWA FARMS ──────────────────
 function BrandSeal({ width = 160, color = C.heading }: { width?: number; color?: string }) {
-  const h = Math.round(width * 435 / 400)
-  const arcId = 'fs-arc'
+  const h = Math.round(width * 500 / 400)
+  const arcId = `fs-arc-${width}`
   return (
     <svg
       width={width} height={h}
-      viewBox="0 0 400 435"
+      viewBox="0 0 400 500"
       fill="none"
+      overflow="visible"
       aria-label="古川農園ブランドシール"
       style={{ flexShrink: 0 }}
     >
+      <defs>
+        {/* sweep=1 → arc bows upward (∩ arch); peak at y≈380, endpoints at y=468 */}
+        <path id={arcId} d="M 40,468 A 190,190 0 0,1 360,468" />
+      </defs>
       <polygon
         points="200,30 334,108 334,263 200,340 66,263 66,108"
         stroke={color} strokeWidth="5" strokeLinejoin="miter"
@@ -156,12 +161,9 @@ function BrandSeal({ width = 160, color = C.heading }: { width?: number; color?:
         dominantBaseline="middle"
         fill={color}
       >竜</text>
-      <defs>
-        <path id={arcId} d="M 71,372 A 215,215 0 0,1 329,372" />
-      </defs>
       <text
         fontFamily="'Futura', 'Century Gothic', 'Avenir', 'Trebuchet MS', Arial, sans-serif"
-        fontSize="22" letterSpacing="5"
+        fontSize="26" letterSpacing="5"
         fill={color}
       >
         <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">FURUKAWA FARMS</textPath>
@@ -441,7 +443,7 @@ function Hero({ ready }: { ready: boolean }) {
 // ─── Farmer Introduction ───────────────────────────────────────────────────────
 function FarmerIntro() {
   const reduce = useReducedMotion()
-  const quoteLines = ['どう生きたいか。', 'その問いに向き合ったとき、', '農業という答えが見つかりました。']
+  const quoteLines = ['農業は自分がどう生きたいか、', 'その表現方法。']
 
   return (
     <section
@@ -503,10 +505,7 @@ function FarmerIntro() {
               color: C.body, fontWeight: 300, maxWidth: '34rem',
               textWrap: 'pretty' as React.CSSProperties['textWrap'],
             }}>
-              東京農業大学を卒業し、カリフォルニアのパセリ農家で農業を学んだのち、
-              生まれ育った長野県茅野市に戻りました。
-              2022年に独立就農。いまは母と二人で、
-              八ヶ岳山麓のハウスでパセリを育てています。
+              食べものを作るというシンプルながら本質的な部分に魅力を感じ、東京農業大に入学。アメリカなどで農業の研修を積み、2022年、故郷茅野市で農家として独立。正解がない中、土づくりや野菜の育て方を毎年、毎回アプローチを変え、自然と対話しながら次のステージに向けて模索中。
             </p>
           </FadeUp>
         </div>
@@ -586,7 +585,7 @@ function Parsley() {
               color: C.heading, lineHeight: 1.3,
               letterSpacing: '0.04em', marginBottom: '2rem', fontWeight: 700,
             }}>
-              1,200m で<br />育つパセリ
+              FURUKAWA FARMSの<br />パセリについて
             </h2>
             <p style={{
               fontFamily: FN, fontSize: '0.875rem', lineHeight: 2.05,
@@ -594,18 +593,14 @@ function Parsley() {
               textWrap: 'pretty' as React.CSSProperties['textWrap'],
               marginBottom: '1.5rem',
             }}>
-              八ヶ岳の澄んだ空気と、昼夜の大きな寒暖差。
-              その環境が、パセリ本来の力を引き出します。
-              密な巻きと深い緑色。
-              低地では出しにくい品質が、ここでは生まれます。
+              パセリは食卓に欠かせない食材ですが、飾りとして扱われることも多い野菜です。しかし実際はビタミン・ミネラル・食物繊維を豊富に含み、積極的に食べてほしい食材。FURUKAWA FARMSの自信作です。
             </p>
             <p style={{
               fontFamily: FN, fontSize: '0.875rem', lineHeight: 2.05,
               color: C.body, fontWeight: 300, maxWidth: '28rem',
               textWrap: 'pretty' as React.CSSProperties['textWrap'],
             }}>
-              JAしんしゅう諏訪を通じて、
-              関東・東海・関西エリアの市場へ出荷しています。
+              標高1,200mの高地で育つパセリは、密な巻きと深い緑色が特徴。昼夜の大きな寒暖差が、本来の味と栄養を凝縮させます。
             </p>
           </div>
         </SlideIn>
@@ -684,10 +679,10 @@ function Surprise() {
 
 // ─── Farm Story ───────────────────────────────────────────────────────────────
 const STEPS = [
-  { year: '東京農大',       label: '農業経営を学ぶ',  text: '東京農業大学で農業科学と経営を学ぶ。農業を「生き方」として選ぶ決意を固める。' },
-  { year: 'カリフォルニア', label: '現地研修',         text: '2020年、カリフォルニアのパセリ農家のもとで研修。海外の農業スタイルに触れる。' },
-  { year: '2022年',        label: '独立就農',           text: '長野県茅野市で母と二人、ハウス栽培を開始。15aからのスタート。' },
-  { year: '現在',           label: '拡大と多様化',       text: '30aへの拡大を目標に、品目の多様化・加工品の開発も視野に。' },
+  { year: '東京農業大学', label: '農業を学ぶ', text: '食べものを作るという本質的な部分に魅力を感じ、東京農業大に入学。農業を生き方として選ぶ。' },
+  { year: 'アメリカ研修', label: '海外で視野を広げる', text: 'アメリカなどで農業の研修を積む。海外の農業スタイルに触れ、多様なアプローチを学ぶ。' },
+  { year: '2022年',       label: '故郷で独立就農', text: '故郷・茅野市白井出で農家として独立。パセリを中心に野菜づくりをスタート。' },
+  { year: 'これから',     label: 'パワーベジタブルへ', text: 'トマトやビーツなど栄養価の高い「パワーベジタブル」へ品目を拡大。地域農業を盛り上げる。' },
 ] as const
 
 function FarmStory() {
@@ -802,10 +797,10 @@ function Growing() {
             color: C.onDarkSoft, fontWeight: 300, maxWidth: '32rem',
             textWrap: 'pretty' as React.CSSProperties['textWrap'],
           }}>
-            八ヶ岳山麓の気候を活かしながら、
-            ハウス内で温度と湿度を管理し、安定した品質を維持しています。
-            年間を通じた安定供給で、
-            飲食店や量販店のニーズに応えます。
+            八ヶ岳連峰に囲まれた標高1,200mの茅野市白井出。
+            湿気が少なく晴天率が高い点に加え昼夜の寒暖差が大きく、
+            山からの豊富な水にも恵まれた環境から、
+            糖度が高く味の濃い野菜が育ちます。
           </p>
         </SlideIn>
       </div>
@@ -864,12 +859,24 @@ function Contact() {
             }}>
               お問い合わせ
             </h2>
-            <p style={{
-              fontFamily: FN, fontSize: '0.875rem', lineHeight: 2.05,
-              color: C.body, fontWeight: 300, marginBottom: '1.5rem',
-            }}>
-              Instagram よりご連絡ください。
-            </p>
+            <dl style={{ fontFamily: FN, fontSize: '0.875rem', lineHeight: 2.2, color: C.body, fontWeight: 300, marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <dt style={{ color: C.muted, minWidth: '3.5rem', flexShrink: 0 }}>住所</dt>
+                <dd style={{ margin: 0 }}>〒391-0211 長野県茅野市湖源2092-1</dd>
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <dt style={{ color: C.muted, minWidth: '3.5rem', flexShrink: 0 }}>Tel</dt>
+                <dd style={{ margin: 0 }}>
+                  <a href="tel:08075931836" style={{ color: C.body, textDecoration: 'none' }}>080-7593-1836</a>
+                </dd>
+              </div>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <dt style={{ color: C.muted, minWidth: '3.5rem', flexShrink: 0 }}>Mail</dt>
+                <dd style={{ margin: 0 }}>
+                  <a href="mailto:furukawaryuki@gmail.com" style={{ color: C.body, textDecoration: 'none' }}>furukawaryuki@gmail.com</a>
+                </dd>
+              </div>
+            </dl>
             <a
               href="https://www.instagram.com/furukawaryuki/"
               target="_blank"
@@ -894,7 +901,7 @@ function Contact() {
                 el.style.borderColor = 'oklch(0.50 0.16 148 / 0.32)'
               }}
             >
-              @furukawaryuki
+              Instagram: @furukawaryuki
             </a>
           </div>
         </SlideIn>
