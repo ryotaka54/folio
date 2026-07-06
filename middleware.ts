@@ -25,6 +25,7 @@ const BYPASS = [
   '/admin',
   '/interview',
   '/ja/interview',
+  '/1oak',
 ];
 
 export async function middleware(request: NextRequest) {
