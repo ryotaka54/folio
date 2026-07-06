@@ -146,8 +146,8 @@ function BrandSeal({ width = 160, color = C.heading }: { width?: number; color?:
       style={{ flexShrink: 0 }}
     >
       <defs>
-        {/* sweep=1 → arc bows upward (∩ arch); peak at y≈380, endpoints at y=468 */}
-        <path id={arcId} d="M 40,468 A 190,190 0 0,1 360,468" />
+        {/* sweep=0 → arc bows downward (∪ bowl); endpoints at y=360, bowl bottom at y≈448 */}
+        <path id={arcId} d="M 40,360 A 190,190 0 0,0 360,360" />
       </defs>
       <polygon
         points="200,30 334,108 334,263 200,340 66,263 66,108"
