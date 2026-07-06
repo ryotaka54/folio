@@ -8,6 +8,7 @@ const BYPASS = [
   '/_next/',
   '/favicon',
   '/icons/',
+  '/images/',
   '/manifest',
   '/offline',
   '/robots',
