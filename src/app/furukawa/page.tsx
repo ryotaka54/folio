@@ -134,20 +134,20 @@ function BrandMark({ size = 32, color = C.onDark }: { size?: number; color?: str
 
 // ─── Brand seal — full hexagon + 竜 + curved FURUKAWA FARMS ──────────────────
 function BrandSeal({ width = 160, color = C.heading }: { width?: number; color?: string }) {
-  const h = Math.round(width * 500 / 400)
+  const h = Math.round(width * 445 / 400)
   const arcId = `fs-arc-${width}`
   return (
     <svg
       width={width} height={h}
-      viewBox="0 0 400 500"
+      viewBox="0 0 400 445"
       fill="none"
       overflow="visible"
       aria-label="古川農園ブランドシール"
       style={{ flexShrink: 0 }}
     >
       <defs>
-        {/* sweep=0 → arc bows downward (∪ bowl); endpoints at y=360, bowl bottom at y≈448 */}
-        <path id={arcId} d="M 40,360 A 190,190 0 0,0 360,360" />
+        {/* sweep=0 → ∪ bowl; r=280 gives shallow curve, endpoints y=352, bowl bottom y≈402 */}
+        <path id={arcId} d="M 40,352 A 280,280 0 0,0 360,352" />
       </defs>
       <polygon
         points="200,30 334,108 334,263 200,340 66,263 66,108"
@@ -444,9 +444,13 @@ function Hero({ ready }: { ready: boolean }) {
 function FarmerIntro() {
   const reduce = useReducedMotion()
   const quoteLines = ['農業は自分がどう生きたいか、', 'その表現方法。']
+  const ref = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
+  const imgY = useTransform(scrollYProgress, [0, 1], ['-7%', '7%'])
 
   return (
     <section
+      ref={ref}
       id="about"
       aria-label="農園主・古川竜生について"
       style={{ background: C.white }}
@@ -510,25 +514,34 @@ function FarmerIntro() {
           </FadeUp>
         </div>
 
-        {/* Right: Japanese rural landscape */}
+        {/* Right: highland field — full-bleed, parallax + Ken Burns */}
         <div className="fw-intro-img" style={{ position: 'relative', overflow: 'hidden' }}>
-          <motion.div
-            initial={reduce ? false : { opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.2, ease: SILK, delay: 0.15 }}
-            style={{ position: 'absolute', inset: 0 }}
-          >
-            <img
-              src={uImg(IM.farmworkers, 800)}
-              alt="農作業の様子"
+          <motion.div style={{
+            position: 'absolute', inset: '-8% 0',
+            y: reduce ? 0 : imgY,
+          }}>
+            <motion.img
+              src={uImg(IM.field, 1200)}
+              alt="八ヶ岳山麓・茅野市の農地"
+              initial={reduce ? false : { opacity: 0, scale: 1.06 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                opacity: { duration: 1.6, ease: 'easeOut' },
+                scale: { duration: 2.8, ease: [0.22, 0, 0.36, 1] },
+              }}
               style={{
-                width: '100%', height: '100%',
+                width: '100%', height: '116%',
                 objectFit: 'cover', display: 'block',
-                filter: 'saturate(0.88)',
+                filter: 'saturate(0.68) brightness(0.9) contrast(1.06)',
               }}
             />
           </motion.div>
+          {/* Gradient blending left edge into content column */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+            background: `linear-gradient(to right, ${C.white} 0%, oklch(0.98 0.005 148 / 0) 22%)`,
+          }} />
         </div>
       </div>
     </section>
