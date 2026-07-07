@@ -661,7 +661,7 @@ function Gallery() {
             <img
               src={uImg(item.id, 900)}
               alt={item.alt}
-              loading={i < 1 ? 'eager' : 'lazy'}
+              loading="eager"
               className="w-full h-full object-cover
                          hover:scale-[1.04] motion-reduce:hover:scale-100
                          transition-transform duration-700 ease-out"
