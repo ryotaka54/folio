@@ -66,6 +66,7 @@
   --accent-2:      var(--accent-blue-hover); /* #1D4ED8 */
   --accent-wash:   var(--light-accent);      /* #EFF6FF */
   --accent-border: #BFDBFE;
+  --gradient-pro:  linear-gradient(135deg, #1E40AF, #2563EB);
 
   /* ── Semantic ────────────────────────────────── */
   --warn:       var(--amber-warning);  /* #D97706 */
@@ -672,6 +673,30 @@ kbd {
   0%   { opacity: 0; transform: scale(0.88); }
   70%  { transform: scale(1.04); }
   100% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Japanese typography (was ja.css) ───────────────────────────────────────
+   Noto Sans JP breathes more than Geist at the same tracking/leading, so JA
+   surfaces get relaxed letter-spacing/line-height on body text and tighter
+   headline tracking. Applied via .ja-body wrapper in ja/layout.tsx. */
+.ja-body {
+  font-family: 'Noto Sans JP', var(--font-geist), sans-serif;
+}
+.ja-body p, .ja-body span, .ja-body li, .ja-body label,
+.ja-body textarea, .ja-body input {
+  letter-spacing: 0.05em;
+  line-height: 1.9;
+}
+.ja-body h1, .ja-body h2, .ja-body h3, .ja-body h4 {
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+@media (max-width: 768px) {
+  .ja-body .es-textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
 }
 
 /* ── Unified alert/nudge feed row ────────────────────────────────────────── */

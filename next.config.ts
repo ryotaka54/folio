@@ -78,6 +78,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      { source: "/ja/faq", destination: "/ja/help", permanent: true },
+      { source: "/ja/support", destination: "/ja/contact", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
