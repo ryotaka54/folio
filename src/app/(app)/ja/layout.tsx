@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import './ja.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://useapplyd.com'),

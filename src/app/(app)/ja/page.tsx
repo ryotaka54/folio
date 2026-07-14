@@ -179,7 +179,6 @@ function AppMockup() {
               background: 'var(--card-bg)',
               borderRadius: 11,
               border: '1px solid var(--border-gray)',
-              borderLeft: `3px solid ${card.color}`,
               padding: '11px 14px',
               display: 'flex', alignItems: 'center', gap: 12,
             }}
@@ -1080,10 +1079,10 @@ export default function JaLandingPage() {
               <div>
                 <p style={{ fontSize: 11, fontWeight: 600, color: '#475569', letterSpacing: '0.1em', margin: '0 0 14px', fontFamily: F, textTransform: 'uppercase' }}>サポート</p>
                 {[
-                  { label: 'よくある質問',         href: '/ja/faq' },
+                  { label: 'よくある質問',         href: '/ja/help' },
                   { label: 'プライバシーポリシー', href: '/ja/privacy' },
                   { label: '利用規約',             href: '/ja/terms' },
-                  { label: 'お問い合わせ',         href: '/ja/support' },
+                  { label: 'お問い合わせ',         href: '/ja/contact' },
                 ].map(l => (
                   <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: '#64748B', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F, transition: 'color 150ms ease' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}

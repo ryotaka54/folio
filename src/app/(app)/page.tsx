@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
-import { TrendingUp, Zap, MessageSquare, Clock, Menu, X, GraduationCap, Calendar, CheckCircle, Award, LayoutGrid, Brain, Target } from 'lucide-react';
+import { TrendingUp, Zap, MessageSquare, Clock, Menu, X, GraduationCap, Calendar, CheckCircle, Award, LayoutGrid, Brain, Target, Flame, PartyPopper } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import ProductWalkthrough from '@/components/ProductWalkthrough';
@@ -260,8 +260,8 @@ function TodayViewPreview() {
                 <p className="text-[17px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Good morning, Alex.</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="text-[11px] px-3 py-1 rounded-full border font-medium" style={{ background: 'rgba(220,38,38,0.06)', borderColor: 'rgba(220,38,38,0.2)', color: '#DC2626' }}>
-                  🔥 OA due tomorrow
+                <div className="inline-flex items-center gap-1 text-[11px] px-3 py-1 rounded-full border font-medium" style={{ background: 'rgba(220,38,38,0.06)', borderColor: 'rgba(220,38,38,0.2)', color: '#DC2626' }}>
+                  <Flame size={11} /> OA due tomorrow
                 </div>
               </div>
             </div>
@@ -269,8 +269,8 @@ function TodayViewPreview() {
             <div className="grid md:grid-cols-3 gap-3">
               {/* Next Up - hero card */}
               <div className="md:col-span-1">
-                <p className="text-[9px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted-text)' }}>⚡ Next Up</p>
-                <div className="rounded-xl p-3 border relative overflow-hidden" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)', borderLeft: '3px solid #DC2626' }}>
+                <p className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted-text)' }}><Zap size={9} /> Next Up</p>
+                <div className="rounded-xl p-3 border relative overflow-hidden" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}>
                   <div className="absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(220,38,38,0.12)', color: '#DC2626' }}>Due Tomorrow</div>
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold mb-2" style={{ background: 'rgba(37,99,235,0.1)', color: '#2563EB' }}>G</div>
                   <p className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Google</p>
@@ -324,7 +324,7 @@ function TodayViewPreview() {
                     <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold" style={{ background: 'rgba(22,163,74,0.15)', color: '#16A34A' }}>J</div>
                     <div>
                       <p className="text-[10px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Jane Street</p>
-                      <p className="text-[9px]" style={{ color: '#16A34A' }}>Offer received 🎉</p>
+                      <p className="inline-flex items-center gap-1 text-[9px]" style={{ color: '#16A34A' }}><PartyPopper size={9} /> Offer received</p>
                     </div>
                   </div>
                 </div>
@@ -912,7 +912,7 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-6 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] px-2.5 py-1 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>Pro</span>
+                  <span className="text-[11px] font-bold uppercase tracking-[0.1em] px-2.5 py-1 rounded-full" style={{ background: 'var(--gradient-pro)', color: '#fff' }}>Pro</span>
                   <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>AI that works for you</span>
                 </div>
                 <div className="mb-1">
@@ -946,7 +946,7 @@ export default function Home() {
                   href={user ? '/dashboard' : '/signup'}
                   onClick={() => capture('landing_pro_cta_click')}
                   className="inline-flex items-center justify-center h-11 px-6 rounded-xl text-[14px] font-semibold text-white transition-opacity hover:opacity-90 whitespace-nowrap"
-                  style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)' }}
+                  style={{ background: 'var(--gradient-pro)' }}
                 >
                   {user ? 'Upgrade in dashboard →' : 'Start free, upgrade anytime →'}
                 </Link>
