@@ -64,7 +64,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
     if (err) { setError(err); setLoading(false); }
   };
 
-  const savings = Math.round(100 - (48 / (6 * 12)) * 100);
+  const savings = Math.round(100 - (60 / (9 * 12)) * 100);
 
   return (
     <AnimatePresence>
@@ -153,10 +153,10 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
                   }}>SAVE {savings}%</span>
                 )}
                 <span style={{ fontSize: 16, fontWeight: 700, color: plan === p ? 'var(--accent-blue)' : 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-                  {p === 'annual' ? '$4' : '$6'}<span style={{ fontSize: 11, fontWeight: 500 }}>/mo</span>
+                  {p === 'annual' ? '$5' : '$9'}<span style={{ fontSize: 11, fontWeight: 500 }}>/mo</span>
                 </span>
                 <span style={{ fontSize: 11, color: 'var(--muted-text)' }}>
-                  {p === 'annual' ? 'Billed $48/year' : 'Billed monthly'}
+                  {p === 'annual' ? 'Billed $60/year' : 'Billed monthly'}
                 </span>
               </button>
             ))}
@@ -214,7 +214,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
                 <svg style={{ animation: 'spin 0.8s linear infinite' }} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
                 Redirecting…
               </>
-            ) : `Upgrade to Pro — ${plan === 'annual' ? '$48/year' : '$6/month'}`}
+            ) : `Upgrade to Pro — ${plan === 'annual' ? '$60/year' : '$9/month'}`}
           </button>
 
           <p style={{ fontSize: 11, color: 'var(--muted-text)', textAlign: 'center', marginTop: 8 }}>

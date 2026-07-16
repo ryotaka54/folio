@@ -916,10 +916,10 @@ export default function Home() {
                   <span className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>AI that works for you</span>
                 </div>
                 <div className="mb-1">
-                  <span className="text-[36px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}>$4</span>
+                  <span className="text-[36px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}>$5</span>
                   <span className="text-[16px]" style={{ color: 'var(--muted-text)' }}>/mo</span>
                 </div>
-                <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>$48/yr · cancel anytime</p>
+                <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>$60/yr · cancel anytime</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

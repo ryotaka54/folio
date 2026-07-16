@@ -954,17 +954,17 @@ export default function JaLandingPage() {
               <div style={{ paddingTop: 14 }}>
                 <p style={{ fontSize: 13, fontWeight: 500, color: 'var(--accent-blue)', letterSpacing: '0.08em', margin: '0 0 18px', fontFamily: F }}>Proプラン</p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                  <span style={{ fontSize: 42, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.04em' }}>¥7,000</span>
+                  <span style={{ fontSize: 42, fontWeight: 700, color: 'var(--brand-navy)', fontFamily: G, letterSpacing: '-0.04em' }}>¥8,900</span>
                   <span style={{ fontSize: 14, color: 'var(--muted-text)', fontFamily: G }}>/年</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-                  <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: 0, fontFamily: F, letterSpacing: '0.05em' }}>月あたり¥583（月払いは¥1,000）</p>
+                  <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: 0, fontFamily: F, letterSpacing: '0.05em' }}>月あたり¥742（月払いは¥1,300）</p>
                   <span style={{
                     fontSize: 10, fontWeight: 600, color: 'var(--green-success)',
                     background: 'rgba(22,163,74,0.12)',
                     borderRadius: 9999, padding: '2px 8px',
                     fontFamily: F, letterSpacing: '0.04em', whiteSpace: 'nowrap',
-                  }}>年間¥5,000お得</span>
+                  }}>年間¥4,700お得</span>
                 </div>
                 <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
                   {[
