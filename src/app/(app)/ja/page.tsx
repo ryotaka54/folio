@@ -964,9 +964,11 @@ export default function JaLandingPage() {
                     background: 'rgba(22,163,74,0.12)',
                     borderRadius: 9999, padding: '2px 8px',
                     fontFamily: F, letterSpacing: '0.04em', whiteSpace: 'nowrap',
-                  }}>年間¥4,700お得</span>
+                  }}>年間¥6,700お得</span>
                 </div>
+                <p style={{ fontSize: 11, color: 'var(--muted-text)', margin: '0 0 20px', fontFamily: F, letterSpacing: '0.04em' }}>5,000人以上の就活生が利用中</p>
                 <div style={{ borderTop: '1px solid var(--border-gray)', paddingTop: 20, display: 'flex', flexDirection: 'column', gap: 11 }}>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--brand-navy)', margin: 0, fontFamily: F, letterSpacing: '0.04em' }}>無料プランの全機能に加えて：</p>
                   {[
                     '無制限の選考管理',
                     'AI面接対策（企業別・職種別）',

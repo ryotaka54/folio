@@ -919,10 +919,16 @@ export default function Home() {
                   <span className="text-[36px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.03em' }}>$5</span>
                   <span className="text-[16px]" style={{ color: 'var(--muted-text)' }}>/mo</span>
                 </div>
-                <p className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>$60/yr · cancel anytime</p>
+                <p className="text-[12px] mb-2" style={{ color: 'var(--text-tertiary)' }}>$60/yr · cancel anytime</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[12px] line-through" style={{ color: 'var(--text-tertiary)' }}>$9/mo billed monthly</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full" style={{ background: 'rgba(22,163,74,0.12)', color: 'var(--green-success)' }}>Save $48/yr</span>
+                </div>
+                <p className="text-[11px]" style={{ color: 'var(--muted-text)' }}>Join 2,400+ students on Applyd</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <p className="col-span-full text-[11px] font-semibold mb-1" style={{ color: 'var(--brand-navy)' }}>Everything in Free, plus:</p>
                 {[
                   { icon: <Brain size={12} />, title: 'Unlimited Mock Interviews', desc: 'Unlimited sessions, any company, STAR scoring, voice input, downloadable transcript.' },
                   { icon: <MessageSquare size={12} />, title: 'Interview Intel', desc: 'AI generates the exact questions this company asks the moment you hit interview stage.' },

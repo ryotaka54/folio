@@ -64,7 +64,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
     if (err) { setError(err); setLoading(false); }
   };
 
-  const savings = Math.round(100 - (60 / (9 * 12)) * 100);
+  const annualSavings = 9 * 12 - 60;
 
   return (
     <AnimatePresence>
@@ -150,7 +150,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
                     position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
                     background: '#16a34a', color: '#fff', fontSize: 10, fontWeight: 700,
                     padding: '2px 7px', borderRadius: 99, whiteSpace: 'nowrap', letterSpacing: '0.02em',
-                  }}>SAVE {savings}%</span>
+                  }}>SAVE ${annualSavings}/YEAR</span>
                 )}
                 <span style={{ fontSize: 16, fontWeight: 700, color: plan === p ? 'var(--accent-blue)' : 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
                   {p === 'annual' ? '$5' : '$9'}<span style={{ fontSize: 11, fontWeight: 500 }}>/mo</span>
