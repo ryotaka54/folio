@@ -52,6 +52,22 @@ export async function POST(request: Request) {
     }
 
     const supabase = getSupabase();
+
+    // Idempotency guard: the same user re-submitting the same question for the
+    // same company (e.g. after leaving and resuming an in-progress interview)
+    // should not create a second leaderboard row.
+    const { data: existing } = await supabase
+      .from('leaderboard_entries')
+      .select('id')
+      .eq('user_id', authedUser.id)
+      .eq('company_slug', company_slug)
+      .eq('question', question)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json({ id: existing.id });
+    }
+
     const { data, error } = await supabase
       .from('leaderboard_entries')
       .insert({

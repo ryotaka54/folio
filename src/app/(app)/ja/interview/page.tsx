@@ -48,8 +48,16 @@ interface SavedSession {
   feedback: Feedback | null;
   questionCount: number;
   questionType: QuestionType;
+  lbPosted?: boolean;
+  lbEntryId?: string | null;
+  lbPostedWithAnswer?: boolean;
+  lbPostedWithName?: boolean;
   savedAt: number;
 }
+
+// Applications in a decided/terminal stage shouldn't be offered for mock-interview
+// practice — matches the TERMINAL set used across PipelineView/PipelineInsights/etc.
+const TERMINAL = new Set(['Rejected', 'Declined', 'Accepted', '承諾', '内定']);
 
 const SESSION_TTL = 2 * 60 * 60 * 1000;
 function sessionKey(userId: string) { return `applyd_interview_session_ja_${userId}`; }
@@ -414,16 +422,17 @@ function InterviewContent() {
       saveSession(user.id, {
         phase, selectedApp, questions, currentIdx,
         answer, transcript, feedback, questionCount, questionType,
+        lbPosted, lbEntryId, lbPostedWithAnswer, lbPostedWithName,
         savedAt: Date.now(),
       });
     } else if (phase === 'pick' || phase === 'complete') {
       clearSession(user.id);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, currentIdx, answer, transcript, feedback]);
+  }, [phase, currentIdx, answer, transcript, feedback, lbPosted, lbEntryId, lbPostedWithAnswer, lbPostedWithName]);
 
   const filteredApps = applications
-    .filter(a => !['Rejected', 'Declined', 'Accepted'].includes(a.status))
+    .filter(a => !TERMINAL.has(a.status))
     .filter(a => {
       const q = search.toLowerCase();
       return !q || a.company.toLowerCase().includes(q) || a.role.toLowerCase().includes(q);
@@ -736,6 +745,10 @@ function InterviewContent() {
                       setFeedback(savedSession.feedback);
                       setQuestionCount(savedSession.questionCount);
                       setQuestionType(savedSession.questionType);
+                      setLbPosted(savedSession.lbPosted ?? false);
+                      setLbEntryId(savedSession.lbEntryId ?? null);
+                      setLbPostedWithAnswer(savedSession.lbPostedWithAnswer ?? false);
+                      setLbPostedWithName(savedSession.lbPostedWithName ?? false);
                       setPhase(savedSession.phase);
                       setSavedSession(null);
                     }}
