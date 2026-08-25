@@ -29,24 +29,8 @@ const BYPASS = [
   '/1oak',
 ];
 
-// Dedicated portfolio alias for the イザキ speculative site — lets it live at
-// its own vercel.app root instead of useapplyd.com/izaki. Only this exact
-// host is affected; every other host (useapplyd.com, previews, etc.) runs
-// through the normal logic below completely unchanged.
-const IZAKI_HOST = 'izaki-folio.vercel.app';
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const host = request.headers.get('host') || '';
-
-  if (host === IZAKI_HOST) {
-    if (!pathname.startsWith('/izaki') && !pathname.startsWith('/api') && !pathname.startsWith('/_next')) {
-      const url = request.nextUrl.clone();
-      url.pathname = '/izaki' + (pathname === '/' ? '' : pathname);
-      return NextResponse.rewrite(url);
-    }
-    return NextResponse.next();
-  }
 
   // Never touch API routes, static files, etc.
   if (BYPASS.some(p => pathname.startsWith(p))) {
