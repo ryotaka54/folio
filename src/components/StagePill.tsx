@@ -1,37 +1,7 @@
 'use client';
 
 import { PipelineStage } from '@/lib/types';
-
-type PillVariant = 'neutral' | 'slate' | 'indigo' | 'violet' | 'amber' | 'green' | 'red' | 'pink';
-
-const STAGE_PILL: Record<string, PillVariant> = {
-  // Internship stages
-  'Wishlist':                  'neutral',
-  'Applied':                   'slate',
-  'OA / Online Assessment':    'indigo',
-  'Phone / Recruiter Screen':  'violet',
-  'Final Round Interviews':    'amber',
-  'Offer':                     'green',
-  'Rejected':                  'red',
-  // Job stages
-  'Recruiter Screen':          'violet',
-  'Technical / Case Interview':'amber',
-  'Final Round':               'amber',
-  'Offer — Negotiating':       'green',
-  'Accepted':                  'green',
-  'Declined':                  'neutral',
-  // Shuukatsu stages
-  'エントリー': 'neutral',
-  '説明会':     'slate',
-  'ES提出':     'indigo',
-  'SPI':        'violet',
-  '一次面接':   'violet',
-  '二次面接':   'amber',
-  '最終面接':   'amber',
-  '内々定':     'green',
-  '内定':       'green',
-  '承諾':       'neutral',
-};
+import { STAGE_PILL_VARIANT, type PillVariant } from '@/lib/constants';
 
 interface StagePillProps {
   stage: PipelineStage | string;
@@ -39,7 +9,7 @@ interface StagePillProps {
 }
 
 export default function StagePill({ stage, size = 'md' }: StagePillProps) {
-  const variant: PillVariant = STAGE_PILL[stage] ?? 'neutral';
+  const variant: PillVariant = STAGE_PILL_VARIANT[stage] ?? 'neutral';
   const fg = `var(--pill-${variant}-fg)`;
   const bg = `var(--pill-${variant}-bg)`;
   const dot = `var(--pill-${variant}-dot)`;

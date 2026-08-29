@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Fraunces } from "next/font/google";
 import "../globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -13,6 +13,15 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
+});
+
+// Display/heading font — pairs with Geist body text for a warmer, editorial
+// headline feel without leaving sans-serif territory for UI chrome.
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
 });
 
 export const metadata: Metadata = {
@@ -57,7 +66,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={geist.variable}>
+    <html lang="en" suppressHydrationWarning className={`${geist.variable} ${fraunces.variable}`}>
       <head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="manifest" href="/manifest.json" />

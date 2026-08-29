@@ -198,6 +198,35 @@
   --color-primary-foreground: #ffffff;
   --color-input: var(--border-gray);
   --color-ring: var(--accent-blue);
+
+  /* "Design system v2" semantic names, exposed as real Tailwind utilities
+     (bg-bg, text-text, border-border, etc.) — these CSS vars already existed
+     for inline-style consumers (PipelineView/TableView) but were never
+     registered here, so the classes silently didn't exist until now. */
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-sunk: var(--bg-sunk);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-border: var(--border);
+  --color-border-emph: var(--border-emph);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-wash: var(--accent-wash);
+  --color-warn: var(--warn);
+  --color-success: var(--success);
+
+  /* ── Sharper radius scale ──────────────────────────────────────────────
+     xs–lg (chips/buttons/inputs — the vast majority of usage) are left at
+     Tailwind's defaults; only the larger end (xl/2xl/3xl/4xl — cards,
+     modals, hero surfaces) is tightened, since that's where the "soft
+     rounded SaaS" look actually lives. Every existing rounded-* class in
+     the app picks this up automatically, no per-component changes. */
+  --radius-xl: 10px;   /* was 12px */
+  --radius-2xl: 12px;  /* was 16px */
+  --radius-3xl: 16px;  /* was 24px */
+  --radius-4xl: 20px;  /* was 32px */
 }
 
 * {
@@ -265,6 +294,13 @@ body {
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
   overscroll-behavior-y: contain;
+}
+
+/* Display/heading font — Fraunces, paired with Geist body text. English-only:
+   Fraunces has no Japanese glyphs, so .ja-body headings stay on Noto Sans JP. */
+.font-display {
+  font-family: var(--font-fraunces, 'Fraunces', Georgia, serif);
+  font-optical-sizing: auto;
 }
 
 /* Smooth momentum scrolling on iOS */

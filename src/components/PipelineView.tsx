@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Application, PipelineStage } from '@/lib/types';
+import { STAGE_PILL_VARIANT } from '@/lib/constants';
 import CompanyAvatar from './CompanyAvatar';
 import CategoryTag from './CategoryTag';
 import TagPill from './TagPill';
@@ -12,36 +13,10 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 
-// Stage → pill CSS variable prefix
-const STAGE_VARIANT: Record<string, string> = {
-  'Wishlist':                   'neutral',
-  'Applied':                    'slate',
-  'OA / Online Assessment':     'indigo',
-  'Phone / Recruiter Screen':   'violet',
-  'Recruiter Screen':           'violet',
-  'Final Round Interviews':     'amber',
-  'Final Round':                'amber',
-  'Technical / Case Interview': 'amber',
-  'Offer':                      'green',
-  'Offer — Negotiating':        'green',
-  'Rejected':                   'red',
-  'Declined':                   'neutral',
-  'エントリー': 'neutral',
-  '説明会':     'slate',
-  'ES提出':     'indigo',
-  'SPI':        'violet',
-  '一次面接':   'violet',
-  '二次面接':   'amber',
-  '最終面接':   'amber',
-  '内々定':     'green',
-  '内定':       'green',
-  '承諾':       'neutral',
-};
-
 const TERMINAL = new Set(['Rejected', 'Declined', 'Accepted', '承諾', '内定']);
 
 function stageVars(stage: string) {
-  const v = STAGE_VARIANT[stage] ?? 'neutral';
+  const v = STAGE_PILL_VARIANT[stage] ?? 'neutral';
   return {
     dot: `var(--pill-${v}-dot)`,
     bg:  `var(--pill-${v}-bg)`,

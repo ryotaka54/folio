@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { Application, PipelineStage } from '@/lib/types';
-import { STAGE_COLORS } from '@/lib/constants';
+import { STAGE_COLORS, STAGE_PILL_VARIANT, type PillVariant } from '@/lib/constants';
 
 interface PipelineBarProps {
   applications: Application[];
@@ -13,34 +13,6 @@ interface PipelineBarProps {
 
 // Stages considered terminal / not worth showing in the funnel bar
 const TERMINAL = new Set(['Rejected', 'Declined', 'Accepted', '承諾', '内定']);
-
-type PillVariant = 'neutral' | 'slate' | 'indigo' | 'violet' | 'amber' | 'green' | 'red';
-
-const STAGE_PILL_VARIANT: Record<string, PillVariant> = {
-  'Wishlist':                  'neutral',
-  'Applied':                   'slate',
-  'OA / Online Assessment':    'indigo',
-  'Phone / Recruiter Screen':  'violet',
-  'Final Round Interviews':    'amber',
-  'Offer':                     'green',
-  'Rejected':                  'red',
-  'Recruiter Screen':          'violet',
-  'Technical / Case Interview':'amber',
-  'Final Round':               'amber',
-  'Offer — Negotiating':       'green',
-  'Accepted':                  'green',
-  'Declined':                  'neutral',
-  'エントリー': 'neutral',
-  '説明会':     'slate',
-  'ES提出':     'indigo',
-  'SPI':        'violet',
-  '一次面接':   'violet',
-  '二次面接':   'amber',
-  '最終面接':   'amber',
-  '内々定':     'green',
-  '内定':       'green',
-  '承諾':       'neutral',
-};
 
 export default function PipelineBar({ applications, stages, activeStage, onStageClick }: PipelineBarProps) {
   const activeStages = stages.filter(s => !TERMINAL.has(s));

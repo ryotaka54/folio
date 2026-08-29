@@ -41,35 +41,61 @@ export const CATEGORIES: Category[] = [
   'Other',
 ];
 
-export const STAGE_COLORS: Record<string, string> = {
-  // English stages
-  'Wishlist': '#8B5CF6',
-  'Applied': '#2563EB',
-  'OA / Online Assessment': '#06B6D4',
-  'Phone / Recruiter Screen': '#F59E0B',
-  'Final Round Interviews': '#EF4444',
-  'Offer': '#1D9E75',
-  'Rejected': '#9CA3AF',
-  'Recruiter Screen': '#F59E0B',
-  'Technical / Case Interview': '#EF4444',
-  'Final Round': '#EC4899',
-  'Offer — Negotiating': '#1D9E75',
-  'Accepted': '#059669',
-  'Declined': '#9CA3AF',
+// ── Stage → color, single source of truth ──────────────────────────────────
+// This used to be three independently-maintained copies (StagePill.tsx,
+// PipelineBar.tsx, PipelineView.tsx) plus a fourth, differently-valued hex
+// map here — they'd already drifted (e.g. "Technical / Case Interview" was
+// red in this map but amber in the pill badges). Every pill/dot/column/bar
+// in the app now derives from this one map.
+export type PillVariant = 'neutral' | 'slate' | 'indigo' | 'violet' | 'amber' | 'green' | 'red' | 'pink';
+
+export const STAGE_PILL_VARIANT: Record<string, PillVariant> = {
+  // English internship/job stages
+  'Wishlist':                   'neutral',
+  'Applied':                    'slate',
+  'OA / Online Assessment':     'indigo',
+  'Phone / Recruiter Screen':   'violet',
+  'Final Round Interviews':     'amber',
+  'Offer':                      'green',
+  'Rejected':                   'red',
+  'Recruiter Screen':           'violet',
+  'Technical / Case Interview': 'amber',
+  'Final Round':                'amber',
+  'Offer — Negotiating':        'green',
+  'Accepted':                   'green',
+  'Declined':                   'neutral',
   // Japanese shuukatsu stages
-  'エントリー': '#64748B',
-  '説明会':     '#0EA5E9',
-  'ES提出':     '#8B5CF6',
-  'SPI':        '#F59E0B',
-  '一次面接':   '#3B82F6',
-  '二次面接':   '#6366F1',
-  '最終面接':   '#EC4899',
-  '内々定':     '#10B981',
-  '内定':       '#22C55E',
-  '承諾':       '#94A3B8',
-  '不採用':     '#9CA3AF',
-  '辞退':       '#9CA3AF',
+  'エントリー': 'neutral',
+  '説明会':     'slate',
+  'ES提出':     'indigo',
+  'SPI':        'violet',
+  '一次面接':   'violet',
+  '二次面接':   'amber',
+  '最終面接':   'amber',
+  '内々定':     'green',
+  '内定':       'green',
+  '承諾':       'neutral',
+  '不採用':     'red',
+  '辞退':       'neutral',
 };
+
+// Matches the --pill-{variant}-dot light-mode values in globals.css, so a
+// solid-fill use (funnel bar) and a pill-badge use (StagePill) of the same
+// stage are always the same color.
+export const PILL_VARIANT_HEX: Record<PillVariant, string> = {
+  neutral: '#9CA3AF',
+  slate:   '#64748B',
+  indigo:  '#6366F1',
+  violet:  '#8B5CF6',
+  amber:   '#F59E0B',
+  green:   '#10B981',
+  red:     '#EF4444',
+  pink:    '#EC4899',
+};
+
+export const STAGE_COLORS: Record<string, string> = Object.fromEntries(
+  Object.entries(STAGE_PILL_VARIANT).map(([stage, variant]) => [stage, PILL_VARIANT_HEX[variant]]),
+);
 
 export const SCHOOL_YEARS = ['High school', 'Freshman', 'Sophomore', 'Junior', 'Senior', 'Graduate'];
 export const RECRUITING_SEASONS = ['Spring 2026', 'Summer 2026', 'Fall 2026', 'Spring 2027'];
