@@ -8,7 +8,7 @@ import CompanyAvatar from './CompanyAvatar';
 import StagePill from './StagePill';
 import EmptyState from './EmptyState';
 import WeeklyCoach from './ai/WeeklyCoach';
-import { Clock, Flame, Trophy, Target, Mail, Sparkles } from 'lucide-react';
+import { Clock, TrendingUp, Trophy, Target, Mail, Sparkles } from 'lucide-react';
 
 interface TodayViewProps {
   applications: Application[];
@@ -106,17 +106,6 @@ function ActivityStrip({ data }: { data: { date: string; count: number }[] }) {
   );
 }
 
-function AnimatedStat({ value, label }: { value: number | string; label: string }) {
-  return (
-    <div>
-      <div style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--brand-navy)', fontVariantNumeric: 'tabular-nums' }}>
-        {value}
-      </div>
-      <div style={{ fontSize: 11, color: 'var(--muted-text)', marginTop: 1 }}>{label}</div>
-    </div>
-  );
-}
-
 function Section({ title, subtitle, action, onAction, children }: {
   title: string;
   subtitle?: string;
@@ -165,7 +154,7 @@ function DeckRow({ a, days, urgent, locale, onOpenApp }: {
     >
       <div style={{
         width: 44, textAlign: 'center', padding: '4px 0', borderRadius: 6, flexShrink: 0,
-        background: urgent ? 'var(--warn-bg, rgba(217,119,6,0.08))' : 'var(--surface-gray)',
+        background: urgent ? 'var(--warn-bg)' : 'var(--surface-gray)',
         color: urgent ? 'var(--amber-warning)' : 'var(--muted-text)',
         fontSize: 11, fontWeight: 500,
         border: '1px solid var(--border-gray)',
@@ -231,39 +220,37 @@ export default function TodayView({
   const activity = useMemo(() => build28DayActivity(applications), [applications]);
 
   const weeklyCount = appsAddedThisWeek(applications);
-  const prevWeekCount = useMemo(() => {
-    const sun = new Date();
-    sun.setDate(sun.getDate() - sun.getDay());
-    sun.setHours(0, 0, 0, 0);
-    const prevSun = new Date(sun.getTime() - 7 * 86400000);
-    return applications.filter(a => {
-      if (!a.created_at) return false;
-      const d = new Date(a.created_at);
-      return d >= prevSun && d < sun;
-    }).length;
-  }, [applications]);
 
-  const weeklyDelta = weeklyCount - prevWeekCount;
-
-  const streak = useMemo(() => {
-    let s = 0;
-    for (let i = activity.length - 1; i >= 0; i--) {
-      if (activity[i].count > 0) s++; else break;
-    }
-    return s;
-  }, [activity]);
+  const RESPONDED_STAGES = useMemo(() => new Set([
+    'OA / Online Assessment', 'Phone / Recruiter Screen', 'Recruiter Screen',
+    'Final Round Interviews', 'Technical / Case Interview', 'Final Round',
+    'Offer', 'Offer — Negotiating', 'Accepted',
+    'OA', '一次面接', '二次面接', '最終面接', '内々定', '内定',
+  ]), []);
 
   const responseRate = useMemo(() => {
     const applied = applications.filter(a => a.status !== 'Wishlist').length;
-    const responded = applications.filter(a =>
-      ['OA / Online Assessment', 'Phone / Recruiter Screen', 'Recruiter Screen',
-        'Final Round Interviews', 'Technical / Case Interview', 'Final Round',
-        'Offer', 'Offer — Negotiating', 'Accepted',
-        '一次面接', '二次面接', '最終面接', '内々定', '内定',
-      ].includes(a.status)
-    ).length;
+    const responded = applications.filter(a => RESPONDED_STAGES.has(a.status)).length;
     return applied >= 5 ? Math.round((responded / applied) * 100) : null;
-  }, [applications]);
+  }, [applications, RESPONDED_STAGES]);
+
+  // Outcome-oriented momentum, not raw activity: how many applications are
+  // sitting in a responded-or-further stage, grouped by when they last moved
+  // there. A raw "day streak" punishes any gap in daily activity — this
+  // tracks progress toward the thing that actually matters (a response),
+  // and a slow week just shows a flat/lower number, never a broken streak.
+  const monthlyResponses = useMemo(() => {
+    const now = new Date();
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const responded = applications.filter(a => RESPONDED_STAGES.has(a.status) && a.updated_at);
+    const thisMonth = responded.filter(a => new Date(a.updated_at!) >= thisMonthStart).length;
+    const lastMonth = responded.filter(a => {
+      const d = new Date(a.updated_at!);
+      return d >= lastMonthStart && d < thisMonthStart;
+    }).length;
+    return { thisMonth, lastMonth };
+  }, [applications, RESPONDED_STAGES]);
 
   const weeklyGoalData = getWeeklyGoal();
   const weeklyGoal = weeklyGoalData?.goal ?? 10;
@@ -273,22 +260,24 @@ export default function TodayView({
     ? new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
     : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  // Real status summary instead of a decorative greeting — the whole point
-  // of putting this at the top is to tell the user what actually matters
-  // right now without reading further.
-  const urgentCount = (nextUp ? 1 : 0) + needsAttention.length;
+  // Real status summary instead of a decorative greeting — but only escalate
+  // tone for genuinely imminent deadlines (within URGENT_DAYS, ~48-72h), not
+  // just because a "next up" item exists somewhere on the calendar. A deadline
+  // three weeks out is not urgent, and a calm dashboard shouldn't read like one.
+  const nextUpIsUrgent = !!nextUp && daysBetween(nextUp.deadline!, today) <= URGENT_DAYS;
+  const urgentCount = (nextUpIsUrgent ? 1 : 0) + needsAttention.length;
   const dueToday = actionable.filter(a => daysBetween(a.deadline!, today) === 0).length;
   const statusLine = locale === 'ja'
     ? (urgentCount === 0
-        ? 'すぐに対応が必要な選考はありません。'
+        ? 'すぐに対応が必要な選考はありません。順調です。'
         : dueToday > 0
-          ? `本日締め切りが${dueToday}件、対応が必要な選考が${urgentCount}件あります。`
-          : `対応が必要な選考が${urgentCount}件あります。`)
+          ? `本日締め切りが${dueToday}件あります。`
+          : `${urgentCount}件、まもなく締め切りです。`)
     : (urgentCount === 0
-        ? "Nothing urgent — you're on top of things."
+        ? "Nothing urgent right now — you're in good shape."
         : dueToday > 0
-          ? `${dueToday} deadline${dueToday === 1 ? '' : 's'} today, ${urgentCount} application${urgentCount === 1 ? '' : 's'} need${urgentCount === 1 ? 's' : ''} attention.`
-          : `${urgentCount} application${urgentCount === 1 ? '' : 's'} need${urgentCount === 1 ? 's' : ''} attention this week.`);
+          ? `${dueToday} deadline${dueToday === 1 ? '' : 's'} today.`
+          : `${urgentCount} deadline${urgentCount === 1 ? '' : 's'} coming up soon.`);
 
   return (
     <div style={{ padding: '28px 24px 80px', maxWidth: 1300, margin: '0 auto' }}>
@@ -410,6 +399,55 @@ export default function TodayView({
               </div>
             )}
 
+            {/* Moving forward — proof the effort is working. This is the
+                psychologically load-bearing section for an anxious job
+                searcher and belongs above anything stalled/urgent, not
+                buried in a side column beneath it. */}
+            {recentWins.length > 0 && (
+              <div style={{ padding: 20, borderRadius: 'var(--radius-2xl, 12px)', border: '1px solid var(--success-border)', background: 'var(--success-bg)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 7,
+                    background: 'var(--card-bg)',
+                    color: 'var(--green-success)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Trophy size={14} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '選考が進んでいます' : 'Moving forward'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted-text)' }}>
+                      {locale === 'ja'
+                        ? `${recentWins.length}件が面接・内定など次の段階に進んでいます。`
+                        : `${recentWins.length} application${recentWins.length === 1 ? '' : 's'} in active interview or offer stages.`}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {recentWins.map(a => (
+                    <button
+                      key={a.id}
+                      onClick={() => onOpenApp(a)}
+                      className="hover:bg-surface-gray"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '8px 10px', borderRadius: 8, border: 'none',
+                        background: 'transparent', cursor: 'pointer',
+                        fontFamily: 'inherit', color: 'var(--brand-navy)', textAlign: 'left',
+                      }}
+                    >
+                      <CompanyAvatar company={a.company} size={28} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.company}</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--muted-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.role}</div>
+                      </div>
+                      <StagePill stage={a.status} size="sm" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Needs attention — everything else due within URGENT_DAYS */}
             {needsAttention.length > 0 && (
               <Section
@@ -417,7 +455,7 @@ export default function TodayView({
                 subtitle={locale === 'ja' ? `あと${URGENT_DAYS}日以内` : `Due within ${URGENT_DAYS} days`}
               >
                 <div style={{
-                  border: '1px solid rgba(217,119,6,0.35)',
+                  border: '1px solid color-mix(in oklch, var(--warn) 35%, transparent)',
                   borderRadius: 'var(--radius-lg, 8px)', overflow: 'hidden', background: 'var(--card-bg)',
                 }}>
                   {needsAttention.map((a, i) => (
@@ -499,88 +537,70 @@ export default function TodayView({
               <WeeklyCoach isPro={isPro} onUpgrade={onUpgrade} />
             )}
 
-            {/* Momentum card */}
+            {/* Progress — outcome-oriented framing instead of a raw activity
+                streak. A quiet week just shows a flat/lower number here,
+                never a "broken streak"; the response-rate line adds a
+                typical-range so a low-seeming number can be read in context
+                instead of assumed to be a personal failure. */}
             <div style={{ padding: 20, borderRadius: 'var(--radius-2xl, 12px)', border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: 7,
-                    background: 'var(--warn-bg, rgba(217,119,6,0.08))',
-                    color: 'var(--amber-warning)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <Flame size={14} />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? 'アクティビティ' : 'Momentum'}</div>
-                    <div style={{ fontSize: 11, color: 'var(--muted-text)' }}>{locale === 'ja' ? '過去4週間' : 'Last 4 weeks'}</div>
-                  </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: 7,
+                  background: 'var(--light-accent)',
+                  color: 'var(--accent-blue)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <TrendingUp size={14} />
                 </div>
-                {weeklyDelta !== 0 && (
-                  <span style={{
-                    fontSize: 11, padding: '3px 7px', borderRadius: 5, fontWeight: 500,
-                    color: weeklyDelta > 0 ? 'var(--green-success)' : 'var(--danger)',
-                    background: weeklyDelta > 0 ? 'var(--success-bg)' : 'var(--error-bg)',
-                  }}>
-                    {weeklyDelta > 0 ? '+' : ''}{weeklyDelta} {locale === 'ja' ? '先週比' : 'vs last week'}
-                  </span>
-                )}
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '進捗' : 'Progress'}</div>
+                  <div style={{ fontSize: 11, color: 'var(--muted-text)' }}>{locale === 'ja' ? '過去4週間の活動' : 'Activity, last 4 weeks'}</div>
+                </div>
               </div>
               <ActivityStrip data={activity} />
               <div style={{
-                display: 'flex', justifyContent: 'space-between',
-                marginTop: 12, paddingTop: 12,
+                display: 'flex', justifyContent: 'space-between', gap: 12,
+                marginTop: 14, paddingTop: 14,
                 borderTop: '1px solid var(--border-gray)',
               }}>
-                <AnimatedStat value={streak} label={locale === 'ja' ? '日連続' : 'day streak'} />
-                <AnimatedStat value={weeklyCount} label={locale === 'ja' ? '今週' : 'this week'} />
-                <AnimatedStat value={responseRate !== null ? `${responseRate}%` : '—'} label={locale === 'ja' ? '回答率' : 'response rate'} />
+                <div>
+                  <div style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--brand-navy)', fontVariantNumeric: 'tabular-nums' }}>
+                    {monthlyResponses.thisMonth}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--muted-text)', marginTop: 1 }}>
+                    {locale === 'ja' ? '今月の返信・選考進展' : 'responses this month'}
+                  </div>
+                  {monthlyResponses.lastMonth > 0 && (
+                    <div style={{ fontSize: 10.5, marginTop: 2, color: monthlyResponses.thisMonth >= monthlyResponses.lastMonth ? 'var(--green-success)' : 'var(--muted-text)' }}>
+                      {locale === 'ja'
+                        ? `先月は${monthlyResponses.lastMonth}件`
+                        : `${monthlyResponses.lastMonth} last month`}
+                    </div>
+                  )}
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--brand-navy)', fontVariantNumeric: 'tabular-nums' }}>
+                    {responseRate !== null ? `${responseRate}%` : '—'}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--muted-text)', marginTop: 1 }}>{locale === 'ja' ? '回答率' : 'response rate'}</div>
+                  {responseRate !== null && (
+                    <div style={{ fontSize: 10.5, marginTop: 2, color: 'var(--text-tertiary)' }}>
+                      {locale === 'ja' ? '目安：15〜30%' : 'Typical range: 15–30%'}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Moving forward */}
-            {recentWins.length > 0 && (
-              <div style={{ padding: 20, borderRadius: 'var(--radius-2xl, 12px)', border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <div style={{
-                    width: 28, height: 28, borderRadius: 7,
-                    background: 'var(--success-bg)',
-                    color: 'var(--green-success)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <Trophy size={14} />
-                  </div>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '選考が進んでいます' : 'Moving forward'}</div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {recentWins.map(a => (
-                    <button
-                      key={a.id}
-                      onClick={() => onOpenApp(a)}
-                      className="hover:bg-surface-gray"
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        padding: '8px 10px', borderRadius: 8, border: 'none',
-                        background: 'transparent', cursor: 'pointer',
-                        fontFamily: 'inherit', color: 'var(--brand-navy)', textAlign: 'left',
-                      }}
-                    >
-                      <CompanyAvatar company={a.company} size={28} />
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.company}</div>
-                        <div style={{ fontSize: 11.5, color: 'var(--muted-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.role}</div>
-                      </div>
-                      <StagePill stage={a.status} size="sm" />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Weekly goal */}
+            {/* Weekly goal — optional pace tracker, never a red/empty bar
+                implying failure. Copy stays encouraging at every count,
+                including zero. */}
             <div style={{ padding: 20, borderRadius: 'var(--radius-2xl, 12px)', border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '週間目標' : 'Weekly goal'}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '週間ペース' : "This week's pace"}</div>
+                  <span style={{ fontSize: 10.5, color: 'var(--text-tertiary)' }}>{locale === 'ja' ? '（任意）' : '(optional)'}</span>
+                </div>
                 <div style={{ fontSize: 12, color: 'var(--muted-text)', fontFamily: 'var(--mono, ui-monospace)', fontVariantNumeric: 'tabular-nums' }}>
                   {weeklyCount} / {weeklyGoal}
                 </div>
@@ -588,7 +608,7 @@ export default function TodayView({
               <div style={{ height: 6, borderRadius: 3, background: 'var(--surface-gray)', overflow: 'hidden' }}>
                 <div style={{
                   height: '100%',
-                  width: `${goalPct}%`,
+                  width: `${Math.max(goalPct, weeklyCount > 0 ? 4 : 0)}%`,
                   borderRadius: 3,
                   background: 'var(--accent-blue)',
                   transition: 'width 0.6s ease',
@@ -596,8 +616,10 @@ export default function TodayView({
               </div>
               <div style={{ marginTop: 10, fontSize: 12, color: 'var(--muted-text)', lineHeight: 1.5 }}>
                 {weeklyCount >= weeklyGoal
-                  ? (locale === 'ja' ? '目標達成 — 素晴らしい週でした。' : 'Goal hit — great week.')
-                  : (locale === 'ja' ? `あと${weeklyGoal - weeklyCount}社で今週の目標達成です。` : `${weeklyGoal - weeklyCount} more to hit your goal this week.`)}
+                  ? (locale === 'ja' ? '目標達成 — 素晴らしい週でした。' : 'Goal hit — nice pace this week.')
+                  : weeklyCount === 0
+                    ? (locale === 'ja' ? 'この週はまだこれから。ペースにプレッシャーは不要です。' : "This week's still open — no pressure on pace. Quality over quantity.")
+                    : (locale === 'ja' ? `今週は${weeklyCount}社。ペースに関わらず、一つひとつが積み重ねになります。` : `${weeklyCount} so far this week — every application counts, whatever the pace.`)}
               </div>
             </div>
           </div>
@@ -609,7 +631,10 @@ export default function TodayView({
           .today-grid { grid-template-columns: 1fr !important; }
         }
 
-        /* Next Up hero — light mode */
+        /* Next Up hero — CSS custom properties already swap value under
+           .dark on the root, so one set of rules covers both themes; the
+           old hardcoded .dark overrides here (literal #60A5FA/#F59E0B/etc.)
+           predated the token system and were silently fighting it. */
         .next-up-hero {
           background: var(--card-bg);
           border: 1px solid var(--border-gray);
@@ -619,7 +644,7 @@ export default function TodayView({
         .next-up-role { color: var(--muted-text); }
         .next-up-deadline {
           color: var(--amber-warning);
-          background: var(--warn-bg, rgba(217,119,6,0.08));
+          background: var(--warn-bg);
         }
         .next-up-note {
           background: var(--surface-gray);
@@ -632,31 +657,6 @@ export default function TodayView({
           border: 1px solid var(--border-gray);
           background: transparent;
           color: var(--brand-navy);
-        }
-
-        /* Next Up hero — dark mode */
-        .dark .next-up-hero {
-          background: var(--card-bg);
-          border: 1px solid var(--border-gray);
-        }
-        .dark .next-up-badge { color: #60A5FA; }
-        .dark .next-up-company { color: #fff; }
-        .dark .next-up-role { color: rgba(255,255,255,0.5); }
-        .dark .next-up-deadline {
-          color: #F59E0B;
-          background: rgba(180,100,0,0.35);
-        }
-        .dark .next-up-note {
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          color: rgba(255,255,255,0.65);
-        }
-        .dark .next-up-note-label { color: rgba(255,255,255,0.4); }
-        .dark .next-up-btn-primary { background: #fff; color: #111827; }
-        .dark .next-up-btn-secondary {
-          border: 1px solid rgba(255,255,255,0.15);
-          background: rgba(255,255,255,0.07);
-          color: rgba(255,255,255,0.8);
         }
       `}</style>
     </div>
