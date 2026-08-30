@@ -166,8 +166,6 @@ function StageSection({
                 className="flex-1 text-left flex items-center gap-3 px-4 py-3 transition-colors active:bg-surface-gray min-w-0"
                 style={{ minHeight: 72, background: 'transparent' }}
               >
-                {/* Left accent */}
-                <div className="w-[3px] self-stretch rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-[15px] font-semibold truncate" style={{ color: 'var(--brand-navy)' }}>

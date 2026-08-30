@@ -90,7 +90,7 @@ export default function TableView({
         overflow: 'hidden',
         background: 'var(--bg)',
       }}>
-        {/* Header */}
+        {/* Header — sticky below the 56px desktop nav (this view is desktop-only, mobile renders MobileCardList instead) */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: COL,
@@ -99,6 +99,9 @@ export default function TableView({
           padding: '10px 16px',
           background: 'var(--bg-soft)',
           borderBottom: '1px solid var(--border)',
+          position: 'sticky',
+          top: 56,
+          zIndex: 10,
         }}>
           <div />
           {th('Company / Role', 'company')}
@@ -124,13 +127,14 @@ export default function TableView({
               key={app.id}
               onClick={() => onRowClick(app)}
               onContextMenu={onRowContextMenu ? e => { e.preventDefault(); onRowContextMenu(app, e); } : undefined}
+              className="hover:bg-bg-soft"
               style={{
                 width: '100%',
                 display: 'grid',
                 gridTemplateColumns: COL,
                 alignItems: 'center',
                 gap: 14,
-                padding: '12px 16px',
+                padding: '14px 16px',
                 border: 'none',
                 borderBottom: '1px solid var(--border)',
                 background: 'transparent',
@@ -138,10 +142,7 @@ export default function TableView({
                 textAlign: 'left',
                 fontFamily: 'inherit',
                 color: 'var(--text)',
-                transition: 'background 0.1s',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-soft)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
               <CompanyAvatar company={app.company} size={28} />
 

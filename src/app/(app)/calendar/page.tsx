@@ -44,12 +44,17 @@ const OA_STAGES = new Set(['OA / Online Assessment']);
 const OFFER_STAGES = new Set(['Offer', 'Offer — Negotiating']);
 const DONE_STAGES = new Set(['Offer', 'Offer — Negotiating', 'Accepted', 'Declined', 'Rejected']);
 
+// Event-type colors now come from the same --pill-* token family the
+// Kanban/Table stage colors use (see STAGE_PILL_VARIANT in lib/constants.ts)
+// instead of an independently-maintained hex table — a calendar "interview"
+// event and a kanban interview-stage card no longer risk showing different
+// colors for the same concept, and this picks up dark-mode theming for free.
 const EVENT_STYLE: Record<EventType, { bg: string; color: string }> = {
-  overdue:   { bg: 'rgba(220,38,38,0.13)',  color: '#DC2626' },
-  interview: { bg: 'rgba(37,99,235,0.13)',  color: '#2563EB' },
-  oa:        { bg: 'rgba(124,58,237,0.13)', color: '#7C3AED' },
-  offer:     { bg: 'rgba(22,163,74,0.13)',  color: '#16A34A' },
-  deadline:  { bg: 'rgba(217,119,6,0.13)',  color: '#D97706' },
+  overdue:   { bg: 'var(--pill-red-bg)',    color: 'var(--pill-red-fg)' },
+  interview: { bg: 'var(--pill-indigo-bg)', color: 'var(--pill-indigo-fg)' },
+  oa:        { bg: 'var(--pill-violet-bg)', color: 'var(--pill-violet-fg)' },
+  offer:     { bg: 'var(--pill-green-bg)',  color: 'var(--pill-green-fg)' },
+  deadline:  { bg: 'var(--pill-amber-bg)',  color: 'var(--pill-amber-fg)' },
 };
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
