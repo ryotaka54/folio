@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
@@ -12,6 +12,7 @@ import { authFetch } from '@/lib/auth-fetch';
 import { Application } from '@/lib/types';
 import { STAGE_COLORS } from '@/lib/constants';
 import UpgradeModal from '@/components/UpgradeModal';
+import { AILoadingState } from '@/components/ui/ai-loading-state';
 import NotificationBell from '@/components/NotificationBell';
 import StreakBadge from '@/components/StreakBadge';
 import AppShell from '@/components/AppShell';
@@ -89,11 +90,30 @@ const SCORE_COLOR = (s: number) => s >= 4 ? '#10B981' : s >= 3 ? '#F59E0B' : '#E
 const SCORE_LABEL = (s: number) =>
   s === 5 ? 'Exceptional' : s === 4 ? 'Strong' : s === 3 ? 'Adequate' : s === 2 ? 'Weak' : 'Poor';
 
+// Uses the app's shared semantic tokens (same ones the success/error form
+// states use elsewhere) instead of its own hardcoded green/amber/red hexes,
+// so STAR feedback reads consistently with the rest of the product.
 const STAR_CFG = {
-  strong:  { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.25)', text: '#10B981', icon: '✓' },
-  okay:    { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.25)', text: '#F59E0B', icon: '~' },
-  missing: { bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.20)',  text: '#EF4444', icon: '✗' },
+  strong:  { bg: 'var(--success-bg)', border: 'var(--success-border)', text: 'var(--success-text)', icon: '✓' },
+  okay:    { bg: 'var(--warn-bg)', border: 'color-mix(in oklch, var(--warn) 30%, transparent)', text: 'var(--warn)', icon: '~' },
+  missing: { bg: 'var(--error-bg)', border: 'var(--error-border)', text: 'var(--error-text)', icon: '✗' },
 };
+
+// ── Live STAR-structure heuristic ─────────────────────────────────────────────
+// Lightweight, local, text-only signal detection — no AI call while typing.
+// This is deliberately a rough structural checklist, not a grade: it can't
+// tell if the story is any *good*, just whether it plausibly touches each
+// STAR part. The real, AI-graded feedback still only happens after submit.
+function checkStarStructure(text: string): { situation: boolean; task: boolean; action: boolean; result: boolean } {
+  const hasLength = text.trim().length > 25;
+  const t = text.toLowerCase();
+  return {
+    situation: hasLength && /\b(when|during|while|as a|in my role|at (my|the)|last (semester|year|summer|month)|working (at|on|as))\b/.test(t),
+    task: hasLength && /\b(my (task|job|responsibility|role)|i (was asked|needed|had) to|i was responsible for|my goal was)\b/.test(t),
+    action: hasLength && /\bi (built|led|created|designed|implemented|wrote|managed|organized|analyzed|developed|coordinated|decided|proposed|fixed|solved|drove|initiated|launched|reached out|collaborated|negotiated|presented|debugged|refactored|shipped)\b/.test(t),
+    result: hasLength && /(\d+%|\$\d|\bincreased\b|\bdecreased\b|\breduced\b|\bimproved\b|\bresulted in\b|\bled to\b|\bachieved\b|\bsaved\b|\bgrew\b|\bboosted\b)/.test(t),
+  };
+}
 
 function avg(t: TranscriptEntry[]) {
   if (!t.length) return 0;
@@ -246,7 +266,7 @@ function ProgressRing({ current, total, score }: { current: number; total: numbe
   const r = 38;
   const circ = 2 * Math.PI * r;
   const pct = total > 0 ? current / total : 0;
-  const scoreColor = score !== undefined ? SCORE_COLOR(score) : '#2563EB';
+  const scoreColor = score !== undefined ? SCORE_COLOR(score) : 'var(--accent-blue)';
 
   return (
     <div style={{ position: 'relative', width: 96, height: 96 }}>
@@ -335,31 +355,6 @@ function StarCard({ label, data }: { label: string; data: StarRating }) {
   );
 }
 
-function LoadingTypewriter({ company }: { company: string }) {
-  const steps = [`Researching ${company}…`, 'Crafting questions…', 'Calibrating difficulty…', 'Almost ready…'];
-  const [idx, setIdx] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setIdx(i => Math.min(i + 1, steps.length - 1)), 1200);
-    return () => clearInterval(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <AnimatePresence mode="wait">
-      <motion.p
-        key={idx}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--muted-text)', marginTop: 20 }}
-      >
-        {steps[idx]}
-      </motion.p>
-    </AnimatePresence>
-  );
-}
-
 // ── Main page content ─────────────────────────────────────────────────────────
 
 function InterviewContent() {
@@ -378,6 +373,7 @@ function InterviewContent() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answer, setAnswer] = useState('');
+  const liveStar = useMemo(() => checkStarStructure(answer), [answer]);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [error, setError] = useState('');
@@ -1090,18 +1086,10 @@ function InterviewContent() {
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
-              style={{ width: 56, height: 56 }}
-            >
-              <svg viewBox="0 0 56 56" fill="none">
-                <circle cx="28" cy="28" r="24" style={{ stroke: 'var(--border-gray)' }} strokeWidth="4" />
-                <circle cx="28" cy="28" r="24" stroke="#2563EB" strokeWidth="4" strokeLinecap="round"
-                  strokeDasharray="40 110" />
-              </svg>
-            </motion.div>
-            <LoadingTypewriter company={selectedApp.company} />
+            <AILoadingState
+              lines={0}
+              label={[`Researching ${selectedApp.company}…`, 'Crafting questions…', 'Calibrating difficulty…', 'Almost ready…']}
+            />
           </motion.div>
         )}
 
@@ -1135,13 +1123,16 @@ function InterviewContent() {
                     </p>
                   </div>
 
-                  {/* STAR guide */}
+                  {/* STAR checklist — live structural signal as you type, not
+                      a grade. The real AI-graded feedback still only shows
+                      up after you submit; this is just "have you touched
+                      each part yet." */}
                   <div>
                     <button
                       onClick={() => setStarCollapsed(v => !v)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 6, padding: 0, marginBottom: 10, fontFamily: "'DM Mono', monospace" }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 6, padding: 0, marginBottom: 4, fontFamily: "'DM Mono', monospace" }}
                     >
-                      STAR FRAMEWORK {starCollapsed ? '▸' : '▾'}
+                      STAR CHECKLIST {starCollapsed ? '▸' : '▾'}
                     </button>
                     <AnimatePresence>
                       {!starCollapsed && (
@@ -1151,20 +1142,26 @@ function InterviewContent() {
                           exit={{ opacity: 0, height: 0 }}
                           style={{ overflow: 'hidden' }}
                         >
-                          {[
-                            { key: 'S', label: 'Situation', desc: 'Set the scene' },
-                            { key: 'T', label: 'Task', desc: 'Your responsibility' },
-                            { key: 'A', label: 'Action', desc: 'What you did' },
-                            { key: 'R', label: 'Result', desc: 'The outcome' },
-                          ].map(item => (
+                          <p style={{ fontSize: 10.5, color: 'var(--text-tertiary)', margin: '0 0 12px', lineHeight: 1.5 }}>
+                            Fills in as your draft touches each part — a rough guide, not the grade.
+                          </p>
+                          {([
+                            { key: 'S', label: 'Situation', desc: 'Set the scene', done: liveStar.situation },
+                            { key: 'T', label: 'Task', desc: 'Your responsibility', done: liveStar.task },
+                            { key: 'A', label: 'Action', desc: 'What you did', done: liveStar.action },
+                            { key: 'R', label: 'Result', desc: 'The outcome', done: liveStar.result },
+                          ] as const).map(item => (
                             <div key={item.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
                               <span style={{
                                 width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                                background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.25)',
+                                background: item.done ? 'var(--success-bg)' : 'var(--bg-soft, var(--surface-gray))',
+                                border: `1px solid ${item.done ? 'var(--success-border)' : 'var(--border-gray)'}`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 10, fontWeight: 800, color: 'var(--accent-blue)', fontFamily: "'DM Mono', monospace",
+                                fontSize: 10, fontWeight: 800, fontFamily: "'DM Mono', monospace",
+                                color: item.done ? 'var(--success-text)' : 'var(--muted-text)',
+                                transition: 'background 0.15s, border-color 0.15s, color 0.15s',
                               }}>
-                                {item.key}
+                                {item.done ? '✓' : item.key}
                               </span>
                               <div>
                                 <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--body-text)', margin: '2px 0 1px' }}>{item.label}</p>

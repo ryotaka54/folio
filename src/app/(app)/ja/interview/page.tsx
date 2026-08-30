@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
@@ -14,6 +14,7 @@ import { STAGE_COLORS } from '@/lib/constants';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import AppShell from '@/components/AppShell';
 import UpgradeModal from '@/components/UpgradeModal';
+import { AILoadingState } from '@/components/ui/ai-loading-state';
 import NotificationBell from '@/components/NotificationBell';
 import StreakBadge from '@/components/StreakBadge';
 
@@ -82,9 +83,9 @@ const SCORE_LABEL = (s: number) =>
   s === 5 ? '非常に優秀' : s === 4 ? '優秀' : s === 3 ? '合格' : s === 2 ? '要改善' : '不合格';
 
 const STAR_CFG = {
-  strong:  { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.25)', text: '#10B981', icon: '✓' },
-  okay:    { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.25)', text: '#F59E0B', icon: '~' },
-  missing: { bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.20)',  text: '#EF4444', icon: '✗' },
+  strong:  { bg: 'var(--success-bg)', border: 'var(--success-border)', text: 'var(--success-text)', icon: '✓' },
+  okay:    { bg: 'var(--warn-bg)', border: 'color-mix(in oklch, var(--warn) 30%, transparent)', text: 'var(--warn)', icon: '~' },
+  missing: { bg: 'var(--error-bg)', border: 'var(--error-border)', text: 'var(--error-text)', icon: '✗' },
 };
 
 const STAR_LABELS = {
@@ -93,6 +94,20 @@ const STAR_LABELS = {
   action:    '行動',
   result:    '結果',
 };
+
+// ── Live STAR-structure heuristic (Japanese) ──────────────────────────────────
+// Lightweight, local, text-only signal detection — no AI call while typing.
+// A rough structural checklist, not a grade: the real AI-graded feedback
+// still only happens after submit.
+function checkStarStructure(text: string): { situation: boolean; task: boolean; action: boolean; result: boolean } {
+  const hasLength = text.trim().length > 20;
+  return {
+    situation: hasLength && /(という状況|背景|当時|所属していた|部活動|サークル|アルバイト|授業|ゼミ)/.test(text),
+    task: hasLength && /(私の役割|担当して|任され|責任者として|求められて|目標は)/.test(text),
+    action: hasLength && /(取り組みました|実施しました|行いました|工夫しました|提案しました|作成しました|改善しました|挑戦しました|実行し)/.test(text),
+    result: hasLength && /(\d+%|向上しました|改善しました|達成しました|成功しました|増加しました|削減しました|評価されました|結果として)/.test(text),
+  };
+}
 
 function avg(t: TranscriptEntry[]) {
   if (!t.length) return 0;
@@ -245,7 +260,7 @@ function ProgressRing({ current, total, score }: { current: number; total: numbe
   const r = 38;
   const circ = 2 * Math.PI * r;
   const pct = total > 0 ? current / total : 0;
-  const scoreColor = score !== undefined ? SCORE_COLOR(score) : '#2563EB';
+  const scoreColor = score !== undefined ? SCORE_COLOR(score) : 'var(--accent-blue)';
 
   return (
     <div style={{ position: 'relative', width: 96, height: 96 }}>
@@ -334,30 +349,6 @@ function StarCard({ label, data }: { label: string; data: StarRating }) {
   );
 }
 
-function LoadingTypewriter({ company }: { company: string }) {
-  const steps = [`${company}を調査中…`, '質問を作成中…', '難易度を調整中…', 'もうすぐ準備完了…'];
-  const [idx, setIdx] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setIdx(i => Math.min(i + 1, steps.length - 1)), 1200);
-    return () => clearInterval(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return (
-    <AnimatePresence mode="wait">
-      <motion.p
-        key={idx}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        style={{ fontFamily: "'DM Mono', monospace", fontSize: 13, color: 'var(--muted-text)', marginTop: 20 }}
-      >
-        {steps[idx]}
-      </motion.p>
-    </AnimatePresence>
-  );
-}
 
 // ── Main page content ─────────────────────────────────────────────────────────
 
@@ -376,6 +367,7 @@ function InterviewContent() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answer, setAnswer] = useState('');
+  const liveStar = useMemo(() => checkStarStructure(answer), [answer]);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [error, setError] = useState('');
@@ -933,18 +925,10 @@ function InterviewContent() {
           <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: 'linear' }}
-              style={{ width: 56, height: 56 }}
-            >
-              <svg viewBox="0 0 56 56" fill="none">
-                <circle cx="28" cy="28" r="24" style={{ stroke: 'var(--border-gray)' }} strokeWidth="4" />
-                <circle cx="28" cy="28" r="24" stroke="#2563EB" strokeWidth="4" strokeLinecap="round"
-                  strokeDasharray="40 110" />
-              </svg>
-            </motion.div>
-            <LoadingTypewriter company={selectedApp.company} />
+            <AILoadingState
+              lines={0}
+              label={[`${selectedApp.company}を調査中…`, '質問を作成中…', '難易度を調整中…', 'もうすぐ準備完了…']}
+            />
           </motion.div>
         )}
 
@@ -978,13 +962,15 @@ function InterviewContent() {
                     </p>
                   </div>
 
-                  {/* STAR guide */}
+                  {/* STAR checklist — live structural signal as you type,
+                      not a grade. The real AI-graded feedback still only
+                      shows up after you submit. */}
                   <div>
                     <button
                       onClick={() => setStarCollapsed(v => !v)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 6, padding: 0, marginBottom: 10, fontFamily: "'DM Mono', monospace" }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted-text)', fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 6, padding: 0, marginBottom: 4, fontFamily: "'DM Mono', monospace" }}
                     >
-                      STAR フレームワーク {starCollapsed ? '▸' : '▾'}
+                      STAR チェックリスト {starCollapsed ? '▸' : '▾'}
                     </button>
                     <AnimatePresence>
                       {!starCollapsed && (
@@ -994,20 +980,26 @@ function InterviewContent() {
                           exit={{ opacity: 0, height: 0 }}
                           style={{ overflow: 'hidden' }}
                         >
-                          {[
-                            { key: '状', label: '状況', desc: '背景・場面を説明する' },
-                            { key: '課', label: '課題', desc: 'あなたの役割・責任' },
-                            { key: '行', label: '行動', desc: '具体的に行ったこと' },
-                            { key: '結', label: '結果', desc: '成果・学び' },
-                          ].map(item => (
+                          <p style={{ fontSize: 10.5, color: 'var(--text-tertiary)', margin: '0 0 12px', lineHeight: 1.6, fontFamily: "'Noto Sans JP', sans-serif" }}>
+                            回答が各項目に触れると埋まります（目安であり、採点ではありません）
+                          </p>
+                          {([
+                            { key: '状', label: '状況', desc: '背景・場面を説明する', done: liveStar.situation },
+                            { key: '課', label: '課題', desc: 'あなたの役割・責任', done: liveStar.task },
+                            { key: '行', label: '行動', desc: '具体的に行ったこと', done: liveStar.action },
+                            { key: '結', label: '結果', desc: '成果・学び', done: liveStar.result },
+                          ] as const).map(item => (
                             <div key={item.key} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
                               <span style={{
                                 width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                                background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.25)',
+                                background: item.done ? 'var(--success-bg)' : 'var(--bg-soft, var(--surface-gray))',
+                                border: `1px solid ${item.done ? 'var(--success-border)' : 'var(--border-gray)'}`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 10, fontWeight: 800, color: 'var(--accent-blue)', fontFamily: "'Noto Sans JP', sans-serif",
+                                fontSize: 10, fontWeight: 800, fontFamily: "'Noto Sans JP', sans-serif",
+                                color: item.done ? 'var(--success-text)' : 'var(--muted-text)',
+                                transition: 'background 0.15s, border-color 0.15s, color 0.15s',
                               }}>
-                                {item.key}
+                                {item.done ? '✓' : item.key}
                               </span>
                               <div>
                                 <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--body-text)', margin: '2px 0 1px', fontFamily: "'Noto Sans JP', sans-serif" }}>{item.label}</p>
