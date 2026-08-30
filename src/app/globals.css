@@ -5,167 +5,183 @@
 :root {
   color-scheme: light;
 
-  /* Blue palette */
-  --accent-blue: #2563EB;
-  --accent-blue-hover: #1D4ED8;
-  --light-accent: #EFF6FF;
-  --accent-blue-text: #1E40AF;
+  /* Accent — muted gold, matching the Pro badge mark. A darker shade of the
+     same hue than the dark-mode value below: the full-saturation gold reads
+     ~2.3:1 against this cream and fails text/button contrast, so light mode
+     uses a deepened bronze of the same family instead of the literal hex. */
+  --accent-blue: #8F6B22;
+  --accent-blue-hover: #755A1B;
+  --light-accent: #F4EAD4;
+  --accent-blue-text: #6B4F18;
 
-  /* Surfaces */
-  --background: #FFFFFF;
-  --card-bg: #F9FAFB;
-  --surface-gray: #F3F4F6;
+  /* Surfaces — warm cream */
+  --background: #FAF8F3;
+  --card-bg: #F3EFE6;
+  --surface-gray: #EBE4D7;
 
   /* Borders */
-  --border-gray: #E5E7EB;
-  --border-emphasis: #D1D5DB;
+  --border-gray: #DED3BE;
+  --border-emphasis: #CBBC9D;
 
-  /* Text */
-  --brand-navy: #111827;
-  --body-text: #111827;
-  --muted-text: #6B7280;
-  --text-tertiary: #9CA3AF;
+  /* Text — neutral ink (echoes the cool dark-mode near-black), on warm paper */
+  --brand-navy: #1B1A1E;
+  --body-text: #1B1A1E;
+  --muted-text: #6F6A61;
+  --text-tertiary: #9C9689;
 
   /* Semantic */
-  --amber-warning: #D97706;
-  --green-success: #16A34A;
-  --danger: #DC2626;
+  --amber-warning: #B5651D;
+  --green-success: #3F7A4C;
+  --danger: #A83B2E;
 
   /* Error/Success state */
-  --error-bg: #FEF2F2;
-  --error-text: #DC2626;
-  --error-border: #FECACA;
-  --success-bg: #F0FDF4;
-  --success-text: #16A34A;
-  --success-border: #BBF7D0;
+  --error-bg: #F5E1DD;
+  --error-text: #832C21;
+  --error-border: #DFB2A8;
+  --success-bg: #E6EEE1;
+  --success-text: #2C5A38;
+  --success-border: #BDD2B3;
 
-  --foreground: #111827;
+  --foreground: #1B1A1E;
   --bmac-bg: #FFFDF7;
-  --progate-overlay: rgba(255, 255, 255, 0.78);
+  --progate-overlay: rgba(250, 248, 243, 0.82);
 
   /* shadcn raw vars (used by focus-visible ring utilities) */
   --ring: var(--accent-blue);
 
   /* ── Design system v2 — surface hierarchy ───── */
   /* --bg > --bg-soft > --bg-sunk (darkening: cards > columns > deep surfaces) */
-  --bg:      var(--background);     /* #FFF  — card / topbar bg      */
-  --bg-soft: var(--card-bg);        /* #F9FAFB — column / hover bg   */
-  --bg-sunk: var(--surface-gray);   /* #F3F4F6 — deep / sunk surface */
+  --bg:      var(--background);     /* #FAF8F3 — card / topbar bg    */
+  --bg-soft: var(--card-bg);        /* #F3EFE6 — column / hover bg   */
+  --bg-sunk: var(--surface-gray);   /* #EBE4D7 — deep / sunk surface */
 
   /* ── Text hierarchy ─────────────────────────── */
-  --text:    var(--brand-navy);     /* #111827 */
-  --muted:   var(--muted-text);     /* #6B7280 */
-  --muted-2: var(--text-tertiary);  /* #9CA3AF */
+  --text:    var(--brand-navy);     /* #1B1A1E */
+  --muted:   var(--muted-text);     /* #6F6A61 */
+  --muted-2: var(--text-tertiary);  /* #9C9689 */
 
   /* ── Borders ─────────────────────────────────── */
-  --border:      var(--border-gray);      /* #E5E7EB */
-  --border-emph: var(--border-emphasis);  /* #D1D5DB */
+  --border:      var(--border-gray);      /* #DED3BE */
+  --border-emph: var(--border-emphasis);  /* #CBBC9D */
 
   /* ── Accent ──────────────────────────────────── */
-  --accent:        var(--accent-blue);       /* #2563EB */
-  --accent-2:      var(--accent-blue-hover); /* #1D4ED8 */
-  --accent-wash:   var(--light-accent);      /* #EFF6FF */
-  --accent-border: #BFDBFE;
-  --gradient-pro:  linear-gradient(135deg, #1E40AF, #2563EB);
+  --accent:        var(--accent-blue);       /* #8F6B22 */
+  --accent-2:      var(--accent-blue-hover); /* #755A1B */
+  --accent-wash:   var(--light-accent);      /* #F4EAD4 */
+  --accent-border: #DEC793;
+  --gradient-pro:  linear-gradient(135deg, #6B4F18, #A5822F);
 
   /* ── Semantic ────────────────────────────────── */
-  --warn:       var(--amber-warning);  /* #D97706 */
-  --warn-bg:    rgba(217,119,6,0.08);
-  --success:    var(--green-success);  /* #16A34A */
-  --danger-bg:  var(--error-bg);       /* #FEF2F2 */
+  --warn:       var(--amber-warning);  /* #B5651D */
+  --warn-bg:    rgba(181,101,29,0.10);
+  --success:    var(--green-success);  /* #3F7A4C */
+  --danger-bg:  var(--error-bg);       /* #F5E1DD */
 
   --mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
-  --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
-  --shadow-md: 0 2px 8px rgba(16,24,40,0.08);
-  --shadow-lg: 0 12px 24px rgba(16,24,40,0.12);
+  --shadow-sm: 0 1px 2px rgba(20,19,22,0.06);
+  --shadow-md: 0 2px 8px rgba(20,19,22,0.09);
+  --shadow-lg: 0 12px 24px rgba(20,19,22,0.14);
 
   /* ── Stage pill tokens — light ───────────────── */
-  --pill-neutral-fg: #4B5563; --pill-neutral-bg: #F3F4F6; --pill-neutral-dot: #9CA3AF;
-  --pill-slate-fg:   #374151; --pill-slate-bg:   #F1F5F9; --pill-slate-dot:   #64748B;
-  --pill-indigo-fg:  #3730A3; --pill-indigo-bg:  #EEF2FF; --pill-indigo-dot:  #6366F1;
-  --pill-violet-fg:  #5B21B6; --pill-violet-bg:  #F5F3FF; --pill-violet-dot:  #8B5CF6;
-  --pill-amber-fg:   #92400E; --pill-amber-bg:   #FFFBEB; --pill-amber-dot:   #F59E0B;
-  --pill-green-fg:   #065F46; --pill-green-bg:   #ECFDF5; --pill-green-dot:   #10B981;
-  --pill-red-fg:     #7F1D1D; --pill-red-bg:     #FEF2F2; --pill-red-dot:     #EF4444;
-  --pill-pink-fg:    #831843; --pill-pink-bg:    #FDF2F8; --pill-pink-dot:    #EC4899;
+  /* Eight distinct hue families (warm-gray/steel/plum/teal/gold/olive/rust/rose)
+     hand-tuned away from Tailwind's default -500 stops, kept saturated enough
+     apart to stay scannable as pipeline-stage categories at a glance. */
+  --pill-neutral-fg: #5C574C; --pill-neutral-bg: #EBE4D7; --pill-neutral-dot: #8C8474;
+  --pill-slate-fg:   #454C52; --pill-slate-bg:   #E3E9EA; --pill-slate-dot:   #6B848C;
+  --pill-indigo-fg:  #5A3E6B; --pill-indigo-bg:  #EEE6F3; --pill-indigo-dot:  #8760A0;
+  --pill-violet-fg:  #1F6B63; --pill-violet-bg:  #E0EFEC; --pill-violet-dot:  #3F9088;
+  --pill-amber-fg:   #7C5A17; --pill-amber-bg:   #FAEFD9; --pill-amber-dot:   #C08A2E;
+  --pill-green-fg:   #3E5A34; --pill-green-bg:   #E8EDDF; --pill-green-dot:   #6C8A54;
+  --pill-red-fg:     #7C3220; --pill-red-bg:     #F6E4DD; --pill-red-dot:     #B85B3E;
+  --pill-pink-fg:    #7C3B4A; --pill-pink-bg:    #F7E5E8; --pill-pink-dot:    #B9707F;
 }
 
 .dark {
   color-scheme: dark;
 
-  --accent-blue: #3B82F6;
-  --accent-blue-hover: #60A5FA;
-  --light-accent: #172554;
-  --accent-blue-text: #93C5FD;
+  /* Deepened gold — --accent-blue doubles as a solid button fill with white
+     text everywhere in the app, and the full-brightness gold (~#C9A24B)
+     only reaches ~2.4:1 against white. This shade holds ~3.9:1 while still
+     reading clearly as gold; --accent-blue-text (link/icon-on-dark-bg use,
+     never overlaid with white) keeps the brighter tone. */
+  --accent-blue: #A1802C;
+  --accent-blue-hover: #BC9640;
+  --light-accent: rgba(161,128,44,0.14);
+  --accent-blue-text: #E4C583;
 
-  --background: #0A0A0A;
-  --card-bg: #161618;
-  --surface-gray: #1E1E20;
+  --background: #0A0B0D;
+  --card-bg: #141519;
+  --surface-gray: #1B1D22;
 
-  --border-gray: #2A2A2C;
-  --border-emphasis: #3A3A3E;
+  --border-gray: #26282E;
+  --border-emphasis: #34373F;
 
-  --brand-navy: #F9FAFB;
-  --body-text: #F9FAFB;
-  --muted-text: #A1A1AA;
-  --text-tertiary: #71717A;
+  --brand-navy: #EFEEEA;
+  --body-text: #EFEEEA;
+  --muted-text: #9C9A96;
+  --text-tertiary: #716F6B;
 
-  --amber-warning: #FBBF24;
-  --green-success: #4ADE80;
-  --danger: #F87171;
+  /* --green-success/--danger double as solid fills (badges, toasts, the
+     destructive button) — deepened for white-text contrast, same reason as
+     --accent-blue above. --success-text/--error-text below stay lighter:
+     those are only ever text color on a translucent tinted background. */
+  --amber-warning: #D68A4E;
+  --green-success: #4C8654;
+  --danger: #B54A34;
 
-  --error-bg: rgba(239, 68, 68, 0.12);
-  --error-text: #f87171;
-  --error-border: rgba(239, 68, 68, 0.25);
-  --success-bg: rgba(34, 197, 94, 0.12);
-  --success-text: #4ade80;
-  --success-border: rgba(34, 197, 94, 0.25);
+  --error-bg: rgba(221, 135, 112, 0.16);
+  --error-text: #E4A491;
+  --error-border: rgba(221, 135, 112, 0.32);
+  --success-bg: rgba(126, 181, 132, 0.14);
+  --success-text: #9ECC9F;
+  --success-border: rgba(126, 181, 132, 0.30);
 
-  --foreground: #F9FAFB;
+  --foreground: #EFEEEA;
   --bmac-bg: #1A1914;
-  --progate-overlay: rgba(10, 10, 10, 0.82);
+  --progate-overlay: rgba(10, 11, 13, 0.82);
 
   --ring: var(--accent-blue);
 
   /* ── Design system v2 — surface hierarchy ───── */
-  --bg:      var(--card-bg);        /* #161618 — card bg (lighter)   */
-  --bg-soft: var(--surface-gray);   /* #1E1E20 — hover / column bg   */
-  --bg-sunk: var(--background);     /* #0A0A0A — page / sunk bg      */
+  --bg:      var(--card-bg);        /* #141519 — card bg (lighter)   */
+  --bg-soft: var(--surface-gray);   /* #1B1D22 — hover / column bg   */
+  --bg-sunk: var(--background);     /* #0A0B0D — page / sunk bg      */
 
   /* ── Text hierarchy ─────────────────────────── */
-  --text:    var(--brand-navy);     /* #F9FAFB */
-  --muted:   var(--muted-text);     /* #A1A1AA */
-  --muted-2: var(--text-tertiary);  /* #71717A */
+  --text:    var(--brand-navy);     /* #EFEEEA */
+  --muted:   var(--muted-text);     /* #9C9A96 */
+  --muted-2: var(--text-tertiary);  /* #716F6B */
 
   /* ── Borders ─────────────────────────────────── */
-  --border:      var(--border-gray);      /* #2A2A2C */
-  --border-emph: var(--border-emphasis);  /* #3A3A3E */
+  --border:      var(--border-gray);      /* #26282E */
+  --border-emph: var(--border-emphasis);  /* #34373F */
 
   /* ── Accent ──────────────────────────────────── */
-  --accent:        var(--accent-blue);       /* #3B82F6 */
-  --accent-2:      var(--accent-blue-hover); /* #60A5FA */
-  --accent-wash:   rgba(59,130,246,0.12);
-  --accent-border: rgba(59,130,246,0.30);
+  --accent:        var(--accent-blue);       /* #A1802C */
+  --accent-2:      var(--accent-blue-hover); /* #BC9640 */
+  --accent-wash:   rgba(161,128,44,0.14);
+  --accent-border: rgba(161,128,44,0.32);
+  --gradient-pro:  linear-gradient(135deg, #8F6B22, #E4C583);
 
   /* ── Semantic ────────────────────────────────── */
-  --warn:       var(--amber-warning);  /* #FBBF24 */
-  --warn-bg:    rgba(251,191,36,0.10);
-  --success:    var(--green-success);  /* #4ADE80 */
-  --danger-bg:  var(--error-bg);       /* rgba(239,68,68,0.12) */
+  --warn:       var(--amber-warning);  /* #D68A4E */
+  --warn-bg:    rgba(214,138,78,0.12);
+  --success:    var(--green-success);  /* #4C8654 */
+  --danger-bg:  var(--error-bg);       /* rgba(221,135,112,0.16) */
 
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
   --shadow-md: 0 2px 10px rgba(0,0,0,0.30);
   --shadow-lg: 0 16px 32px rgba(0,0,0,0.40);
 
   /* ── Stage pill tokens — dark ────────────────── */
-  --pill-neutral-fg: #9CA3AF; --pill-neutral-bg: #1F2937; --pill-neutral-dot: #6B7280;
-  --pill-slate-fg:   #CBD5E1; --pill-slate-bg:   #1E293B; --pill-slate-dot:   #94A3B8;
-  --pill-indigo-fg:  #A5B4FC; --pill-indigo-bg:  #1E1B4B; --pill-indigo-dot:  #818CF8;
-  --pill-violet-fg:  #C4B5FD; --pill-violet-bg:  #2E1065; --pill-violet-dot:  #A78BFA;
-  --pill-amber-fg:   #FCD34D; --pill-amber-bg:   #292524; --pill-amber-dot:   #FBBF24;
-  --pill-green-fg:   #6EE7B7; --pill-green-bg:   #022C22; --pill-green-dot:   #34D399;
-  --pill-red-fg:     #FCA5A5; --pill-red-bg:     #450A0A; --pill-red-dot:     #F87171;
-  --pill-pink-fg:    #F9A8D4; --pill-pink-bg:    #500724; --pill-pink-dot:    #F472B6;
+  --pill-neutral-fg: #B8AD9B; --pill-neutral-bg: #1B1D22; --pill-neutral-dot: #948870;
+  --pill-slate-fg:   #9DC2CE; --pill-slate-bg:   #17242A; --pill-slate-dot:   #5E8A99;
+  --pill-indigo-fg:  #C9AEDD; --pill-indigo-bg:  #221B2C; --pill-indigo-dot:  #9B72B8;
+  --pill-violet-fg:  #8FD0C4; --pill-violet-bg:  #102621; --pill-violet-dot:  #4FA898;
+  --pill-amber-fg:   #E8C878; --pill-amber-bg:   #2A2110; --pill-amber-dot:   #C99A3E;
+  --pill-green-fg:   #A8C994; --pill-green-bg:   #1A2314; --pill-green-dot:   #7FA664;
+  --pill-red-fg:     #E2A88F; --pill-red-bg:     #271A17; --pill-red-dot:     #C97350;
+  --pill-pink-fg:    #E2A6B4; --pill-pink-bg:    #26191F; --pill-pink-dot:    #C77E8F;
 }
 
 @theme inline {
@@ -250,7 +266,7 @@ button, a, input, select, textarea, [role="button"] {
 /* Focus ring — smooth transition on all inputs */
 input:focus, textarea:focus, select:focus {
   border-color: var(--accent-blue) !important;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-blue) 16%, transparent) !important;
   outline: none !important;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -436,13 +452,13 @@ body {
   to   { transform: scaleX(1); }
 }
 @keyframes wt-badge-pulse {
-  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-  50%     { box-shadow: 0 0 0 3px rgba(239,68,68,0.15); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(168,59,46,0); }
+  50%     { box-shadow: 0 0 0 3px rgba(168,59,46,0.15); }
 }
 @keyframes wt-stat-highlight {
-  0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
-  50%  { box-shadow: 0 0 0 3px rgba(245,158,11,0.2); }
-  100% { box-shadow: 0 0 0 2px rgba(245,158,11,0.1); }
+  0%   { box-shadow: 0 0 0 0 rgba(181,101,29,0); }
+  50%  { box-shadow: 0 0 0 3px rgba(181,101,29,0.2); }
+  100% { box-shadow: 0 0 0 2px rgba(181,101,29,0.1); }
 }
 @keyframes wt-slide-left {
   from { opacity: 0; transform: translateX(-10px); }
@@ -641,7 +657,7 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #EF4444;
+  background: var(--danger);
   animation: pulseDot 1.8s ease-in-out infinite;
 }
 

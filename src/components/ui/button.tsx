@@ -8,8 +8,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:     'bg-accent-blue text-white hover:bg-accent-blue-hover [transition:background_220ms_ease,transform_120ms_ease,box-shadow_220ms_ease] hover:shadow-[0_4px_14px_rgba(37,99,235,0.35)]',
-        destructive: 'bg-red-600 text-white hover:bg-red-700 [transition:background_220ms_ease,transform_120ms_ease]',
+        default:     'bg-accent-blue text-white hover:bg-accent-blue-hover [transition:background_220ms_ease,transform_120ms_ease,box-shadow_220ms_ease] hover:shadow-[0_4px_14px_color-mix(in_oklch,var(--accent-blue)_35%,transparent)]',
+        destructive: 'bg-[var(--danger)] text-white hover:bg-[color-mix(in_oklch,var(--danger)_82%,black)] [transition:background_220ms_ease,transform_120ms_ease]',
         outline:     'border border-border-gray bg-background text-brand-navy hover:bg-surface-gray hover:border-border-emphasis [transition:background_220ms_ease,border-color_220ms_ease,transform_120ms_ease]',
         secondary:   'bg-surface-gray text-brand-navy hover:bg-border-gray [transition:background_220ms_ease,transform_120ms_ease]',
         ghost:       'text-muted-text hover:bg-surface-gray hover:text-brand-navy [transition:background_220ms_ease,color_220ms_ease,transform_120ms_ease]',

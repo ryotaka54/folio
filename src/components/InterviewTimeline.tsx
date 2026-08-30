@@ -123,7 +123,7 @@ export default function InterviewTimeline({ steps, onUpdate, isShuukatsu = false
                         <ChevronDown size={12} />
                       </button>
                     )}
-                    <button onClick={(e) => { e.stopPropagation(); removeStep(step.id); }} aria-label={ja ? '削除' : 'Delete step'} className="p-0.5 rounded hover:bg-red-500/10 transition-colors" style={{ color: 'var(--muted-text)' }}>
+                    <button onClick={(e) => { e.stopPropagation(); removeStep(step.id); }} aria-label={ja ? '削除' : 'Delete step'} className="p-0.5 rounded hover:bg-[color-mix(in_oklch,var(--danger)_10%,transparent)] transition-colors" style={{ color: 'var(--muted-text)' }}>
                       <Trash2 size={12} />
                     </button>
                   </div>

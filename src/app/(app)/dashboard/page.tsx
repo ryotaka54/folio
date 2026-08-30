@@ -485,7 +485,7 @@ function DashboardContent() {
 
       {/* Store error banner */}
       {storeError && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-red-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 bg-[var(--danger)] text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg">
           {storeError}
           <button
             onClick={() => { clearStoreError(); retryLoad(); }}
@@ -684,7 +684,7 @@ function DashboardContent() {
             Apply
           </button>
           <div className="w-px h-4 bg-white/20 mx-1" />
-          <button onClick={handleBulkDelete} className="px-3 h-7 bg-red-500 text-white text-[12px] font-medium rounded-md hover:bg-red-600 transition-colors">
+          <button onClick={handleBulkDelete} className="px-3 h-7 bg-[var(--danger)] text-white text-[12px] font-medium rounded-md hover:bg-[color-mix(in_oklch,var(--danger)_82%,black)] transition-colors">
             Delete
           </button>
           <button onClick={() => setSelectedIds(new Set())} className="ml-1 text-white/60 hover:text-white text-[12px]">

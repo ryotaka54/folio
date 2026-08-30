@@ -297,7 +297,7 @@ export default function ContactDrawer({ contact, open, onClose, onUpdate, onDele
                     <div className="bg-error-bg border border-error-border rounded-lg p-3">
                       <p className="text-[13px] mb-2" style={{ color: 'var(--error-text)' }}>Delete {contact.name}? This cannot be undone.</p>
                       <div className="flex gap-2">
-                        <button onClick={() => { onDelete(contact.id); onClose(); }} className="px-3 py-1.5 bg-red-500 text-white text-[12px] font-medium rounded-md">
+                        <button onClick={() => { onDelete(contact.id); onClose(); }} className="px-3 py-1.5 bg-[var(--danger)] text-white text-[12px] font-medium rounded-md">
                           Yes, delete
                         </button>
                         <button onClick={() => setShowDeleteConfirm(false)} className="px-3 py-1.5 text-[12px] font-medium rounded-md border border-border-gray" style={{ background: 'var(--card-bg)', color: 'var(--brand-navy)' }}>

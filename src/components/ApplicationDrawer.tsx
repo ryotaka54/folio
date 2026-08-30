@@ -564,7 +564,7 @@ export default function ApplicationDrawer({
                         {isShuukatsu ? 'この選考を削除しますか？' : "Remove this application? You'll have a moment to undo."}
                       </p>
                       <div className="flex gap-2">
-                        <button onClick={() => { onDelete(application.id); onClose(); }} className="px-3 py-1.5 bg-red-500 text-white text-[12px] font-medium rounded-md hover:bg-red-600 transition-colors">
+                        <button onClick={() => { onDelete(application.id); onClose(); }} className="px-3 py-1.5 bg-[var(--danger)] text-white text-[12px] font-medium rounded-md hover:bg-[color-mix(in_oklch,var(--danger)_82%,black)] transition-colors">
                           {isShuukatsu ? '削除する' : 'Yes, delete'}
                         </button>
                         <button onClick={() => setShowDeleteConfirm(false)} className="px-3 py-1.5 text-[12px] font-medium rounded-md border border-border-gray transition-colors" style={{ background: 'var(--card-bg)', color: 'var(--brand-navy)' }}>
