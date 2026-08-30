@@ -309,8 +309,8 @@ function WeeklyCoachPanel() {
   return (
     <div style={{ flex: 1, padding: '8px 10px', overflow: 'hidden' }}>
       <div style={{
-        borderRadius: 10, border: '1px solid rgba(37,99,235,0.2)',
-        background: 'linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(37,99,235,0.02) 100%)',
+        borderRadius: 10, border: `1px solid ${D.accentBlue}33`,
+        background: `${D.accentBlue}0D`,
         padding: '11px 12px', height: '100%', overflow: 'auto',
         display: 'flex', flexDirection: 'column' as const, gap: 9,
         boxSizing: 'border-box' as const,
@@ -557,8 +557,8 @@ function JaWeeklyCoachPanel() {
   return (
     <div style={{ flex: 1, padding: '8px 10px', overflow: 'hidden' }}>
       <div style={{
-        borderRadius: 10, border: '1px solid rgba(37,99,235,0.2)',
-        background: 'linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(37,99,235,0.02) 100%)',
+        borderRadius: 10, border: `1px solid ${D.accentBlue}33`,
+        background: `${D.accentBlue}0D`,
         padding: '11px 12px', height: '100%', overflow: 'auto',
         display: 'flex', flexDirection: 'column' as const, gap: 9,
         boxSizing: 'border-box' as const,

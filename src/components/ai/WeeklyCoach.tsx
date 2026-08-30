@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sparkles, X } from 'lucide-react';
+import { Sparkles, X, RotateCcw } from 'lucide-react';
 import ProGate from '@/components/ProGate';
 import { authFetch } from '@/lib/auth-fetch';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { AILoadingState } from '@/components/ui/ai-loading-state';
 
 interface CoachData {
   headline: string;
@@ -35,19 +36,6 @@ function getDismissKey(): string {
   return `weekly_coach_dismissed_${week}`;
 }
 
-function Skeleton() {
-  return (
-    <div className="animate-pulse space-y-3 p-4 rounded-xl border border-border-gray">
-      <div className="flex items-center gap-2">
-        <div className="h-3 rounded w-6" style={{ background: 'var(--surface-gray)' }} />
-        <div className="h-3 rounded w-40" style={{ background: 'var(--surface-gray)' }} />
-      </div>
-      <div className="h-3 rounded w-full" style={{ background: 'var(--surface-gray)' }} />
-      <div className="h-3 rounded w-4/5" style={{ background: 'var(--surface-gray)' }} />
-    </div>
-  );
-}
-
 export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
   const [data, setData] = useState<CoachData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -61,11 +49,7 @@ export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
     }
   }, []);
 
-  useEffect(() => {
-    if (!isPro || dismissed || !shouldShowCoach()) return;
-    // Kicks off the API fetch below — part of the same synchronization
-    // with the external request, not a derived value.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const fetchCoach = () => {
     setLoading(true);
     authFetch('/api/ai/weekly-coach', {
       method: 'POST',
@@ -78,6 +62,14 @@ export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
       })
       .catch((e: Error) => console.error('Weekly coach fetch failed:', e.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!isPro || dismissed || !shouldShowCoach()) return;
+    // Kicks off the API fetch below — part of the same synchronization
+    // with the external request, not a derived value.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchCoach();
   }, [isPro, dismissed]);
 
   const handleDismiss = () => {
@@ -111,7 +103,7 @@ export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
 
   return (
     <div data-tutorial-id="weekly-coach">
-      {loading && <Skeleton />}
+      {loading && <AILoadingState label="Reading your week…" lines={3} className="p-4 rounded-xl border border-border-gray" />}
       <AnimatePresence>
         {data && !loading && !dismissed && (
           <motion.div
@@ -120,23 +112,33 @@ export default function WeeklyCoach({ isPro, onUpgrade }: WeeklyCoachProps) {
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -16, scale: 0.98 }}
             transition={coachSpring}
             className="rounded-xl border p-4 space-y-3 relative"
-            style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.04) 0%, rgba(37,99,235,0.01) 100%)', borderColor: 'rgba(37,99,235,0.2)' }}
+            style={{ background: 'color-mix(in oklch, var(--accent-blue) 5%, var(--card-bg))', borderColor: 'color-mix(in oklch, var(--accent-blue) 20%, transparent)' }}
           >
-            <button
-              onClick={handleDismiss}
-              className="absolute top-3 right-3 p-1 rounded-md hover:bg-surface-gray transition-colors"
-              style={{ color: 'var(--muted-text)' }}
-              aria-label="Dismiss"
-            >
-              <X size={13} />
-            </button>
+            <div className="absolute top-3 right-3 flex items-center gap-1">
+              <button
+                onClick={fetchCoach}
+                className="p-1 rounded-md hover:bg-surface-gray transition-colors"
+                style={{ color: 'var(--muted-text)' }}
+                aria-label="Regenerate"
+              >
+                <RotateCcw size={12} />
+              </button>
+              <button
+                onClick={handleDismiss}
+                className="p-1 rounded-md hover:bg-surface-gray transition-colors"
+                style={{ color: 'var(--muted-text)' }}
+                aria-label="Dismiss"
+              >
+                <X size={13} />
+              </button>
+            </div>
 
             <div className="flex items-center gap-2">
               <Sparkles size={13} style={{ color: 'var(--accent-blue)' }} />
               <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--accent-blue)' }}>Weekly Recruiting Coach</span>
             </div>
 
-            <p className="text-[14px] font-semibold pr-6" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>{data.headline}</p>
+            <p className="text-[14px] font-semibold pr-10" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>{data.headline}</p>
             <p className="text-[12px] leading-relaxed" style={{ color: 'var(--brand-navy)' }}>{data.assessment}</p>
 
             <div>
