@@ -6,6 +6,8 @@ import { Application } from '@/lib/types';
 import { appsAddedThisWeek, getWeeklyGoal } from '@/lib/recruiting';
 import CompanyAvatar from './CompanyAvatar';
 import StagePill from './StagePill';
+import EmptyState from './EmptyState';
+import WeeklyCoach from './ai/WeeklyCoach';
 import { Clock, Flame, Trophy, Target, Mail, Sparkles } from 'lucide-react';
 
 interface TodayViewProps {
@@ -14,6 +16,13 @@ interface TodayViewProps {
   onOpenApp: (app: Application) => void;
   locale?: 'ja';
   prepRoute?: string; // defaults to '/interview'
+  /** Empty-state ("no applications yet") wiring — omit to fall back to a plain message. */
+  onAdd?: () => void;
+  onAutofillUrl?: (url: string) => void;
+  hideExtensionHint?: boolean;
+  /** Weekly Coach — English only for now (its UI copy isn't localized yet). */
+  isPro?: boolean;
+  onUpgrade?: () => void;
 }
 
 const TERMINAL = new Set(['Rejected', 'Declined', 'Accepted', '承諾', '内定']);
@@ -23,6 +32,7 @@ const WIN_STAGES = new Set([
   'Offer', 'Offer — Negotiating', 'Accepted',
   '一次面接', '二次面接', '最終面接', '内々定', '内定',
 ]);
+const URGENT_DAYS = 3;
 
 function todayStr() {
   return new Date().toISOString().split('T')[0];
@@ -124,6 +134,7 @@ function Section({ title, subtitle, action, onAction, children }: {
         {action && (
           <button
             onClick={onAction}
+            className="hover:text-text"
             style={{ fontSize: 12, color: 'var(--muted-text)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
           >
             {action} ↗
@@ -135,7 +146,47 @@ function Section({ title, subtitle, action, onAction, children }: {
   );
 }
 
-export default function TodayView({ applications, userName, onOpenApp, locale, prepRoute = '/interview' }: TodayViewProps) {
+function DeckRow({ a, days, urgent, locale, onOpenApp }: {
+  a: Application; days: number; urgent: boolean; locale?: 'ja'; onOpenApp: (a: Application) => void;
+}) {
+  return (
+    <div
+      onClick={() => onOpenApp(a)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === 'Enter' && onOpenApp(a)}
+      className="hover:bg-surface-gray"
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '10px 14px',
+        background: 'transparent',
+        cursor: 'pointer',
+      }}
+    >
+      <div style={{
+        width: 44, textAlign: 'center', padding: '4px 0', borderRadius: 6, flexShrink: 0,
+        background: urgent ? 'var(--warn-bg, rgba(217,119,6,0.08))' : 'var(--surface-gray)',
+        color: urgent ? 'var(--amber-warning)' : 'var(--muted-text)',
+        fontSize: 11, fontWeight: 500,
+        border: '1px solid var(--border-gray)',
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1 }}>{days === 0 ? (locale === 'ja' ? '今日' : 'Now') : days}</div>
+        {days !== 0 && <div style={{ fontSize: 9, marginTop: 1, opacity: 0.8 }}>{locale === 'ja' ? '日' : (days === 1 ? 'day' : 'days')}</div>}
+      </div>
+      <CompanyAvatar company={a.company} size={28} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.company}</div>
+        <div style={{ fontSize: 11.5, color: 'var(--muted-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.role}</div>
+      </div>
+      <StagePill stage={a.status} size="sm" />
+    </div>
+  );
+}
+
+export default function TodayView({
+  applications, userName, onOpenApp, locale, prepRoute = '/interview',
+  onAdd, onAutofillUrl, hideExtensionHint, isPro, onUpgrade,
+}: TodayViewProps) {
   const today = todayStr();
   const router = useRouter();
 
@@ -152,7 +203,13 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
   );
 
   const nextUp = actionable[0];
-  const onDeck = actionable.slice(1, 7);
+  const rest = actionable.slice(1, 7);
+  // Split the remaining deck into "needs attention" (due within URGENT_DAYS)
+  // and a calmer "this week" group — the brief asked for a real priority
+  // zone at the top, not one flat list where urgency only shows up as a
+  // per-row chip color.
+  const needsAttention = rest.filter(a => daysBetween(a.deadline!, today) <= URGENT_DAYS);
+  const thisWeek = rest.filter(a => daysBetween(a.deadline!, today) > URGENT_DAYS);
 
   const stuck = useMemo(() =>
     applications
@@ -216,6 +273,23 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
     ? new Date().toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
     : new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
+  // Real status summary instead of a decorative greeting — the whole point
+  // of putting this at the top is to tell the user what actually matters
+  // right now without reading further.
+  const urgentCount = (nextUp ? 1 : 0) + needsAttention.length;
+  const dueToday = actionable.filter(a => daysBetween(a.deadline!, today) === 0).length;
+  const statusLine = locale === 'ja'
+    ? (urgentCount === 0
+        ? 'すぐに対応が必要な選考はありません。'
+        : dueToday > 0
+          ? `本日締め切りが${dueToday}件、対応が必要な選考が${urgentCount}件あります。`
+          : `対応が必要な選考が${urgentCount}件あります。`)
+    : (urgentCount === 0
+        ? "Nothing urgent — you're on top of things."
+        : dueToday > 0
+          ? `${dueToday} deadline${dueToday === 1 ? '' : 's'} today, ${urgentCount} application${urgentCount === 1 ? '' : 's'} need${urgentCount === 1 ? 's' : ''} attention.`
+          : `${urgentCount} application${urgentCount === 1 ? '' : 's'} need${urgentCount === 1 ? 's' : ''} attention this week.`);
+
   return (
     <div style={{ padding: '28px 24px 80px', maxWidth: 1300, margin: '0 auto' }}>
       {/* Greeting */}
@@ -227,31 +301,29 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
         }}>
           {dateLabel}
         </div>
-        <h1 style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.03em', margin: 0, lineHeight: 1.2, color: 'var(--brand-navy)', fontFamily: locale === 'ja' ? "'Noto Sans JP', sans-serif" : undefined }}>
+        <h1
+          className={locale === 'ja' ? '' : 'font-display'}
+          style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em', margin: 0, lineHeight: 1.2, color: 'var(--brand-navy)', fontFamily: locale === 'ja' ? "'Noto Sans JP', sans-serif" : undefined }}
+        >
           {locale === 'ja'
             ? (userName ? `${userName}さん、` : 'こんにちは。')
             : (userName ? `Morning, ${userName}.` : 'Good morning.')}
-          {' '}
-          <span style={{ color: 'var(--muted-text)' }}>
-            {locale === 'ja' ? '今日の選考状況です。' : "Here's where things stand."}
-          </span>
         </h1>
+        <p style={{ fontSize: 14, margin: '4px 0 0', color: urgentCount > 0 ? 'var(--amber-warning)' : 'var(--muted-text)', fontWeight: urgentCount > 0 ? 500 : 400 }}>
+          {statusLine}
+        </p>
       </div>
 
       {applications.length === 0 ? (
-        <div style={{
-          padding: '60px 24px',
-          textAlign: 'center',
-          border: '1px dashed var(--border-gray)',
-          borderRadius: 14,
-        }}>
-          <p style={{ fontSize: 15, color: 'var(--muted-text)', margin: '0 0 8px' }}>
-            {locale === 'ja' ? 'まだ選考を追加していません。' : 'No applications yet.'}
-          </p>
-          <p style={{ fontSize: 13, color: 'var(--text-tertiary)', margin: 0 }}>
-            {locale === 'ja' ? '最初の選考を追加すると、ここに表示されます。' : 'Add your first application to see your command center here.'}
-          </p>
-        </div>
+        onAdd ? (
+          <EmptyState onAdd={onAdd} onAutofillUrl={onAutofillUrl} hideExtensionHint={hideExtensionHint} locale={locale} />
+        ) : (
+          <div style={{ padding: '60px 24px', textAlign: 'center', border: '1px dashed var(--border-gray)', borderRadius: 'var(--radius-2xl, 12px)' }}>
+            <p style={{ fontSize: 15, color: 'var(--muted-text)', margin: 0 }}>
+              {locale === 'ja' ? 'まだ選考を追加していません。' : 'No applications yet.'}
+            </p>
+          </div>
+        )
       ) : (
         <div style={{
           display: 'grid',
@@ -260,11 +332,11 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
         }}
           className="today-grid"
         >
-          {/* ── LEFT COLUMN ── */}
+          {/* ── LEFT COLUMN — needs attention now, then this week ── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* Next-up hero */}
             {nextUp ? (
-              <div className="next-up-hero" style={{ padding: 24, borderRadius: 14, position: 'relative', overflow: 'hidden' }}>
+              <div className="next-up-hero" style={{ padding: 24, borderRadius: 'var(--radius-2xl, 12px)', position: 'relative', overflow: 'hidden' }}>
                 <div className="next-up-badge" style={{
                   position: 'absolute', top: 16, right: 16,
                   display: 'flex', alignItems: 'center', gap: 5,
@@ -324,7 +396,7 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
               </div>
             ) : (
               <div style={{
-                padding: 24, borderRadius: 14,
+                padding: 24, borderRadius: 'var(--radius-2xl, 12px)',
                 border: '1px dashed var(--border-gray)',
                 background: 'var(--card-bg)',
                 textAlign: 'center',
@@ -338,59 +410,42 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
               </div>
             )}
 
-            {/* On deck */}
-            {onDeck.length > 0 && (
+            {/* Needs attention — everything else due within URGENT_DAYS */}
+            {needsAttention.length > 0 && (
               <Section
-              title={locale === 'ja' ? '期限が近い' : 'On deck'}
-              subtitle={locale === 'ja' ? `締め切りまで${actionable.length}件` : `${actionable.length} with upcoming deadlines`}
-            >
+                title={locale === 'ja' ? '対応が必要' : 'Needs attention'}
+                subtitle={locale === 'ja' ? `あと${URGENT_DAYS}日以内` : `Due within ${URGENT_DAYS} days`}
+              >
+                <div style={{
+                  border: '1px solid rgba(217,119,6,0.35)',
+                  borderRadius: 'var(--radius-lg, 8px)', overflow: 'hidden', background: 'var(--card-bg)',
+                }}>
+                  {needsAttention.map((a, i) => (
+                    <div key={a.id} style={{ borderBottom: i < needsAttention.length - 1 ? '1px solid var(--border-gray)' : 'none' }}>
+                      <DeckRow a={a} days={daysBetween(a.deadline!, today)} urgent locale={locale} onOpenApp={onOpenApp} />
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            )}
+
+            {/* This week — calmer, no urgency styling */}
+            {thisWeek.length > 0 && (
+              <Section
+                title={locale === 'ja' ? '今週の予定' : 'This week'}
+                subtitle={locale === 'ja' ? `締め切りまで${actionable.length}件` : `${actionable.length} with upcoming deadlines`}
+              >
                 <div style={{
                   border: '1px solid var(--border-gray)',
-                  borderRadius: 12,
+                  borderRadius: 'var(--radius-lg, 8px)',
                   overflow: 'hidden',
                   background: 'var(--card-bg)',
                 }}>
-                  {onDeck.map((a, i) => {
-                    const days = daysBetween(a.deadline!, today);
-                    const urgent = days <= 3;
-                    return (
-                      <div
-                        key={a.id}
-                        onClick={() => onOpenApp(a)}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={e => e.key === 'Enter' && onOpenApp(a)}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 12,
-                          padding: '10px 14px',
-                          borderBottom: i < onDeck.length - 1 ? '1px solid var(--border-gray)' : 'none',
-                          background: 'transparent',
-                          cursor: 'pointer',
-                          transition: 'background 0.12s',
-                        }}
-                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'var(--surface-gray)'}
-                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'transparent'}
-                      >
-                        {/* Day countdown chip */}
-                        <div style={{
-                          width: 44, textAlign: 'center', padding: '4px 0', borderRadius: 6, flexShrink: 0,
-                          background: urgent ? 'var(--warn-bg, rgba(217,119,6,0.08))' : 'var(--surface-gray)',
-                          color: urgent ? 'var(--amber-warning)' : 'var(--muted-text)',
-                          fontSize: 11, fontWeight: 500,
-                          border: '1px solid var(--border-gray)',
-                        }}>
-                          <div style={{ fontSize: 14, fontWeight: 700, lineHeight: 1 }}>{days === 0 ? (locale === 'ja' ? '今日' : 'Now') : days}</div>
-                          {days !== 0 && <div style={{ fontSize: 9, marginTop: 1, opacity: 0.8 }}>{locale === 'ja' ? '日' : (days === 1 ? 'day' : 'days')}</div>}
-                        </div>
-                        <CompanyAvatar company={a.company} size={28} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.company}</div>
-                          <div style={{ fontSize: 11.5, color: 'var(--muted-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.role}</div>
-                        </div>
-                        <StagePill stage={a.status} size="sm" />
-                      </div>
-                    );
-                  })}
+                  {thisWeek.map((a, i) => (
+                    <div key={a.id} style={{ borderBottom: i < thisWeek.length - 1 ? '1px solid var(--border-gray)' : 'none' }}>
+                      <DeckRow a={a} days={daysBetween(a.deadline!, today)} urgent={false} locale={locale} onOpenApp={onOpenApp} />
+                    </div>
+                  ))}
                 </div>
               </Section>
             )}
@@ -406,17 +461,15 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
                       <button
                         key={a.id}
                         onClick={() => onOpenApp(a)}
+                        className="hover:bg-surface-gray"
                         style={{
-                          padding: 14, borderRadius: 10,
+                          padding: 14, borderRadius: 'var(--radius-lg, 8px)',
                           border: '1px solid var(--border-gray)',
                           background: 'var(--card-bg)',
                           textAlign: 'left', cursor: 'pointer', fontFamily: 'inherit',
                           color: 'var(--brand-navy)',
                           display: 'flex', alignItems: 'center', gap: 12,
-                          transition: 'background 0.12s',
                         }}
-                        onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-gray)'}
-                        onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = 'var(--card-bg)'}
                       >
                         <CompanyAvatar company={a.company} size={32} />
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -439,10 +492,15 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
             )}
           </div>
 
-          {/* ── RIGHT COLUMN ── */}
+          {/* ── RIGHT COLUMN — calm summary strip ── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* Weekly Coach — English only for now, self-hides when not applicable */}
+            {locale !== 'ja' && isPro !== undefined && onUpgrade && (
+              <WeeklyCoach isPro={isPro} onUpgrade={onUpgrade} />
+            )}
+
             {/* Momentum card */}
-            <div style={{ padding: 20, borderRadius: 14, border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
+            <div style={{ padding: 20, borderRadius: 'var(--radius-2xl, 12px)', border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{
@@ -482,7 +540,7 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
 
             {/* Moving forward */}
             {recentWins.length > 0 && (
-              <div style={{ padding: 20, borderRadius: 14, border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
+              <div style={{ padding: 20, borderRadius: 'var(--radius-2xl, 12px)', border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: 7,
@@ -499,15 +557,13 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
                     <button
                       key={a.id}
                       onClick={() => onOpenApp(a)}
+                      className="hover:bg-surface-gray"
                       style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '8px 10px', borderRadius: 8, border: 'none',
                         background: 'transparent', cursor: 'pointer',
                         fontFamily: 'inherit', color: 'var(--brand-navy)', textAlign: 'left',
-                        transition: 'background 0.12s',
                       }}
-                      onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-gray)'}
-                      onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.background = 'transparent'}
                     >
                       <CompanyAvatar company={a.company} size={28} />
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -522,7 +578,7 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
             )}
 
             {/* Weekly goal */}
-            <div style={{ padding: 20, borderRadius: 14, border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
+            <div style={{ padding: 20, borderRadius: 'var(--radius-2xl, 12px)', border: '1px solid var(--border-gray)', background: 'var(--card-bg)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--brand-navy)' }}>{locale === 'ja' ? '週間目標' : 'Weekly goal'}</div>
                 <div style={{ fontSize: 12, color: 'var(--muted-text)', fontFamily: 'var(--mono, ui-monospace)', fontVariantNumeric: 'tabular-nums' }}>
@@ -534,13 +590,13 @@ export default function TodayView({ applications, userName, onOpenApp, locale, p
                   height: '100%',
                   width: `${goalPct}%`,
                   borderRadius: 3,
-                  background: 'linear-gradient(90deg, var(--accent-blue), var(--accent-blue-hover))',
-                  transition: 'width 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+                  background: 'var(--accent-blue)',
+                  transition: 'width 0.6s ease',
                 }} />
               </div>
               <div style={{ marginTop: 10, fontSize: 12, color: 'var(--muted-text)', lineHeight: 1.5 }}>
                 {weeklyCount >= weeklyGoal
-                  ? (locale === 'ja' ? '🎉 目標達成！素晴らしい週でした。' : '🎉 Goal hit — great week.')
+                  ? (locale === 'ja' ? '目標達成 — 素晴らしい週でした。' : 'Goal hit — great week.')
                   : (locale === 'ja' ? `あと${weeklyGoal - weeklyCount}社で今週の目標達成です。` : `${weeklyGoal - weeklyCount} more to hit your goal this week.`)}
               </div>
             </div>

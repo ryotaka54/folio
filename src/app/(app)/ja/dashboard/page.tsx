@@ -349,6 +349,8 @@ function JaDashboardContent() {
             onOpenApp={handleCardClick}
             locale="ja"
             prepRoute="/ja/interview"
+            onAdd={() => setShowAddModal(true)}
+            hideExtensionHint
           />
           <footer className="mt-16 pt-6 border-t border-border-gray flex justify-between flex-wrap gap-3">
             <div className="flex gap-5">

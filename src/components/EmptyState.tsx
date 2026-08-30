@@ -9,9 +9,44 @@ interface EmptyStateProps {
   onAdd: () => void;
   onAutofillUrl?: (url: string) => void;
   hideExtensionHint?: boolean;
+  locale?: 'ja';
 }
 
-export default function EmptyState({ onAdd, hideExtensionHint }: EmptyStateProps) {
+const COPY = {
+  en: {
+    headline: 'Ready to start recruiting?',
+    subtitle: 'Add your first application and Applyd starts working for you.',
+    aiTeaser: 'AI interview prep, follow-up emails & coaching — automatically.',
+    cta: 'Add Application',
+    ctaHint: 'Takes 30 seconds. No spreadsheet needed.',
+    extensionHint: (
+      <>
+        Already found jobs? The{' '}
+        <a
+          href="https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="tap-compact"
+          style={{ color: 'var(--muted-text)', textDecoration: 'underline', textUnderlineOffset: 2 }}
+        >
+          Applyd extension
+        </a>
+        {' '}logs them directly from LinkedIn or Handshake in one click.
+      </>
+    ),
+  },
+  ja: {
+    headline: '就活を始めましょう',
+    subtitle: '最初の選考を追加すると、Applydがあなたのために動き始めます。',
+    aiTeaser: 'AI面接対策・フォローアップメール・コーチングを自動で。',
+    cta: '選考を追加',
+    ctaHint: '所要時間は30秒。スプレッドシートは不要です。',
+    extensionHint: null,
+  },
+};
+
+export default function EmptyState({ onAdd, hideExtensionHint, locale }: EmptyStateProps) {
+  const t = COPY[locale === 'ja' ? 'ja' : 'en'];
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 mt-4">
 
@@ -45,18 +80,21 @@ export default function EmptyState({ onAdd, hideExtensionHint }: EmptyStateProps
       </div>
 
       {/* Headline */}
-      <h3 className="text-[20px] sm:text-[16px] font-bold mb-2 text-center" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>
-        Ready to start recruiting?
+      <h3
+        className={`text-[20px] sm:text-[16px] font-bold mb-2 text-center ${locale === 'ja' ? '' : 'font-display'}`}
+        style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: locale === 'ja' ? "'Noto Sans JP', sans-serif" : undefined }}
+      >
+        {t.headline}
       </h3>
       <p className="text-[14px] sm:text-[13px] text-center max-w-xs mb-1" style={{ color: 'var(--muted-text)' }}>
-        Add your first application and Applyd starts working for you.
+        {t.subtitle}
       </p>
 
       {/* AI features teaser */}
       <div className="flex items-center gap-1.5 mb-7 mt-1">
         <Sparkles size={11} style={{ color: 'var(--accent-blue)' }} />
         <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
-          AI interview prep, follow-up emails &amp; coaching — automatically.
+          {t.aiTeaser}
         </p>
       </div>
 
@@ -66,26 +104,16 @@ export default function EmptyState({ onAdd, hideExtensionHint }: EmptyStateProps
         className="w-full sm:w-auto sm:px-6 rounded-xl sm:rounded-md font-semibold text-white transition-colors active:opacity-80"
         style={{ background: 'var(--accent-blue)', minHeight: 56, fontSize: 16 }}
       >
-        Add Application
+        {t.cta}
       </button>
 
       <p className="mt-3 text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
-        Takes 30 seconds. No spreadsheet needed.
+        {t.ctaHint}
       </p>
 
-      {!hideExtensionHint && (
+      {!hideExtensionHint && t.extensionHint && (
         <p className="mt-6 text-[11px] text-center max-w-xs hidden sm:block" style={{ color: 'var(--text-tertiary)' }}>
-          Already found jobs? The{' '}
-          <a
-            href="https://chromewebstore.google.com/detail/ggmjnghbacddpbgimenpickockijboao"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="tap-compact"
-            style={{ color: 'var(--muted-text)', textDecoration: 'underline', textUnderlineOffset: 2 }}
-          >
-            Applyd extension
-          </a>
-          {' '}logs them directly from LinkedIn or Handshake in one click.
+          {t.extensionHint}
         </p>
       )}
     </div>

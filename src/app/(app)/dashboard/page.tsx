@@ -540,6 +540,11 @@ function DashboardContent() {
             applications={displayApplications}
             userName={user?.name?.split(' ')[0]}
             onOpenApp={handleCardClick}
+            onAdd={() => { setAddModalInitialUrl(''); setShowAddModal(true); }}
+            onAutofillUrl={handleAutofillUrl}
+            hideExtensionHint={bannerVisible}
+            isPro={userIsPro}
+            onUpgrade={() => setShowUpgradeModal(true)}
           />
 
           {/* Dashboard Footer */}
