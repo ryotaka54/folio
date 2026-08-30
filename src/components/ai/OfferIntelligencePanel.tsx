@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronUp, DollarSign, RotateCcw } from 'lucide-react';
 import ProGate from '@/components/ProGate';
 import { authFetch } from '@/lib/auth-fetch';
+import { AILoadingState } from '@/components/ui/ai-loading-state';
 
 interface OfferData {
   salaryRange: string;
@@ -24,16 +25,6 @@ interface OfferIntelligencePanelProps {
   cached?: OfferData | null;
   onUpgrade: () => void;
   isShuukatsu?: boolean;
-}
-
-function Skeleton() {
-  return (
-    <div className="space-y-3 animate-pulse">
-      <div className="h-3 rounded w-1/2" style={{ background: 'var(--surface-gray)' }} />
-      <div className="h-3 rounded w-full" style={{ background: 'var(--surface-gray)' }} />
-      <div className="h-3 rounded w-4/5" style={{ background: 'var(--surface-gray)' }} />
-    </div>
-  );
 }
 
 function Section({ title, items }: { title: string; items: string[] }) {
@@ -62,9 +53,7 @@ export default function OfferIntelligencePanel({
   const [error, setError] = useState('');
   const ja = isShuukatsu;
 
-  const generate = async () => {
-    if (data) { setExpanded(v => !v); return; }
-    if (!expanded) setExpanded(true);
+  const fetchIntel = async () => {
     setLoading(true);
     setError('');
     try {
@@ -82,36 +71,59 @@ export default function OfferIntelligencePanel({
     }
   };
 
+  const toggle = () => {
+    if (data) { setExpanded(v => !v); return; }
+    setExpanded(true);
+    fetchIntel();
+  };
+
   const content = (
     <div className="rounded-lg border border-border-gray overflow-hidden">
-      <button
-        onClick={generate}
-        className="w-full flex items-center justify-between px-3 py-2.5 transition-colors hover:bg-surface-gray/50"
+      <div
+        className="w-full flex items-center justify-between px-3 py-2.5"
         style={{ background: 'var(--surface-gray)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}
-        disabled={loading}
       >
-        <div className="flex items-center gap-2">
-          <DollarSign size={13} style={{ color: '#10B981' }} />
+        <button
+          onClick={toggle}
+          disabled={loading}
+          className="flex items-center gap-2 flex-1 min-w-0 text-left"
+        >
+          <DollarSign size={13} style={{ color: 'var(--success)' }} />
           <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{ja ? 'AI内定分析' : 'AI Offer Intelligence'}</span>
-          {data && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#10B981', color: '#fff' }}>{ja ? '生成済み' : 'Ready'}</span>}
+          {data && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--success)', color: '#fff' }}>{ja ? '生成済み' : 'Ready'}</span>}
+        </button>
+        <div className="flex items-center gap-1">
+          {data && (
+            <button
+              onClick={fetchIntel}
+              disabled={loading}
+              aria-label={ja ? '再生成' : 'Regenerate'}
+              className="p-1 rounded-md transition-colors hover:bg-surface-gray"
+              style={{ color: 'var(--muted-text)' }}
+            >
+              <RotateCcw size={12} />
+            </button>
+          )}
+          <button onClick={toggle} disabled={loading} aria-label={expanded ? 'Collapse' : 'Expand'} className="p-1">
+            {loading ? (
+              <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--muted-text)' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            ) : expanded ? (
+              <ChevronUp size={13} style={{ color: 'var(--muted-text)' }} />
+            ) : (
+              <ChevronDown size={13} style={{ color: 'var(--muted-text)' }} />
+            )}
+          </button>
         </div>
-        {loading ? (
-          <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--muted-text)' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-        ) : expanded ? (
-          <ChevronUp size={13} style={{ color: 'var(--muted-text)' }} />
-        ) : (
-          <ChevronDown size={13} style={{ color: 'var(--muted-text)' }} />
-        )}
-      </button>
+      </div>
 
       {expanded && (
         <div className="px-3 py-3 space-y-3 border-t border-border-gray" style={{ background: 'var(--card-bg)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}>
-          {loading && <Skeleton />}
+          {loading && <AILoadingState label={ja ? '内定を分析中…' : 'Analyzing your offer…'} lines={3} />}
           {error && <p className="text-[12px] text-error-text">{error}</p>}
-          {data && (
+          {data && !loading && (
             <>
               <div className="flex items-center gap-2 p-2 rounded-md" style={{ background: 'var(--surface-gray)' }}>
-                <DollarSign size={12} style={{ color: '#10B981' }} />
+                <DollarSign size={12} style={{ color: 'var(--success)' }} />
                 <span className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{data.salaryRange}</span>
               </div>
               <div>

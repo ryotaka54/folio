@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, RotateCcw } from 'lucide-react';
 import ProGate from '@/components/ProGate';
 import { authFetch } from '@/lib/auth-fetch';
+import { AILoadingState } from '@/components/ui/ai-loading-state';
 
 interface StrengthData {
   score: number;
@@ -25,36 +26,20 @@ interface StrengthSignalProps {
   onUpgrade: () => void;
 }
 
-const LABEL_COLORS: Record<string, { bg: string; text: string }> = {
-  Strong: { bg: '#D1FAE5', text: '#065F46' },
-  Competitive: { bg: '#DBEAFE', text: '#1E40AF' },
-  Fair: { bg: '#FEF3C7', text: '#92400E' },
-  Challenging: { bg: '#FEE2E2', text: '#991B1B' },
+const LABEL_COLORS: Record<string, { bg: string; text: string; bar: string }> = {
+  Strong: { bg: 'var(--success-bg)', text: 'var(--success-text)', bar: 'var(--pill-green-dot)' },
+  Competitive: { bg: 'var(--pill-indigo-bg)', text: 'var(--pill-indigo-fg)', bar: 'var(--pill-indigo-dot)' },
+  Fair: { bg: 'var(--warn-bg)', text: 'var(--warn)', bar: 'var(--pill-amber-dot)' },
+  Challenging: { bg: 'var(--error-bg)', text: 'var(--error-text)', bar: 'var(--pill-red-dot)' },
 };
 
-function ScoreBar({ score }: { score: number }) {
+function ScoreBar({ score, color }: { score: number; color: string }) {
   return (
     <div className="w-full h-1.5 rounded-full" style={{ background: 'var(--border-gray)' }}>
       <div
         className="h-1.5 rounded-full transition-all duration-700"
-        style={{
-          width: `${score}%`,
-          background: score >= 75 ? '#10B981' : score >= 50 ? '#3B82F6' : score >= 30 ? '#F59E0B' : '#EF4444',
-        }}
+        style={{ width: `${score}%`, background: color }}
       />
-    </div>
-  );
-}
-
-function Skeleton() {
-  return (
-    <div className="animate-pulse space-y-2 p-3 rounded-lg border border-border-gray">
-      <div className="flex items-center justify-between">
-        <div className="h-3 rounded w-32" style={{ background: 'var(--surface-gray)' }} />
-        <div className="h-5 rounded w-20" style={{ background: 'var(--surface-gray)' }} />
-      </div>
-      <div className="h-1.5 rounded-full" style={{ background: 'var(--surface-gray)' }} />
-      <div className="h-3 rounded w-4/5" style={{ background: 'var(--surface-gray)' }} />
     </div>
   );
 }
@@ -67,13 +52,9 @@ export default function StrengthSignal({
   const [error, setError] = useState('');
   const [triggered, setTriggered] = useState(false);
 
-  useEffect(() => {
-    if (!company.trim() || !role.trim() || triggered || data) return;
-    // Kicks off the API fetch below — triggered/loading are part of that
-    // same synchronization with the external request, not a derived value.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTriggered(true);
+  const fetchSignal = () => {
     setLoading(true);
+    setError('');
     authFetch('/api/ai/strength-signal', {
       method: 'POST',
       body: JSON.stringify({ applicationId, company, role, category, location }),
@@ -85,6 +66,15 @@ export default function StrengthSignal({
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!company.trim() || !role.trim() || triggered || data) return;
+    // Kicks off the API fetch below — triggered/loading are part of that
+    // same synchronization with the external request, not a derived value.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTriggered(true);
+    fetchSignal();
   }, [company, role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!company.trim() || !role.trim()) return null;
@@ -94,28 +84,38 @@ export default function StrengthSignal({
   return (
     <ProGate isPro={isPro} onUpgrade={onUpgrade} label="AI Strength Signal — Pro">
       <div>
-        {loading && <Skeleton />}
+        {loading && <AILoadingState label="Reading your application…" lines={2} />}
         {error && (
           <div className="px-3 py-2 rounded-lg border border-border-gray text-[12px] flex items-center gap-2" style={{ color: 'var(--muted-text)' }}>
             <Sparkles size={11} />
             AI signal unavailable
           </div>
         )}
-        {data && (
+        {data && !loading && (
           <div className="p-3 rounded-lg border border-border-gray space-y-2" style={{ background: 'var(--surface-gray)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Sparkles size={11} style={{ color: 'var(--accent-blue)' }} />
                 <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--muted-text)' }}>Application Strength</span>
               </div>
-              <span
-                className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
-                style={{ background: labelColors!.bg, color: labelColors!.text }}
-              >
-                {data.label}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ background: labelColors!.bg, color: labelColors!.text }}
+                >
+                  {data.label}
+                </span>
+                <button
+                  onClick={fetchSignal}
+                  aria-label="Regenerate"
+                  className="p-1 rounded-md transition-colors hover:bg-surface-gray"
+                  style={{ color: 'var(--muted-text)' }}
+                >
+                  <RotateCcw size={11} />
+                </button>
+              </div>
             </div>
-            <ScoreBar score={data.score} />
+            <ScoreBar score={data.score} color={labelColors!.bar} />
             <p className="text-[12px] leading-relaxed" style={{ color: 'var(--brand-navy)' }}>{data.summary}</p>
             {data.tip && (
               <p className="text-[11px] leading-relaxed" style={{ color: 'var(--muted-text)' }}>
