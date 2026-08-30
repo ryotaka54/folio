@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { ChevronDown, ChevronUp, Sparkles, RotateCcw } from 'lucide-react';
 import ProGate from '@/components/ProGate';
 import { authFetch } from '@/lib/auth-fetch';
+import { AILoadingState } from '@/components/ui/ai-loading-state';
 
 // ── v2 data shape — compact, scannable ──────────────────────────────────────
 interface PrepQuestion {
@@ -39,21 +40,11 @@ interface InterviewPrepPanelProps {
   isShuukatsu?: boolean;
 }
 
-function Skeleton() {
-  return (
-    <div className="space-y-3 animate-pulse">
-      <div className="h-3 rounded" style={{ background: 'var(--surface-gray)', width: '80%' }} />
-      <div className="h-3 rounded" style={{ background: 'var(--surface-gray)', width: '60%' }} />
-      <div className="h-3 rounded" style={{ background: 'var(--surface-gray)', width: '70%' }} />
-    </div>
-  );
-}
-
 // ── Confidence badge ─────────────────────────────────────────────────────────
 const CONFIDENCE_COLORS = {
-  high: { bg: 'rgba(22,163,74,0.1)', border: 'rgba(22,163,74,0.25)', text: 'var(--green-success)', label: 'High confidence', labelJa: '精度：高' },
-  medium: { bg: 'rgba(202,138,4,0.1)', border: 'rgba(202,138,4,0.25)', text: 'var(--amber-warning)', label: 'Medium confidence', labelJa: '精度：中' },
-  low: { bg: 'rgba(220,38,38,0.08)', border: 'rgba(220,38,38,0.2)', text: '#DC2626', label: 'Limited company data', labelJa: '情報限定' },
+  high: { bg: 'var(--success-bg)', border: 'var(--success-border)', text: 'var(--success-text)', label: 'High confidence', labelJa: '精度：高' },
+  medium: { bg: 'var(--warn-bg)', border: 'color-mix(in oklch, var(--warn) 30%, transparent)', text: 'var(--warn)', label: 'Medium confidence', labelJa: '精度：中' },
+  low: { bg: 'var(--error-bg)', border: 'var(--error-border)', text: 'var(--error-text)', label: 'Limited company data', labelJa: '情報限定' },
 };
 
 function ConfidenceBadge({ level, isShuukatsu }: { level: 'high' | 'medium' | 'low'; isShuukatsu?: boolean }) {
@@ -75,9 +66,9 @@ function TypePill({ type, isShuukatsu }: { type: string; isShuukatsu?: boolean }
     <span
       className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full flex-shrink-0"
       style={{
-        background: isTech ? 'rgba(37,99,235,0.1)' : 'rgba(139,92,246,0.1)',
-        color: isTech ? 'var(--accent-blue)' : '#8B5CF6',
-        border: `1px solid ${isTech ? 'rgba(37,99,235,0.2)' : 'rgba(139,92,246,0.2)'}`,
+        background: isTech ? 'var(--pill-indigo-bg)' : 'var(--pill-violet-bg)',
+        color: isTech ? 'var(--pill-indigo-fg)' : 'var(--pill-violet-fg)',
+        border: `1px solid ${isTech ? 'color-mix(in oklch, var(--pill-indigo-dot) 30%, transparent)' : 'color-mix(in oklch, var(--pill-violet-dot) 30%, transparent)'}`,
       }}
     >
       {isShuukatsu ? (isTech ? '技術' : '行動') : (isTech ? 'Tech' : 'Behav')}
@@ -142,7 +133,7 @@ function CompactContent({ data, isShuukatsu }: { data: InterviewPrepData; isShuu
       {/* TL;DR — the one thing to focus on */}
       <div
         className="rounded-lg px-3 py-2.5"
-        style={{ background: 'rgba(37,99,235,0.06)', border: '1px solid rgba(37,99,235,0.12)' }}
+        style={{ background: 'color-mix(in oklch, var(--accent-blue) 6%, transparent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 14%, transparent)' }}
       >
         <div className="flex items-center gap-1.5 mb-1">
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--accent-blue)' }}>
@@ -220,7 +211,7 @@ function CompactContent({ data, isShuukatsu }: { data: InterviewPrepData; isShuu
       {data.confidence === 'low' && (
         <div
           className="rounded-lg px-3 py-2 text-[11px] leading-snug"
-          style={{ background: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.12)', color: 'var(--muted-text)' }}
+          style={{ background: 'var(--error-bg)', border: '1px solid var(--error-border)', color: 'var(--muted-text)' }}
         >
           {ja
             ? '⚠️ この企業に関する公開情報が少ないため、職種と業界の一般情報をもとに作成しています。求人URLを追加すると精度が上がります。'
@@ -247,9 +238,7 @@ export default function InterviewPrepPanel({
   const [error, setError] = useState('');
   const ja = isShuukatsu;
 
-  const generate = async () => {
-    if (data) { setExpanded(v => !v); return; }
-    if (!expanded) setExpanded(true);
+  const fetchPrep = async () => {
     setLoading(true);
     setError('');
     try {
@@ -267,33 +256,52 @@ export default function InterviewPrepPanel({
     }
   };
 
+  const toggle = () => {
+    if (data) { setExpanded(v => !v); return; }
+    setExpanded(true);
+    fetchPrep();
+  };
+
   const content = (
     <div className="rounded-lg border border-border-gray overflow-hidden">
-      <button
-        onClick={generate}
-        className="w-full flex items-center justify-between px-3 py-2.5 transition-colors hover:bg-surface-gray/50"
+      <div
+        className="w-full flex items-center justify-between px-3 py-2.5"
         style={{ background: 'var(--surface-gray)', fontFamily: ja ? "'Noto Sans JP', sans-serif" : undefined }}
-        disabled={loading}
       >
-        <div className="flex items-center gap-2">
+        <button onClick={toggle} disabled={loading} className="flex items-center gap-2 flex-1 min-w-0 text-left">
           <Sparkles size={13} style={{ color: 'var(--accent-blue)' }} />
           <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{ja ? 'AI面接対策' : 'AI Interview Prep'}</span>
           {data && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-blue)', color: '#fff' }}>{ja ? '生成済み' : 'Ready'}</span>}
+        </button>
+        <div className="flex items-center gap-1">
+          {data && (
+            <button
+              onClick={fetchPrep}
+              disabled={loading}
+              aria-label={ja ? '再生成' : 'Regenerate'}
+              className="p-1 rounded-md transition-colors hover:bg-surface-gray"
+              style={{ color: 'var(--muted-text)' }}
+            >
+              <RotateCcw size={12} />
+            </button>
+          )}
+          <button onClick={toggle} disabled={loading} aria-label={expanded ? 'Collapse' : 'Expand'} className="p-1">
+            {loading ? (
+              <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--muted-text)' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+            ) : expanded ? (
+              <ChevronUp size={13} style={{ color: 'var(--muted-text)' }} />
+            ) : (
+              <ChevronDown size={13} style={{ color: 'var(--muted-text)' }} />
+            )}
+          </button>
         </div>
-        {loading ? (
-          <svg className="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ color: 'var(--muted-text)' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-        ) : expanded ? (
-          <ChevronUp size={13} style={{ color: 'var(--muted-text)' }} />
-        ) : (
-          <ChevronDown size={13} style={{ color: 'var(--muted-text)' }} />
-        )}
-      </button>
+      </div>
 
       {expanded && (
         <div className="px-3 py-3 border-t border-border-gray" style={{ background: 'var(--card-bg)' }}>
-          {loading && <Skeleton />}
+          {loading && <AILoadingState label={ja ? '対策を準備中…' : 'Preparing your prep…'} lines={3} />}
           {error && <p className="text-[12px] text-error-text">{error}</p>}
-          {data && (isV2Data(data) ? <CompactContent data={data} isShuukatsu={ja} /> : <LegacyContent data={data} />)}
+          {data && !loading && (isV2Data(data) ? <CompactContent data={data} isShuukatsu={ja} /> : <LegacyContent data={data} />)}
         </div>
       )}
     </div>
