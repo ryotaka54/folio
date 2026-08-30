@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     if (!authedUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const userId = authedUser.id;
 
-    const { company, role, recruiterName, recruiterEmail, emailType, notes, stage } = await request.json();
+    const { company, role, recruiterName, recruiterEmail, emailType, notes, stage, tone } = await request.json();
     if (!emailType) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
@@ -69,12 +69,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Rate limit exceeded', used, limit }, { status: 429 });
     }
 
+    const TONE_INSTRUCTION_EN: Record<string, string> = {
+      warmer: 'Make the tone noticeably warmer and more personable than a standard business email.',
+      formal: 'Make the tone more formal and reserved than a standard business email.',
+      concise: 'Make it significantly more concise — half the length, no filler.',
+    };
+    const TONE_INSTRUCTION_JA: Record<string, string> = {
+      warmer: '通常のビジネスメールより温かみのある、親しみやすいトーンにしてください。',
+      formal: '通常のビジネスメールよりもさらに丁寧でフォーマルなトーンにしてください。',
+      concise: '大幅に簡潔にしてください（現在の半分程度の長さ、無駄な表現なし）。',
+    };
+    const toneInstruction = tone
+      ? (isJa ? TONE_INSTRUCTION_JA[tone] : TONE_INSTRUCTION_EN[tone]) ?? ''
+      : '';
+
     const emailTypeLabel = EMAIL_TYPES[emailType] ?? emailType;
     const prompt = isJa
       ? `就活生が${company}（${role}）への${emailTypeLabel}を書きたいと思っています。
 ${recruiterName ? `採用担当者名: ${recruiterName}` : '採用担当者名: 不明（一般的な宛名を使用してください）'}
 現在のステージ: ${stage}
 ${notes ? `状況・メモ: ${notes}` : ''}
+${toneInstruction}
 
 自然で丁寧な日本語で、200字程度のメールを書いてください。`
       : `Write a ${emailTypeLabel} email for a job application.
@@ -84,6 +99,7 @@ ${recruiterName ? `Recruiter name: ${recruiterName}` : 'Recruiter name: unknown 
 ${recruiterEmail ? `Recruiter email: ${recruiterEmail}` : ''}
 Current stage: ${stage}
 ${notes ? `Context/notes: ${notes}` : ''}
+${toneInstruction}
 
 Write a concise, professional, and human-sounding email. Keep it under 150 words.`;
 
