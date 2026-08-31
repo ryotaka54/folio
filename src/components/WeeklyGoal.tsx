@@ -119,7 +119,7 @@ export default function WeeklyGoal({ applications, onToast }: Props) {
       <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--surface-gray)' }}>
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: done ? '#16A34A' : 'var(--accent-blue)' }}
+          style={{ width: `${pct}%`, background: done ? 'var(--green-success)' : 'var(--accent-blue)' }}
         />
       </div>
     </div>

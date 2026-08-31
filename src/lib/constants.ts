@@ -83,14 +83,14 @@ export const STAGE_PILL_VARIANT: Record<string, PillVariant> = {
 // solid-fill use (funnel bar) and a pill-badge use (StagePill) of the same
 // stage are always the same color.
 export const PILL_VARIANT_HEX: Record<PillVariant, string> = {
-  neutral: '#9CA3AF',
-  slate:   '#64748B',
-  indigo:  '#6366F1',
-  violet:  '#8B5CF6',
-  amber:   '#F59E0B',
-  green:   '#10B981',
-  red:     '#EF4444',
-  pink:    '#EC4899',
+  neutral: '#8C8474',
+  slate:   '#6B848C',
+  indigo:  '#8760A0',
+  violet:  '#3F9088',
+  amber:   '#C08A2E',
+  green:   '#6C8A54',
+  red:     '#B85B3E',
+  pink:    '#B9707F',
 };
 
 export const STAGE_COLORS: Record<string, string> = Object.fromEntries(
@@ -112,28 +112,23 @@ export interface ShuukatsuStageConfig {
   order: number;
 }
 
+// Colors derive from PILL_VARIANT_HEX via STAGE_PILL_VARIANT (same lookup
+// STAGE_COLORS uses above) so this JA-specific list can't drift from the
+// pill-variant palette — previously this held its own independent hex per
+// stage, an eighth copy of the same eight colors.
 export const SHUUKATSU_STAGES: ShuukatsuStageConfig[] = [
-  { id: 'エントリー',       label: 'エントリー',       color: '#64748B', order: 1 },
-  { id: '説明会',           label: '説明会',           color: '#0EA5E9', order: 2 },
-  { id: 'ES提出',           label: 'ES提出',           color: '#8B5CF6', order: 3 },
-  { id: 'SPI',              label: 'SPI / 適性検査',   color: '#F59E0B', order: 4 },
-  { id: '一次面接',         label: '一次面接',         color: '#3B82F6', order: 5 },
-  { id: '二次面接',         label: '二次面接',         color: '#6366F1', order: 6 },
-  { id: '最終面接',         label: '最終面接',         color: '#EC4899', order: 7 },
-  { id: '内々定',           label: '内々定',           color: '#10B981', order: 8 },
-  { id: '内定',             label: '内定',             color: '#22C55E', order: 9 },
-  { id: '承諾',             label: '承諾 / 辞退',      color: '#94A3B8', order: 10 },
+  { id: 'エントリー',       label: 'エントリー',       color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['エントリー']], order: 1 },
+  { id: '説明会',           label: '説明会',           color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['説明会']], order: 2 },
+  { id: 'ES提出',           label: 'ES提出',           color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['ES提出']], order: 3 },
+  { id: 'SPI',              label: 'SPI / 適性検査',   color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['SPI']], order: 4 },
+  { id: '一次面接',         label: '一次面接',         color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['一次面接']], order: 5 },
+  { id: '二次面接',         label: '二次面接',         color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['二次面接']], order: 6 },
+  { id: '最終面接',         label: '最終面接',         color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['最終面接']], order: 7 },
+  { id: '内々定',           label: '内々定',           color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['内々定']], order: 8 },
+  { id: '内定',             label: '内定',             color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['内定']], order: 9 },
+  { id: '承諾',             label: '承諾 / 辞退',      color: PILL_VARIANT_HEX[STAGE_PILL_VARIANT['承諾']], order: 10 },
 ];
 
-export const SHUUKATSU_STAGE_COLORS: Record<string, string> = {
-  'エントリー': '#64748B',
-  '説明会':     '#0EA5E9',
-  'ES提出':     '#8B5CF6',
-  'SPI':        '#F59E0B',
-  '一次面接':   '#3B82F6',
-  '二次面接':   '#6366F1',
-  '最終面接':   '#EC4899',
-  '内々定':     '#10B981',
-  '内定':       '#22C55E',
-  '承諾':       '#94A3B8',
-};
+export const SHUUKATSU_STAGE_COLORS: Record<string, string> = Object.fromEntries(
+  SHUUKATSU_STAGES.map(({ id, color }) => [id, color]),
+);

@@ -16,7 +16,7 @@ export default function Toast({ message, onDismiss, onUndo }: ToastProps) {
       {message && (
         <motion.div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-lg shadow-lg pointer-events-auto"
-          style={{ background: '#0F172A', color: '#F9FAFB', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ background: '#141519', color: '#EFEEEA', border: '1px solid rgba(255,255,255,0.08)' }}
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 16, scale: 0.95 }}
           animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
           exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.95 }}

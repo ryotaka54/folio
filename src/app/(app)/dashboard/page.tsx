@@ -455,7 +455,7 @@ function DashboardContent() {
       {/* Pro upgrade success banner */}
       {upgradedSuccess && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl shadow-lg fade-in"
-          style={{ background: 'linear-gradient(135deg,#0a0a14,#1e1e3a)', border: '1px solid rgba(201,168,76,0.3)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
+          style={{ background: 'linear-gradient(135deg, #0A0B0D, #1B1D22)', border: '1px solid rgba(201,168,76,0.3)', color: '#fff', fontSize: 13, fontWeight: 600 }}>
           <ProLogo size={24} />
           Welcome to Pro! Unlimited applications unlocked.
           <button onClick={() => setUpgradedSuccess(false)} className="ml-1 opacity-60 hover:opacity-100 transition-opacity">✕</button>
@@ -467,7 +467,7 @@ function DashboardContent() {
         <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-3">
           <div
             className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg"
-            style={{ background: 'rgba(37,99,235,0.07)', border: '1px solid rgba(37,99,235,0.2)' }}
+            style={{ background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 20%, transparent)' }}
           >
             <p className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>
               <span className="font-semibold">Almost at the limit</span> — {FREE_TIER_LIMIT - applications.length} free slot{FREE_TIER_LIMIT - applications.length !== 1 ? 's' : ''} remaining.
@@ -767,9 +767,9 @@ function DashboardContent() {
       {showFirstAppTip && (
         <div
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 px-5 py-3.5 rounded-xl shadow-2xl fade-in"
-          style={{ background: '#111827', color: '#fff', fontSize: 13, textAlign: 'center', lineHeight: 1.5, maxWidth: 340, width: 'calc(100% - 2rem)', border: '1px solid rgba(74,222,128,0.2)' }}
+          style={{ background: '#141519', color: '#fff', fontSize: 13, textAlign: 'center', lineHeight: 1.5, maxWidth: 340, width: 'calc(100% - 2rem)', border: '1px solid rgba(126,181,132,0.30)' }}
         >
-          <div style={{ color: '#4ADE80', fontWeight: 700, marginBottom: 2 }}>✓ Your pipeline is live.</div>
+          <div style={{ color: '#9ECC9F', fontWeight: 700, marginBottom: 2 }}>✓ Your pipeline is live.</div>
           <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>Keep adding applications — the more you track, the smarter Applyd gets.</div>
         </div>
       )}

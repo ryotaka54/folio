@@ -63,9 +63,9 @@ export default function SPITracker({ applicationId, initialData, isPro }: Props)
   };
 
   const RESULT_OPTIONS: { label: SPIResult; color: string; bg: string }[] = [
-    { label: '未受験', color: '#94A3B8', bg: 'rgba(148,163,184,0.15)' },
-    { label: '通過',   color: '#16A34A', bg: 'rgba(22,163,74,0.12)'  },
-    { label: '不通過', color: '#DC2626', bg: 'rgba(220,38,38,0.12)'  },
+    { label: '未受験', color: 'var(--pill-neutral-fg)', bg: 'var(--pill-neutral-bg)' },
+    { label: '通過',   color: 'var(--green-success)',   bg: 'var(--success-bg)'  },
+    { label: '不通過', color: 'var(--danger)',           bg: 'var(--error-bg)'  },
   ];
 
   if (!isPro) return null;
@@ -112,8 +112,8 @@ export default function SPITracker({ applicationId, initialData, isPro }: Props)
               style={{
                 fontSize: 10,
                 fontWeight: 600,
-                color: data.result === '通過' ? '#16A34A' : '#DC2626',
-                background: data.result === '通過' ? 'rgba(22,163,74,0.12)' : 'rgba(220,38,38,0.12)',
+                color: data.result === '通過' ? 'var(--green-success)' : 'var(--danger)',
+                background: data.result === '通過' ? 'var(--success-bg)' : 'var(--error-bg)',
                 borderRadius: 9999,
                 padding: '1px 8px',
                 fontFamily: "'Noto Sans JP', sans-serif",
@@ -124,8 +124,8 @@ export default function SPITracker({ applicationId, initialData, isPro }: Props)
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {saving && <span style={{ fontSize: 11, color: '#94A3B8', fontFamily: "'Noto Sans JP', sans-serif" }}>保存中</span>}
-          {saved && <span style={{ fontSize: 11, color: '#22C55E', fontFamily: "'Noto Sans JP', sans-serif" }}>保存済み ✓</span>}
+          {saving && <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: "'Noto Sans JP', sans-serif" }}>保存中</span>}
+          {saved && <span style={{ fontSize: 11, color: 'var(--green-success)', fontFamily: "'Noto Sans JP', sans-serif" }}>保存済み ✓</span>}
           <svg
             width="14"
             height="14"
@@ -301,7 +301,7 @@ export default function SPITracker({ applicationId, initialData, isPro }: Props)
               }}
             />
             <div style={{ textAlign: 'right', marginTop: 2 }}>
-              <span style={{ fontSize: 11, color: '#94A3B8', fontFamily: 'var(--font-geist), sans-serif' }}>
+              <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: 'var(--font-geist), sans-serif' }}>
                 {data.memo.length} / 200文字
               </span>
             </div>

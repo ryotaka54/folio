@@ -245,7 +245,7 @@ function CompanyAvatar({ company, color, size = 48 }: { company: string; color: 
   return (
     <div style={{
       width: size, height: size, borderRadius: size * 0.22,
-      background: `${color}22`, border: `1px solid ${color}44`,
+      background: `color-mix(in oklch, ${color} 13%, transparent)`, border: `1px solid color-mix(in oklch, ${color} 27%, transparent)`,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontFamily: "'DM Mono', 'Fira Mono', monospace",
       fontSize: size * 0.42, fontWeight: 700, color,
@@ -309,7 +309,7 @@ function WaveformBars({ active }: { active: boolean }) {
       {[0.4, 0.7, 1, 0.7, 0.4].map((scale, i) => (
         <motion.div
           key={i}
-          style={{ width: 4, borderRadius: 2, background: '#2563EB' }}
+          style={{ width: 4, borderRadius: 2, background: 'var(--accent-blue)' }}
           animate={active ? {
             height: [8, 32 * scale, 8],
             opacity: [0.6, 1, 0.6],
@@ -565,7 +565,7 @@ function InterviewContent() {
 
   const currentQ = questions[currentIdx];
   const progress = questions.length > 0 ? (currentIdx + (phase === 'feedback' ? 1 : 0)) / questions.length : 0;
-  const appColor = selectedApp ? (STAGE_COLORS[selectedApp.status] || '#2563EB') : '#2563EB';
+  const appColor = selectedApp ? (STAGE_COLORS[selectedApp.status] || 'var(--accent-blue)') : 'var(--accent-blue)';
 
   if (!user) return null;
 
@@ -598,7 +598,7 @@ function InterviewContent() {
             {/* Hero */}
             <div style={{
               padding: '64px 24px 48px',
-              background: 'radial-gradient(ellipse 60% 40% at 50% 0%, rgba(37,99,235,0.1) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse 60% 40% at 50% 0%, color-mix(in oklch, var(--accent-blue) 10%, transparent) 0%, transparent 70%)',
               textAlign: 'center',
             }}>
               <motion.div
@@ -607,12 +607,12 @@ function InterviewContent() {
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                 style={{
                   width: 64, height: 64, borderRadius: 20,
-                  background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.25)',
+                  background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 25%, transparent)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 20px',
                 }}
               >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="9" y="2" width="6" height="12" rx="3" />
                   <path d="M5 10a7 7 0 0 0 14 0" />
                   <line x1="12" y1="19" x2="12" y2="22" />
@@ -647,7 +647,7 @@ function InterviewContent() {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 16,
                   padding: '14px 18px', borderRadius: 14,
-                  background: 'rgba(37,99,235,0.08)', border: '1px solid rgba(37,99,235,0.2)',
+                  background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 20%, transparent)',
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--body-text)', margin: '0 0 2px', fontFamily: "'Noto Sans JP', sans-serif" }}>
@@ -676,7 +676,7 @@ function InterviewContent() {
                     }}
                     style={{
                       height: 34, padding: '0 16px', borderRadius: 9,
-                      background: '#2563EB', border: 'none', cursor: 'pointer',
+                      background: 'var(--accent-blue)', border: 'none', cursor: 'pointer',
                       fontSize: 13, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap',
                       fontFamily: "'Noto Sans JP', sans-serif",
                     }}
@@ -734,13 +734,13 @@ function InterviewContent() {
               ) : filteredApps.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '60px 0' }}>
                   <p style={{ color: 'var(--muted-text)', fontSize: 15, fontFamily: "'Noto Sans JP', sans-serif" }}>応募中の企業が見つかりません。</p>
-                  <Link href="/ja/dashboard" style={{ color: '#2563EB', fontSize: 13, textDecoration: 'none', marginTop: 8, display: 'inline-block', fontFamily: "'Noto Sans JP', sans-serif" }}>企業を追加する →</Link>
+                  <Link href="/ja/dashboard" style={{ color: 'var(--accent-blue)', fontSize: 13, textDecoration: 'none', marginTop: 8, display: 'inline-block', fontFamily: "'Noto Sans JP', sans-serif" }}>企業を追加する →</Link>
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
                   <AnimatePresence>
                     {filteredApps.map((app, i) => {
-                      const color = STAGE_COLORS[app.status] || '#2563EB';
+                      const color = STAGE_COLORS[app.status] || 'var(--accent-blue)';
                       return (
                         <motion.button
                           key={app.id}
@@ -748,7 +748,7 @@ function InterviewContent() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, scale: 0.96 }}
                           transition={{ delay: i * 0.04, duration: 0.3 }}
-                          whileHover={{ scale: 1.02, boxShadow: `0 8px 32px ${color}30` }}
+                          whileHover={{ scale: 1.02, boxShadow: `0 8px 32px color-mix(in oklch, ${color} 19%, transparent)` }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => {
                             setSelectedApp(app);
@@ -763,7 +763,7 @@ function InterviewContent() {
                             display: 'flex', alignItems: 'flex-start', gap: 14,
                             transition: 'border-color 0.2s',
                           }}
-                          onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.borderColor = `${color}60`}
+                          onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.borderColor = `color-mix(in oklch, ${color} 38%, transparent)`}
                           onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-gray)'}
                         >
                           <CompanyAvatar company={app.company} color={color} size={44} />
@@ -777,7 +777,7 @@ function InterviewContent() {
                             <span style={{
                               fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em',
                               padding: '3px 8px', borderRadius: 6,
-                              background: `${color}18`, color,
+                              background: `color-mix(in oklch, ${color} 9%, transparent)`, color,
                             }}>
                               {app.status}
                             </span>
@@ -859,7 +859,7 @@ function InterviewContent() {
                       style={{
                         height: 38, padding: '0 18px', borderRadius: 9,
                         border: row.value === opt.value ? '1.5px solid var(--accent-blue)' : '1px solid var(--border-gray)',
-                        background: row.value === opt.value ? 'rgba(37,99,235,0.1)' : 'var(--surface-gray)',
+                        background: row.value === opt.value ? 'var(--light-accent)' : 'var(--surface-gray)',
                         color: row.value === opt.value ? 'var(--accent-blue)' : 'var(--muted-text)',
                         fontSize: 13, fontWeight: row.value === opt.value ? 600 : 400,
                         cursor: 'pointer', transition: 'all 0.15s',
@@ -874,20 +874,20 @@ function InterviewContent() {
             ))}
 
             {/* 辛口フィードバックトグル */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', marginBottom: 28, background: roastMode ? 'rgba(220,38,38,0.06)' : 'var(--surface-gray)', borderRadius: 10, border: roastMode ? '1px solid rgba(220,38,38,0.25)' : '1px solid var(--border-gray)', transition: 'all 0.2s' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', marginBottom: 28, background: roastMode ? 'var(--error-bg)' : 'var(--surface-gray)', borderRadius: 10, border: roastMode ? '1px solid var(--error-border)' : '1px solid var(--border-gray)', transition: 'all 0.2s' }}>
               <div>
-                <span style={{ fontSize: 13, fontWeight: 600, color: roastMode ? '#DC2626' : 'var(--brand-navy)', fontFamily: "'Noto Sans JP', sans-serif" }}>🔥 辛口フィードバック</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: roastMode ? 'var(--error-text)' : 'var(--brand-navy)', fontFamily: "'Noto Sans JP', sans-serif" }}>🔥 辛口フィードバック</span>
                 <span style={{ fontSize: 12, color: 'var(--muted-text)', marginLeft: 8, fontFamily: "'Noto Sans JP', sans-serif" }}>忖度なし。AIが率直に指摘します。</span>
               </div>
               <button
                 onClick={() => setRoastMode(r => !r)}
-                style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: roastMode ? '#DC2626' : 'var(--border-gray)', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}
+                style={{ width: 36, height: 20, borderRadius: 10, border: 'none', cursor: 'pointer', background: roastMode ? 'var(--danger)' : 'var(--border-gray)', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}
               >
                 <span style={{ position: 'absolute', top: 2, left: roastMode ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
               </button>
             </div>
 
-            {error && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 16, fontFamily: "'Noto Sans JP', sans-serif" }}>{error}</p>}
+            {error && <p style={{ fontSize: 13, color: 'var(--error-text)', marginBottom: 16, fontFamily: "'Noto Sans JP', sans-serif" }}>{error}</p>}
 
             {/* CTA */}
             <style>{`
@@ -902,7 +902,7 @@ function InterviewContent() {
               whileTap={{ scale: 0.97 }}
               style={{
                 width: '100%', height: 52, borderRadius: 13,
-                background: '#2563EB', border: 'none', cursor: 'pointer',
+                background: 'var(--accent-blue)', border: 'none', cursor: 'pointer',
                 fontSize: 15, fontWeight: 700, color: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 position: 'relative', overflow: 'hidden',
@@ -1027,8 +1027,8 @@ function InterviewContent() {
                       <span style={{
                         fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em',
                         padding: '4px 10px', borderRadius: 9999,
-                        background: currentQ.type === 'behavioral' ? 'rgba(37,99,235,0.12)' : 'rgba(139,92,246,0.12)',
-                        color: currentQ.type === 'behavioral' ? 'var(--accent-blue)' : '#8B5CF6',
+                        background: currentQ.type === 'behavioral' ? 'var(--pill-violet-bg)' : 'var(--pill-indigo-bg)',
+                        color: currentQ.type === 'behavioral' ? 'var(--pill-violet-fg)' : 'var(--pill-indigo-fg)',
                         fontFamily: "'Noto Sans JP', sans-serif",
                       }}>
                         {currentQ.type === 'behavioral' ? '行動面接' : '技術面接'}
@@ -1042,7 +1042,7 @@ function InterviewContent() {
                       marginBottom: 24, padding: '20px 22px',
                       background: 'var(--card-bg)', borderRadius: 14,
                       border: '1px solid var(--border-gray)',
-                      borderLeft: `3px solid ${currentQ.type === 'behavioral' ? '#2563EB' : '#7C3AED'}`,
+                      borderLeft: `3px solid ${currentQ.type === 'behavioral' ? 'var(--pill-violet-dot)' : 'var(--pill-indigo-dot)'}`,
                       fontFamily: "'Noto Sans JP', sans-serif",
                     }}>
                       {currentQ.q}
@@ -1055,8 +1055,8 @@ function InterviewContent() {
                           <button key={m} onClick={() => { if (voice.listening) voice.stop(); if (cam.active) cam.stop(); setInputMode(m); }}
                             style={{
                               fontSize: 12, padding: '5px 14px', borderRadius: 8,
-                              border: inputMode === m ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
-                              background: inputMode === m ? 'rgba(37,99,235,0.1)' : 'transparent',
+                              border: inputMode === m ? '1px solid color-mix(in oklch, var(--accent-blue) 50%, transparent)' : '1px solid var(--border-gray)',
+                              background: inputMode === m ? 'var(--light-accent)' : 'transparent',
                               color: inputMode === m ? 'var(--accent-blue)' : 'var(--muted-text)',
                               cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif", fontWeight: inputMode === m ? 600 : 400,
                             }}>
@@ -1077,30 +1077,30 @@ function InterviewContent() {
                         disabled={phase === 'evaluating'}
                         style={{
                           width: '100%', borderRadius: 12,
-                          border: answer.length > 0 ? '1px solid rgba(37,99,235,0.4)' : '1px solid var(--border-gray)',
+                          border: answer.length > 0 ? '1px solid color-mix(in oklch, var(--accent-blue) 40%, transparent)' : '1px solid var(--border-gray)',
                           background: 'var(--surface-gray)', color: 'var(--body-text)', fontSize: 15,
                           padding: '14px 16px', lineHeight: 1.75, resize: 'vertical',
                           outline: 'none', boxSizing: 'border-box', fontFamily: "'Noto Sans JP', sans-serif",
                           transition: 'border-color 0.2s',
                         }}
-                        onFocus={e => (e.currentTarget.style.borderColor = 'rgba(37,99,235,0.6)')}
-                        onBlur={e => (e.currentTarget.style.borderColor = answer.length > 0 ? 'rgba(37,99,235,0.4)' : 'var(--border-gray)')}
+                        onFocus={e => (e.currentTarget.style.borderColor = 'color-mix(in oklch, var(--accent-blue) 60%, transparent)')}
+                        onBlur={e => (e.currentTarget.style.borderColor = answer.length > 0 ? 'color-mix(in oklch, var(--accent-blue) 40%, transparent)' : 'var(--border-gray)')}
                         onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) submitAnswer(); }}
                       />
                     ) : (
                       /* Voice input with integrated camera preview */
                       <div style={{
-                        border: voice.listening ? '1px solid rgba(37,99,235,0.5)' : '1px solid var(--border-gray)',
+                        border: voice.listening ? '1px solid color-mix(in oklch, var(--accent-blue) 50%, transparent)' : '1px solid var(--border-gray)',
                         borderRadius: 12, overflow: 'hidden', transition: 'border-color 0.2s',
                       }}>
                         {/* Camera preview — collapses when inactive */}
-                        <div style={{ height: cam.active ? 180 : 0, overflow: 'hidden', transition: 'height 0.3s ease', background: '#0A0A0A', position: 'relative' }}>
+                        <div style={{ height: cam.active ? 180 : 0, overflow: 'hidden', transition: 'height 0.3s ease', background: '#0A0B0D', position: 'relative' }}>
                           <video ref={cam.videoRef} playsInline muted
                             style={{ width: '100%', height: 180, objectFit: 'cover', transform: 'scaleX(-1)', display: 'block' }} />
                           <canvas ref={cam.canvasRef} style={{ display: 'none' }} />
                           {cam.active && (
                             <div style={{ position: 'absolute', top: 8, left: 8, display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,0,0,0.55)', borderRadius: 9999, padding: '3px 9px' }}>
-                              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#EF4444' }} />
+                              <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--danger)' }} />
                               <span style={{ fontSize: 10, color: '#fff', fontWeight: 700, letterSpacing: '0.08em' }}>収録中</span>
                             </div>
                           )}
@@ -1122,7 +1122,7 @@ function InterviewContent() {
                             }}
                             style={{
                               width: 46, height: 46, borderRadius: '50%', border: 'none', cursor: 'pointer',
-                              background: voice.listening ? '#EF4444' : '#2563EB',
+                              background: voice.listening ? 'var(--danger)' : 'var(--accent-blue)',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               transition: 'background 0.2s',
                             }}
@@ -1161,7 +1161,7 @@ function InterviewContent() {
                         whileTap={answer.trim() ? { scale: 0.97 } : {}}
                         style={{
                           height: 44, padding: '0 22px', borderRadius: 11,
-                          background: answer.trim() && phase !== 'evaluating' ? '#2563EB' : 'var(--surface-gray)',
+                          background: answer.trim() && phase !== 'evaluating' ? 'var(--accent-blue)' : 'var(--surface-gray)',
                           border: 'none', color: answer.trim() && phase !== 'evaluating' ? '#fff' : 'var(--text-tertiary)',
                           fontSize: 14, fontWeight: 600, cursor: answer.trim() && phase !== 'evaluating' ? 'pointer' : 'not-allowed',
                           display: 'flex', alignItems: 'center', gap: 8,
@@ -1175,7 +1175,7 @@ function InterviewContent() {
                       </motion.button>
                     </div>
 
-                    {error && <p style={{ fontSize: 13, color: '#EF4444', marginTop: 12, fontFamily: "'Noto Sans JP', sans-serif" }}>{error}</p>}
+                    {error && <p style={{ fontSize: 13, color: 'var(--error-text)', marginTop: 12, fontFamily: "'Noto Sans JP', sans-serif" }}>{error}</p>}
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -1193,10 +1193,10 @@ function InterviewContent() {
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.22)', borderRadius: 10, padding: '8px 14px', marginBottom: 18 }}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--error-bg)', border: '1px solid var(--error-border)', borderRadius: 10, padding: '8px 14px', marginBottom: 18 }}
               >
                 <span style={{ fontSize: 16 }}>🔥</span>
-                <span style={{ fontSize: 12, color: '#DC2626', fontWeight: 600, fontFamily: "'Noto Sans JP', sans-serif" }}>辛口モード — 忖度なしの率直なフィードバック</span>
+                <span style={{ fontSize: 12, color: 'var(--error-text)', fontWeight: 600, fontFamily: "'Noto Sans JP', sans-serif" }}>辛口モード — 忖度なしの率直なフィードバック</span>
               </motion.div>
             )}
 
@@ -1260,7 +1260,7 @@ function InterviewContent() {
                     </label>
                   ))}
                   <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                    <button onClick={postToLeaderboard} disabled={!lbPostScore} style={{ height: 32, padding: '0 16px', borderRadius: 8, border: 'none', background: lbPostScore ? '#2563EB' : 'var(--border-gray)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: lbPostScore ? 'pointer' : 'default', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                    <button onClick={postToLeaderboard} disabled={!lbPostScore} style={{ height: 32, padding: '0 16px', borderRadius: 8, border: 'none', background: lbPostScore ? 'var(--accent-blue)' : 'var(--border-gray)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: lbPostScore ? 'pointer' : 'default', fontFamily: "'Noto Sans JP', sans-serif" }}>
                       投稿する
                     </button>
                     <button onClick={() => setLbPosted(true)} style={{ height: 32, padding: '0 14px', borderRadius: 8, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', fontSize: 13, cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif" }}>
@@ -1269,10 +1269,10 @@ function InterviewContent() {
                   </div>
                 </div>
               ) : lbEntryId ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 10, background: 'rgba(16,185,129,0.06)', gap: 10, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: '1px solid var(--success-border)', borderRadius: 10, background: 'var(--success-bg)', gap: 10, flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ color: '#10B981', fontSize: 13, fontFamily: "'Noto Sans JP', sans-serif" }}>✓ 投稿済み</span>
-                    <a href={`/leaderboard/${selectedApp?.company.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?lang=ja`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#2563EB', textDecoration: 'none', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                    <span style={{ color: 'var(--green-success)', fontSize: 13, fontFamily: "'Noto Sans JP', sans-serif" }}>✓ 投稿済み</span>
+                    <a href={`/leaderboard/${selectedApp?.company.toLowerCase().replace(/[^a-z0-9]+/g, '-')}?lang=ja`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: 'var(--accent-blue)', textDecoration: 'none', fontFamily: "'Noto Sans JP', sans-serif" }}>
                       リーダーボードを見る →
                     </a>
                   </div>
@@ -1283,7 +1283,7 @@ function InterviewContent() {
                     {lbPostedWithName && (
                       <button onClick={() => manageLeaderboardEntry('anonymize')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border-gray)', background: 'transparent', color: 'var(--muted-text)', cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif" }}>匿名にする</button>
                     )}
-                    <button onClick={() => manageLeaderboardEntry('delete')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#EF4444', cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif" }}>削除</button>
+                    <button onClick={() => manageLeaderboardEntry('delete')} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--error-border)', background: 'transparent', color: 'var(--error-text)', cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif" }}>削除</button>
                   </div>
                 </div>
               ) : null}
@@ -1306,7 +1306,7 @@ function InterviewContent() {
             {/* Strengths */}
             {feedback.strengths.length > 0 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} style={{ marginBottom: 18 }}>
-                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#10B981', margin: '0 0 10px', fontFamily: "'Noto Sans JP', sans-serif" }}>強み</p>
+                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--green-success)', margin: '0 0 10px', fontFamily: "'Noto Sans JP', sans-serif" }}>強み</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
                   {feedback.strengths.map((s, i) => (
                     <motion.span
@@ -1314,7 +1314,7 @@ function InterviewContent() {
                       initial={{ opacity: 0, scale: 0.85 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.55 + i * 0.06 }}
-                      style={{ fontSize: 12, padding: '5px 12px', borderRadius: 9999, background: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)', fontFamily: "'Noto Sans JP', sans-serif" }}
+                      style={{ fontSize: 12, padding: '5px 12px', borderRadius: 9999, background: 'var(--success-bg)', color: 'var(--green-success)', border: '1px solid var(--success-border)', fontFamily: "'Noto Sans JP', sans-serif" }}
                     >{s}</motion.span>
                   ))}
                 </div>
@@ -1324,7 +1324,7 @@ function InterviewContent() {
             {/* Improvements */}
             {feedback.improvements.length > 0 && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} style={{ marginBottom: 24 }}>
-                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#F59E0B', margin: '0 0 10px', fontFamily: "'Noto Sans JP', sans-serif" }}>改善点</p>
+                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--amber-warning)', margin: '0 0 10px', fontFamily: "'Noto Sans JP', sans-serif" }}>改善点</p>
                 <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {feedback.improvements.map((s, i) => (
                     <li key={i} style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.6, fontFamily: "'Noto Sans JP', sans-serif" }}>{s}</li>
@@ -1349,7 +1349,7 @@ function InterviewContent() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.78 }}
-                style={{ padding: '14px 16px', background: 'rgba(37,99,235,0.06)', border: '1px solid rgba(37,99,235,0.18)', borderRadius: 12, marginBottom: 28 }}
+                style={{ padding: '14px 16px', background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 18%, transparent)', borderRadius: 12, marginBottom: 28 }}
               >
                 <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--accent-blue)', margin: '0 0 8px', fontFamily: "'DM Mono', monospace" }}>
                   📷 プレゼンス分析
@@ -1360,7 +1360,7 @@ function InterviewContent() {
               </motion.div>
             )}
 
-            {error && <p style={{ fontSize: 13, color: '#EF4444', marginBottom: 12, fontFamily: "'Noto Sans JP', sans-serif" }}>{error}</p>}
+            {error && <p style={{ fontSize: 13, color: 'var(--error-text)', marginBottom: 12, fontFamily: "'Noto Sans JP', sans-serif" }}>{error}</p>}
 
             <motion.button
               onClick={advance}
@@ -1371,7 +1371,7 @@ function InterviewContent() {
               whileTap={{ scale: 0.97 }}
               style={{
                 width: '100%', height: 50, borderRadius: 13,
-                background: '#2563EB', border: 'none', cursor: 'pointer',
+                background: 'var(--accent-blue)', border: 'none', cursor: 'pointer',
                 fontSize: 15, fontWeight: 700, color: '#fff',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 fontFamily: "'Noto Sans JP', sans-serif",
@@ -1483,7 +1483,7 @@ function InterviewContent() {
                 onClick={() => downloadTranscript(selectedApp.company, selectedApp.role, transcript)}
                 whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                 style={{
-                  flex: 1, height: 50, borderRadius: 13, background: '#2563EB',
+                  flex: 1, height: 50, borderRadius: 13, background: 'var(--accent-blue)',
                   border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#fff',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   fontFamily: "'Noto Sans JP', sans-serif",
@@ -1496,7 +1496,7 @@ function InterviewContent() {
                 style={{
                   height: 50, padding: '0 20px', borderRadius: 13,
                   border: '1px solid var(--border-gray)', background: 'var(--surface-gray)',
-                  color: copied ? '#10B981' : 'var(--muted-text)',
+                  color: copied ? 'var(--green-success)' : 'var(--muted-text)',
                   fontSize: 14, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
                   fontFamily: "'Noto Sans JP', sans-serif",
                 }}
@@ -1519,7 +1519,7 @@ function InterviewContent() {
       {questions.length > 0 && (phase === 'question' || phase === 'evaluating' || phase === 'feedback') && (
         <div style={{ position: 'fixed', top: 52, left: 0, right: 0, height: 2, background: 'var(--border-gray)', zIndex: 40 }}>
           <motion.div
-            style={{ height: '100%', background: '#2563EB', transformOrigin: 'left' }}
+            style={{ height: '100%', background: 'var(--accent-blue)', transformOrigin: 'left' }}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: progress }}
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}

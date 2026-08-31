@@ -165,7 +165,7 @@ export default function NotificationBell({ userId, applications, onOpenApp }: No
             position: 'absolute', top: -3, right: -3,
             width: 16, height: 16,
             borderRadius: 999,
-            background: '#EF4444',
+            background: 'var(--danger)',
             color: '#fff',
             fontSize: 9, fontWeight: 700,
             display: 'flex', alignItems: 'center', justifyContent: 'center',

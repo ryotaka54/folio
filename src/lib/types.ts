@@ -60,7 +60,11 @@ export type Category =
   | 'Healthcare & Life Sciences'
   | 'Other';
 
-export const TAG_COLORS = ['#6366F1','#10B981','#F59E0B','#EF4444','#8B5CF6','#3B82F6','#EC4899','#64748B'] as const;
+// Positionally: indigo, green, amber, red, violet, brand-blue, pink, slate.
+// First five and pink/slate match --pill-{variant}-dot in globals.css; the
+// 6th ("brand blue") has no pill-variant equivalent and maps to --accent-blue
+// instead since it functions as the app's brand-color swatch, not a stage hue.
+export const TAG_COLORS = ['#8760A0','#6C8A54','#C08A2E','#B85B3E','#3F9088','#8F6B22','#B9707F','#6B848C'] as const;
 
 export interface Tag {
   id: string;

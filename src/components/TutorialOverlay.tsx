@@ -231,7 +231,7 @@ function ExtensionDemo() {
       >
         <div style={{ width: 60, height: 7, borderRadius: 4, background: 'var(--accent-blue)', marginBottom: 5, opacity: 0.7 }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green-success)', flexShrink: 0 }} />
           <div style={{ width: 36, height: 6, borderRadius: 4, background: 'var(--border-gray)' }} />
         </div>
       </div>

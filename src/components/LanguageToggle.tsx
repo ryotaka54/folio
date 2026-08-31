@@ -93,7 +93,7 @@ export default function LanguageToggle() {
           fontWeight: 600,
           letterSpacing: '0.03em',
           fontFamily: 'var(--font-geist), sans-serif',
-          background: !isJa ? 'var(--accent-blue, #2563EB)' : 'transparent',
+          background: !isJa ? 'var(--accent-blue)' : 'transparent',
           color: !isJa ? '#fff' : 'var(--muted-text)',
           transition: 'background 0.15s, color 0.15s',
         }}
@@ -113,7 +113,7 @@ export default function LanguageToggle() {
           fontWeight: 600,
           letterSpacing: '0.02em',
           fontFamily: "'Noto Sans JP', var(--font-geist), sans-serif",
-          background: isJa ? 'var(--accent-blue, #2563EB)' : 'transparent',
+          background: isJa ? 'var(--accent-blue)' : 'transparent',
           color: isJa ? '#fff' : 'var(--muted-text)',
           transition: 'background 0.15s, color 0.15s',
         }}

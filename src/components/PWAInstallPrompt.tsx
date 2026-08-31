@@ -125,7 +125,7 @@ export default function PWAInstallPrompt() {
           <button
             onClick={install}
             style={{
-              flex: 1, height: 32, background: '#2563EB', color: '#fff',
+              flex: 1, height: 32, background: 'var(--accent-blue)', color: '#fff',
               border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600,
               cursor: 'pointer',
             }}
@@ -137,7 +137,7 @@ export default function PWAInstallPrompt() {
             href="/install"
             onClick={dismiss}
             style={{
-              flex: 1, height: 32, background: '#2563EB', color: '#fff',
+              flex: 1, height: 32, background: 'var(--accent-blue)', color: '#fff',
               border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600,
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
               textDecoration: 'none',

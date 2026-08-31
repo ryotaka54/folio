@@ -232,14 +232,14 @@ export default function ContactDrawer({ contact, open, onClose, onUpdate, onDele
                   {linkedApps.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
                       {linkedApps.map(app => {
-                        const color = STAGE_COLORS[app.status] || '#6B7280';
+                        const color = STAGE_COLORS[app.status] || 'var(--pill-neutral-dot)';
                         return (
                           <div key={app.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border-gray)', background: 'var(--surface-gray)' }}>
                             <div>
                               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)' }}>{app.company}</div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                                 <span style={{ fontSize: 11, color: 'var(--muted-text)' }}>{app.role}</span>
-                                <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99, background: `${color}18`, color, border: `1px solid ${color}33` }}>{app.status}</span>
+                                <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99, background: `color-mix(in oklch, ${color} 9%, transparent)`, color, border: `1px solid color-mix(in oklch, ${color} 20%, transparent)` }}>{app.status}</span>
                               </div>
                             </div>
                             <button onClick={() => unlinkApp(app.id)} style={{ fontSize: 11, color: 'var(--muted-text)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}>Unlink</button>

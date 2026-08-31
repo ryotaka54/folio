@@ -21,7 +21,19 @@ export default function OfferConfetti({ trigger }: Props) {
 
     const ctx = canvas.getContext('2d')!;
     const particles: Particle[] = [];
-    const colors = ['#2563EB', '#16A34A', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+    // Canvas fillStyle can't resolve CSS custom properties directly (var(...)
+    // is a stylesheet-only construct) — read the computed values off the root
+    // element so confetti still tracks the current theme's palette.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cssVar = (name: string) => rootStyle.getPropertyValue(name).trim();
+    const colors = [
+      cssVar('--accent-blue'),
+      cssVar('--green-success'),
+      cssVar('--amber-warning'),
+      cssVar('--danger'),
+      cssVar('--pill-violet-dot'),
+      cssVar('--pill-pink-dot'),
+    ];
 
     interface Particle {
       x: number; y: number;

@@ -18,7 +18,7 @@ export default function GlobalError({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>
           <div style={{ textAlign: 'center' }}>
             <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8 }}>Something went wrong</h1>
-            <p style={{ fontSize: 14, color: '#64748b' }}>Please refresh the page. Your data is safe.</p>
+            <p style={{ fontSize: 14, color: '#6F6A61' }}>Please refresh the page. Your data is safe.</p>
           </div>
         </div>
       </body>

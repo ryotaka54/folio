@@ -37,7 +37,7 @@ export default function StreakBadge({ onMilestone }: Props) {
       style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)' }}
       title={`${streak}-day streak`}
     >
-      <span style={{ color: '#F59E0B' }}>🔥</span>
+      <span style={{ color: 'var(--amber-warning)' }}>🔥</span>
       {streak}
     </span>
   );

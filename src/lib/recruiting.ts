@@ -205,11 +205,16 @@ export function computeMomentum(applications: Application[]): MomentumScore {
 
   let label: MomentumLabel;
   let color: string;
-  if (score >= 80) { label = 'Unstoppable'; color = '#16A34A'; }
-  else if (score >= 60) { label = 'On Fire'; color = '#16A34A'; }
-  else if (score >= 40) { label = 'Active'; color = '#2563EB'; }
-  else if (score >= 20) { label = 'Warming Up'; color = '#D97706'; }
-  else { label = 'Cold'; color = '#9CA3AF'; }
+  // Literal hex, not CSS vars: computeMomentum is a plain TS function with no
+  // guarantee its caller is in a CSS-var-friendly context. Values match
+  // globals.css light-mode tokens — --green-success, --accent-blue,
+  // --amber-warning, --muted-text (picked over --pill-neutral-dot: this is
+  // an activity-level label color, not a stage pill).
+  if (score >= 80) { label = 'Unstoppable'; color = '#3F7A4C'; }
+  else if (score >= 60) { label = 'On Fire'; color = '#3F7A4C'; }
+  else if (score >= 40) { label = 'Active'; color = '#8F6B22'; }
+  else if (score >= 20) { label = 'Warming Up'; color = '#B5651D'; }
+  else { label = 'Cold'; color = '#6F6A61'; }
 
   return { score, label, color };
 }

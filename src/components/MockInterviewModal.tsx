@@ -57,9 +57,9 @@ interface Props {
 const STAR_LABELS = { situation: 'Situation', task: 'Task', action: 'Action', result: 'Result' };
 
 const STAR_COLORS: Record<StarRating['rating'], { bg: string; text: string; icon: string }> = {
-  strong:  { bg: 'rgba(22,163,74,0.1)',   text: '#16A34A', icon: '✓' },
-  okay:    { bg: 'rgba(202,138,4,0.1)',   text: '#D97706', icon: '~' },
-  missing: { bg: 'rgba(220,38,38,0.08)', text: '#DC2626', icon: '✗' },
+  strong:  { bg: 'var(--success-bg)', text: 'var(--success-text)',  icon: '✓' },
+  okay:    { bg: 'var(--warn-bg)',    text: 'var(--amber-warning)', icon: '~' },
+  missing: { bg: 'var(--error-bg)',   text: 'var(--error-text)',    icon: '✗' },
 };
 
 const SCORE_COLOR = (s: number) =>
@@ -457,7 +457,7 @@ export default function MockInterviewModal({ company, role, notes, applicationId
               )}
             </SettingBlock>
 
-            {error && <p style={{ fontSize: 13, color: '#DC2626', marginBottom: 16 }}>{error}</p>}
+            {error && <p style={{ fontSize: 13, color: 'var(--error-text)', marginBottom: 16 }}>{error}</p>}
 
             <button onClick={startInterview} style={primaryBtn}>
               Start Interview <ChevronRight size={15} />
@@ -480,8 +480,8 @@ export default function MockInterviewModal({ company, role, notes, applicationId
               <span style={{
                 fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em',
                 padding: '3px 9px', borderRadius: 9999,
-                background: currentQ.type === 'behavioral' ? 'rgba(37,99,235,0.1)' : 'rgba(124,58,237,0.1)',
-                color: currentQ.type === 'behavioral' ? 'var(--accent-blue)' : '#7C3AED',
+                background: currentQ.type === 'behavioral' ? 'var(--light-accent)' : 'var(--pill-violet-bg)',
+                color: currentQ.type === 'behavioral' ? 'var(--accent-blue)' : 'var(--pill-violet-fg)',
               }}>
                 {currentQ.type}
               </span>
@@ -534,7 +534,7 @@ export default function MockInterviewModal({ company, role, notes, applicationId
                     onClick={() => voice.listening ? voice.stop() : (setAnswer(''), voice.start())}
                     style={{
                       width: 44, height: 44, borderRadius: '50%', border: 'none', cursor: 'pointer',
-                      background: voice.listening ? '#DC2626' : 'var(--accent-blue)',
+                      background: voice.listening ? 'var(--danger)' : 'var(--accent-blue)',
                       color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       animation: voice.listening ? 'pulse 1.5s infinite' : 'none',
                     }}
@@ -611,10 +611,10 @@ export default function MockInterviewModal({ company, role, notes, applicationId
             {/* Strengths */}
             {feedback.strengths.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#16A34A', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Strengths</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--green-success)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Strengths</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {feedback.strengths.map((s, i) => (
-                    <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 9999, background: 'rgba(22,163,74,0.1)', color: '#16A34A' }}>{s}</span>
+                    <span key={i} style={{ fontSize: 12, padding: '4px 10px', borderRadius: 9999, background: 'var(--success-bg)', color: 'var(--success-text)' }}>{s}</span>
                   ))}
                 </div>
               </div>
@@ -623,7 +623,7 @@ export default function MockInterviewModal({ company, role, notes, applicationId
             {/* Improvements */}
             {feedback.improvements.length > 0 && (
               <div style={{ marginBottom: 20 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#D97706', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>To improve</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--amber-warning)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>To improve</p>
                 <ul style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {feedback.improvements.map((s, i) => (
                     <li key={i} style={{ fontSize: 13, color: 'var(--brand-navy)', lineHeight: 1.5 }}>{s}</li>
@@ -637,7 +637,7 @@ export default function MockInterviewModal({ company, role, notes, applicationId
               {feedback.overall}
             </div>
 
-            {error && <p style={{ fontSize: 13, color: '#DC2626', marginBottom: 12 }}>{error}</p>}
+            {error && <p style={{ fontSize: 13, color: 'var(--error-text)', marginBottom: 12 }}>{error}</p>}
 
             <button onClick={advance} style={primaryBtn}>
               {currentIdx + 1 >= questions.length ? 'View Results' : 'Next Question'} <ChevronRight size={15} />
@@ -736,7 +736,7 @@ function SettingBlock({ label, children }: { label: string; children: React.Reac
 
 const chipStyle = (active: boolean): React.CSSProperties => ({
   height: 36, padding: '0 16px', borderRadius: 8, border: active ? '2px solid var(--accent-blue)' : '1px solid var(--border-gray)',
-  background: active ? 'rgba(37,99,235,0.08)' : 'var(--surface-gray)', color: active ? 'var(--accent-blue)' : 'var(--muted-text)',
+  background: active ? 'var(--light-accent)' : 'var(--surface-gray)', color: active ? 'var(--accent-blue)' : 'var(--muted-text)',
   fontWeight: active ? 600 : 400, fontSize: 13, cursor: 'pointer', transition: 'all 0.15s',
 });
 

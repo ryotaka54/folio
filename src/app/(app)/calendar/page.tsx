@@ -212,7 +212,7 @@ function DayCell({
         <span
           className="inline-flex items-center justify-center w-6 h-6 rounded-full text-[12px] font-medium"
           style={isToday ? {
-            background: 'rgba(37,99,235,0.15)',
+            background: 'var(--light-accent)',
             color: 'var(--accent-blue)',
             outline: '1.5px solid var(--accent-blue)',
             fontWeight: 600,
@@ -371,10 +371,10 @@ function GoogleCalendarModal({
         {isConnected ? (
           <div>
             <div className="flex items-center gap-3 p-4 rounded-xl mb-4"
-              style={{ background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.2)' }}>
-              <CheckCircle size={18} style={{ color: '#16A34A', flexShrink: 0 }} />
+              style={{ background: 'var(--success-bg)', border: '1px solid var(--success-border)' }}>
+              <CheckCircle size={18} style={{ color: 'var(--green-success)', flexShrink: 0 }} />
               <div>
-                <p className="text-[13px] font-semibold" style={{ color: '#16A34A' }}>Connected</p>
+                <p className="text-[13px] font-semibold" style={{ color: 'var(--green-success)' }}>Connected</p>
                 {connectedEmail && (
                   <p className="text-[12px]" style={{ color: 'var(--muted-text)' }}>{connectedEmail}</p>
                 )}
@@ -404,7 +404,7 @@ function GoogleCalendarModal({
                 'Removed when you delete an application',
               ].map(item => (
                 <li key={item} className="flex items-center gap-2 text-[12px]" style={{ color: 'var(--muted-text)' }}>
-                  <CheckCircle size={13} style={{ color: '#16A34A', flexShrink: 0 }} />
+                  <CheckCircle size={13} style={{ color: 'var(--green-success)', flexShrink: 0 }} />
                   {item}
                 </li>
               ))}
@@ -627,7 +627,7 @@ function MobileWeekView({
               <span
                 className="w-7 h-7 rounded-full flex items-center justify-center text-[13px] font-medium"
                 style={isToday ? {
-                  background: 'rgba(37,99,235,0.15)',
+                  background: 'var(--light-accent)',
                   color: 'var(--accent-blue)',
                   outline: '1.5px solid var(--accent-blue)',
                   fontWeight: 700,
@@ -868,13 +868,13 @@ function CalendarContent() {
             {/* Stat pills */}
             <div className="flex flex-wrap gap-2">
               {(isJa ? [
-                { label: '件予定', count: statCounts.upcoming, style: { background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)' } },
-                { label: '件今週', count: statCounts.thisWeek, style: { background: 'rgba(217,119,6,0.10)', color: 'var(--amber-warning)' } },
-                { label: '件面接', count: statCounts.interviews, style: { background: 'rgba(22,163,74,0.10)', color: 'var(--green-success)' } },
+                { label: '件予定', count: statCounts.upcoming, style: { background: 'var(--light-accent)', color: 'var(--accent-blue)' } },
+                { label: '件今週', count: statCounts.thisWeek, style: { background: 'var(--warn-bg)', color: 'var(--amber-warning)' } },
+                { label: '件面接', count: statCounts.interviews, style: { background: 'var(--success-bg)', color: 'var(--green-success)' } },
               ] : [
-                { label: 'upcoming', count: statCounts.upcoming, style: { background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)' } },
-                { label: 'this week', count: statCounts.thisWeek, style: { background: 'rgba(217,119,6,0.10)', color: 'var(--amber-warning)' } },
-                { label: 'interviews', count: statCounts.interviews, style: { background: 'rgba(22,163,74,0.10)', color: 'var(--green-success)' } },
+                { label: 'upcoming', count: statCounts.upcoming, style: { background: 'var(--light-accent)', color: 'var(--accent-blue)' } },
+                { label: 'this week', count: statCounts.thisWeek, style: { background: 'var(--warn-bg)', color: 'var(--amber-warning)' } },
+                { label: 'interviews', count: statCounts.interviews, style: { background: 'var(--success-bg)', color: 'var(--green-success)' } },
               ]).map(p => (
                 <span key={p.label} className="text-[11px] font-semibold px-2.5 py-1 rounded-full" style={p.style}>
                   {p.count} {p.label}
@@ -928,9 +928,9 @@ function CalendarContent() {
                 onClick={() => setShowGCalModal(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] font-medium transition-all"
                 style={{
-                  borderColor: isGCalConnected ? 'rgba(22,163,74,0.4)' : 'var(--border-gray)',
-                  color: isGCalConnected ? '#16A34A' : 'var(--brand-navy)',
-                  background: isGCalConnected ? 'rgba(22,163,74,0.07)' : 'var(--surface-gray)',
+                  borderColor: isGCalConnected ? 'var(--success-border)' : 'var(--border-gray)',
+                  color: isGCalConnected ? 'var(--green-success)' : 'var(--brand-navy)',
+                  background: isGCalConnected ? 'var(--success-bg)' : 'var(--surface-gray)',
                 }}
               >
                 <Calendar size={13} />

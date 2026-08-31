@@ -46,7 +46,7 @@ export default function PipelineBar({ applications, stages, activeStage, onStage
         {activeStages.map(stage => {
           const count = counts[stage] || 0;
           if (count === 0) return null;
-          const color = STAGE_COLORS[stage] || '#6B7280';
+          const color = STAGE_COLORS[stage] || 'var(--pill-neutral-dot)';
           const isActive = activeStage === 'all' || activeStage === stage;
           return (
             <button
@@ -86,7 +86,7 @@ export default function PipelineBar({ applications, stages, activeStage, onStage
             label={stage}
             count={counts[stage] || 0}
             active={activeStage === stage}
-            color={STAGE_COLORS[stage] || '#6B7280'}
+            color={STAGE_COLORS[stage] || 'var(--pill-neutral-dot)'}
             variant={STAGE_PILL_VARIANT[stage] ?? 'neutral'}
             onClick={() => onStageClick(stage)}
           />

@@ -38,9 +38,9 @@ const inputCls = [
 ].join(' ');
 
 const urgencyColors = {
-  danger:  { bg: 'rgba(220,38,38,0.1)',  text: '#DC2626', border: 'rgba(220,38,38,0.25)'  },
-  warning: { bg: 'rgba(217,119,6,0.1)',  text: '#D97706', border: 'rgba(217,119,6,0.25)'  },
-  safe:    { bg: 'rgba(22,163,74,0.1)',  text: '#16A34A', border: 'rgba(22,163,74,0.25)'  },
+  danger:  { bg: 'var(--error-bg)',   text: 'var(--error-text)',    border: 'var(--error-border)'   },
+  warning: { bg: 'var(--warn-bg)',    text: 'var(--amber-warning)', border: 'color-mix(in oklch, var(--amber-warning) 25%, transparent)' },
+  safe:    { bg: 'var(--success-bg)', text: 'var(--success-text)',  border: 'var(--success-border)' },
 };
 
 export default function OfferDetailsPanel({ application, onUpdate }: Props) {
@@ -105,15 +105,15 @@ export default function OfferDetailsPanel({ application, onUpdate }: Props) {
         onClick={() => setOpen(o => !o)}
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '14px 16px', background: 'linear-gradient(135deg, rgba(22,163,74,0.06), rgba(5,150,105,0.06))',
+          padding: '14px 16px', background: 'linear-gradient(135deg, color-mix(in oklch, var(--green-success) 6%, transparent), color-mix(in oklch, var(--green-success) 6%, transparent))',
           border: 'none', cursor: 'pointer', fontFamily: 'inherit',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><path d="M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M21 7c0 4.97-4.03 9-9 9S3 11.97 3 7"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.21 13.89L7 23l5-3 5 3-1.21-9.12"/><path d="M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M21 7c0 4.97-4.03 9-9 9S3 11.97 3 7"/></svg>
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)' }}>Offer Details</span>
           {totalComp > 0 && (
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#16A34A' }}>
+            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--green-success)' }}>
               ~{fmtDisplay(totalComp)}/yr
             </span>
           )}
@@ -147,15 +147,15 @@ export default function OfferDetailsPanel({ application, onUpdate }: Props) {
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '9px 14px', borderRadius: 9,
-                background: 'rgba(37,99,235,0.06)', border: '1px dashed rgba(37,99,235,0.3)',
+                background: 'var(--light-accent)', border: '1px dashed color-mix(in oklch, var(--accent-blue) 30%, transparent)',
                 cursor: 'pointer', fontFamily: 'inherit', width: '100%',
                 transition: 'all 0.15s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(37,99,235,0.1)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(37,99,235,0.06)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'color-mix(in oklch, var(--accent-blue) 10%, transparent)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--light-accent)'; }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l2 2"/><path d="M18 2l4 4-4 4"/><path d="M22 6H14"/></svg>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#2563EB' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l2 2"/><path d="M18 2l4 4-4 4"/><path d="M22 6H14"/></svg>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--accent-blue)' }}>
                 {hasAnyData ? 'Re-parse offer letter' : 'Paste offer letter to auto-fill'}
               </span>
               <span style={{ fontSize: 12, color: 'var(--muted-text)', marginLeft: 2 }}>— AI extracts salary, bonus & equity</span>
@@ -178,11 +178,11 @@ export default function OfferDetailsPanel({ application, onUpdate }: Props) {
                   fontFamily: 'inherit', lineHeight: 1.5,
                   boxSizing: 'border-box',
                 }}
-                onFocus={e => { e.currentTarget.style.borderColor = '#2563EB'; }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'var(--accent-blue)'; }}
                 onBlur={e => { e.currentTarget.style.borderColor = 'var(--border-gray)'; }}
               />
               {parseError && (
-                <p style={{ fontSize: 12, color: '#EF4444', margin: 0 }}>{parseError}</p>
+                <p style={{ fontSize: 12, color: 'var(--error-text)', margin: 0 }}>{parseError}</p>
               )}
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
@@ -190,7 +190,7 @@ export default function OfferDetailsPanel({ application, onUpdate }: Props) {
                   disabled={!parseText.trim() || parsing}
                   style={{
                     height: 34, padding: '0 16px', borderRadius: 8,
-                    background: parsing ? 'rgba(37,99,235,0.5)' : '#2563EB',
+                    background: parsing ? 'color-mix(in oklch, var(--accent-blue) 50%, transparent)' : 'var(--accent-blue)',
                     color: '#fff', border: 'none', cursor: parsing ? 'default' : 'pointer',
                     fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
                     display: 'flex', alignItems: 'center', gap: 6,
@@ -222,15 +222,15 @@ export default function OfferDetailsPanel({ application, onUpdate }: Props) {
           {parsedFields && !showParse && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
-              borderRadius: 8, background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.2)',
+              borderRadius: 8, background: 'var(--success-bg)', border: '1px solid var(--success-border)',
             }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              <span style={{ fontSize: 12, color: '#16A34A', fontWeight: 500 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success-text)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style={{ fontSize: 12, color: 'var(--success-text)', fontWeight: 500 }}>
                 Auto-filled {Object.keys(parsedFields).length} field{Object.keys(parsedFields).length !== 1 ? 's' : ''} from your offer letter
               </span>
               <button
                 onClick={() => setParsedFields(null)}
-                style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#16A34A', fontSize: 14, lineHeight: 1, padding: 0 }}
+                style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--success-text)', fontSize: 14, lineHeight: 1, padding: 0 }}
               >×</button>
             </div>
           )}
@@ -273,10 +273,10 @@ export default function OfferDetailsPanel({ application, onUpdate }: Props) {
           {totalComp > 0 && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 8,
-              background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.2)',
+              background: 'var(--success-bg)', border: '1px solid var(--success-border)',
             }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#16A34A' }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success-text)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--success-text)' }}>
                 ~${fmt(totalComp)} / yr total comp
               </span>
               <span style={{ fontSize: 11, color: 'var(--muted-text)', marginLeft: 2 }}>(base + ¼ signing + bonus)</span>

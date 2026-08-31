@@ -28,10 +28,10 @@ export default function FunnelChart({ applications }: FunnelChartProps) {
     const offersCount     = applications.filter(a => positiveOutcomes.includes(a.status)).length;
 
     return [
-      { name: 'Wishlist',   count: wishlistCount,  color: STAGE_COLORS['Wishlist'] || '#8B5CF6' },
-      { name: 'Applied',    count: appliedCount,   color: STAGE_COLORS['Applied']  || '#4361EE' },
-      { name: 'Interviews', count: interviewCount, color: STAGE_COLORS['Phone / Recruiter Screen'] || '#F59E0B' },
-      { name: 'Offers',     count: offersCount,    color: STAGE_COLORS['Offer'] || '#1D9E75' },
+      { name: 'Wishlist',   count: wishlistCount,  color: STAGE_COLORS['Wishlist'] || 'var(--pill-violet-dot)' },
+      { name: 'Applied',    count: appliedCount,   color: STAGE_COLORS['Applied']  || 'var(--accent-blue)' },
+      { name: 'Interviews', count: interviewCount, color: STAGE_COLORS['Phone / Recruiter Screen'] || 'var(--amber-warning)' },
+      { name: 'Offers',     count: offersCount,    color: STAGE_COLORS['Offer'] || 'var(--green-success)' },
     ];
   }, [applications]);
 

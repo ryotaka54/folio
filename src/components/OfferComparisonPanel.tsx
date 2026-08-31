@@ -8,11 +8,11 @@ interface Props { applications: Application[] }
 const OFFER_STAGES = new Set(['Offer', 'Offer — Negotiating', 'Accepted', '内々定', '内定']);
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  'Offer':              { bg: 'rgba(22,163,74,0.12)',  color: '#16A34A' },
-  'Offer — Negotiating':{ bg: 'rgba(217,119,6,0.12)',  color: '#D97706' },
-  'Accepted':           { bg: 'rgba(37,99,235,0.12)',  color: '#2563EB' },
-  '内々定':              { bg: 'rgba(22,163,74,0.12)',  color: '#16A34A' },
-  '内定':               { bg: 'rgba(37,99,235,0.12)',  color: '#2563EB' },
+  'Offer':              { bg: 'var(--success-bg)', color: 'var(--success-text)' },
+  'Offer — Negotiating':{ bg: 'var(--warn-bg)',     color: 'var(--amber-warning)' },
+  'Accepted':           { bg: 'var(--light-accent)', color: 'var(--accent-blue)' },
+  '内々定':              { bg: 'var(--success-bg)', color: 'var(--success-text)' },
+  '内定':               { bg: 'var(--light-accent)', color: 'var(--accent-blue)' },
 };
 
 function initials(name: string) {
@@ -55,7 +55,7 @@ export default function OfferComparisonPanel({ applications }: Props) {
       <div style={{ maxWidth: 560, margin: '80px auto', padding: '0 24px', textAlign: 'center' }}>
         <div style={{
           width: 64, height: 64, borderRadius: 16, margin: '0 auto 20px',
-          background: 'linear-gradient(135deg, rgba(22,163,74,0.15), rgba(37,99,235,0.15))',
+          background: 'linear-gradient(135deg, color-mix(in oklch, var(--green-success) 15%, transparent), color-mix(in oklch, var(--accent-blue) 15%, transparent))',
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28,
         }}>🏆</div>
         <p style={{ fontSize: 17, fontWeight: 700, color: 'var(--brand-navy)', margin: '0 0 8px', letterSpacing: '-0.01em' }}>No offers yet</p>
@@ -114,11 +114,11 @@ export default function OfferComparisonPanel({ applications }: Props) {
               style={{
                 position: 'relative',
                 borderRadius: 14,
-                border: `2px solid ${isChecked ? '#2563EB' : 'var(--border-gray)'}`,
+                border: `2px solid ${isChecked ? 'var(--accent-blue)' : 'var(--border-gray)'}`,
                 background: 'var(--card-bg)',
                 cursor: 'pointer',
                 transition: 'border-color 0.15s, box-shadow 0.15s',
-                boxShadow: isChecked ? '0 0 0 3px rgba(37,99,235,0.12)' : '0 1px 4px rgba(0,0,0,0.06)',
+                boxShadow: isChecked ? '0 0 0 3px color-mix(in oklch, var(--accent-blue) 12%, transparent)' : '0 1px 4px rgba(0,0,0,0.06)',
                 overflow: 'hidden',
               }}
             >
@@ -149,8 +149,8 @@ export default function OfferComparisonPanel({ applications }: Props) {
                   {/* Checkbox */}
                   <div style={{
                     width: 20, height: 20, borderRadius: 6, flexShrink: 0,
-                    border: `2px solid ${isChecked ? '#2563EB' : 'var(--border-gray)'}`,
-                    background: isChecked ? '#2563EB' : 'transparent',
+                    border: `2px solid ${isChecked ? 'var(--accent-blue)' : 'var(--border-gray)'}`,
+                    background: isChecked ? 'var(--accent-blue)' : 'transparent',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'background 0.12s, border-color 0.12s',
                   }}>
@@ -163,16 +163,16 @@ export default function OfferComparisonPanel({ applications }: Props) {
                   <div style={{
                     padding: '10px 14px', borderRadius: 10, marginBottom: 12,
                     background: isBest
-                      ? 'linear-gradient(135deg, rgba(22,163,74,0.1), rgba(16,185,129,0.08))'
+                      ? 'linear-gradient(135deg, color-mix(in oklch, var(--green-success) 10%, transparent), color-mix(in oklch, var(--green-success) 8%, transparent))'
                       : 'var(--surface-gray)',
-                    border: isBest ? '1px solid rgba(22,163,74,0.25)' : '1px solid var(--border-gray)',
+                    border: isBest ? '1px solid var(--success-border)' : '1px solid var(--border-gray)',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: isBest ? '#16A34A' : 'var(--muted-text)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: isBest ? 'var(--green-success)' : 'var(--muted-text)', marginBottom: 2 }}>
                         {isBest ? '⭐ BEST TOTAL COMP' : 'TOTAL COMP'}
                       </div>
-                      <div style={{ fontSize: 22, fontWeight: 800, color: isBest ? '#16A34A' : 'var(--brand-navy)', letterSpacing: '-0.02em', lineHeight: 1 }}>
+                      <div style={{ fontSize: 22, fontWeight: 800, color: isBest ? 'var(--green-success)' : 'var(--brand-navy)', letterSpacing: '-0.02em', lineHeight: 1 }}>
                         ${tc.toLocaleString()}
                       </div>
                     </div>
@@ -214,11 +214,11 @@ export default function OfferComparisonPanel({ applications }: Props) {
                   <div style={{
                     marginTop: 12, display: 'flex', alignItems: 'center', gap: 6,
                     padding: '6px 10px', borderRadius: 8,
-                    background: days <= 3 ? 'rgba(220,38,38,0.08)' : days <= 7 ? 'rgba(217,119,6,0.08)' : 'var(--surface-gray)',
-                    border: days <= 3 ? '1px solid rgba(220,38,38,0.2)' : days <= 7 ? '1px solid rgba(217,119,6,0.2)' : '1px solid var(--border-gray)',
+                    background: days <= 3 ? 'var(--error-bg)' : days <= 7 ? 'var(--warn-bg)' : 'var(--surface-gray)',
+                    border: days <= 3 ? '1px solid var(--error-border)' : days <= 7 ? '1px solid color-mix(in oklch, var(--amber-warning) 20%, transparent)' : '1px solid var(--border-gray)',
                   }}>
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: days <= 3 ? '#DC2626' : days <= 7 ? '#D97706' : 'var(--muted-text)', flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: days <= 3 ? '#DC2626' : days <= 7 ? '#D97706' : 'var(--muted-text)' }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--amber-warning)' : 'var(--muted-text)', flexShrink: 0 }}><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: days <= 3 ? 'var(--danger)' : days <= 7 ? 'var(--amber-warning)' : 'var(--muted-text)' }}>
                       {days < 0 ? 'Deadline passed' : days === 0 ? 'Due today' : `${days}d to decide`}
                     </span>
                   </div>
@@ -286,7 +286,7 @@ export default function OfferComparisonPanel({ applications }: Props) {
               <div key={key} style={{
                 display: 'grid', gridTemplateColumns: '180px 1fr 1fr',
                 borderTop: '1px solid var(--border-gray)',
-                background: highlight ? 'rgba(22,163,74,0.03)' : 'var(--card-bg)',
+                background: highlight ? 'color-mix(in oklch, var(--green-success) 3%, transparent)' : 'var(--card-bg)',
               }}>
                 <div style={{ padding: '12px 16px', fontSize: 12, color: 'var(--muted-text)', fontWeight: 500, display: 'flex', alignItems: 'center' }}>{label}</div>
                 {comparing.map((app, ci) => {
@@ -297,7 +297,7 @@ export default function OfferComparisonPanel({ applications }: Props) {
                       borderLeft: '1px solid var(--border-gray)',
                       fontSize: highlight ? 15 : 13,
                       fontWeight: highlight ? 800 : 400,
-                      color: isWinner ? '#16A34A' : 'var(--brand-navy)',
+                      color: isWinner ? 'var(--green-success)' : 'var(--brand-navy)',
                       display: 'flex', alignItems: 'center', gap: 6,
                     }}>
                       {fn(app)}

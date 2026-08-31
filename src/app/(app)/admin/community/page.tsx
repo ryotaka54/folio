@@ -200,7 +200,7 @@ export default function AdminCommunityPage() {
             </span>
             <span
               className="text-[10px] font-medium px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)' }}
+              style={{ background: 'var(--light-accent)', color: 'var(--accent-blue)' }}
             >
               Day {currentDay}
             </span>
@@ -231,7 +231,7 @@ export default function AdminCommunityPage() {
             <button
               onClick={advanceDay}
               className="px-3 py-1.5 rounded-lg border text-[12px] font-medium transition-colors"
-              style={{ borderColor: 'var(--amber-warning)', color: 'var(--amber-warning)', background: 'rgba(217,119,6,0.06)' }}
+              style={{ borderColor: 'var(--amber-warning)', color: 'var(--amber-warning)', background: 'var(--warn-bg)' }}
             >
               Advance day →
             </button>
@@ -291,7 +291,7 @@ export default function AdminCommunityPage() {
                                 <button
                                   onClick={() => setWinner(idea.id)}
                                   className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors"
-                                  style={{ background: 'rgba(217,119,6,0.10)', color: '#D97706', border: '1px solid rgba(217,119,6,0.25)' }}
+                                  style={{ background: 'var(--warn-bg)', color: 'var(--amber-warning)', border: '1px solid color-mix(in oklch, var(--amber-warning) 25%, transparent)' }}
                                 >
                                   Set as winner
                                 </button>
@@ -308,7 +308,7 @@ export default function AdminCommunityPage() {
                               <button
                                 onClick={() => updateStatus(idea.id, 'building')}
                                 className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors"
-                                style={{ background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)', border: '1px solid rgba(37,99,235,0.25)' }}
+                                style={{ background: 'var(--light-accent)', color: 'var(--accent-blue)', border: '1px solid color-mix(in oklch, var(--accent-blue) 25%, transparent)' }}
                               >
                                 Mark as building
                               </button>
@@ -317,7 +317,7 @@ export default function AdminCommunityPage() {
                               <button
                                 onClick={() => setEditingId(editingId === idea.id ? null : idea.id)}
                                 className="px-2.5 py-1 rounded-lg text-[11px] font-medium transition-colors"
-                                style={{ background: 'rgba(22,163,74,0.10)', color: '#16A34A', border: '1px solid rgba(22,163,74,0.25)' }}
+                                style={{ background: 'var(--success-bg)', color: 'var(--green-success)', border: '1px solid var(--success-border)' }}
                               >
                                 Mark live →
                               </button>
@@ -372,7 +372,7 @@ export default function AdminCommunityPage() {
                               <button
                                 onClick={() => markLive(idea.id)}
                                 className="px-3 py-1.5 rounded-lg text-[12px] font-medium"
-                                style={{ background: '#16A34A', color: '#fff' }}
+                                style={{ background: 'var(--green-success)', color: '#fff' }}
                               >
                                 Confirm live
                               </button>

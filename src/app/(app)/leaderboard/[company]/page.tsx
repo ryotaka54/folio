@@ -29,10 +29,10 @@ interface PreviewFeedback {
 }
 
 function scoreColor(s: number) {
-  if (s >= 5) return '#10B981';
-  if (s >= 4) return '#3B82F6';
-  if (s >= 3) return '#F59E0B';
-  return '#EF4444';
+  if (s >= 5) return 'var(--green-success)';
+  if (s >= 4) return 'var(--accent-blue)';
+  if (s >= 3) return 'var(--amber-warning)';
+  return 'var(--danger)';
 }
 
 function scoreLabel(s: number) {
@@ -101,7 +101,7 @@ export default function CompanyLeaderboardPage({ params }: { params: Promise<{ c
           {user ? (
             <Link href="/interview" style={{ fontSize: 13, color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 500 }}>Practice →</Link>
           ) : (
-            <Link href="/signup" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: '#2563EB', padding: '7px 16px', borderRadius: 8, textDecoration: 'none' }}>Sign up free</Link>
+            <Link href="/signup" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: 'var(--accent-blue)', padding: '7px 16px', borderRadius: 8, textDecoration: 'none' }}>Sign up free</Link>
           )}
         </div>
       </nav>
@@ -122,7 +122,7 @@ export default function CompanyLeaderboardPage({ params }: { params: Promise<{ c
         ) : groups.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <p style={{ color: 'var(--muted-text)', fontSize: 15 }}>No answers yet for this company.</p>
-            <Link href={user ? '/interview' : '/signup'} style={{ display: 'inline-block', marginTop: 14, fontSize: 14, fontWeight: 600, color: '#2563EB', textDecoration: 'none' }}>
+            <Link href={user ? '/interview' : '/signup'} style={{ display: 'inline-block', marginTop: 14, fontSize: 14, fontWeight: 600, color: 'var(--accent-blue)', textDecoration: 'none' }}>
               {user ? 'Be the first — practice now →' : 'Sign up and be the first →'}
             </Link>
           </div>
@@ -186,14 +186,14 @@ function QuestionBlock({ group, user, companySlug }: { group: QuestionGroup; use
           <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--brand-navy)', margin: 0, lineHeight: 1.55, flex: 1 }}>
             &quot;{group.question}&quot;
           </p>
-          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: 'rgba(37,99,235,0.1)', color: '#2563EB', whiteSpace: 'nowrap', flexShrink: 0, letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 8px', borderRadius: 6, background: 'var(--light-accent)', color: 'var(--accent-blue)', whiteSpace: 'nowrap', flexShrink: 0, letterSpacing: '0.04em' }}>
             {group.question_type.toUpperCase()}
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
           <button
             onClick={() => { setTryOpen(t => !t); if (!tryOpen) setTimeout(() => textareaRef.current?.focus(), 100); }}
-            style={{ height: 32, padding: '0 14px', borderRadius: 8, border: '1px solid var(--accent-blue)', background: 'rgba(37,99,235,0.08)', color: '#2563EB', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
+            style={{ height: 32, padding: '0 14px', borderRadius: 8, border: '1px solid var(--accent-blue)', background: 'var(--light-accent)', color: 'var(--accent-blue)', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}
           >
             {tryOpen ? 'Close' : 'Try this question'}
           </button>
@@ -219,7 +219,7 @@ function QuestionBlock({ group, user, companySlug }: { group: QuestionGroup; use
                 rows={5}
                 style={{ width: '100%', padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border-gray)', background: 'var(--card-bg)', fontSize: 14, color: 'var(--body-text)', fontFamily: 'inherit', resize: 'vertical', outline: 'none', boxSizing: 'border-box', lineHeight: 1.6 }}
               />
-              {previewError && <p style={{ fontSize: 13, color: '#EF4444', margin: '8px 0 0' }}>{previewError}</p>}
+              {previewError && <p style={{ fontSize: 13, color: 'var(--error-text)', margin: '8px 0 0' }}>{previewError}</p>}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
                 <span style={{ fontSize: 12, color: 'var(--muted-text)' }}>
                   Top score on this question: <strong style={{ color: scoreColor(topScore) }}>{topScore}/5</strong>
@@ -227,7 +227,7 @@ function QuestionBlock({ group, user, companySlug }: { group: QuestionGroup; use
                 <button
                   onClick={submitPreview}
                   disabled={loading || !answer.trim()}
-                  style={{ height: 36, padding: '0 20px', borderRadius: 9, border: 'none', background: loading || !answer.trim() ? 'var(--border-gray)' : '#2563EB', color: '#fff', fontSize: 13, fontWeight: 600, cursor: loading || !answer.trim() ? 'default' : 'pointer', fontFamily: 'inherit' }}
+                  style={{ height: 36, padding: '0 20px', borderRadius: 9, border: 'none', background: loading || !answer.trim() ? 'var(--border-gray)' : 'var(--accent-blue)', color: '#fff', fontSize: 13, fontWeight: 600, cursor: loading || !answer.trim() ? 'default' : 'pointer', fontFamily: 'inherit' }}
                 >
                   {loading ? 'Evaluating…' : 'See my score'}
                 </button>
@@ -247,18 +247,18 @@ function QuestionBlock({ group, user, companySlug }: { group: QuestionGroup; use
                   <div style={{ fontSize: 11, color: 'var(--muted-text)', marginTop: 2 }}>Top on board</div>
                 </div>
                 <div style={{ flex: 1 }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: scoreColor(preview.score), padding: '4px 10px', borderRadius: 6, background: `${scoreColor(preview.score)}18` }}>{scoreLabel(preview.score)}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: scoreColor(preview.score), padding: '4px 10px', borderRadius: 6, background: `color-mix(in oklch, ${scoreColor(preview.score)} 10%, transparent)` }}>{scoreLabel(preview.score)}</span>
               </div>
               <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.65, fontStyle: 'italic', margin: '0 0 14px', padding: '12px 14px', background: 'var(--surface-gray)', borderRadius: 8 }}>
                 {preview.overall}
               </p>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {(user ? (
-                  <Link href="/interview" style={{ height: 34, padding: '0 16px', borderRadius: 8, background: '#2563EB', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                  <Link href="/interview" style={{ height: 34, padding: '0 16px', borderRadius: 8, background: 'var(--accent-blue)', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                     Practice with full feedback →
                   </Link>
                 ) : (
-                  <Link href="/signup" style={{ height: 34, padding: '0 16px', borderRadius: 8, background: '#2563EB', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                  <Link href="/signup" style={{ height: 34, padding: '0 16px', borderRadius: 8, background: 'var(--accent-blue)', color: '#fff', fontSize: 13, fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                     Sign up to post your score →
                   </Link>
                 ))}
@@ -279,14 +279,14 @@ function QuestionBlock({ group, user, companySlug }: { group: QuestionGroup; use
             style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 22px', borderTop: i > 0 ? '1px solid var(--border-gray)' : undefined }}
           >
             <div style={{ width: 28, textAlign: 'center', flexShrink: 0 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: i === 0 ? '#F59E0B' : 'var(--muted-text)', fontFamily: "'DM Mono', monospace" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: i === 0 ? 'var(--amber-warning)' : 'var(--muted-text)', fontFamily: "'DM Mono', monospace" }}>
                 #{i + 1}
               </span>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
                 <span style={{ fontSize: 13, fontWeight: 700, color: scoreColor(entry.score), fontFamily: "'DM Mono', monospace" }}>{entry.score}/5</span>
-                <span style={{ fontSize: 11, fontWeight: 600, color: scoreColor(entry.score), padding: '2px 7px', borderRadius: 5, background: `${scoreColor(entry.score)}18` }}>{scoreLabel(entry.score)}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, color: scoreColor(entry.score), padding: '2px 7px', borderRadius: 5, background: `color-mix(in oklch, ${scoreColor(entry.score)} 10%, transparent)` }}>{scoreLabel(entry.score)}</span>
                 <span style={{ fontSize: 12, color: 'var(--muted-text)', marginLeft: 'auto' }}>
                   {entry.display_name ?? 'Anonymous'}
                 </span>
@@ -299,7 +299,7 @@ function QuestionBlock({ group, user, companySlug }: { group: QuestionGroup; use
                   {entry.answer_text.length > 200 && (
                     <button
                       onClick={() => setExpandedAnswers(s => { const n = new Set(s); if (n.has(entry.id)) n.delete(entry.id); else n.add(entry.id); return n; })}
-                      style={{ fontSize: 12, color: '#2563EB', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'inherit' }}
+                      style={{ fontSize: 12, color: 'var(--accent-blue)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', fontFamily: 'inherit' }}
                     >
                       {expandedAnswers.has(entry.id) ? 'Show less' : 'Read more'}
                     </button>

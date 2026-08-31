@@ -27,7 +27,7 @@ interface Props {
 function generateConfettiPieces() {
   return Array.from({ length: 16 }, (_, i) => ({
     id: i,
-    color: ['#EF4444', '#fff', '#1E3A8A', '#F59E0B', '#22C55E'][i % 5],
+    color: ['var(--danger)', '#fff', 'var(--pill-indigo-dot)', 'var(--amber-warning)', 'var(--green-success)'][i % 5],
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 40}%`,
     delay: `${Math.random() * 0.4}s`,
@@ -67,9 +67,9 @@ function CountdownBadge({ deadline }: { deadline: string }) {
   if (!cd) return null;
 
   const colors = {
-    safe:    { bg: 'rgba(22,163,74,0.12)',  text: '#16A34A', border: 'rgba(22,163,74,0.3)'  },
-    warning: { bg: 'rgba(217,119,6,0.12)',  text: '#D97706', border: 'rgba(217,119,6,0.3)'  },
-    danger:  { bg: 'rgba(220,38,38,0.12)',  text: '#DC2626', border: 'rgba(220,38,38,0.3)'  },
+    safe:    { bg: 'var(--success-bg)', text: 'var(--green-success)', border: 'color-mix(in oklch, var(--green-success) 30%, transparent)' },
+    warning: { bg: 'var(--warn-bg)',    text: 'var(--amber-warning)', border: 'color-mix(in oklch, var(--amber-warning) 30%, transparent)' },
+    danger:  { bg: 'var(--error-bg)',   text: 'var(--danger)',        border: 'color-mix(in oklch, var(--danger) 30%, transparent)' },
   }[cd.urgency];
 
   return (
@@ -205,20 +205,20 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
         style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '14px 16px',
-          background: 'linear-gradient(135deg, rgba(34,197,94,0.06), rgba(16,185,129,0.06))',
+          background: 'linear-gradient(135deg, color-mix(in oklch, var(--green-success) 6%, transparent), color-mix(in oklch, var(--pill-violet-dot) 6%, transparent))',
           border: 'none', cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif",
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Award size={15} color="#16A34A" />
+          <Award size={15} color="var(--green-success)" />
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--brand-navy)', letterSpacing: '0.05em' }}>
             内定管理
           </span>
           {data.acceptanceDeadline && <CountdownBadge deadline={data.acceptanceDeadline} />}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {saving && <span style={{ fontSize: 11, color: '#94A3B8' }}>保存中</span>}
-          {saved && <span style={{ fontSize: 11, color: '#22C55E' }}>保存済み ✓</span>}
+          {saving && <span style={{ fontSize: 11, color: 'var(--muted-text)' }}>保存中</span>}
+          {saved && <span style={{ fontSize: 11, color: 'var(--green-success)' }}>保存済み ✓</span>}
           <svg
             width="14" height="14" viewBox="0 0 24 24" fill="none"
             stroke="var(--muted-text)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -231,9 +231,9 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
 
       {/* ── Celebration ── */}
       {showCelebration && open && (
-        <div style={{ padding: '10px 16px', background: 'rgba(34,197,94,0.06)', borderBottom: '1px solid rgba(34,197,94,0.15)' }}>
+        <div style={{ padding: '10px 16px', background: 'color-mix(in oklch, var(--green-success) 6%, transparent)', borderBottom: '1px solid color-mix(in oklch, var(--green-success) 15%, transparent)' }}>
           <p style={{
-            fontSize: 16, fontWeight: 600, color: '#2563EB', letterSpacing: '0.05em',
+            fontSize: 16, fontWeight: 600, color: 'var(--accent-blue)', letterSpacing: '0.05em',
             margin: 0, fontFamily: "'Noto Sans JP', sans-serif",
             animation: 'fadeOut 1s 2s ease-out forwards',
           }}>
@@ -254,15 +254,15 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '9px 14px', borderRadius: 9,
-                background: 'rgba(37,99,235,0.06)', border: '1px dashed rgba(37,99,235,0.3)',
+                background: 'var(--light-accent)', border: '1px dashed color-mix(in oklch, var(--accent-blue) 30%, transparent)',
                 cursor: 'pointer', fontFamily: "'Noto Sans JP', sans-serif", width: '100%',
                 transition: 'all 0.15s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(37,99,235,0.1)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(37,99,235,0.06)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'color-mix(in oklch, var(--accent-blue) 10%, transparent)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--light-accent)'; }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l2 2"/><path d="M18 2l4 4-4 4"/><path d="M22 6H14"/></svg>
-              <span style={{ fontSize: 13, fontWeight: 500, color: '#2563EB' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l2 2"/><path d="M18 2l4 4-4 4"/><path d="M22 6H14"/></svg>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--accent-blue)' }}>
                 {hasData ? '内定通知書を再読み込み' : '内定通知書を貼り付けてAIで自動入力'}
               </span>
               <span style={{ fontSize: 12, color: 'var(--muted-text)', marginLeft: 2 }}>— 年収・条件・期限を自動抽出</span>
@@ -285,11 +285,11 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
                   fontFamily: "'Noto Sans JP', sans-serif", lineHeight: 1.8, letterSpacing: '0.03em',
                   boxSizing: 'border-box',
                 }}
-                onFocus={e => { e.currentTarget.style.borderColor = '#2563EB'; }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'var(--accent-blue)'; }}
                 onBlur={e => { e.currentTarget.style.borderColor = 'var(--border-gray)'; }}
               />
               {parseError && (
-                <p style={{ fontSize: 12, color: '#EF4444', margin: 0, fontFamily: "'Noto Sans JP', sans-serif" }}>{parseError}</p>
+                <p style={{ fontSize: 12, color: 'var(--danger)', margin: 0, fontFamily: "'Noto Sans JP', sans-serif" }}>{parseError}</p>
               )}
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
@@ -297,7 +297,7 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
                   disabled={!parseText.trim() || parsing}
                   style={{
                     height: 34, padding: '0 16px', borderRadius: 8,
-                    background: parsing ? 'rgba(37,99,235,0.5)' : '#2563EB',
+                    background: parsing ? 'color-mix(in oklch, var(--accent-blue) 50%, transparent)' : 'var(--accent-blue)',
                     color: '#fff', border: 'none', cursor: parsing ? 'default' : 'pointer',
                     fontSize: 13, fontWeight: 600, fontFamily: "'Noto Sans JP', sans-serif",
                     display: 'flex', alignItems: 'center', gap: 6,
@@ -329,15 +329,15 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
           {parsedCount !== null && !showParse && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px',
-              borderRadius: 8, background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.2)',
+              borderRadius: 8, background: 'color-mix(in oklch, var(--green-success) 8%, transparent)', border: '1px solid color-mix(in oklch, var(--green-success) 20%, transparent)',
             }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              <span style={{ fontSize: 12, color: '#16A34A', fontWeight: 600, fontFamily: "'Noto Sans JP', sans-serif" }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style={{ fontSize: 12, color: 'var(--green-success)', fontWeight: 600, fontFamily: "'Noto Sans JP', sans-serif" }}>
                 {parsedCount}件の項目を自動入力しました
               </span>
               <button
                 onClick={() => setParsedCount(null)}
-                style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#16A34A', fontSize: 14, lineHeight: 1, padding: 0 }}
+                style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--green-success)', fontSize: 14, lineHeight: 1, padding: 0 }}
               >×</button>
             </div>
           )}
@@ -352,7 +352,7 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
                 style={inputStyle}
               />
               {data.offerDate && (
-                <p style={{ fontSize: 11, color: '#94A3B8', margin: '4px 0 0', fontFamily: "'Noto Sans JP', sans-serif" }}>
+                <p style={{ fontSize: 11, color: 'var(--text-tertiary)', margin: '4px 0 0', fontFamily: "'Noto Sans JP', sans-serif" }}>
                   {formatDateJa(data.offerDate)}
                 </p>
               )}
@@ -398,7 +398,7 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
           <div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 }}>
               <label style={labelStyle}>他社との比較メモ</label>
-              <span style={{ fontSize: 11, color: '#94A3B8', fontFamily: "'Noto Sans JP', sans-serif", letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontFamily: "'Noto Sans JP', sans-serif", letterSpacing: '0.05em' }}>
                 複数内定の場合はここで整理しましょう
               </span>
             </div>
@@ -409,8 +409,8 @@ export default function NaiteiManager({ applicationId, stage, initialData, isPro
               rows={4}
               style={{
                 width: '100%', borderRadius: 8,
-                border: '1.5px solid var(--accent-blue, #2563EB)',
-                background: 'rgba(37,99,235,0.03)', color: 'var(--brand-navy)',
+                border: '1.5px solid var(--accent-blue)',
+                background: 'color-mix(in oklch, var(--accent-blue) 3%, transparent)', color: 'var(--brand-navy)',
                 fontSize: 13, padding: '10px 12px',
                 fontFamily: "'Noto Sans JP', sans-serif",
                 letterSpacing: '0.05em', lineHeight: 1.8, resize: 'vertical', boxSizing: 'border-box',

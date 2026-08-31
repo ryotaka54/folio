@@ -71,7 +71,7 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-        <meta name="theme-color" content="#2563EB" />
+        <meta name="theme-color" content="#8F6B22" />
         <meta name="application-name" content="Applyd" />
         {/* Apple PWA */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -79,7 +79,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Applyd" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         {/* Windows */}
-        <meta name="msapplication-TileColor" content="#2563EB" />
+        <meta name="msapplication-TileColor" content="#8F6B22" />
         <meta name="msapplication-TileImage" content="/icons/icon-144.png" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
         <script

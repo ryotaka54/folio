@@ -224,7 +224,7 @@ export default function AddApplicationModal({ open, onClose, onSave, stages, ini
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-semibold" style={{ color: 'var(--brand-navy)' }}>{companyInfo.name}</span>
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: 'var(--border-gray)', color: 'var(--muted-text)' }}>{companyInfo.industry}</span>
-                    {companyInfo.hasOA && <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: '#FEF3C7', color: '#92400E' }}>Includes OA</span>}
+                    {companyInfo.hasOA && <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ background: 'var(--warn-bg)', color: 'var(--amber-warning)' }}>Includes OA</span>}
                   </div>
                   <p>{companyInfo.tip}</p>
                   <p className="mt-1 opacity-70">Apps open: {companyInfo.applicationWindow} · Timeline: {companyInfo.timeline}</p>

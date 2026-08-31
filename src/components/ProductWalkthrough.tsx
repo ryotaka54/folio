@@ -7,26 +7,27 @@ import { Logo } from './Logo';
 // ── Dark-mode design tokens ───────────────────────────────────────────────────
 // Always applied — the demo frame is always dark regardless of page theme.
 const D = {
-  bg:           '#0A0A0A',
-  cardBg:       '#161618',
-  surfaceGray:  '#1E1E20',
-  borderGray:   '#2A2A2C',
-  brandNavy:    '#F9FAFB',
-  mutedText:    '#A1A1AA',
-  textTertiary: '#71717A',
-  accentBlue:   '#3B82F6',
-  green:        '#4ADE80',
-  amber:        '#FBBF24',
-  red:          '#F87171',
+  bg:           '#0A0B0D',
+  cardBg:       '#141519',
+  surfaceGray:  '#1B1D22',
+  borderGray:   '#26282E',
+  brandNavy:    '#EFEEEA',
+  mutedText:    '#9C9A96',
+  textTertiary: '#716F6B',
+  accentBlue:   '#A1802C',
+  green:        '#4C8654',
+  amber:        '#D68A4E',
+  red:          '#B54A34',
 } as const;
 
-// Stage colors from constants.ts
+// Stage colors from constants.ts (dark-mode --pill-{variant}-dot values —
+// matches each stage's PillVariant via STAGE_PILL_VARIANT)
 const SC = {
-  Applied:     '#2563EB',
-  OA:          '#06B6D4',
-  PhoneScreen: '#F59E0B',
-  FinalRound:  '#EF4444',
-  Offer:       '#1D9E75',
+  Applied:     '#5E8A99', // slate
+  OA:          '#9B72B8', // indigo
+  PhoneScreen: '#4FA898', // violet
+  FinalRound:  '#C99A3E', // amber
+  Offer:       '#7FA664', // green
 } as const;
 
 const FEATURES = [
@@ -119,7 +120,7 @@ function PipelinePanel() {
           <div key={s.label} style={{
             borderRadius: 7, padding: '5px 7px', background: D.cardBg,
             border: s.accent === 'green' ? `1px solid ${D.borderGray}` : s.accent === 'amber' ? `1px solid ${D.borderGray}` : `1px solid ${D.borderGray}`,
-            borderLeft: s.accent === 'green' ? '3px solid #16A34A' : s.accent === 'amber' ? '3px solid #D97706' : `1px solid ${D.borderGray}`,
+            borderLeft: s.accent === 'green' ? `3px solid ${D.green}` : s.accent === 'amber' ? `3px solid ${D.amber}` : `1px solid ${D.borderGray}`,
           }}>
             <div style={{ fontSize: 6.5, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.05em', color: D.mutedText, marginBottom: 2 }}>{s.label}</div>
             <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: s.accent === 'green' ? D.green : s.accent === 'amber' ? D.amber : D.brandNavy, marginBottom: 1 }}>{s.value}</div>
@@ -146,8 +147,8 @@ function PipelinePanel() {
                       <span style={{
                         fontSize: 7, fontWeight: 600, padding: '1px 4px', borderRadius: 3,
                         ...(card.red
-                          ? { background: 'rgba(239,68,68,0.12)', color: D.red, border: '1px solid rgba(239,68,68,0.25)' }
-                          : { background: 'rgba(217,119,6,0.12)', color: D.amber, border: '1px solid rgba(217,119,6,0.25)' }),
+                          ? { background: 'rgba(181,74,52,0.12)', color: D.red, border: '1px solid rgba(181,74,52,0.25)' }
+                          : { background: 'rgba(214,138,78,0.12)', color: D.amber, border: '1px solid rgba(214,138,78,0.25)' }),
                       }}>{card.deadline}</span>
                     </div>
                   )}
@@ -267,7 +268,7 @@ function DeadlinesPanel() {
           <div key={s.label} style={{
             borderRadius: 7, padding: '6px 8px', background: D.cardBg,
             border: `1px solid ${D.borderGray}`,
-            borderLeft: s.accent === 'red' ? '3px solid #DC2626' : s.accent === 'amber' ? '3px solid #D97706' : `1px solid ${D.borderGray}`,
+            borderLeft: s.accent === 'red' ? `3px solid ${D.red}` : s.accent === 'amber' ? `3px solid ${D.amber}` : `1px solid ${D.borderGray}`,
           }}>
             <div style={{ fontSize: 6.5, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.05em', color: D.mutedText, marginBottom: 2 }}>{s.label}</div>
             <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: s.accent === 'red' ? D.red : s.accent === 'amber' ? D.amber : D.brandNavy, marginBottom: 1 }}>{s.value}</div>
@@ -293,8 +294,8 @@ function DeadlinesPanel() {
             <span style={{
               fontSize: 8.5, fontWeight: 600, padding: '2px 6px', borderRadius: 4, flexShrink: 0,
               ...(item.red
-                ? { background: 'rgba(220,38,38,0.12)', color: D.red, border: '1px solid rgba(220,38,38,0.25)' }
-                : { background: 'rgba(217,119,6,0.12)', color: D.amber, border: '1px solid rgba(217,119,6,0.25)' }),
+                ? { background: 'rgba(181,74,52,0.12)', color: D.red, border: '1px solid rgba(181,74,52,0.25)' }
+                : { background: 'rgba(214,138,78,0.12)', color: D.amber, border: '1px solid rgba(214,138,78,0.25)' }),
             }}>{item.deadline}</span>
           </div>
         ))}
@@ -333,8 +334,8 @@ function WeeklyCoachPanel() {
               <div key={p.n} style={{ display: 'flex', gap: 7, alignItems: 'flex-start' }}>
                 <div style={{
                   width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
-                  background: p.urgent ? 'rgba(239,68,68,0.15)' : `${D.accentBlue}15`,
-                  border: `1px solid ${p.urgent ? 'rgba(239,68,68,0.3)' : `${D.accentBlue}30`}`,
+                  background: p.urgent ? 'rgba(181,74,52,0.15)' : `${D.accentBlue}15`,
+                  border: `1px solid ${p.urgent ? 'rgba(181,74,52,0.3)' : `${D.accentBlue}30`}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 8, fontWeight: 700, color: p.urgent ? D.red : D.accentBlue,
                 }}>{p.n}</div>
@@ -376,7 +377,7 @@ function JaPipelinePanel() {
           <div key={s.label} style={{
             borderRadius: 7, padding: '5px 7px', background: D.cardBg,
             border: s.accent === 'green' ? `1px solid ${D.borderGray}` : s.accent === 'amber' ? `1px solid ${D.borderGray}` : `1px solid ${D.borderGray}`,
-            borderLeft: s.accent === 'green' ? '3px solid #16A34A' : s.accent === 'amber' ? '3px solid #D97706' : `1px solid ${D.borderGray}`,
+            borderLeft: s.accent === 'green' ? `3px solid ${D.green}` : s.accent === 'amber' ? `3px solid ${D.amber}` : `1px solid ${D.borderGray}`,
           }}>
             <div style={{ fontSize: 6.5, fontWeight: 700, textTransform: 'uppercase' as const, letterSpacing: '0.05em', color: D.mutedText, marginBottom: 2 }}>{s.label}</div>
             <div style={{ fontSize: 15, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: s.accent === 'green' ? D.green : s.accent === 'amber' ? D.amber : D.brandNavy, marginBottom: 1 }}>{s.value}</div>
@@ -402,8 +403,8 @@ function JaPipelinePanel() {
                       <span style={{
                         fontSize: 7, fontWeight: 600, padding: '1px 4px', borderRadius: 3,
                         ...(card.red
-                          ? { background: 'rgba(239,68,68,0.12)', color: D.red, border: '1px solid rgba(239,68,68,0.25)' }
-                          : { background: 'rgba(217,119,6,0.12)', color: D.amber, border: '1px solid rgba(217,119,6,0.25)' }),
+                          ? { background: 'rgba(181,74,52,0.12)', color: D.red, border: '1px solid rgba(181,74,52,0.25)' }
+                          : { background: 'rgba(214,138,78,0.12)', color: D.amber, border: '1px solid rgba(214,138,78,0.25)' }),
                       }}>{card.deadline}</span>
                     </div>
                   )}
@@ -517,7 +518,7 @@ function JaDeadlinesPanel() {
           <div key={s.label} style={{
             borderRadius: 7, padding: '6px 8px', background: D.cardBg,
             border: `1px solid ${D.borderGray}`,
-            borderLeft: s.accent === 'red' ? '3px solid #DC2626' : s.accent === 'amber' ? '3px solid #D97706' : `1px solid ${D.borderGray}`,
+            borderLeft: s.accent === 'red' ? `3px solid ${D.red}` : s.accent === 'amber' ? `3px solid ${D.amber}` : `1px solid ${D.borderGray}`,
           }}>
             <div style={{ fontSize: 6.5, fontWeight: 700, letterSpacing: '0.05em', color: D.mutedText, marginBottom: 2 }}>{s.label}</div>
             <div style={{ fontSize: 17, fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: s.accent === 'red' ? D.red : s.accent === 'amber' ? D.amber : D.brandNavy, marginBottom: 1 }}>{s.value}</div>
@@ -543,8 +544,8 @@ function JaDeadlinesPanel() {
             <span style={{
               fontSize: 8.5, fontWeight: 600, padding: '2px 6px', borderRadius: 4, flexShrink: 0,
               ...(item.red
-                ? { background: 'rgba(220,38,38,0.12)', color: D.red, border: '1px solid rgba(220,38,38,0.25)' }
-                : { background: 'rgba(217,119,6,0.12)', color: D.amber, border: '1px solid rgba(217,119,6,0.25)' }),
+                ? { background: 'rgba(181,74,52,0.12)', color: D.red, border: '1px solid rgba(181,74,52,0.25)' }
+                : { background: 'rgba(214,138,78,0.12)', color: D.amber, border: '1px solid rgba(214,138,78,0.25)' }),
             }}>{item.deadline}</span>
           </div>
         ))}
@@ -581,8 +582,8 @@ function JaWeeklyCoachPanel() {
               <div key={p.n} style={{ display: 'flex', gap: 7, alignItems: 'flex-start' }}>
                 <div style={{
                   width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
-                  background: p.urgent ? 'rgba(239,68,68,0.15)' : `${D.accentBlue}15`,
-                  border: `1px solid ${p.urgent ? 'rgba(239,68,68,0.3)' : `${D.accentBlue}30`}`,
+                  background: p.urgent ? 'rgba(181,74,52,0.15)' : `${D.accentBlue}15`,
+                  border: `1px solid ${p.urgent ? 'rgba(181,74,52,0.3)' : `${D.accentBlue}30`}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 8, fontWeight: 700, color: p.urgent ? D.red : D.accentBlue,
                 }}>{p.n}</div>
@@ -729,12 +730,12 @@ export default function ProductWalkthrough({ locale = 'en' }: { locale?: 'en' | 
                 >
                   <div style={{
                     width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                    background: isActive ? 'rgba(59,130,246,0.12)' : 'var(--surface-gray)',
-                    border: `1px solid ${isActive ? 'rgba(59,130,246,0.25)' : 'var(--border-gray)'}`,
+                    background: isActive ? 'var(--light-accent)' : 'var(--surface-gray)',
+                    border: `1px solid ${isActive ? 'color-mix(in oklch, var(--accent-blue) 25%, transparent)' : 'var(--border-gray)'}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     transition: 'all 0.2s',
                   }}>
-                    <f.Icon size={15} color={isActive ? '#3B82F6' : 'var(--muted-text)'} />
+                    <f.Icon size={15} color={isActive ? 'var(--accent-blue)' : 'var(--muted-text)'} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
@@ -752,7 +753,7 @@ export default function ProductWalkthrough({ locale = 'en' }: { locale?: 'en' | 
                         <div
                           key={`pb-${animKey}`}
                           style={{
-                            height: '100%', background: '#3B82F6', borderRadius: 1, width: '0%',
+                            height: '100%', background: 'var(--accent-blue)', borderRadius: 1, width: '0%',
                             animation: `wt-progress ${f.duration}ms linear both`,
                             animationPlayState: playing ? 'running' : 'paused',
                           }}
@@ -779,7 +780,7 @@ export default function ProductWalkthrough({ locale = 'en' }: { locale?: 'en' | 
               onClick={() => goTo(i)}
               style={{
                 width: i === active ? 20 : 6, height: 6, borderRadius: 3,
-                background: i === active ? '#3B82F6' : 'var(--border-gray)',
+                background: i === active ? 'var(--accent-blue)' : 'var(--border-gray)',
                 border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.2s',
               }}
             />

@@ -54,12 +54,12 @@ export default function DemoOverlay() {
             width: 12,
             height: 12,
             borderRadius: '50%',
-            background: '#3B82F6',
+            background: 'var(--accent-blue)',
             pointerEvents: 'none',
             zIndex: 99999,
             transform: `translate(${demo.cursorX - 6}px, ${demo.cursorY - 6}px)`,
             transition: 'transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-            boxShadow: '0 0 0 4px rgba(59, 130, 246, 0.25)',
+            boxShadow: '0 0 0 4px color-mix(in oklch, var(--accent-blue) 25%, transparent)',
           }}
         />
       )}

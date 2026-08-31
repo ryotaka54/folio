@@ -4,9 +4,13 @@ interface LogoProps {
 }
 
 export function Logo({ size = 32, variant = 'dark' }: LogoProps) {
-  const bg = variant === 'dark' ? '#111827' : variant === 'blue' ? '#2563EB' : 'none';
-  const lineColor = variant === 'mono' ? '#2563EB' : 'white';
-  const dotColor = variant === 'dark' ? '#2563EB' : variant === 'blue' ? 'white' : '#2563EB';
+  // 'dark' is a fixed near-black mark (header/nav badge) — a literal, not
+  // var(--brand-navy), since that token flips to near-white in dark mode and
+  // would invert this always-dark badge. Matches the new palette's ink
+  // (light-mode --brand-navy / --body-text: #1B1A1E in globals.css).
+  const bg = variant === 'dark' ? '#1B1A1E' : variant === 'blue' ? 'var(--accent-blue)' : 'none';
+  const lineColor = variant === 'mono' ? 'var(--accent-blue)' : 'white';
+  const dotColor = variant === 'dark' ? 'var(--accent-blue)' : variant === 'blue' ? 'white' : 'var(--accent-blue)';
   const rx = variant === 'mono' ? 0 : 13;
 
   return (

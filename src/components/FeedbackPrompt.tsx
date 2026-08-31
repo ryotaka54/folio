@@ -81,7 +81,7 @@ export default function FeedbackPrompt({ userId, applicationCount }: Props) {
           aria-label="Quick feedback"
         >
           {/* Top accent */}
-          <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, var(--accent-blue), #6366f1)' }} />
+          <div className="h-0.5 w-full" style={{ background: 'linear-gradient(90deg, var(--accent-blue), var(--pill-indigo-dot))' }} />
 
           <div className="px-4 py-4">
             {submitted ? (
@@ -128,7 +128,7 @@ export default function FeedbackPrompt({ userId, applicationCount }: Props) {
                       className="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl border transition-all"
                       style={{
                         borderColor: rating === r.value ? 'var(--accent-blue)' : 'var(--border-gray)',
-                        background: rating === r.value ? 'rgba(37,99,235,0.07)' : 'var(--surface-gray)',
+                        background: rating === r.value ? 'var(--light-accent)' : 'var(--surface-gray)',
                         transform: rating === r.value ? 'scale(1.05)' : 'scale(1)',
                       }}
                       aria-pressed={rating === r.value}

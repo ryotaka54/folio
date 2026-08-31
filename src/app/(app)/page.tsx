@@ -66,7 +66,7 @@ const TESTIMONIALS: Testimonial[] = [
     quote: "The weekly AI coaching brief on Mondays was genuinely useful. It told me to follow up on my Google PM application after 8 days of silence — turns out the recruiter had been waiting on me.",
     tags: [{ text: 'Product Management', type: 'featured' }, { text: 'Tech', type: 'default' }],
     stats: [{ icon: MessageSquare, text: 'Weekly AI coach' }, { icon: Award, text: 'Offer @ Google' }],
-    avatarGradient: 'linear-gradient(135deg, #0ea5e9, #2563eb)',
+    avatarGradient: 'linear-gradient(135deg, #0ea5e9, var(--accent-blue))',
   },
   {
     id: 6,
@@ -247,7 +247,7 @@ function TodayViewPreview() {
               ))}
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <div className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(220,38,38,0.1)', color: '#DC2626' }}>3 urgent</div>
+              <div className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'var(--error-bg)', color: 'var(--error-text)' }}>3 urgent</div>
               <div className="w-6 h-6 rounded-lg text-[9px] font-bold flex items-center justify-center" style={{ background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)' }}>AK</div>
             </div>
           </div>
@@ -260,7 +260,7 @@ function TodayViewPreview() {
                 <p className="text-[17px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em' }}>Good morning, Alex.</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="inline-flex items-center gap-1 text-[11px] px-3 py-1 rounded-full border font-medium" style={{ background: 'rgba(220,38,38,0.06)', borderColor: 'rgba(220,38,38,0.2)', color: '#DC2626' }}>
+                <div className="inline-flex items-center gap-1 text-[11px] px-3 py-1 rounded-full border font-medium" style={{ background: 'var(--error-bg)', borderColor: 'var(--error-border)', color: 'var(--error-text)' }}>
                   <Flame size={11} /> OA due tomorrow
                 </div>
               </div>
@@ -271,14 +271,14 @@ function TodayViewPreview() {
               <div className="md:col-span-1">
                 <p className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--muted-text)' }}><Zap size={9} /> Next Up</p>
                 <div className="rounded-xl p-3 border relative overflow-hidden" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-gray)' }}>
-                  <div className="absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(220,38,38,0.12)', color: '#DC2626' }}>Due Tomorrow</div>
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold mb-2" style={{ background: 'rgba(37,99,235,0.1)', color: '#2563EB' }}>G</div>
+                  <div className="absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--error-bg)', color: 'var(--error-text)' }}>Due Tomorrow</div>
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold mb-2" style={{ background: 'var(--light-accent)', color: 'var(--accent-blue)' }}>G</div>
                   <p className="text-[13px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Google</p>
                   <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted-text)' }}>SWE Intern · OA</p>
                   <div className="mt-2.5 h-0.5 rounded-full overflow-hidden" style={{ background: 'var(--border-gray)' }}>
-                    <div className="h-full rounded-full" style={{ width: '85%', background: '#DC2626' }} />
+                    <div className="h-full rounded-full" style={{ width: '85%', background: 'var(--danger)' }} />
                   </div>
-                  <p className="text-[9px] mt-1" style={{ color: '#DC2626' }}>1 day until deadline</p>
+                  <p className="text-[9px] mt-1" style={{ color: 'var(--danger)' }}>1 day until deadline</p>
                 </div>
               </div>
 
@@ -296,7 +296,7 @@ function TodayViewPreview() {
                         <p className="text-[10px] font-semibold truncate" style={{ color: 'var(--brand-navy)' }}>{item.co}</p>
                         <p className="text-[9px] truncate" style={{ color: 'var(--muted-text)' }}>{item.stage}</p>
                       </div>
-                      <span className="text-[8px] font-semibold px-1.5 py-0.5 rounded" style={item.red ? { background: 'rgba(220,38,38,0.1)', color: '#DC2626' } : { background: 'rgba(217,119,6,0.1)', color: '#D97706' }}>{item.days}</span>
+                      <span className="text-[8px] font-semibold px-1.5 py-0.5 rounded" style={item.red ? { background: 'var(--error-bg)', color: 'var(--error-text)' } : { background: 'var(--warn-bg)', color: 'var(--amber-warning)' }}>{item.days}</span>
                     </div>
                   ))}
                 </div>
@@ -318,13 +318,13 @@ function TodayViewPreview() {
                     ))}
                   </div>
                 </div>
-                <div className="rounded-lg p-2.5 border" style={{ background: 'rgba(22,163,74,0.05)', borderColor: 'rgba(22,163,74,0.15)' }}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest mb-1.5" style={{ color: '#16A34A' }}>Moving Forward</p>
+                <div className="rounded-lg p-2.5 border" style={{ background: 'var(--success-bg)', borderColor: 'var(--success-border)' }}>
+                  <p className="text-[9px] font-bold uppercase tracking-widest mb-1.5" style={{ color: 'var(--success-text)' }}>Moving Forward</p>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold" style={{ background: 'rgba(22,163,74,0.15)', color: '#16A34A' }}>J</div>
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold" style={{ background: 'var(--success-bg)', color: 'var(--success-text)' }}>J</div>
                     <div>
                       <p className="text-[10px] font-semibold" style={{ color: 'var(--brand-navy)' }}>Jane Street</p>
-                      <p className="inline-flex items-center gap-1 text-[9px]" style={{ color: '#16A34A' }}><PartyPopper size={9} /> Offer received</p>
+                      <p className="inline-flex items-center gap-1 text-[9px]" style={{ color: 'var(--success-text)' }}><PartyPopper size={9} /> Offer received</p>
                     </div>
                   </div>
                 </div>
@@ -409,7 +409,7 @@ function CompanyBar() {
 
 function FinalCTA({ user }: { user: unknown }) {
   return (
-    <section style={{ background: '#060810', padding: '96px 24px' }}>
+    <section style={{ background: '#0A0B0D', padding: '96px 24px' }}>
       <div style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -417,7 +417,7 @@ function FinalCTA({ user }: { user: unknown }) {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div style={{ width: 48, height: 2, background: '#2563EB', margin: '0 auto 28px', borderRadius: 1 }} />
+          <div style={{ width: 48, height: 2, background: '#A1802C', margin: '0 auto 28px', borderRadius: 1 }} />
           <h2 className="font-display" style={{
             fontSize: 'clamp(28px, 4vw, 44px)',
             fontWeight: 600,
@@ -427,7 +427,7 @@ function FinalCTA({ user }: { user: unknown }) {
             margin: '0 0 18px',
           }}>
             Your coach is ready.<br />
-            <span style={{ color: '#3B82F6' }}>Are you?</span>
+            <span style={{ color: '#E4C583' }}>Are you?</span>
           </h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, margin: '0 0 36px' }}>
             2,400+ students already have a system. Free up to 25 apps, no card needed.
@@ -437,7 +437,7 @@ function FinalCTA({ user }: { user: unknown }) {
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               height: 52, padding: '0 48px', borderRadius: 9999,
-              background: '#fff', color: '#060810',
+              background: '#fff', color: '#0A0B0D',
               fontSize: 16, fontWeight: 700,
               textDecoration: 'none',
               transition: 'opacity 150ms ease, transform 100ms ease-out',
@@ -497,7 +497,7 @@ export default function Home() {
             >
               {/* Eyebrow */}
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[12px] font-medium mb-6"
-                style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(37,99,235,0.2)', color: 'var(--accent-blue)' }}>
+                style={{ background: 'var(--light-accent)', borderColor: 'color-mix(in oklch, var(--accent-blue) 20%, transparent)', color: 'var(--accent-blue)' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 The AI recruiting coach built for students who get offers
               </div>
@@ -570,7 +570,7 @@ export default function Home() {
         <UniversitiesSection />
 
         {/* ── Mock Interview — HERO FEATURE ── */}
-        <section style={{ background: '#080C14', padding: '96px 0 0', overflow: 'hidden' }}>
+        <section style={{ background: '#0A0B0D', padding: '96px 0 0', overflow: 'hidden' }}>
           <div className="max-w-6xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -580,14 +580,14 @@ export default function Home() {
               className="flex flex-col items-center text-center mb-14"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] font-semibold mb-5"
-                style={{ background: 'rgba(37,99,235,0.15)', borderColor: 'rgba(37,99,235,0.35)', color: '#60A5FA', letterSpacing: '0.08em' }}>
+                style={{ background: 'rgba(161,128,44,0.15)', borderColor: 'rgba(161,128,44,0.35)', color: '#E4C583', letterSpacing: '0.08em' }}>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                 NEW — AI MOCK INTERVIEW
               </div>
               <h2 className="font-display text-[28px] md:text-[44px] font-semibold leading-tight mb-4"
                 style={{ color: '#fff', letterSpacing: '-0.015em', maxWidth: 640 }}>
                 Practice out loud.<br />
-                <span style={{ color: '#60A5FA' }}>Get hired faster.</span>
+                <span style={{ color: '#E4C583' }}>Get hired faster.</span>
               </h2>
               <p className="text-[16px] max-w-[500px]" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
                 Pick any company from your pipeline. AI generates tailored questions, scores every answer with a STAR rubric, and tells you exactly what to fix — in seconds. Free users get one full session on the house.
@@ -595,9 +595,9 @@ export default function Home() {
               <Link
                 href={user ? '/interview' : '/signup'}
                 className="mt-8 inline-flex items-center gap-2 h-12 px-7 rounded-xl text-[14px] font-semibold text-white transition-all"
-                style={{ background: '#2563EB', boxShadow: '0 4px 20px rgba(37,99,235,0.4)' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 28px rgba(37,99,235,0.6)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(37,99,235,0.4)'; }}
+                style={{ background: '#A1802C', boxShadow: '0 4px 20px rgba(161,128,44,0.4)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 28px rgba(161,128,44,0.6)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(161,128,44,0.4)'; }}
               >
                 {user ? 'Open Interview Room →' : 'Try it free →'}
               </Link>
@@ -609,7 +609,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="relative mx-auto rounded-t-2xl overflow-hidden border border-b-0"
-              style={{ maxWidth: 900, borderColor: 'rgba(255,255,255,0.08)', background: '#0D1117' }}
+              style={{ maxWidth: 900, borderColor: 'rgba(255,255,255,0.08)', background: '#141519' }}
             >
               <div className="flex items-center gap-3 px-5 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF5F57' }} />
@@ -621,7 +621,7 @@ export default function Home() {
               <div className="grid md:grid-cols-[2fr_3fr]">
                 <div className="p-6 border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-[14px] font-bold" style={{ background: 'rgba(37,99,235,0.2)', color: '#60A5FA' }}>G</div>
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-[14px] font-bold" style={{ background: 'rgba(161,128,44,0.2)', color: '#E4C583' }}>G</div>
                     <div>
                       <p className="text-[13px] font-semibold" style={{ color: '#fff', margin: 0 }}>Google</p>
                       <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.4)', margin: 0 }}>SWE Intern</p>
@@ -631,7 +631,7 @@ export default function Home() {
                     <div className="relative w-20 h-20">
                       <svg viewBox="0 0 80 80" className="w-20 h-20" style={{ transform: 'rotate(-90deg)' }}>
                         <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="5" />
-                        <circle cx="40" cy="40" r="32" fill="none" stroke="#2563EB" strokeWidth="5" strokeLinecap="round"
+                        <circle cx="40" cy="40" r="32" fill="none" stroke="#A1802C" strokeWidth="5" strokeLinecap="round"
                           strokeDasharray={`${2 * Math.PI * 32 * 0.4} ${2 * Math.PI * 32 * 0.6}`} />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -644,7 +644,7 @@ export default function Home() {
                   <div className="space-y-2">
                     {[['S','Situation','Set the scene'],['T','Task','Your responsibility'],['A','Action','What you did'],['R','Result','The outcome']].map(([k,l,d]) => (
                       <div key={k} className="flex items-start gap-2.5">
-                        <span className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[9px] font-bold" style={{ background: 'rgba(37,99,235,0.2)', color: '#60A5FA' }}>{k}</span>
+                        <span className="w-5 h-5 rounded flex-shrink-0 flex items-center justify-center text-[9px] font-bold" style={{ background: 'rgba(161,128,44,0.2)', color: '#E4C583' }}>{k}</span>
                         <div>
                           <p className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.7)', margin: 0 }}>{l}</p>
                           <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)', margin: 0 }}>{d}</p>
@@ -656,20 +656,20 @@ export default function Home() {
 
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(37,99,235,0.18)', color: '#60A5FA', letterSpacing: '0.08em' }}>BEHAVIORAL</span>
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full" style={{ background: 'rgba(161,128,44,0.18)', color: '#E4C583', letterSpacing: '0.08em' }}>BEHAVIORAL</span>
                     <span className="text-[11px] italic" style={{ color: 'rgba(255,255,255,0.35)' }}>Common at Google L3+</span>
                   </div>
-                  <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.04)', borderLeft: '2px solid #2563EB', paddingLeft: 16 }}>
+                  <div className="rounded-xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.04)', borderLeft: '2px solid #A1802C', paddingLeft: 16 }}>
                     <p className="text-[15px] font-semibold leading-relaxed" style={{ color: '#fff' }}>
                       Tell me about a time you had to meet a tight deadline while maintaining code quality. What trade-offs did you make?
                     </p>
                   </div>
-                  <div className="rounded-xl p-3 border mb-4" style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(37,99,235,0.3)' }}>
+                  <div className="rounded-xl p-3 border mb-4" style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(161,128,44,0.3)' }}>
                     <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
                       During my last internship, our team had 3 days to ship a checkout flow before a product launch. I broke the work into parallel tracks — I owned the API layer while a teammate handled the UI...
                     </p>
                     <div className="mt-2 flex items-center gap-1">
-                      <div className="h-0.5 flex-1 rounded" style={{ background: 'rgba(37,99,235,0.4)' }} />
+                      <div className="h-0.5 flex-1 rounded" style={{ background: 'rgba(161,128,44,0.4)' }} />
                       <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace' }}>typing...</span>
                     </div>
                   </div>
@@ -681,11 +681,11 @@ export default function Home() {
                       { label: 'Result', rating: 'missing', note: 'Quantify the outcome' },
                     ].map(s => (
                       <div key={s.label} className="rounded-lg p-2.5" style={{
-                        background: s.rating === 'strong' ? 'rgba(16,185,129,0.1)' : s.rating === 'okay' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
-                        border: `1px solid ${s.rating === 'strong' ? 'rgba(16,185,129,0.2)' : s.rating === 'okay' ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.15)'}`,
+                        background: s.rating === 'strong' ? 'rgba(158,204,159,0.1)' : s.rating === 'okay' ? 'rgba(214,138,78,0.1)' : 'rgba(228,164,145,0.08)',
+                        border: `1px solid ${s.rating === 'strong' ? 'rgba(158,204,159,0.2)' : s.rating === 'okay' ? 'rgba(214,138,78,0.2)' : 'rgba(228,164,145,0.15)'}`,
                       }}>
-                        <p className="text-[10px] font-bold mb-1" style={{ color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444', margin: '0 0 3px' }}>{s.label}</p>
-                        <p className="text-[11px]" style={{ color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444', margin: 0, opacity: 0.8 }}>{s.note}</p>
+                        <p className="text-[10px] font-bold mb-1" style={{ color: s.rating === 'strong' ? '#9ECC9F' : s.rating === 'okay' ? '#D68A4E' : '#E4A491', margin: '0 0 3px' }}>{s.label}</p>
+                        <p className="text-[11px]" style={{ color: s.rating === 'strong' ? '#9ECC9F' : s.rating === 'okay' ? '#D68A4E' : '#E4A491', margin: 0, opacity: 0.8 }}>{s.note}</p>
                       </div>
                     ))}
                   </div>
@@ -693,7 +693,7 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
-          <div style={{ height: 80, background: 'linear-gradient(to bottom, #080C14, var(--background))' }} />
+          <div style={{ height: 80, background: 'linear-gradient(to bottom, #0A0B0D, var(--background))' }} />
         </section>
 
         {/* ── Product Walkthrough ── */}
@@ -702,7 +702,7 @@ export default function Home() {
         </div>
 
         {/* ── Weekly Coach showcase ── */}
-        <section style={{ background: '#060D1A', padding: '96px 0 0', overflow: 'hidden' }}>
+        <section style={{ background: '#0A0B0D', padding: '96px 0 0', overflow: 'hidden' }}>
           <div className="max-w-6xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -712,14 +712,14 @@ export default function Home() {
               className="flex flex-col items-center text-center mb-14"
             >
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] font-semibold mb-5"
-                style={{ background: 'rgba(16,185,129,0.12)', borderColor: 'rgba(16,185,129,0.3)', color: '#34D399', letterSpacing: '0.08em' }}>
+                style={{ background: 'rgba(126,181,132,0.12)', borderColor: 'rgba(126,181,132,0.3)', color: '#9ECC9F', letterSpacing: '0.08em' }}>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 WEEKLY AI COACH — ARRIVES EVERY MONDAY
               </div>
               <h2 className="font-display text-[28px] md:text-[44px] font-semibold leading-tight mb-4"
                 style={{ color: '#fff', letterSpacing: '-0.015em', maxWidth: 640 }}>
                 Your personal brief.<br />
-                <span style={{ color: '#34D399' }}>Every Monday morning.</span>
+                <span style={{ color: '#9ECC9F' }}>Every Monday morning.</span>
               </h2>
               <p className="text-[16px] max-w-[480px]" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
                 Nobody else does this. Applyd reads your entire pipeline, identifies what&apos;s stalled, and delivers a word-for-word action plan before you even open your laptop. No prompting. No searching. Just a plan.
@@ -732,10 +732,10 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.1 }}
               className="relative mx-auto rounded-t-2xl overflow-hidden border border-b-0"
-              style={{ maxWidth: 760, borderColor: 'rgba(255,255,255,0.08)', background: '#0D1117' }}
+              style={{ maxWidth: 760, borderColor: 'rgba(255,255,255,0.08)', background: '#141519' }}
             >
               {/* Email chrome */}
-              <div className="flex items-center gap-3 px-5 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: '#0A0F18' }}>
+              <div className="flex items-center gap-3 px-5 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: '#141519' }}>
                 <div className="flex gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FF5F57' }} />
                   <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#FEBC2E' }} />
@@ -746,7 +746,7 @@ export default function Home() {
                   <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
                   <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>Monday, 9:07 AM</span>
                 </div>
-                <div className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(52,211,153,0.12)', color: '#34D399' }}>Weekly Brief</div>
+                <div className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(126,181,132,0.12)', color: '#9ECC9F' }}>Weekly Brief</div>
               </div>
 
               <div className="p-6 md:p-8">
@@ -755,9 +755,9 @@ export default function Home() {
 
                 <div className="grid md:grid-cols-3 gap-4 mb-6">
                   {[
-                    { label: 'Active applications', value: '11', color: '#60A5FA' },
-                    { label: 'Need attention', value: '3', color: '#F59E0B' },
-                    { label: 'Upcoming deadlines', value: '2', color: '#EF4444' },
+                    { label: 'Active applications', value: '11', color: '#E4C583' },
+                    { label: 'Need attention', value: '3', color: '#D68A4E' },
+                    { label: 'Upcoming deadlines', value: '2', color: '#E4A491' },
                   ].map(s => (
                     <div key={s.label} className="rounded-xl p-3 border text-center" style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}>
                       <div className="text-[28px] font-bold mb-1" style={{ color: s.color, letterSpacing: '-0.03em', lineHeight: 1 }}>{s.value}</div>
@@ -769,12 +769,12 @@ export default function Home() {
                 <div className="space-y-3 mb-6">
                   <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.3)' }}>What needs your attention</p>
                   {[
-                    { co: 'Amazon', note: '14 days since you applied with no response. A brief follow-up email today could restart the thread.', tag: 'Follow up', tagColor: '#F59E0B', tagBg: 'rgba(245,158,11,0.1)' },
-                    { co: 'Anthropic', note: 'Final round interview on Thursday. Your last prep session was 6 days ago — run a mock interview today.', tag: 'Prep now', tagColor: '#EF4444', tagBg: 'rgba(239,68,68,0.1)' },
-                    { co: 'Goldman Sachs', note: 'Application deadline is in 2 days. You haven\'t submitted yet — this one is time-sensitive.', tag: 'Deadline soon', tagColor: '#EF4444', tagBg: 'rgba(239,68,68,0.1)' },
+                    { co: 'Amazon', note: '14 days since you applied with no response. A brief follow-up email today could restart the thread.', tag: 'Follow up', tagColor: '#D68A4E', tagBg: 'rgba(214,138,78,0.1)' },
+                    { co: 'Anthropic', note: 'Final round interview on Thursday. Your last prep session was 6 days ago — run a mock interview today.', tag: 'Prep now', tagColor: '#E4A491', tagBg: 'rgba(228,164,145,0.1)' },
+                    { co: 'Goldman Sachs', note: 'Application deadline is in 2 days. You haven\'t submitted yet — this one is time-sensitive.', tag: 'Deadline soon', tagColor: '#E4A491', tagBg: 'rgba(228,164,145,0.1)' },
                   ].map(item => (
                     <div key={item.co} className="flex items-start gap-3 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 mt-0.5" style={{ background: 'rgba(37,99,235,0.2)', color: '#60A5FA' }}>{item.co[0]}</div>
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[11px] font-bold flex-shrink-0 mt-0.5" style={{ background: 'rgba(161,128,44,0.2)', color: '#E4C583' }}>{item.co[0]}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="text-[12px] font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>{item.co}</p>
@@ -786,8 +786,8 @@ export default function Home() {
                   ))}
                 </div>
 
-                <div className="rounded-xl p-4" style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.15)' }}>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-2" style={{ color: '#34D399' }}>One thing to do today</p>
+                <div className="rounded-xl p-4" style={{ background: 'rgba(126,181,132,0.06)', border: '1px solid rgba(126,181,132,0.15)' }}>
+                  <p className="text-[11px] font-bold uppercase tracking-[0.1em] mb-2" style={{ color: '#9ECC9F' }}>One thing to do today</p>
                   <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
                     Send a 2-line follow-up to your Amazon recruiter. Subject: <span style={{ color: '#fff', fontFamily: 'monospace', fontSize: 12 }}>&ldquo;Following up — SWE Intern application&rdquo;</span>. Applyd has a draft ready for you.
                   </p>
@@ -795,7 +795,7 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
-          <div style={{ height: 80, background: 'linear-gradient(to bottom, #060D1A, var(--background))' }} />
+          <div style={{ height: 80, background: 'linear-gradient(to bottom, #0A0B0D, var(--background))' }} />
         </section>
 
         {/* ── Product metrics bridge ── */}
@@ -907,7 +907,7 @@ export default function Home() {
           {/* Pro card */}
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
             className="rounded-2xl border p-6"
-            style={{ background: 'linear-gradient(160deg, rgba(37,99,235,0.06) 0%, var(--card-bg) 60%)', borderColor: 'rgba(37,99,235,0.22)', boxShadow: '0 4px 24px rgba(37,99,235,0.08)' }}
+            style={{ background: 'linear-gradient(160deg, var(--light-accent) 0%, var(--card-bg) 60%)', borderColor: 'color-mix(in oklch, var(--accent-blue) 22%, transparent)', boxShadow: '0 4px 24px color-mix(in oklch, var(--accent-blue) 8%, transparent)' }}
           >
             <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-6 items-center">
               <div>
@@ -922,7 +922,7 @@ export default function Home() {
                 <p className="text-[12px] mb-2" style={{ color: 'var(--text-tertiary)' }}>$60/yr · cancel anytime</p>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[12px] line-through" style={{ color: 'var(--text-tertiary)' }}>$9/mo billed monthly</span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full" style={{ background: 'rgba(22,163,74,0.12)', color: 'var(--green-success)' }}>Save $48/yr</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.06em] px-2 py-0.5 rounded-full" style={{ background: 'var(--success-bg)', color: 'var(--green-success)' }}>Save $48/yr</span>
                 </div>
                 <p className="text-[11px]" style={{ color: 'var(--muted-text)' }}>Join 2,400+ students on Applyd</p>
               </div>
@@ -938,7 +938,7 @@ export default function Home() {
                   { icon: <Calendar size={12} />, title: 'Weekly AI Coach', desc: 'Monday briefing: what\'s stalled, what to prioritize, one thing to do this week.' },
                 ].map(f => (
                   <div key={f.title} className="flex items-start gap-2">
-                    <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(37,99,235,0.12)', color: '#3B82F6' }}>{f.icon}</div>
+                    <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'var(--light-accent)', color: 'var(--accent-blue)' }}>{f.icon}</div>
                     <div>
                       <span className="text-[12px] font-semibold" style={{ color: 'var(--brand-navy)' }}>{f.title}</span>
                       <span className="text-[11px]" style={{ color: 'var(--muted-text)' }}> — {f.desc}</span>
@@ -1090,13 +1090,13 @@ export default function Home() {
                   <div key={vi} className="p-4 flex items-center justify-center border-l" style={{ borderColor: 'var(--border-gray)' }}>
                     {val === true ? (
                       <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: vi === 2 ? 'rgba(22,163,74,0.12)' : 'rgba(22,163,74,0.08)' }}>
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                        style={{ background: 'var(--success-bg)' }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--green-success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                       </span>
                     ) : val === false ? (
                       <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'rgba(220,38,38,0.08)' }}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                        style={{ background: 'var(--error-bg)' }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                       </span>
                     ) : (
                       <span className="text-[11px] font-medium" style={{ color: 'var(--muted-text)' }}>{val}</span>
@@ -1112,7 +1112,7 @@ export default function Home() {
         <FinalCTA user={user} />
 
         {/* ── Footer ── */}
-        <footer className="border-t border-border-gray py-8" style={{ background: '#060810' }}>
+        <footer className="border-t border-border-gray py-8" style={{ background: '#0A0B0D' }}>
           <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2" style={{ opacity: 0.4 }}>
               <Logo size={20} variant="dark" />

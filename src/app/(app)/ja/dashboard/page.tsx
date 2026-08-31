@@ -215,7 +215,7 @@ function JaDashboardContent() {
 
       {!userIsPro && !loading && applications.length >= FREE_TIER_LIMIT - 3 && applications.length < FREE_TIER_LIMIT && (
         <div className="mx-auto max-w-[1200px] px-4 md:px-6 pt-3">
-          <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg" style={{ background: 'rgba(37,99,235,0.07)', border: '1px solid rgba(37,99,235,0.2)' }}>
+          <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg" style={{ background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 20%, transparent)' }}>
             <p className="text-[13px]" style={{ color: 'var(--brand-navy)' }}>
               <span className="font-semibold">上限まで残り{FREE_TIER_LIMIT - applications.length}社</span> — Proにアップグレードして無制限に。
             </p>
@@ -232,7 +232,7 @@ function JaDashboardContent() {
           {userIsPro ? <ProLogo size={26} /> : <Logo size={26} variant="dark" />}
           <span className="text-[16px] font-semibold" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.02em', fontFamily: 'var(--font-geist), sans-serif' }}>Applyd</span>
           {userIsPro && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>⚡ Pro</span>
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: 'var(--gradient-pro)', color: '#fff' }}>⚡ Pro</span>
           )}
         </div>
         <ThemeToggle />
@@ -273,7 +273,7 @@ function JaDashboardContent() {
                   >
                     {icon}{label}
                     {k === 'offers' && offerCount >= 2 && (
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16A34A', flexShrink: 0 }} />
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--green-success)', flexShrink: 0 }} />
                     )}
                   </button>
                 );
@@ -305,7 +305,7 @@ function JaDashboardContent() {
             {userIsPro ? (
               <span
                 className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full"
-                style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff', letterSpacing: '0.02em' }}
+                style={{ background: 'var(--gradient-pro)', color: '#fff', letterSpacing: '0.02em' }}
               >
                 ⚡ Pro
               </span>
@@ -474,7 +474,7 @@ function JaDashboardContent() {
             </div>
           ) : applications.length === 0 ? (
             <div className="max-w-[1200px] mx-auto px-4 md:px-6 py-20 text-center border border-dashed border-border-gray rounded-xl mx-6">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(37,99,235,0.08)' }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--light-accent)' }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </div>
               <p className="text-[17px] font-semibold mb-2" style={{ color: 'var(--brand-navy)' }}>まだ選考を追加していません</p>

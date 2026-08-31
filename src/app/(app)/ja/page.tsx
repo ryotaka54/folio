@@ -14,17 +14,22 @@ import { motion } from 'framer-motion';
 // Data
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Ten stages, ten distinct colors — the mechanical hex→token mapping used
+// during the color-identity cleanup collapsed a couple of these onto the
+// same new token (old cyan and old violet both mapped to the new "violet"
+// teal, old #10B981/#22C55E both mapped to green-success), which erased the
+// visual distinction between adjacent pipeline stages. Reassigned by hand.
 const PIPELINE_STAGES = [
-  { label: 'エントリー',     color: '#64748B', num: '01' },
-  { label: '説明会',         color: '#0EA5E9', num: '02' },
-  { label: 'ES提出',         color: '#8B5CF6', num: '03' },
-  { label: 'SPI / 適性検査', color: '#F59E0B', num: '04' },
-  { label: '一次面接',       color: '#3B82F6', num: '05' },
-  { label: '二次面接',       color: '#6366F1', num: '06' },
-  { label: '最終面接',       color: '#EC4899', num: '07' },
-  { label: '内々定',         color: '#10B981', num: '08' },
-  { label: '内定',           color: '#22C55E', num: '09' },
-  { label: '承諾 / 辞退',    color: '#94A3B8', num: '10' },
+  { label: 'エントリー',     color: 'var(--pill-slate-dot)', num: '01' },
+  { label: '説明会',         color: 'var(--pill-neutral-dot)', num: '02' },
+  { label: 'ES提出',         color: 'var(--pill-violet-dot)', num: '03' },
+  { label: 'SPI / 適性検査', color: 'var(--pill-amber-dot)', num: '04' },
+  { label: '一次面接',       color: 'var(--accent-blue)', num: '05' },
+  { label: '二次面接',       color: 'var(--pill-indigo-dot)', num: '06' },
+  { label: '最終面接',       color: 'var(--pill-pink-dot)', num: '07' },
+  { label: '内々定',         color: 'var(--pill-red-dot)', num: '08' },
+  { label: '内定',           color: 'var(--green-success)', num: '09' },
+  { label: '承諾 / 辞退',    color: 'var(--amber-warning)', num: '10' },
 ];
 
 const FEATURES = [
@@ -67,21 +72,21 @@ const TESTIMONIALS = [
     name: 'K.M さん',
     detail: '早稲田大学 商学部 3年生 / 26卒',
     result: '内定 3社',
-    color: '#3B82F6',
+    color: 'var(--accent-blue)',
   },
   {
     quote: 'AI面接対策が本当に便利。メルカリの最終面接の前日に使ったら聞かれた質問の7割が対策に出てた。偶然じゃないと思う。あれ以来、面接前は必ずApplydで練習するようになりました。',
     name: 'T.Y さん',
     detail: '東京工業大学 情報工学系 4年生 / 25卒',
     result: 'IT企業に内定',
-    color: '#10B981',
+    color: 'var(--green-success)',
   },
   {
     quote: 'ES管理が特に助かりました。企業ごとにガクチカをカスタマイズしていたので前に何を書いたか見返せるのはすごく重要でした。志望動機の使い回しが格段に楽になりました。',
     name: 'S.A さん',
     detail: '慶應義塾大学 法学部 3年生 / 26卒',
     result: 'コンサル内定',
-    color: '#8B5CF6',
+    color: 'var(--pill-violet-dot)',
   },
 ];
 
@@ -117,10 +122,10 @@ function FadeUp({ children, delay = 0, className = '' }: { children: React.React
 
 function AppMockup() {
   const cards = [
-    { company: 'Mercari',    role: 'バックエンドエンジニア', stage: 'ES提出',  color: '#8B5CF6', deadline: 'あと2日', urgent: true },
-    { company: 'Recruit',    role: 'プロダクトマネージャー', stage: '一次面接', color: '#3B82F6', deadline: 'あと5日', urgent: false },
-    { company: 'CyberAgent', role: 'Webエンジニア',          stage: '最終面接', color: '#EC4899', deadline: null,     urgent: false },
-    { company: 'Sansan',     role: 'バックエンドエンジニア', stage: '内々定',   color: '#10B981', deadline: null,     urgent: false },
+    { company: 'Mercari',    role: 'バックエンドエンジニア', stage: 'ES提出',  color: 'var(--pill-violet-dot)', deadline: 'あと2日', urgent: true },
+    { company: 'Recruit',    role: 'プロダクトマネージャー', stage: '一次面接', color: 'var(--accent-blue)', deadline: 'あと5日', urgent: false },
+    { company: 'CyberAgent', role: 'Webエンジニア',          stage: '最終面接', color: 'var(--pill-pink-dot)', deadline: null,     urgent: false },
+    { company: 'Sansan',     role: 'バックエンドエンジニア', stage: '内々定',   color: 'var(--pill-red-dot)', deadline: null,     urgent: false },
   ];
 
   return (
@@ -190,11 +195,11 @@ function AppMockup() {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3, flexShrink: 0 }}>
               <span style={{
                 fontSize: 10, fontWeight: 500, color: card.color,
-                background: `${card.color}20`, border: `1px solid ${card.color}30`,
+                background: `color-mix(in oklch, ${card.color} 20%, transparent)`, border: `1px solid color-mix(in oklch, ${card.color} 30%, transparent)`,
                 borderRadius: 9999, padding: '2px 8px', fontFamily: F, letterSpacing: '0.04em',
               }}>{card.stage}</span>
               {card.deadline && (
-                <span style={{ fontSize: 10, color: card.urgent ? '#EF4444' : '#D97706', fontFamily: G, fontWeight: 600 }}>{card.deadline}</span>
+                <span style={{ fontSize: 10, color: card.urgent ? 'var(--danger)' : 'var(--amber-warning)', fontFamily: G, fontWeight: 600 }}>{card.deadline}</span>
               )}
             </div>
           </motion.div>
@@ -211,8 +216,8 @@ function AppMockup() {
 function CheckIcon({ blue }: { blue?: boolean }) {
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="7" cy="7" r="7" fill={blue ? 'rgba(37,99,235,0.15)' : 'rgba(34,197,94,0.15)'} />
-      <path d="M4.5 7.5l1.75 1.75L9.5 5" stroke={blue ? 'var(--accent-blue)' : '#22C55E'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="7" cy="7" r="7" fill={blue ? 'var(--light-accent)' : 'var(--success-bg)'} />
+      <path d="M4.5 7.5l1.75 1.75L9.5 5" stroke={blue ? 'var(--accent-blue)' : 'var(--green-success)'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -225,7 +230,7 @@ function FeatureVisual({ index }: { index: number }) {
   if (index === 0) {
     return (
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end', width: '100%', justifyContent: 'center' }}>
-        {['#64748B','#8B5CF6','#3B82F6','#EC4899','#22C55E'].map((c, j) => (
+        {['var(--pill-slate-dot)','var(--pill-violet-dot)','var(--accent-blue)','var(--pill-pink-dot)','var(--green-success)'].map((c, j) => (
           <motion.div
             key={c}
             initial={{ scaleY: 0, opacity: 0 }}
@@ -233,7 +238,7 @@ function FeatureVisual({ index }: { index: number }) {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 + j * 0.08, ease: 'easeOut' }}
             style={{
-              flex: 1, maxWidth: 48, background: c + '20', border: `1px solid ${c}40`,
+              flex: 1, maxWidth: 48, background: `color-mix(in oklch, ${c} 20%, transparent)`, border: `1px solid color-mix(in oklch, ${c} 40%, transparent)`,
               borderRadius: 8, display: 'flex', flexDirection: 'column',
               gap: 6, padding: 8,
               height: [90,130,110,70,150][j],
@@ -241,7 +246,7 @@ function FeatureVisual({ index }: { index: number }) {
             }}
           >
             {[...Array([2,4,3,1,4][j])].map((_,k) => (
-              <div key={k} style={{ height: 16, borderRadius: 4, background: c + '50' }} />
+              <div key={k} style={{ height: 16, borderRadius: 4, background: `color-mix(in oklch, ${c} 50%, transparent)` }} />
             ))}
           </motion.div>
         ))}
@@ -250,13 +255,13 @@ function FeatureVisual({ index }: { index: number }) {
   }
   if (index === 1) {
     return (
-      <div style={{ width: '100%', maxWidth: 300, background: '#080C14', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ width: '100%', maxWidth: 300, background: '#0A0B0D', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563EB' }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#A1802C' }} />
           <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', fontFamily: F, letterSpacing: '0.08em' }}>AI 模擬面接 · 質問 2 / 5</span>
         </div>
         <div style={{ padding: '12px 14px' }}>
-          <div style={{ background: 'rgba(37,99,235,0.12)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 8, padding: '10px 12px', marginBottom: 10, borderLeft: '2px solid #2563EB' }}>
+          <div style={{ background: 'rgba(161,128,44,0.12)', border: '1px solid rgba(161,128,44,0.2)', borderRadius: 8, padding: '10px 12px', marginBottom: 10, borderLeft: '2px solid #A1802C' }}>
             <p style={{ fontSize: 11, color: '#fff', margin: 0, fontFamily: F, letterSpacing: '0.04em', lineHeight: 1.7 }}>
               困難なプロジェクトでチームをまとめた経験を教えてください。
             </p>
@@ -270,8 +275,8 @@ function FeatureVisual({ index }: { index: number }) {
             <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
               <span style={{
                 fontSize: 9, fontWeight: 700, padding: '2px 7px', borderRadius: 4,
-                color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444',
-                background: s.rating === 'strong' ? 'rgba(16,185,129,0.15)' : s.rating === 'okay' ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.12)',
+                color: s.rating === 'strong' ? '#9ECC9F' : s.rating === 'okay' ? '#D68A4E' : '#E4A491',
+                background: s.rating === 'strong' ? 'rgba(158,204,159,0.15)' : s.rating === 'okay' ? 'rgba(214,138,78,0.15)' : 'rgba(228,164,145,0.12)',
               }}>{s.label}</span>
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', fontFamily: F, letterSpacing: '0.04em' }}>{s.note}</span>
             </div>
@@ -283,7 +288,7 @@ function FeatureVisual({ index }: { index: number }) {
   if (index === 2) {
     return (
       <div style={{ width: '100%', maxWidth: 280 }}>
-        <div style={{ height: 10, borderRadius: 4, background: 'rgba(37,99,235,0.2)', marginBottom: 10, width: '60%' }} />
+        <div style={{ height: 10, borderRadius: 4, background: 'color-mix(in oklch, var(--accent-blue) 20%, transparent)', marginBottom: 10, width: '60%' }} />
         {['よくある質問①：入社後のキャリアパスは？','よくある質問②：チームの雰囲気は？','よくある質問③：残業について教えてください'].map((q, j) => (
           <motion.div
             key={j}
@@ -325,8 +330,8 @@ function FeatureVisual({ index }: { index: number }) {
   return (
     <div style={{ width: '100%', maxWidth: 280 }}>
       {[
-        { label: 'Mercari ES締め切り', days: 2, color: '#EF4444' },
-        { label: 'Recruit 説明会',     days: 5, color: '#F59E0B' },
+        { label: 'Mercari ES締め切り', days: 2, color: 'var(--danger)' },
+        { label: 'Recruit 説明会',     days: 5, color: 'var(--amber-warning)' },
         { label: 'DeNA 一次面接',      days: 9, color: 'var(--muted-text)' },
       ].map((d, j) => (
         <motion.div
@@ -429,13 +434,13 @@ export default function JaLandingPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28, flexWrap: 'wrap' }}
             >
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 14px', borderRadius: 9999, border: '1px solid rgba(37,99,235,0.25)', background: 'rgba(37,99,235,0.06)' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '6px 14px', borderRadius: 9999, border: '1px solid color-mix(in oklch, var(--accent-blue) 25%, transparent)', background: 'var(--light-accent)' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--accent-blue)', fontFamily: F }}>就活生のための無料ツール</span>
               </div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 9999, border: '1px solid rgba(16,185,129,0.3)', background: 'rgba(16,185,129,0.08)' }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: '#10B981', fontFamily: F }}>NEW · AI模擬面接</span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', borderRadius: 9999, border: '1px solid var(--success-border)', background: 'var(--success-bg)' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--green-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--green-success)', fontFamily: F }}>NEW · AI模擬面接</span>
               </div>
             </motion.div>
 
@@ -492,7 +497,7 @@ export default function JaLandingPage() {
                   background: 'var(--accent-blue)', color: '#fff',
                   fontSize: 15, fontWeight: 600, letterSpacing: '0.05em',
                   textDecoration: 'none', fontFamily: F,
-                  boxShadow: '0 4px 14px rgba(37,99,235,0.3)',
+                  boxShadow: '0 4px 14px color-mix(in oklch, var(--accent-blue) 30%, transparent)',
                   transition: 'opacity 150ms ease, transform 100ms ease-out',
                 }}
                 onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
@@ -606,8 +611,8 @@ export default function JaLandingPage() {
                     {f.isNew && (
                       <span style={{
                         fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
-                        color: '#10B981', background: 'rgba(16,185,129,0.12)',
-                        border: '1px solid rgba(16,185,129,0.25)',
+                        color: 'var(--green-success)', background: 'var(--success-bg)',
+                        border: '1px solid var(--success-border)',
                         borderRadius: 9999, padding: '2px 8px', fontFamily: F,
                       }}>NEW</span>
                     )}
@@ -645,13 +650,13 @@ export default function JaLandingPage() {
       </section>
 
       {/* ─── AI Mock Interview — Dark section ────────────────────────────── */}
-      <section style={{ background: '#080C14', padding: '96px 0 0', overflow: 'hidden' }}>
+      <section style={{ background: '#0A0B0D', padding: '96px 0 0', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 28px' }}>
           <FadeUp>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 56 }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 14px', borderRadius: 9999, border: '1px solid rgba(37,99,235,0.35)', background: 'rgba(37,99,235,0.15)', marginBottom: 20 }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: '#60A5FA', fontFamily: F }}>NEW · AI 模擬面接</span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 14px', borderRadius: 9999, border: '1px solid rgba(161,128,44,0.35)', background: 'rgba(161,128,44,0.15)', marginBottom: 20 }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#E4C583" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', color: '#E4C583', fontFamily: F }}>NEW · AI 模擬面接</span>
               </div>
               <h2 style={{
                 fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 700,
@@ -659,7 +664,7 @@ export default function JaLandingPage() {
                 color: '#fff', margin: '0 0 18px', fontFamily: F,
               }}>
                 前日でも間に合う。<br />
-                <span style={{ color: '#60A5FA' }}>本番さながらの練習を。</span>
+                <span style={{ color: '#E4C583' }}>本番さながらの練習を。</span>
               </h2>
               <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, maxWidth: 500, fontFamily: F, letterSpacing: '0.05em' }}>
                 企業名と職種を入れるだけで、その会社に特化した面接質問をAIが生成。STAR法でフィードバックして、弱点を即日改善。
@@ -669,14 +674,14 @@ export default function JaLandingPage() {
                 style={{
                   display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                   marginTop: 28, height: 48, padding: '0 36px', borderRadius: 9999,
-                  background: '#2563EB', color: '#fff',
+                  background: '#A1802C', color: '#fff',
                   fontSize: 14, fontWeight: 600, letterSpacing: '0.06em',
                   textDecoration: 'none', fontFamily: F,
-                  boxShadow: '0 4px 20px rgba(37,99,235,0.4)',
+                  boxShadow: '0 4px 20px rgba(161,128,44,0.4)',
                   transition: 'box-shadow 200ms ease',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 28px rgba(37,99,235,0.6)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(37,99,235,0.4)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 28px rgba(161,128,44,0.6)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(161,128,44,0.4)'; }}
               >無料で試してみる →</Link>
             </div>
           </FadeUp>
@@ -692,7 +697,7 @@ export default function JaLandingPage() {
               overflow: 'hidden',
               border: '1px solid rgba(255,255,255,0.08)',
               borderBottom: 'none',
-              background: '#0D1117',
+              background: '#141519',
               maxWidth: 860,
               margin: '0 auto',
             }}
@@ -708,7 +713,7 @@ export default function JaLandingPage() {
               {/* Left */}
               <div style={{ padding: '20px', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(37,99,235,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#60A5FA' }}>M</div>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(161,128,44,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: '#E4C583' }}>M</div>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 600, color: '#fff', margin: 0, fontFamily: F }}>Mercari</p>
                     <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0, fontFamily: F }}>バックエンドエンジニア</p>
@@ -717,7 +722,7 @@ export default function JaLandingPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {[['S','Situation','状況'],['T','Task','役割'],['A','Action','行動'],['R','Result','成果']].map(([k,l,d]) => (
                     <div key={k} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                      <span style={{ width: 20, height: 20, borderRadius: 5, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: 'rgba(37,99,235,0.2)', color: '#60A5FA' }}>{k}</span>
+                      <span style={{ width: 20, height: 20, borderRadius: 5, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, background: 'rgba(161,128,44,0.2)', color: '#E4C583' }}>{k}</span>
                       <div>
                         <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.7)', margin: 0, fontFamily: G }}>{l}</p>
                         <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', margin: 0, fontFamily: F }}>{d}</p>
@@ -730,10 +735,10 @@ export default function JaLandingPage() {
               {/* Right */}
               <div style={{ padding: '20px' }}>
                 <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 9999, background: 'rgba(37,99,235,0.18)', color: '#60A5FA', letterSpacing: '0.08em', fontFamily: G }}>行動面接</span>
+                  <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 9999, background: 'rgba(161,128,44,0.18)', color: '#E4C583', letterSpacing: '0.08em', fontFamily: G }}>行動面接</span>
                   <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: F }}>質問 2 / 5</span>
                 </div>
-                <div style={{ borderRadius: 10, padding: '14px 16px', marginBottom: 14, background: 'rgba(255,255,255,0.04)', borderLeft: '2px solid #2563EB', paddingLeft: 16 }}>
+                <div style={{ borderRadius: 10, padding: '14px 16px', marginBottom: 14, background: 'rgba(255,255,255,0.04)', borderLeft: '2px solid #A1802C', paddingLeft: 16 }}>
                   <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', lineHeight: 1.7, margin: 0, fontFamily: F, letterSpacing: '0.04em' }}>
                     チームで困難に直面した経験と、あなたがどう行動したかを具体的に教えてください。
                   </p>
@@ -747,11 +752,11 @@ export default function JaLandingPage() {
                   ].map(s => (
                     <div key={s.label} style={{
                       borderRadius: 8, padding: '10px 12px',
-                      background: s.rating === 'strong' ? 'rgba(16,185,129,0.1)' : s.rating === 'okay' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
-                      border: `1px solid ${s.rating === 'strong' ? 'rgba(16,185,129,0.2)' : s.rating === 'okay' ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.15)'}`,
+                      background: s.rating === 'strong' ? 'rgba(158,204,159,0.1)' : s.rating === 'okay' ? 'rgba(214,138,78,0.1)' : 'rgba(228,164,145,0.08)',
+                      border: `1px solid ${s.rating === 'strong' ? 'rgba(158,204,159,0.2)' : s.rating === 'okay' ? 'rgba(214,138,78,0.2)' : 'rgba(228,164,145,0.15)'}`,
                     }}>
-                      <p style={{ fontSize: 10, fontWeight: 700, margin: '0 0 3px', fontFamily: G, color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444' }}>{s.label}</p>
-                      <p style={{ fontSize: 10, margin: 0, fontFamily: F, letterSpacing: '0.03em', color: s.rating === 'strong' ? '#10B981' : s.rating === 'okay' ? '#F59E0B' : '#EF4444', opacity: 0.85 }}>{s.note}</p>
+                      <p style={{ fontSize: 10, fontWeight: 700, margin: '0 0 3px', fontFamily: G, color: s.rating === 'strong' ? '#9ECC9F' : s.rating === 'okay' ? '#D68A4E' : '#E4A491' }}>{s.label}</p>
+                      <p style={{ fontSize: 10, margin: 0, fontFamily: F, letterSpacing: '0.03em', color: s.rating === 'strong' ? '#9ECC9F' : s.rating === 'okay' ? '#D68A4E' : '#E4A491', opacity: 0.85 }}>{s.note}</p>
                     </div>
                   ))}
                 </div>
@@ -759,7 +764,7 @@ export default function JaLandingPage() {
             </div>
           </motion.div>
         </div>
-        <div style={{ height: 80, background: 'linear-gradient(to bottom, #080C14, var(--background))' }} />
+        <div style={{ height: 80, background: 'linear-gradient(to bottom, #0A0B0D, var(--background))' }} />
       </section>
 
       {/* ─── Product tour ─────────────────────────────────────────────────── */}
@@ -866,7 +871,7 @@ export default function JaLandingPage() {
                   </div>
                   <span style={{
                     fontSize: 11, fontWeight: 600, color: 'var(--green-success)',
-                    background: 'rgba(22,163,74,0.12)',
+                    background: 'var(--success-bg)',
                     borderRadius: 9999, padding: '3px 10px',
                     fontFamily: F, letterSpacing: '0.04em', whiteSpace: 'nowrap',
                   }}>{t.result}</span>
@@ -961,7 +966,7 @@ export default function JaLandingPage() {
                   <p style={{ fontSize: 12, color: 'var(--muted-text)', margin: 0, fontFamily: F, letterSpacing: '0.05em' }}>月あたり¥742（月払いは¥1,300）</p>
                   <span style={{
                     fontSize: 10, fontWeight: 600, color: 'var(--green-success)',
-                    background: 'rgba(22,163,74,0.12)',
+                    background: 'var(--success-bg)',
                     borderRadius: 9999, padding: '2px 8px',
                     fontFamily: F, letterSpacing: '0.04em', whiteSpace: 'nowrap',
                   }}>年間¥6,700お得</span>
@@ -992,7 +997,7 @@ export default function JaLandingPage() {
                     background: 'var(--accent-blue)', color: '#fff',
                     fontSize: 14, fontWeight: 600, letterSpacing: '0.05em',
                     textDecoration: 'none', fontFamily: F,
-                    boxShadow: '0 4px 14px rgba(37,99,235,0.28)',
+                    boxShadow: '0 4px 14px color-mix(in oklch, var(--accent-blue) 28%, transparent)',
                     transition: 'opacity 150ms ease, transform 100ms ease-out',
                   }}
                   onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(0.97)'; }}
@@ -1010,7 +1015,7 @@ export default function JaLandingPage() {
       </section>
 
       {/* ─── Final CTA ────────────────────────────────────────────────────── */}
-      <section style={{ background: '#060810', padding: '96px 28px' }}>
+      <section style={{ background: '#0A0B0D', padding: '96px 28px' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -1033,7 +1038,7 @@ export default function JaLandingPage() {
               style={{
                 display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                 height: 52, padding: '0 48px', borderRadius: 9999,
-                background: '#fff', color: '#060810',
+                background: '#fff', color: '#0A0B0D',
                 fontSize: 16, fontWeight: 700, letterSpacing: '0.05em',
                 textDecoration: 'none', fontFamily: F,
                 boxShadow: '0 4px 24px rgba(255,255,255,0.15)',
@@ -1051,7 +1056,7 @@ export default function JaLandingPage() {
       </section>
 
       {/* ─── Footer ───────────────────────────────────────────────────────── */}
-      <footer style={{ background: '#060810', padding: '48px 28px 40px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <footer style={{ background: '#0A0B0D', padding: '48px 28px 40px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div style={{ maxWidth: 1160, margin: '0 auto' }}>
           <div className="ja-footer-top" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 32, marginBottom: 36 }}>
             <div>
@@ -1059,36 +1064,36 @@ export default function JaLandingPage() {
                 <Logo size={22} variant="dark" />
                 <span style={{ fontSize: 15, fontWeight: 700, color: '#fff', letterSpacing: '-0.02em', fontFamily: G }}>Applyd</span>
               </div>
-              <p style={{ fontSize: 12, color: '#475569', letterSpacing: '0.05em', margin: 0, fontFamily: F, lineHeight: 1.8 }}>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em', margin: 0, fontFamily: F, lineHeight: 1.8 }}>
                 就活生のために<br />就活生が作りました。
               </p>
             </div>
 
             <div style={{ display: 'flex', gap: 48, flexWrap: 'wrap' }}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: '#475569', letterSpacing: '0.1em', margin: '0 0 14px', fontFamily: F, textTransform: 'uppercase' }}>プロダクト</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', margin: '0 0 14px', fontFamily: F, textTransform: 'uppercase' }}>プロダクト</p>
                 {[
                   { label: '機能について', href: '#features' },
                   { label: '料金プラン',   href: '#pricing' },
                   { label: 'ダッシュボード', href: '/ja/dashboard' },
                 ].map(l => (
-                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: '#64748B', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F, transition: 'color 150ms ease' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748B'; }}
+                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F, transition: 'color 150ms ease' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.65)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; }}
                   >{l.label}</Link>
                 ))}
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 600, color: '#475569', letterSpacing: '0.1em', margin: '0 0 14px', fontFamily: F, textTransform: 'uppercase' }}>サポート</p>
+                <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', margin: '0 0 14px', fontFamily: F, textTransform: 'uppercase' }}>サポート</p>
                 {[
                   { label: 'よくある質問',         href: '/ja/help' },
                   { label: 'プライバシーポリシー', href: '/ja/privacy' },
                   { label: '利用規約',             href: '/ja/terms' },
                   { label: 'お問い合わせ',         href: '/ja/contact' },
                 ].map(l => (
-                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: '#64748B', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F, transition: 'color 150ms ease' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#64748B'; }}
+                  <Link key={l.href} href={l.href} style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: '0 0 10px', letterSpacing: '0.05em', textDecoration: 'none', fontFamily: F, transition: 'color 150ms ease' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.65)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.45)'; }}
                   >{l.label}</Link>
                 ))}
               </div>
@@ -1096,7 +1101,7 @@ export default function JaLandingPage() {
           </div>
 
           <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-            <p style={{ fontSize: 11, color: '#334155', letterSpacing: '0.06em', margin: 0, fontFamily: F }}>© {new Date().getFullYear()} Applyd. All rights reserved.</p>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.06em', margin: 0, fontFamily: F }}>© {new Date().getFullYear()} Applyd. All rights reserved.</p>
             <LocaleSwitcher />
           </div>
         </div>

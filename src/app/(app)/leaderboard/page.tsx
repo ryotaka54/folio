@@ -46,7 +46,7 @@ export default function LeaderboardPage() {
           {user ? (
             <Link href="/dashboard" style={{ fontSize: 13, color: 'var(--accent-blue)', textDecoration: 'none', fontWeight: 500 }}>← Dashboard</Link>
           ) : (
-            <Link href="/signup" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: '#2563EB', padding: '7px 16px', borderRadius: 8, textDecoration: 'none' }}>Sign up free</Link>
+            <Link href="/signup" style={{ fontSize: 13, fontWeight: 600, color: '#fff', background: 'var(--accent-blue)', padding: '7px 16px', borderRadius: 8, textDecoration: 'none' }}>Sign up free</Link>
           )}
         </div>
       </nav>
@@ -61,9 +61,9 @@ export default function LeaderboardPage() {
             Real answers from real candidates, scored by AI. Browse top responses by company — or submit your own after a mock interview.
           </p>
           {!user && (
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '14px 18px', background: 'rgba(37,99,235,0.07)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 12 }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '14px 18px', background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 20%, transparent)', borderRadius: 12 }}>
               <span style={{ fontSize: 14, color: 'var(--body-text)' }}>Practice a question, then post your score to compete.</span>
-              <Link href="/signup" style={{ fontSize: 13, fontWeight: 600, color: '#2563EB', textDecoration: 'none', whiteSpace: 'nowrap' }}>Get started free →</Link>
+              <Link href="/signup" style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent-blue)', textDecoration: 'none', whiteSpace: 'nowrap' }}>Get started free →</Link>
             </div>
           )}
         </div>
@@ -83,7 +83,7 @@ export default function LeaderboardPage() {
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
             <p style={{ color: 'var(--muted-text)', fontSize: 15 }}>No companies yet.</p>
             <p style={{ color: 'var(--muted-text)', fontSize: 13, marginTop: 8 }}>Be the first — practice a mock interview and post your score.</p>
-            <Link href={user ? '/interview' : '/signup'} style={{ display: 'inline-block', marginTop: 16, fontSize: 14, fontWeight: 600, color: '#2563EB', textDecoration: 'none' }}>
+            <Link href={user ? '/interview' : '/signup'} style={{ display: 'inline-block', marginTop: 16, fontSize: 14, fontWeight: 600, color: 'var(--accent-blue)', textDecoration: 'none' }}>
               {user ? 'Practice now →' : 'Sign up free →'}
             </Link>
           </div>
@@ -130,7 +130,7 @@ function CompanyList({ companies, title, user }: { companies: CompanyRow[]; titl
       </div>
       {!user && (
         <p style={{ fontSize: 12, color: 'var(--muted-text)', marginTop: 10, textAlign: 'center' }}>
-          <Link href="/signup" style={{ color: '#2563EB', textDecoration: 'none' }}>Sign up free</Link> to post your score
+          <Link href="/signup" style={{ color: 'var(--accent-blue)', textDecoration: 'none' }}>Sign up free</Link> to post your score
         </p>
       )}
     </div>

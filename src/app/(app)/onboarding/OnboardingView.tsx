@@ -448,7 +448,7 @@ function EnOnboardingFlow({ locale }: { locale: Locale }) {
               <div className="relative mb-4">
                 <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
                   {stages.map((stage) => {
-                    const color = STAGE_COLORS[stage] || '#6B7280';
+                    const color = STAGE_COLORS[stage] || 'var(--muted-text)';
                     return (
                       <div key={stage} className="flex flex-col items-center gap-1.5 flex-shrink-0 min-w-[64px]">
                         <div className="w-8 h-8 rounded-lg border border-border-gray flex items-center justify-center" style={{ background: 'var(--surface-gray)' }}>

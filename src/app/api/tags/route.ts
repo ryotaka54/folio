@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const supabase = getSupabase();
     const { data, error } = await supabase
       .from('tags')
-      .insert({ user_id: authedUser.id, name: name.trim(), color: color ?? '#6366F1' })
+      .insert({ user_id: authedUser.id, name: name.trim(), color: color ?? '#8760A0' })
       .select()
       .single();
 

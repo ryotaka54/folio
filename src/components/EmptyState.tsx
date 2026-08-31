@@ -53,7 +53,7 @@ export default function EmptyState({ onAdd, hideExtensionHint, locale }: EmptySt
       {/* Ghost pipeline preview — desktop only */}
       <div className="hidden sm:flex gap-2 mb-8 w-full max-w-sm opacity-40 pointer-events-none" aria-hidden>
         {GHOST_STAGES.map((stage, i) => {
-          const color = STAGE_COLORS[stage] || '#6B7280';
+          const color = STAGE_COLORS[stage] || 'var(--pill-neutral-dot)';
           return (
             <div key={stage} className="flex-1 rounded-lg border border-border-gray p-1.5" style={{ background: 'var(--card-bg)' }}>
               <div className="flex items-center gap-1 mb-1.5">
@@ -70,7 +70,7 @@ export default function EmptyState({ onAdd, hideExtensionHint, locale }: EmptySt
 
       {/* Mobile illustration */}
       <div className="sm:hidden mb-8 flex items-end gap-3 opacity-40 pointer-events-none" aria-hidden>
-        {['#8B5CF6', '#2563EB', '#06B6D4', '#F59E0B', '#1D9E75'].map((color, i) => (
+        {['var(--pill-violet-dot)', 'var(--accent-blue)', 'var(--pill-indigo-dot)', 'var(--pill-amber-dot)', 'var(--pill-green-dot)'].map((color, i) => (
           <div
             key={i}
             className="w-8 rounded-lg"

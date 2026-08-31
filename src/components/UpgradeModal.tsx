@@ -105,7 +105,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
         <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
 
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 100%)', padding: '20px 24px 18px', position: 'relative' }}>
+        <div style={{ background: 'var(--gradient-pro)', padding: '20px 24px 18px', position: 'relative' }}>
           <button
             onClick={onClose}
             aria-label="Close"
@@ -139,7 +139,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
                 style={{
                   flex: 1, height: 56, borderRadius: 10, cursor: 'pointer',
                   border: `2px solid ${plan === p ? 'var(--accent-blue)' : 'var(--border-gray)'}`,
-                  background: plan === p ? 'rgba(37,99,235,0.06)' : 'var(--background)',
+                  background: plan === p ? 'var(--light-accent)' : 'var(--background)',
                   transition: 'border-color 180ms ease, background 180ms ease',
                   position: 'relative',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1,
@@ -148,7 +148,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
                 {p === 'annual' && (
                   <span style={{
                     position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)',
-                    background: '#16a34a', color: '#fff', fontSize: 10, fontWeight: 700,
+                    background: 'var(--green-success)', color: '#fff', fontSize: 10, fontWeight: 700,
                     padding: '2px 7px', borderRadius: 99, whiteSpace: 'nowrap', letterSpacing: '0.02em',
                   }}>SAVE ${annualSavings}/YEAR</span>
                 )}
@@ -168,7 +168,7 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
             {AI_FEATURES.map(f => (
-              <div key={f.name} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 10px', borderRadius: 8, background: 'rgba(37,99,235,0.04)', border: '1px solid rgba(37,99,235,0.1)' }}>
+              <div key={f.name} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 10px', borderRadius: 8, background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 10%, transparent)' }}>
                 <span style={{ fontSize: 15, flexShrink: 0, marginTop: 1 }}>{f.icon}</span>
                 <div>
                   <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--brand-navy)', marginBottom: 1 }}>{f.name}</p>
@@ -182,8 +182,8 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px', display: 'flex', flexDirection: 'column', gap: 7 }}>
             {BASE_FEATURES.map(f => (
               <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-                <span style={{ width: 16, height: 16, borderRadius: 999, background: 'rgba(37,99,235,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span style={{ width: 16, height: 16, borderRadius: 999, background: 'color-mix(in oklch, var(--accent-blue) 12%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
                 <span style={{ fontSize: 12, color: 'var(--body-text)' }}>{f}</span>
               </li>
@@ -195,13 +195,13 @@ export default function UpgradeModal({ open, onClose, reason = 'billing' }: Prop
             Students who use the AI features report feeling significantly more prepared for interviews and more confident in negotiations.
           </p>
 
-          {error && <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 12, textAlign: 'center' }}>{error}</p>}
+          {error && <p style={{ fontSize: 12, color: 'var(--error-text)', marginBottom: 12, textAlign: 'center' }}>{error}</p>}
 
           <button
             onClick={handleUpgrade}
             disabled={loading}
             style={{
-              width: '100%', height: 44, background: loading ? 'var(--muted-text)' : '#2563eb',
+              width: '100%', height: 44, background: loading ? 'var(--muted-text)' : 'var(--accent-blue)',
               color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700,
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'background 200ms ease',

@@ -98,11 +98,11 @@ function SectionCard({ title, description, children, danger }: { title?: string;
     <div
       className="rounded-lg p-5 mb-4"
       style={{
-        background: danger ? 'rgba(220,38,38,0.03)' : 'var(--card-bg)',
-        border: `1px solid ${danger ? 'rgba(220,38,38,0.2)' : 'var(--border-gray)'}`,
+        background: danger ? 'var(--error-bg)' : 'var(--card-bg)',
+        border: `1px solid ${danger ? 'var(--error-border)' : 'var(--border-gray)'}`,
       }}
     >
-      {title && <p className="text-[14px] font-semibold mb-1" style={{ color: danger ? '#DC2626' : 'var(--brand-navy)' }}>{title}</p>}
+      {title && <p className="text-[14px] font-semibold mb-1" style={{ color: danger ? 'var(--error-text)' : 'var(--brand-navy)' }}>{title}</p>}
       {description && <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>{description}</p>}
       {children}
     </div>
@@ -141,7 +141,7 @@ function InlineToast({ message, type, onDismiss }: { message: string | null; typ
   return (
     <div
       className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-3 px-4 py-2.5 rounded-lg shadow-lg fade-in pointer-events-auto"
-      style={{ background: isErr ? '#DC2626' : '#0F172A', color: '#F9FAFB', border: '1px solid rgba(255,255,255,0.08)' }}
+      style={{ background: isErr ? '#B54A34' : '#141519', color: '#F9FAFB', border: '1px solid rgba(255,255,255,0.08)' }}
     >
       {!isErr && <CheckIcon />}
       <span className="text-[13px] font-medium">{message}</span>
@@ -522,8 +522,8 @@ function AISection() {
             <span style={{ fontSize: 13, color: 'var(--brand-navy)', fontWeight: 500 }}>{f.label}</span>
             <span style={{
               fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 99,
-              background: userIsPro ? 'rgba(22,163,74,0.1)' : 'var(--surface-gray)',
-              color: userIsPro ? '#16A34A' : 'var(--muted-text)',
+              background: userIsPro ? 'var(--success-bg)' : 'var(--surface-gray)',
+              color: userIsPro ? 'var(--green-success)' : 'var(--muted-text)',
             }}>
               {userIsPro ? '20 uses/day' : '3 uses/day'}
             </span>
@@ -564,8 +564,8 @@ function AppearanceSection() {
   };
 
   const themes = [
-    { id: 'light', label: 'Light', preview: { bg: '#FFFFFF', border: '#E5E7EB', dot: '#2563EB' } },
-    { id: 'dark', label: 'Dark', preview: { bg: '#0A0A0A', border: '#2C2C2E', dot: '#3B82F6' } },
+    { id: 'light', label: 'Light', preview: { bg: '#FAF8F3', border: '#DED3BE', dot: '#8F6B22' } },
+    { id: 'dark', label: 'Dark', preview: { bg: '#0A0B0D', border: '#26282E', dot: '#A1802C' } },
   ];
 
   return (
@@ -658,7 +658,7 @@ function PlanCard() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold" style={{ background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff' }}>⚡ Pro</span>
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold" style={{ background: 'var(--gradient-pro)', color: '#fff' }}>⚡ Pro</span>
               <button
                 onClick={handleManage}
                 disabled={loadingPortal}
@@ -798,7 +798,7 @@ function AccountSection({ showToast }: { showToast: (msg: string, type?: 'succes
           {extensionInstalled === null ? (
             <span className="text-[12px]" style={{ color: 'var(--text-tertiary)' }}>Checking…</span>
           ) : extensionInstalled ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold" style={{ background: 'rgba(22,163,74,0.1)', color: '#16A34A', border: '1px solid rgba(22,163,74,0.2)' }}>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold" style={{ background: 'var(--success-bg)', color: 'var(--green-success)', border: '1px solid var(--success-border)' }}>
               <div className="w-1.5 h-1.5 rounded-full bg-green-success" /> Installed
             </span>
           ) : (
@@ -807,9 +807,9 @@ function AccountSection({ showToast }: { showToast: (msg: string, type?: 'succes
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold transition-colors"
-              style={{ background: 'rgba(217,119,6,0.1)', color: '#D97706', border: '1px solid rgba(217,119,6,0.2)' }}
+              style={{ background: 'var(--warn-bg)', color: 'var(--amber-warning)', border: '1px solid color-mix(in oklch, var(--amber-warning) 20%, transparent)' }}
             >
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#D97706' }} /> Not installed → Install
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--amber-warning)' }} /> Not installed → Install
             </a>
           )}
         </div>
@@ -902,7 +902,7 @@ function DangerSection({ showToast }: { showToast: (msg: string, type?: 'success
 
       {/* Clear all modal */}
       <Modal open={clearModal} onClose={() => { setClearModal(false); setClearConfirm(''); }}>
-        <h3 className="text-[16px] font-semibold mb-2" style={{ color: '#DC2626' }}>Clear all applications?</h3>
+        <h3 className="text-[16px] font-semibold mb-2" style={{ color: 'var(--error-text)' }}>Clear all applications?</h3>
         <p className="text-[13px] mb-4 leading-relaxed" style={{ color: 'var(--muted-text)' }}>
           This will permanently delete all your applications. Your profile and settings will be kept. <strong style={{ color: 'var(--brand-navy)' }}>This cannot be undone.</strong>
         </p>
@@ -935,7 +935,7 @@ function DangerSection({ showToast }: { showToast: (msg: string, type?: 'success
       <Modal open={deleteModal} onClose={() => setDeleteModal(false)}>
         {deleteStep === 1 ? (
           <>
-            <h3 className="text-[16px] font-semibold mb-2" style={{ color: '#DC2626' }}>Delete your account?</h3>
+            <h3 className="text-[16px] font-semibold mb-2" style={{ color: 'var(--error-text)' }}>Delete your account?</h3>
             <p className="text-[13px] mb-3 leading-relaxed" style={{ color: 'var(--muted-text)' }}>
               This will permanently delete:
             </p>
@@ -944,7 +944,7 @@ function DangerSection({ showToast }: { showToast: (msg: string, type?: 'success
               <li>• All your tracked applications</li>
               <li>• All your settings and preferences</li>
             </ul>
-            <p className="text-[13px] mb-5 font-semibold" style={{ color: '#DC2626' }}>This action is irreversible and cannot be undone.</p>
+            <p className="text-[13px] mb-5 font-semibold" style={{ color: 'var(--error-text)' }}>This action is irreversible and cannot be undone.</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteStep(2)}
@@ -963,7 +963,7 @@ function DangerSection({ showToast }: { showToast: (msg: string, type?: 'success
           </>
         ) : (
           <>
-            <h3 className="text-[16px] font-semibold mb-2" style={{ color: '#DC2626' }}>Final confirmation</h3>
+            <h3 className="text-[16px] font-semibold mb-2" style={{ color: 'var(--error-text)' }}>Final confirmation</h3>
             <p className="text-[13px] mb-4" style={{ color: 'var(--muted-text)' }}>
               {userEmail
                 ? <>Type your email address <strong style={{ color: 'var(--brand-navy)' }}>{userEmail}</strong> to confirm deletion.</>
@@ -1247,14 +1247,14 @@ function LeaderboardSection({ showToast }: { showToast: (msg: string, type?: 'su
                       <span style={{ fontSize: 11, color: 'var(--muted-text)' }}>·</span>
                       <span style={{ fontSize: 12, color: 'var(--muted-text)' }}>{entry.role}</span>
                       {entry.lang === 'ja' && (
-                        <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99, background: 'rgba(139,92,246,0.1)', color: '#7C3AED', border: '1px solid rgba(139,92,246,0.2)' }}>JA</span>
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99, background: 'var(--pill-violet-bg)', color: 'var(--pill-violet-fg)', border: '1px solid color-mix(in oklch, var(--pill-violet-dot) 20%, transparent)' }}>JA</span>
                       )}
                     </div>
                     <p style={{ fontSize: 12, color: 'var(--muted-text)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {entry.question.length > 80 ? entry.question.slice(0, 80) + '…' : entry.question}
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, padding: '1px 8px', borderRadius: 99, background: entry.score >= 4 ? 'rgba(22,163,74,0.1)' : entry.score >= 3 ? 'rgba(234,179,8,0.1)' : 'rgba(220,38,38,0.1)', color: entry.score >= 4 ? '#16A34A' : entry.score >= 3 ? '#A16207' : '#DC2626', border: `1px solid ${entry.score >= 4 ? 'rgba(22,163,74,0.2)' : entry.score >= 3 ? 'rgba(234,179,8,0.2)' : 'rgba(220,38,38,0.2)'}` }}>
+                      <span style={{ fontSize: 12, fontWeight: 600, padding: '1px 8px', borderRadius: 99, background: entry.score >= 4 ? 'var(--success-bg)' : entry.score >= 3 ? 'var(--warn-bg)' : 'var(--error-bg)', color: entry.score >= 4 ? 'var(--green-success)' : entry.score >= 3 ? 'var(--amber-warning)' : 'var(--error-text)', border: `1px solid ${entry.score >= 4 ? 'var(--success-border)' : entry.score >= 3 ? 'color-mix(in oklch, var(--amber-warning) 20%, transparent)' : 'var(--error-border)'}` }}>
                         {entry.score}/5
                       </span>
                       {entry.has_answer && (
@@ -1291,7 +1291,7 @@ function LeaderboardSection({ showToast }: { showToast: (msg: string, type?: 'su
                       )}
                       <button
                         onClick={() => setConfirmDeleteId(entry.id)}
-                        style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(220,38,38,0.25)', background: 'rgba(220,38,38,0.05)', color: '#DC2626', cursor: 'pointer' }}
+                        style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--error-border)', background: 'var(--error-bg)', color: 'var(--error-text)', cursor: 'pointer' }}
                       >
                         Remove
                       </button>
@@ -1300,12 +1300,12 @@ function LeaderboardSection({ showToast }: { showToast: (msg: string, type?: 'su
                 </div>
 
                 {isConfirmingDelete && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, padding: '10px 12px', borderRadius: 8, background: 'rgba(220,38,38,0.05)', border: '1px solid rgba(220,38,38,0.15)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, padding: '10px 12px', borderRadius: 8, background: 'var(--error-bg)', border: '1px solid var(--error-border)' }}>
                     <span style={{ fontSize: 13, color: 'var(--brand-navy)', flex: 1 }}>Remove this entry from the leaderboard?</span>
                     <button
                       onClick={() => deleteEntry(entry.id)}
                       disabled={actioning === entry.id + 'delete'}
-                      style={{ fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 6, border: 'none', background: '#DC2626', color: '#fff', cursor: 'pointer', opacity: actioning === entry.id + 'delete' ? 0.6 : 1 }}
+                      style={{ fontSize: 12, fontWeight: 600, padding: '4px 12px', borderRadius: 6, border: 'none', background: 'var(--danger)', color: '#fff', cursor: 'pointer', opacity: actioning === entry.id + 'delete' ? 0.6 : 1 }}
                     >
                       {actioning === entry.id + 'delete' ? 'Removing…' : 'Yes, remove'}
                     </button>
@@ -1452,7 +1452,7 @@ function SettingsPageInner() {
               style={{
                 background: section === s.id ? 'var(--accent-blue)' : 'var(--surface-gray)',
                 borderColor: section === s.id ? 'var(--accent-blue)' : 'var(--border-gray)',
-                color: section === s.id ? '#fff' : s.danger ? '#DC2626' : 'var(--muted-text)',
+                color: section === s.id ? '#fff' : s.danger ? 'var(--danger)' : 'var(--muted-text)',
               }}
             >
               {s.icon}
@@ -1474,8 +1474,8 @@ function SettingsPageInner() {
                   style={{
                     background: section === s.id ? 'var(--surface-gray)' : 'transparent',
                     color: section === s.id
-                      ? s.danger ? '#DC2626' : 'var(--brand-navy)'
-                      : s.danger ? '#DC2626' : 'var(--muted-text)',
+                      ? s.danger ? 'var(--danger)' : 'var(--brand-navy)'
+                      : s.danger ? 'var(--danger)' : 'var(--muted-text)',
                     border: section === s.id ? '1px solid var(--border-gray)' : '1px solid transparent',
                   }}
                 >

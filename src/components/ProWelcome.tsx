@@ -96,7 +96,7 @@ export default function ProWelcome({ onDone }: ProWelcomeProps) {
         }}
       >
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg, #0a0a14 0%, #1e1e3a 100%)', padding: '28px 28px 24px', textAlign: 'center' }}>
+        <div style={{ background: 'linear-gradient(135deg, #0A0B0D 0%, #1B1D22 100%)', padding: '28px 28px 24px', textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
             <ProLogo size={48} />
           </div>
@@ -127,7 +127,7 @@ export default function ProWelcome({ onDone }: ProWelcomeProps) {
             onClick={onDone}
             style={{
               width: '100%', height: 44,
-              background: 'linear-gradient(135deg, #1e40af, #2563eb)',
+              background: 'var(--gradient-pro)',
               color: '#fff', border: 'none', borderRadius: 12,
               fontSize: 14, fontWeight: 700, cursor: 'pointer',
               letterSpacing: '-0.01em',

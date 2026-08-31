@@ -61,7 +61,7 @@ const DISPLAY_STAGES: PipelineStage[] = [
 function DemoColumn({ stage, apps, highlightCardId }: {
   stage: PipelineStage; apps: Application[]; highlightCardId?: string | null;
 }) {
-  const color = STAGE_COLORS[stage] ?? '#6B7280';
+  const color = STAGE_COLORS[stage] ?? 'var(--pill-neutral-dot)';
   return (
     <div className="flex-1 min-w-0 flex flex-col">
       {/* Exact header from PipelineView */}
@@ -160,7 +160,7 @@ function DemoAddModal({ fields, highlightSave }: {
           background: 'var(--accent-blue)', color: '#fff', fontSize: 13, fontWeight: 600,
           border: 'none', cursor: 'pointer',
           transform: highlightSave ? 'scale(0.98)' : undefined,
-          boxShadow: highlightSave ? '0 0 0 3px rgba(59,130,246,0.35)' : undefined,
+          boxShadow: highlightSave ? '0 0 0 3px color-mix(in oklch, var(--accent-blue) 35%, transparent)' : undefined,
           transition: 'all 0.15s ease',
         }}>Save Application</button>
       </div>
@@ -202,10 +202,10 @@ function ChromeMockup({ stage }: { stage: 'hidden' | 'in' | 'tapping' | 'popup' 
           {/* Applyd icon */}
           <div style={{
             width: 24, height: 24, borderRadius: 5,
-            background: tapped ? '#60A5FA' : '#3B82F6',
+            background: tapped ? 'var(--accent-blue-hover)' : 'var(--accent-blue)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 11, fontWeight: 800, color: '#fff',
-            boxShadow: tapped ? '0 0 0 2px rgba(59,130,246,0.5), 0 0 12px rgba(59,130,246,0.4)' : undefined,
+            boxShadow: tapped ? '0 0 0 2px color-mix(in oklch, var(--accent-blue) 50%, transparent), 0 0 12px color-mix(in oklch, var(--accent-blue) 40%, transparent)' : undefined,
             animation: tapped ? 'extPulse 0.35s ease' : undefined,
             transition: 'background 0.2s, box-shadow 0.2s',
           }}>A</div>
@@ -220,7 +220,7 @@ function ChromeMockup({ stage }: { stage: 'hidden' | 'in' | 'tapping' | 'popup' 
               animation: 'popupIn 0.2s cubic-bezier(0.22,1,0.36,1)',
             }}>
               <div style={{ background: 'var(--surface-gray)', padding: '10px 12px', borderBottom: '1px solid var(--border-gray)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 20, height: 20, borderRadius: 5, background: '#3B82F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>A</div>
+                <div style={{ width: 20, height: 20, borderRadius: 5, background: 'var(--accent-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff' }}>A</div>
                 <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-navy)' }}>Applyd</span>
                 <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 600, color: 'var(--green-success)' }}>● Job detected</span>
               </div>
@@ -237,7 +237,7 @@ function ChromeMockup({ stage }: { stage: 'hidden' | 'in' | 'tapping' | 'popup' 
                 ))}
                 <button style={{
                   width: '100%', height: 34, marginTop: 4, borderRadius: 7,
-                  background: '#3B82F6', color: '#fff', fontSize: 12, fontWeight: 600,
+                  background: 'var(--accent-blue)', color: '#fff', fontSize: 12, fontWeight: 600,
                   border: 'none', cursor: 'pointer',
                 }}>✓ Save to Applyd</button>
               </div>
@@ -281,8 +281,8 @@ function DemoCursor({ x, y, visible }: { x: number; y: number; visible: boolean 
     <div style={{
       position: 'absolute', left: x, top: y, zIndex: 9000,
       width: 18, height: 18, borderRadius: '50%',
-      background: 'rgba(59,130,246,0.9)', border: '2px solid rgba(255,255,255,0.95)',
-      boxShadow: '0 2px 14px rgba(59,130,246,0.55)',
+      background: 'color-mix(in oklch, var(--accent-blue) 90%, transparent)', border: '2px solid rgba(255,255,255,0.95)',
+      boxShadow: '0 2px 14px color-mix(in oklch, var(--accent-blue) 55%, transparent)',
       transform: 'translate(-50%,-50%)', pointerEvents: 'none',
       opacity: visible ? 1 : 0,
       transition: 'left 0.55s cubic-bezier(0.25,0.46,0.45,0.94), top 0.55s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease',
@@ -305,7 +305,7 @@ function Particles() {
         <div key={p.id} style={{
           position: 'absolute', left: `${p.x}%`, top: `${p.y}%`,
           width: p.size, height: p.size, borderRadius: '50%',
-          background: '#3B82F6', opacity: 0,
+          background: 'var(--accent-blue)', opacity: 0,
           animation: `particleFloat ${p.dur}s ${p.delay}s ease-in-out infinite`,
         }} />
       ))}
@@ -520,7 +520,7 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
         @keyframes extPulse   { 0%{transform:scale(1)} 50%{transform:scale(1.22)} 100%{transform:scale(1)} }
         @keyframes popupIn    { from{opacity:0;transform:scale(0.92) translateY(4px)} to{opacity:1;transform:scale(1) translateY(0)} }
         @keyframes particleFloat { 0%,100%{opacity:0;transform:translateY(0)} 40%,60%{opacity:0.08} 50%{transform:translateY(-20px)} }
-        @keyframes logoGlow   { 0%,100%{box-shadow:0 0 40px rgba(59,130,246,0.3)} 50%{box-shadow:0 0 70px rgba(59,130,246,0.65)} }
+        @keyframes logoGlow   { 0%,100%{box-shadow:0 0 40px color-mix(in oklch, var(--accent-blue) 30%, transparent)} 50%{box-shadow:0 0 70px color-mix(in oklch, var(--accent-blue) 65%, transparent)} }
         @keyframes fadeBlack  { from{opacity:0} to{opacity:1} }
         html, body { background:#0A0A0A !important; margin:0 !important; padding:0 !important; overflow:hidden !important; }
         * { box-sizing:border-box; }
@@ -556,7 +556,7 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
                   height: 34, padding: '0 14px', borderRadius: 7,
                   background: highlightBtn ? 'var(--accent-blue-hover)' : 'var(--accent-blue)',
                   color: '#fff', fontSize: 13, fontWeight: 600, border: 'none', cursor: 'pointer',
-                  boxShadow: highlightBtn ? '0 0 0 3px rgba(59,130,246,0.35)' : undefined,
+                  boxShadow: highlightBtn ? '0 0 0 3px color-mix(in oklch, var(--accent-blue) 35%, transparent)' : undefined,
                   transform: highlightBtn ? 'scale(1.04)' : undefined,
                   transition: 'all 0.2s ease',
                 }}
@@ -589,7 +589,7 @@ export default function DemoScene({ variant }: { variant: 'full' | 'short' | 'ex
                 <div style={{
                   background: 'var(--amber-warning)', color: '#000',
                   fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 24,
-                  boxShadow: '0 4px 24px rgba(251,191,36,0.4)',
+                  boxShadow: '0 4px 24px color-mix(in oklch, var(--amber-warning) 40%, transparent)',
                   animation: 'bgFadeIn 0.3s ease',
                 }}>{tooltipText}</div>
               </div>

@@ -21,9 +21,9 @@ interface Props {
 function SaveIndicator({ state }: { state: 'idle' | 'saving' | 'saved' | 'error' }) {
   if (state === 'idle') return null;
   const map = {
-    saving: { text: '保存中', color: '#94A3B8' },
-    saved:  { text: '保存済み ✓', color: '#22C55E' },
-    error:  { text: '保存エラー', color: '#EF4444' },
+    saving: { text: '保存中', color: 'var(--text-tertiary)' },
+    saved:  { text: '保存済み ✓', color: 'var(--green-success)' },
+    error:  { text: '保存エラー', color: 'var(--danger)' },
   } as const;
   const cfg = map[state as keyof typeof map];
   if (!cfg) return null;
@@ -41,7 +41,7 @@ function CharCounter({ count, max }: { count: number; max: number }) {
     <span
       style={{
         fontSize: 11,
-        color: over ? '#EF4444' : near ? '#F59E0B' : '#94A3B8',
+        color: over ? 'var(--danger)' : near ? 'var(--amber-warning)' : 'var(--text-tertiary)',
         fontFamily: 'var(--font-geist), sans-serif',
         letterSpacing: 0,
       }}
@@ -104,7 +104,7 @@ function ESField({
             alignItems: 'center',
             gap: 4,
             fontSize: 11,
-            color: copied ? '#22C55E' : '#94A3B8',
+            color: copied ? 'var(--green-success)' : 'var(--text-tertiary)',
             background: 'none',
             border: 'none',
             cursor: 'pointer',
@@ -132,7 +132,7 @@ function ESField({
             width: '100%',
             minHeight: 100,
             borderRadius: 10,
-            border: isOverLimit ? '1.5px solid #EF4444' : '1px solid var(--border-gray)',
+            border: isOverLimit ? '1.5px solid var(--danger)' : '1px solid var(--border-gray)',
             background: 'var(--surface-gray)',
             color: 'var(--brand-navy)',
             fontSize: 13,

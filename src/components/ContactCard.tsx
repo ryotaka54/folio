@@ -11,11 +11,11 @@ const REL_LABELS: Record<RelationshipType, string> = {
 };
 
 const REL_COLORS: Record<RelationshipType, { bg: string; text: string; border: string }> = {
-  recruiter: { bg: 'rgba(37,99,235,0.1)',   text: '#2563EB', border: 'rgba(37,99,235,0.25)' },
-  referral:  { bg: 'rgba(22,163,74,0.1)',   text: '#16A34A', border: 'rgba(22,163,74,0.25)' },
-  employee:  { bg: 'rgba(139,92,246,0.1)',  text: '#7C3AED', border: 'rgba(139,92,246,0.25)' },
-  alumni:    { bg: 'rgba(217,119,6,0.1)',   text: '#D97706', border: 'rgba(217,119,6,0.25)' },
-  other:     { bg: 'rgba(100,116,139,0.1)', text: '#64748B', border: 'rgba(100,116,139,0.25)' },
+  recruiter: { bg: 'var(--light-accent)',      text: 'var(--accent-blue)',      border: 'color-mix(in oklch, var(--accent-blue) 25%, transparent)' },
+  referral:  { bg: 'var(--success-bg)',        text: 'var(--success-text)',     border: 'var(--success-border)' },
+  employee:  { bg: 'var(--pill-violet-bg)',    text: 'var(--pill-violet-fg)',   border: 'color-mix(in oklch, var(--pill-violet-dot) 25%, transparent)' },
+  alumni:    { bg: 'var(--warn-bg)',           text: 'var(--amber-warning)',    border: 'color-mix(in oklch, var(--amber-warning) 25%, transparent)' },
+  other:     { bg: 'var(--surface-gray)',      text: 'var(--muted-text)',       border: 'var(--border-gray)' },
 };
 
 function timeAgo(dateStr: string | null) {
@@ -48,7 +48,7 @@ export default function ContactCard({ contact, onClick, active }: ContactCardPro
         padding: '12px 16px',
         borderRadius: 10,
         border: `1px solid ${active ? 'var(--accent-blue)' : 'var(--border-gray)'}`,
-        background: active ? 'rgba(37,99,235,0.04)' : 'var(--card-bg)',
+        background: active ? 'color-mix(in oklch, var(--accent-blue) 4%, transparent)' : 'var(--card-bg)',
         cursor: 'pointer',
         fontFamily: 'inherit',
         transition: 'border-color 0.12s, background 0.12s',
@@ -56,7 +56,7 @@ export default function ContactCard({ contact, onClick, active }: ContactCardPro
         alignItems: 'center',
         gap: 12,
       }}
-      onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(37,99,235,0.3)'; } }}
+      onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.borderColor = 'color-mix(in oklch, var(--accent-blue) 30%, transparent)'; } }}
       onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-gray)'; } }}
     >
       {/* Avatar */}

@@ -47,7 +47,7 @@ export default function ReferralWelcomeModal({ onDone }: Props) {
         style={{ background: 'var(--card-bg)', border: '1px solid var(--border-gray)' }}
       >
         {/* Top accent bar */}
-        <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, var(--accent-blue), #6366f1)' }} />
+        <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, var(--accent-blue), var(--pill-indigo-dot))' }} />
 
         <div className="px-6 py-6">
           {/* Icon + headline */}
@@ -77,7 +77,7 @@ export default function ReferralWelcomeModal({ onDone }: Props) {
           {/* Reward description */}
           <div
             className="rounded-xl px-4 py-3.5 mb-4"
-            style={{ background: 'rgba(37,99,235,0.06)', border: '1px solid rgba(37,99,235,0.15)' }}
+            style={{ background: 'var(--light-accent)', border: '1px solid color-mix(in oklch, var(--accent-blue) 15%, transparent)' }}
           >
             <div className="flex items-center gap-3 mb-2.5">
               {[1, 2, 3].map(n => (
@@ -115,9 +115,9 @@ export default function ReferralWelcomeModal({ onDone }: Props) {
                   onClick={handleCopy}
                   className="flex-shrink-0 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors"
                   style={{
-                    background: copied ? 'rgba(22,163,74,0.12)' : 'var(--background)',
+                    background: copied ? 'var(--success-bg)' : 'var(--background)',
                     color: copied ? 'var(--green-success)' : 'var(--brand-navy)',
-                    border: `1px solid ${copied ? 'rgba(22,163,74,0.3)' : 'var(--border-gray)'}`,
+                    border: `1px solid ${copied ? 'var(--success-border)' : 'var(--border-gray)'}`,
                   }}
                 >
                   {copied ? '✓ Copied' : 'Copy'}

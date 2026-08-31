@@ -23,11 +23,11 @@ interface ProTourStep {
 
 function InterviewIntelMockup() {
   return (
-    <div style={{ borderRadius: 10, border: '1px solid rgba(37,99,235,0.2)', background: 'rgba(37,99,235,0.04)', padding: '12px 14px', marginBottom: 4 }}>
+    <div style={{ borderRadius: 10, border: '1px solid color-mix(in oklch, var(--accent-blue) 20%, transparent)', background: 'color-mix(in oklch, var(--accent-blue) 4%, transparent)', padding: '12px 14px', marginBottom: 4 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 14 }}>🧠</span>
         <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-navy)' }}>Interview Intel</span>
-        <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: '#2563eb', background: 'rgba(37,99,235,0.1)', borderRadius: 4, padding: '2px 6px' }}>Active</span>
+        <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: 'var(--accent-blue)', background: 'var(--light-accent)', borderRadius: 4, padding: '2px 6px' }}>Active</span>
       </div>
       {[
         { q: 'Walk me through a time you handled ambiguity under pressure.' },
@@ -69,7 +69,7 @@ function FollowUpMockup() {
 function OfferMockup() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 4 }}>
-      <div style={{ borderRadius: 10, border: '1px solid rgba(22,163,74,0.25)', background: 'rgba(22,163,74,0.04)', padding: '11px 14px' }}>
+      <div style={{ borderRadius: 10, border: '1px solid color-mix(in oklch, var(--green-success) 25%, transparent)', background: 'var(--success-bg)', padding: '11px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <span style={{ fontSize: 13 }}>💰</span>
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-navy)' }}>Offer Negotiation Guide</span>
@@ -78,14 +78,14 @@ function OfferMockup() {
           Market range for SWE at Stripe, SF: <span style={{ color: 'var(--brand-navy)', fontWeight: 600 }}>$165k–$210k</span>. Your offer of $170k sits in the 35th percentile. Counter at $195k — here&apos;s the script…
         </div>
       </div>
-      <div style={{ borderRadius: 10, border: '1px solid rgba(124,58,237,0.2)', background: 'rgba(124,58,237,0.04)', padding: '11px 14px' }}>
+      <div style={{ borderRadius: 10, border: '1px solid color-mix(in oklch, var(--pill-violet-dot) 20%, transparent)', background: 'var(--pill-violet-bg)', padding: '11px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <span style={{ fontSize: 13 }}>📊</span>
           <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--brand-navy)' }}>Strength Signal</span>
           <span style={{ marginLeft: 'auto', fontSize: 10, fontWeight: 700, color: 'var(--muted-text)' }}>on add</span>
         </div>
         <div style={{ fontSize: 11, color: 'var(--muted-text)' }}>
-          Your profile is a <span style={{ color: '#7C3AED', fontWeight: 600 }}>strong match</span> — 3 of 4 required skills found, CS degree aligns. Estimated response rate: 35–45%.
+          Your profile is a <span style={{ color: 'var(--pill-violet-dot)', fontWeight: 600 }}>strong match</span> — 3 of 4 required skills found, CS degree aligns. Estimated response rate: 35–45%.
         </div>
       </div>
     </div>
@@ -188,7 +188,7 @@ function WelcomeModal({ onStart, onSkip }: { onStart: () => void; onSkip: () => 
         `}</style>
 
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%)', padding: '26px 26px 20px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--gradient-pro)', padding: '26px 26px 20px', position: 'relative', overflow: 'hidden' }}>
           {/* Subtle star particles */}
           {[...Array(12)].map((_, i) => (
             <div key={i} aria-hidden style={{ position: 'absolute', left: `${8 + i * 8}%`, top: `${20 + (i % 3) * 25}%`, width: 3 + (i % 2) * 2, height: 3 + (i % 2) * 2, borderRadius: '50%', background: '#C9A84C', animation: `pro-tour-star ${1.5 + (i % 4) * 0.4}s ease-out ${i * 0.12}s both` }} />
@@ -214,8 +214,8 @@ function WelcomeModal({ onStart, onSkip }: { onStart: () => void; onSkip: () => 
                   <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--brand-navy)', marginBottom: 1 }}>{f.name}</p>
                   <p style={{ fontSize: 11, color: 'var(--text-tertiary)', lineHeight: 1.3 }}>{f.when}</p>
                 </div>
-                <div style={{ marginLeft: 'auto', flexShrink: 0, width: 16, height: 16, borderRadius: '50%', background: 'rgba(22,163,74,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                <div style={{ marginLeft: 'auto', flexShrink: 0, width: 16, height: 16, borderRadius: '50%', background: 'var(--success-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="var(--green-success)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                 </div>
               </div>
             ))}
@@ -227,7 +227,7 @@ function WelcomeModal({ onStart, onSkip }: { onStart: () => void; onSkip: () => 
           <button
             onClick={onStart}
             autoFocus
-            style={{ flex: 1, height: 42, borderRadius: 10, background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', letterSpacing: '-0.01em' }}
+            style={{ flex: 1, height: 42, borderRadius: 10, background: 'var(--gradient-pro)', color: '#fff', border: 'none', fontSize: 13, fontWeight: 700, cursor: 'pointer', letterSpacing: '-0.01em' }}
           >
             Take the tour →
           </button>
@@ -253,8 +253,8 @@ function DoneModal({ onClose }: { onClose: () => void }) {
         role="dialog" aria-modal aria-label="Pro tour complete"
         style={{ position: 'relative', width: '100%', maxWidth: 400, background: 'var(--card-bg)', border: '1px solid var(--border-gray)', borderRadius: 18, padding: '28px 26px', boxShadow: '0 24px 64px rgba(0,0,0,0.35)', animation: 'pro-tour-in 280ms cubic-bezier(0.34,1.2,0.64,1) both', textAlign: 'center' }}
       >
-        <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(22,163,74,0.1)', border: '2px solid rgba(22,163,74,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+        <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--success-bg)', border: '2px solid color-mix(in oklch, var(--green-success) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
         </div>
         <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--brand-navy)', letterSpacing: '-0.025em', marginBottom: 8 }}>
           You&apos;re all set.
@@ -296,7 +296,7 @@ function SpotTooltip({
   return (
     <div
       role="dialog" aria-modal aria-label={`Pro tour step ${stepIndex + 1}: ${step.title}`}
-      style={{ position: 'fixed', left: pos.left, top: pos.top, width: 320, zIndex: 9302, background: 'var(--card-bg)', border: '1px solid rgba(37,99,235,0.3)', borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', padding: '16px 18px', animation: 'pro-tour-in 200ms ease' }}
+      style={{ position: 'fixed', left: pos.left, top: pos.top, width: 320, zIndex: 9302, background: 'var(--card-bg)', border: '1px solid color-mix(in oklch, var(--accent-blue) 30%, transparent)', borderRadius: 12, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', padding: '16px 18px', animation: 'pro-tour-in 200ms ease' }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
         <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-blue)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Pro feature · {stepIndex + 1} of {totalSteps}</span>
@@ -326,7 +326,7 @@ function FeatureModal({
       <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }} aria-hidden />
       <div
         role="dialog" aria-modal aria-label={`Pro tour: ${step.title}`}
-        style={{ position: 'relative', width: '100%', maxWidth: 420, background: 'var(--card-bg)', border: '1px solid rgba(37,99,235,0.2)', borderRadius: 16, padding: '22px 22px 20px', boxShadow: '0 24px 60px rgba(0,0,0,0.3)', animation: 'pro-tour-in 240ms cubic-bezier(0.34,1.2,0.64,1) both' }}
+        style={{ position: 'relative', width: '100%', maxWidth: 420, background: 'var(--card-bg)', border: '1px solid color-mix(in oklch, var(--accent-blue) 20%, transparent)', borderRadius: 16, padding: '22px 22px 20px', boxShadow: '0 24px 60px rgba(0,0,0,0.3)', animation: 'pro-tour-in 240ms cubic-bezier(0.34,1.2,0.64,1) both' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-blue)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Pro feature · {stepIndex + 1} of {totalSteps}</span>
@@ -392,15 +392,15 @@ function MobileSheet({
               ))}
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={onNext} autoFocus style={{ flex: 1, height: 44, borderRadius: 10, background: 'linear-gradient(135deg,#1e40af,#2563eb)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Take the tour →</button>
+              <button onClick={onNext} autoFocus style={{ flex: 1, height: 44, borderRadius: 10, background: 'var(--gradient-pro)', color: '#fff', border: 'none', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Take the tour →</button>
               <button onClick={onSkip} style={{ height: 44, padding: '0 16px', borderRadius: 10, background: 'var(--surface-gray)', color: 'var(--muted-text)', border: '1px solid var(--border-gray)', fontSize: 13, cursor: 'pointer' }}>Skip</button>
             </div>
           </>
         ) : isDone ? (
           <>
             <div style={{ textAlign: 'center', marginBottom: 18 }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(22,163,74,0.1)', border: '2px solid rgba(22,163,74,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--success-bg)', border: '2px solid color-mix(in oklch, var(--green-success) 30%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
               </div>
               <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--brand-navy)', letterSpacing: '-0.025em', marginBottom: 8 }}>You&apos;re all set.</h2>
               <p style={{ fontSize: 13, color: 'var(--muted-text)', lineHeight: 1.6 }}>The AI activates automatically as your applications move through stages. Add your first app and let it go to work.</p>
@@ -605,7 +605,7 @@ export default function ProTour({ onDone }: ProTourProps) {
               x={spotRect.left} y={spotRect.top}
               width={spotRect.width} height={spotRect.height}
               rx={spotRect.br} fill="none"
-              stroke="#2563eb" strokeWidth="2"
+              stroke="var(--accent-blue)" strokeWidth="2"
               style={{ opacity: spotVisible ? 0.7 : 0 }}
             />
           </svg>

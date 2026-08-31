@@ -13,7 +13,7 @@ interface ApplicationCardProps {
 }
 
 export default function ApplicationCard({ application, onClick, onContextMenu, muted, tags }: ApplicationCardProps) {
-  const stageColor = STAGE_COLORS[application.status] || '#6B7280';
+  const stageColor = STAGE_COLORS[application.status] || 'var(--pill-neutral-dot)';
 
   const deadlineInfo = (() => {
     if (!application.deadline) return null;
@@ -78,7 +78,7 @@ export default function ApplicationCard({ application, onClick, onContextMenu, m
               className="flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-md leading-none"
               style={deadlineInfo.urgent
                 ? { background: 'var(--error-bg)', color: 'var(--error-text)', border: '1px solid var(--error-border)' }
-                : { background: 'rgba(245,158,11,0.10)', color: 'var(--amber-warning)', border: '1px solid rgba(245,158,11,0.22)' }
+                : { background: 'var(--warn-bg)', color: 'var(--amber-warning)', border: '1px solid color-mix(in oklch, var(--amber-warning) 22%, transparent)' }
               }
             >
               {deadlineInfo.label}

@@ -48,7 +48,7 @@ function StagePicker({
 
         <div className="overflow-y-auto" style={{ maxHeight: '60vh' }}>
           {stages.map(stage => {
-            const color = STAGE_COLORS[stage] || '#6B7280';
+            const color = STAGE_COLORS[stage] || 'var(--pill-neutral-dot)';
             const isCurrent = app.status === stage;
             return (
               <button
@@ -107,7 +107,7 @@ function DeadlineInfo({ deadline }: { deadline: string | null }) {
       className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0"
       style={urgent
         ? { background: 'var(--error-bg)', color: 'var(--error-text)', border: '1px solid var(--error-border)' }
-        : { background: 'rgba(245,158,11,0.12)', color: 'var(--amber-warning)', border: '1px solid rgba(245,158,11,0.25)' }
+        : { background: 'var(--warn-bg)', color: 'var(--amber-warning)', border: '1px solid color-mix(in oklch, var(--amber-warning) 25%, transparent)' }
       }
     >
       {label}
@@ -131,7 +131,7 @@ function StageSection({
   onCardContextMenu?: (app: Application, e: React.MouseEvent) => void;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const color = STAGE_COLORS[stage] || '#6B7280';
+  const color = STAGE_COLORS[stage] || 'var(--pill-neutral-dot)';
   const isInactive = stage === 'Rejected' || stage === 'Declined';
 
   return (
@@ -243,7 +243,7 @@ export default function MobileCardList({ applications, stages, onCardClick, onSt
         {/* Stage filter pill row */}
         <div ref={stageFilterRef} className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
           {stages.map(stage => {
-            const color = STAGE_COLORS[stage] || '#6B7280';
+            const color = STAGE_COLORS[stage] || 'var(--pill-neutral-dot)';
             const count = applications.filter(a => a.status === stage).length;
             return (
               <button

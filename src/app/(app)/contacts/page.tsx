@@ -123,7 +123,7 @@ export default function ContactsPage() {
           </div>
           <button
             onClick={() => setShowAddForm(f => !f)}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 16px', borderRadius: 8, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', flexShrink: 0 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, height: 36, padding: '0 16px', borderRadius: 8, background: 'var(--accent-blue)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', flexShrink: 0 }}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add contact
@@ -132,7 +132,7 @@ export default function ContactsPage() {
 
         {/* Inline add form */}
         {showAddForm && (
-          <div style={{ display: 'flex', gap: 8, padding: '14px 16px', borderRadius: 10, border: '1px solid var(--accent-blue)', background: 'rgba(37,99,235,0.04)' }}>
+          <div style={{ display: 'flex', gap: 8, padding: '14px 16px', borderRadius: 10, border: '1px solid var(--accent-blue)', background: 'var(--light-accent)' }}>
             <input
               autoFocus
               type="text"
@@ -156,7 +156,7 @@ export default function ContactsPage() {
               Cancel
             </button>
             {createError && (
-              <p style={{ fontSize: 12, color: '#EF4444', margin: 0, alignSelf: 'center' }}>{createError}</p>
+              <p style={{ fontSize: 12, color: 'var(--error-text)', margin: 0, alignSelf: 'center' }}>{createError}</p>
             )}
           </div>
         )}
@@ -177,9 +177,9 @@ export default function ContactsPage() {
                 onClick={() => setRelFilter(f.value)}
                 style={{
                   height: 30, padding: '0 12px', borderRadius: 99, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit',
-                  background: relFilter === f.value ? '#2563EB' : 'transparent',
+                  background: relFilter === f.value ? 'var(--accent-blue)' : 'transparent',
                   color: relFilter === f.value ? '#fff' : 'var(--muted-text)',
-                  border: relFilter === f.value ? '1px solid #2563EB' : '1px solid var(--border-gray)',
+                  border: relFilter === f.value ? '1px solid var(--accent-blue)' : '1px solid var(--border-gray)',
                 }}
               >
                 {f.label}

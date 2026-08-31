@@ -52,7 +52,7 @@ function ChallengeBanner({
   return (
     <div
       className="relative rounded-2xl overflow-hidden p-6 md:p-8"
-      style={{ background: 'linear-gradient(135deg, #1D4ED8 0%, #2563EB 60%, #3B82F6 100%)' }}
+      style={{ background: 'var(--gradient-pro)' }}
     >
       <style>{SHIMMER_STYLE}</style>
 
@@ -201,10 +201,10 @@ function WinnerCard({ winner }: { winner: CommunityIdea }) {
       style={{
         background: 'var(--card-bg)',
         borderColor: 'var(--border-gray)',
-        borderLeft: '4px solid #D97706',
+        borderLeft: '4px solid var(--amber-warning)',
       }}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] mb-3" style={{ color: '#D97706' }}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] mb-3" style={{ color: 'var(--amber-warning)' }}>
         Today&apos;s winning idea
       </p>
       <p className="text-[17px] font-medium leading-snug mb-3" style={{ color: 'var(--brand-navy)', letterSpacing: '-0.01em' }}>
@@ -218,17 +218,17 @@ function WinnerCard({ winner }: { winner: CommunityIdea }) {
           </div>
         )}
         {isLive && (
-          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(22,163,74,0.12)', color: '#16A34A' }}>
+          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--success-bg)', color: 'var(--green-success)' }}>
             ✓ Live in app
           </span>
         )}
         {isBuilding && (
-          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)' }}>
+          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--light-accent)', color: 'var(--accent-blue)' }}>
             Building now
           </span>
         )}
         {winner.status === 'winning' && (
-          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(217,119,6,0.12)', color: '#D97706' }}>
+          <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'var(--warn-bg)', color: 'var(--amber-warning)' }}>
             Winner — building starts soon
           </span>
         )}
@@ -351,13 +351,13 @@ function HallOfFameModal({ entry, onClose }: { entry: CommunityIdea; onClose: ()
         <div className="flex items-center gap-2 mb-4">
           <span
             className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(22,163,74,0.12)', color: '#16A34A' }}
+            style={{ background: 'var(--success-bg)', color: 'var(--green-success)' }}
           >
             Day {entry.day_number}
           </span>
           <span
             className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(22,163,74,0.12)', color: '#16A34A' }}
+            style={{ background: 'var(--success-bg)', color: 'var(--green-success)' }}
           >
             ✓ Live
           </span>
@@ -591,7 +591,7 @@ export default function CommunityPage() {
               <Link
                 href="/community"
                 className="text-[13px] font-medium px-2.5 py-1.5 rounded-lg transition-colors"
-                style={{ color: 'var(--accent-blue)', background: 'rgba(37,99,235,0.08)' }}
+                style={{ color: 'var(--accent-blue)', background: 'var(--light-accent)' }}
               >
                 Community
               </Link>
@@ -785,7 +785,7 @@ export default function CommunityPage() {
                 >
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-semibold"
-                    style={{ background: 'rgba(37,99,235,0.10)', color: 'var(--accent-blue)' }}
+                    style={{ background: 'var(--light-accent)', color: 'var(--accent-blue)' }}
                   >
                     {entry.day_number}
                   </div>
@@ -808,7 +808,7 @@ export default function CommunityPage() {
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <span
                       className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(22,163,74,0.12)', color: '#16A34A' }}
+                      style={{ background: 'var(--success-bg)', color: 'var(--green-success)' }}
                     >
                       ✓ Live
                     </span>
